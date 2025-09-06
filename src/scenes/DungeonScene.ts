@@ -17,20 +17,17 @@ export class DungeonScene extends BaseScene {
 
   private createBackground(): void {
     const bg = new PIXI.Graphics();
-    bg.beginFill(0x1a0e0a);
-    bg.drawRect(0, 0, this.gameWidth, this.gameHeight);
-    bg.endFill();
+    bg.fill(0x1a0e0a).rect(0, 0, this.gameWidth, this.gameHeight);
     
     // Add mystical atmosphere
     for (let i = 0; i < 15; i++) {
       const orb = new PIXI.Graphics();
-      orb.beginFill(0x4a148c, 0.3);
-      orb.drawCircle(
-        Math.random() * this.gameWidth,
-        Math.random() * this.gameHeight,
-        5 + Math.random() * 10
-      );
-      orb.endFill();
+      orb.fill({ color: 0x4a148c, alpha: 0.3 })
+        .circle(
+          Math.random() * this.gameWidth,
+          Math.random() * this.gameHeight,
+          5 + Math.random() * 10
+        );
       bg.addChild(orb);
     }
     
@@ -71,17 +68,15 @@ export class DungeonScene extends BaseScene {
     
     // Background
     const bg = new PIXI.Graphics();
-    bg.beginFill(0x3e2723, 0.9);
-    bg.lineStyle(3, 0x8d6e63);
-    bg.drawRoundedRect(0, 0, 600, 160, 15);
-    bg.endFill();
+    bg.fill({ color: 0x3e2723, alpha: 0.9 })
+      .stroke({ width: 3, color: 0x8d6e63 })
+      .roundRect(0, 0, 600, 160, 15);
     
     // Dungeon icon/preview
     const iconBg = new PIXI.Graphics();
-    iconBg.beginFill(0x5d4037);
-    iconBg.lineStyle(2, 0x8d6e63);
-    iconBg.drawRoundedRect(20, 20, 120, 120, 10);
-    iconBg.endFill();
+    iconBg.fill(0x5d4037)
+      .stroke({ width: 2, color: 0x8d6e63 })
+      .roundRect(20, 20, 120, 120, 10);
     
     const icon = new PIXI.Text('🏰', {
       fontSize: 48,

@@ -29,14 +29,12 @@ export class FormationScene extends BaseScene {
 
   private createBackground(): void {
     const bg = new PIXI.Graphics();
-    bg.beginFill(0x1a0e0a);
-    bg.drawRect(0, 0, this.gameWidth, this.gameHeight);
-    bg.endFill();
+    bg.fill(0x1a0e0a).rect(0, 0, this.gameWidth, this.gameHeight);
     
     // Battle field grid lines
     const gridSpacing = 40;
     const grid = new PIXI.Graphics();
-    grid.lineStyle(1, 0x3e2723, 0.3);
+    grid.stroke({ width: 1, color: 0x3e2723, alpha: 0.3 });
     
     for (let x = 0; x <= this.gameWidth; x += gridSpacing) {
       grid.moveTo(x, 0);
@@ -126,10 +124,9 @@ export class FormationScene extends BaseScene {
     const slot = new PIXI.Container();
     
     const bg = new PIXI.Graphics();
-    bg.beginFill(0x3e2723, 0.5);
-    bg.lineStyle(2, 0x8d6e63, 0.8);
-    bg.drawRoundedRect(0, 0, size, size, 8);
-    bg.endFill();
+    bg.fill({ color: 0x3e2723, alpha: 0.5 })
+      .stroke({ width: 2, color: 0x8d6e63, alpha: 0.8 })
+      .roundRect(0, 0, size, size, 8);
     
     const positionText = new PIXI.Text(`${positionIndex + 1}`, {
       fontFamily: 'Kalam',
@@ -194,10 +191,9 @@ export class FormationScene extends BaseScene {
     
     // Pool background
     const poolBg = new PIXI.Graphics();
-    poolBg.beginFill(0x3e2723, 0.8);
-    poolBg.lineStyle(2, 0x8d6e63);
-    poolBg.drawRoundedRect(0, 0, this.gameWidth - 100, 140, 12);
-    poolBg.endFill();
+    poolBg.fill({ color: 0x3e2723, alpha: 0.8 })
+      .stroke({ width: 2, color: 0x8d6e63 })
+      .roundRect(0, 0, this.gameWidth - 100, 140, 12);
     
     const poolTitle = new PIXI.Text('Available Characters', {
       fontFamily: 'Kalam',

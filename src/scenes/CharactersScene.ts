@@ -92,9 +92,7 @@ export class CharactersScene implements AppScreen {
 
   private createBackground(): void {
     const bg = new PIXI.Graphics();
-    bg.beginFill(0x2c1810);
-    bg.drawRect(0, 0, this.gameWidth, this.gameHeight);
-    bg.endFill();
+    bg.fill(0x2c1810).rect(0, 0, this.gameWidth, this.gameHeight);
     this.container.addChildAt(bg, 0);
   }
 
@@ -223,9 +221,8 @@ export class CharactersScene implements AppScreen {
     };
     
     const elementIndicator = new PIXI.Graphics();
-    elementIndicator.beginFill(elementColors[character.element] || 0x888888);
-    elementIndicator.drawCircle(120, 20, 8);
-    elementIndicator.endFill();
+    elementIndicator.fill(elementColors[character.element] || 0x888888)
+      .circle(120, 20, 8);
     
     card.addChild(symbolText, nameText, levelText, expText, statsContainer, elementIndicator);
     
@@ -288,10 +285,9 @@ export class CharactersScene implements AppScreen {
     
     // Button background with fantasy styling
     const bg = new PIXI.Graphics();
-    bg.beginFill(0x8d6e63);
-    bg.lineStyle(3, 0x5d4037);
-    bg.drawRoundedRect(0, 0, width, height, 8);
-    bg.endFill();
+    bg.fill(0x8d6e63)
+      .stroke({ width: 3, color: 0x5d4037 })
+      .roundRect(0, 0, width, height, 8);
     
     // Button text
     const buttonText = new PIXI.Text(text, {
@@ -344,10 +340,9 @@ export class CharactersScene implements AppScreen {
     };
     
     const bg = new PIXI.Graphics();
-    bg.beginFill(rarityColors[rarity] || rarityColors.common);
-    bg.lineStyle(2, 0x3e2723);
-    bg.drawRoundedRect(0, 0, width, height, 8);
-    bg.endFill();
+    bg.fill(rarityColors[rarity] || rarityColors.common)
+      .stroke({ width: 2, color: 0x3e2723 })
+      .roundRect(0, 0, width, height, 8);
     
     card.addChild(bg);
     card.x = x;

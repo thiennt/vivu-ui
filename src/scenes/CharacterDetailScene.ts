@@ -26,9 +26,7 @@ export class CharacterDetailScene extends BaseScene {
 
   private createBackground(): void {
     const bg = new PIXI.Graphics();
-    bg.beginFill(0x2c1810);
-    bg.drawRect(0, 0, this.gameWidth, this.gameHeight);
-    bg.endFill();
+    bg.fill(0x2c1810).rect(0, 0, this.gameWidth, this.gameHeight);
     this.addChildAt(bg, 0);
   }
 
@@ -112,10 +110,9 @@ export class CharacterDetailScene extends BaseScene {
     
     // Stats panel
     const statsPanel = new PIXI.Graphics();
-    statsPanel.beginFill(0x3e2723, 0.9);
-    statsPanel.lineStyle(3, 0x8d6e63);
-    statsPanel.drawRoundedRect(0, 0, 300, 250, 12);
-    statsPanel.endFill();
+    statsPanel.fill({ color: 0x3e2723, alpha: 0.9 })
+      .stroke({ width: 3, color: 0x8d6e63 })
+      .roundRect(0, 0, 300, 250, 12);
     
     // Title
     const title = new PIXI.Text('Character Statistics', {
@@ -161,17 +158,13 @@ export class CharacterDetailScene extends BaseScene {
       
       // Stat bar
       const barBg = new PIXI.Graphics();
-      barBg.beginFill(0x424242);
-      barBg.drawRect(15, y + 20, 270, 4);
-      barBg.endFill();
+      barBg.fill(0x424242).rect(15, y + 20, 270, 4);
       
       const maxValue = Math.max(...stats.filter(s => typeof s.value === 'number').map(s => s.value as number));
       const barWidth = (typeof stat.value === 'number' ? stat.value : 0) / maxValue * 270;
       
       const bar = new PIXI.Graphics();
-      bar.beginFill(stat.color);
-      bar.drawRect(15, y + 20, barWidth, 4);
-      bar.endFill();
+      bar.fill(stat.color).rect(15, y + 20, barWidth, 4);
       
       statsPanel.addChild(nameText, valueText, barBg, bar);
     });
@@ -188,10 +181,9 @@ export class CharacterDetailScene extends BaseScene {
     
     // Skills panel
     const skillsPanel = new PIXI.Graphics();
-    skillsPanel.beginFill(0x3e2723, 0.9);
-    skillsPanel.lineStyle(3, 0x8d6e63);
-    skillsPanel.drawRoundedRect(0, 0, this.gameWidth - 100, 150, 12);
-    skillsPanel.endFill();
+    skillsPanel.fill({ color: 0x3e2723, alpha: 0.9 })
+      .stroke({ width: 3, color: 0x8d6e63 })
+      .roundRect(0, 0, this.gameWidth - 100, 150, 12);
     
     // Title
     const title = new PIXI.Text('Skills & Abilities', {
@@ -211,10 +203,9 @@ export class CharacterDetailScene extends BaseScene {
       
       // Skill background
       const skillBg = new PIXI.Graphics();
-      skillBg.beginFill(0x5d4037, 0.8);
-      skillBg.lineStyle(2, 0x8d6e63);
-      skillBg.drawRoundedRect(0, 0, 280, 80, 8);
-      skillBg.endFill();
+      skillBg.fill({ color: 0x5d4037, alpha: 0.8 })
+        .stroke({ width: 2, color: 0x8d6e63 })
+        .roundRect(0, 0, 280, 80, 8);
       
       // Skill name
       const skillName = new PIXI.Text(skill.name, {

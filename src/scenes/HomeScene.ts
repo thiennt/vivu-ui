@@ -38,10 +38,9 @@ export class PlayerDetailScene implements AppScreen {
   ): PIXI.Container {
     const button = new PIXI.Container();
     const bg = new PIXI.Graphics();
-    bg.beginFill(0x8d6e63);
-    bg.lineStyle(3, 0x5d4037);
-    bg.drawRoundedRect(0, 0, width, height, 8);
-    bg.endFill();
+    bg.fill(0x8d6e63)
+      .stroke({ width: 3, color: 0x5d4037 })
+      .roundRect(0, 0, width, height, 8);
     
     const buttonText = new PIXI.Text(text, {
       fontFamily: 'Kalam',
@@ -109,10 +108,9 @@ export class FormationScene implements AppScreen {
   ): PIXI.Container {
     const button = new PIXI.Container();
     const bg = new PIXI.Graphics();
-    bg.beginFill(0x8d6e63);
-    bg.lineStyle(3, 0x5d4037);
-    bg.drawRoundedRect(0, 0, width, height, 8);
-    bg.endFill();
+    bg.fill(0x8d6e63)
+      .stroke({ width: 3, color: 0x5d4037 })
+      .roundRect(0, 0, width, height, 8);
     
     const buttonText = new PIXI.Text(text, {
       fontFamily: 'Kalam',
@@ -180,10 +178,9 @@ export class DungeonScene implements AppScreen {
   ): PIXI.Container {
     const button = new PIXI.Container();
     const bg = new PIXI.Graphics();
-    bg.beginFill(0x8d6e63);
-    bg.lineStyle(3, 0x5d4037);
-    bg.drawRoundedRect(0, 0, width, height, 8);
-    bg.endFill();
+    bg.fill(0x8d6e63)
+      .stroke({ width: 3, color: 0x5d4037 })
+      .roundRect(0, 0, width, height, 8);
     
     const buttonText = new PIXI.Text(text, {
       fontFamily: 'Kalam',
@@ -308,16 +305,13 @@ export class HomeScene implements AppScreen {
     const bg = new PIXI.Graphics();
     
     // Main background with gradient effect
-    bg.beginFill(0x1a0e0a);
-    bg.drawRect(0, 0, this.gameWidth, this.gameHeight);
-    bg.endFill();
+    bg.fill(0x1a0e0a).rect(0, 0, this.gameWidth, this.gameHeight);
     
     // Add some mystical patterns
     for (let i = 0; i < 15; i++) {
       const star = new PIXI.Graphics();
-      star.beginFill(0x4a90e2, 0.3 + Math.random() * 0.4);
-      star.drawCircle(0, 0, 2 + Math.random() * 3);
-      star.endFill();
+      star.fill({ color: 0x4a90e2, alpha: 0.3 + Math.random() * 0.4 })
+        .circle(0, 0, 2 + Math.random() * 3);
       star.x = Math.random() * this.gameWidth;
       star.y = Math.random() * this.gameHeight;
       bg.addChild(star);
@@ -367,10 +361,9 @@ export class HomeScene implements AppScreen {
     
     // Background panel
     const bg = new PIXI.Graphics();
-    bg.beginFill(0x3e2723, 0.8);
-    bg.lineStyle(2, 0x8d6e63);
-    bg.drawRoundedRect(0, 0, 300, 100, 12);
-    bg.endFill();
+    bg.fill({ color: 0x3e2723, alpha: 0.8 })
+      .stroke({ width: 2, color: 0x8d6e63 })
+      .roundRect(0, 0, 300, 100, 12);
     
     // Player info text
     const playerName = new PIXI.Text(`Welcome, ${mockPlayer.username}!`, {
@@ -445,10 +438,9 @@ export class HomeScene implements AppScreen {
     
     // Button background with fantasy styling
     const bg = new PIXI.Graphics();
-    bg.beginFill(0x8d6e63);
-    bg.lineStyle(3, 0x5d4037);
-    bg.drawRoundedRect(0, 0, width, height, 8);
-    bg.endFill();
+    bg.fill(0x8d6e63)
+      .stroke({ width: 3, color: 0x5d4037 })
+      .roundRect(0, 0, width, height, 8);
     
     // Button text
     const buttonText = new PIXI.Text(text, {
@@ -487,9 +479,8 @@ export class HomeScene implements AppScreen {
     // Add some floating magical elements
     for (let i = 0; i < 8; i++) {
       const decoration = new PIXI.Graphics();
-      decoration.beginFill(0x4fc3f7, 0.6);
-      decoration.drawCircle(0, 0, 3 + Math.random() * 5);
-      decoration.endFill();
+      decoration.fill({ color: 0x4fc3f7, alpha: 0.6 })
+        .circle(0, 0, 3 + Math.random() * 5);
       
       decoration.x = Math.random() * this.gameWidth;
       decoration.y = Math.random() * this.gameHeight;

@@ -19,9 +19,7 @@ export abstract class BaseScene extends PIXI.Container {
 
   protected setupBackground() {
     const bg = new PIXI.Graphics();
-    bg.beginFill(0x2c1810);
-    bg.drawRect(0, 0, this.gameWidth, this.gameHeight);
-    bg.endFill();
+    bg.fill(0x2c1810).rect(0, 0, this.gameWidth, this.gameHeight);
     this.addChild(bg);
   }
 
@@ -37,10 +35,9 @@ export abstract class BaseScene extends PIXI.Container {
     
     // Button background with fantasy styling
     const bg = new PIXI.Graphics();
-    bg.beginFill(0x8d6e63);
-    bg.lineStyle(3, 0x5d4037);
-    bg.drawRoundedRect(0, 0, width, height, 8);
-    bg.endFill();
+    bg.fill(0x8d6e63)
+      .stroke({ width: 3, color: 0x5d4037 })
+      .roundRect(0, 0, width, height, 8);
     
     // Button text
     const buttonText = new PIXI.Text(text, {
@@ -117,10 +114,9 @@ export abstract class BaseScene extends PIXI.Container {
     };
     
     const bg = new PIXI.Graphics();
-    bg.beginFill(rarityColors[rarity] || rarityColors.common);
-    bg.lineStyle(2, 0x3e2723);
-    bg.drawRoundedRect(0, 0, width, height, 8);
-    bg.endFill();
+    bg.fill(rarityColors[rarity] || rarityColors.common)
+      .stroke({ width: 2, color: 0x3e2723 })
+      .roundRect(0, 0, width, height, 8);
     
     card.addChild(bg);
     card.x = x;
