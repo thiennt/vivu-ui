@@ -148,14 +148,3 @@ export enum Difficulty {
   HARD = 'hard',
   NIGHTMARE = 'nightmare'
 }
-
-export enum GameScene {
-  HOME = 'home',
-  PLAYER_DETAIL = 'player_detail',
-  CHARACTERS = 'characters',
-  CHARACTER_DETAIL = 'character_detail',
-  DUNGEON = 'dungeon',
-  STAGE = 'stage',
-  FORMATION = 'formation',
-  BATTLE = 'battle'
-}

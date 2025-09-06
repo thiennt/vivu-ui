@@ -1,11 +1,12 @@
-import * as PIXI from 'pixi.js';
-import { BaseScene, SceneManager } from '@/utils/SceneManager';
-import { GameScene } from '@/types';
+import { Graphics, Text, Container, Ticker } from 'pixi.js';
+import { BaseScene } from '@/utils/BaseScene';
 import { mockDungeons } from '@/utils/mockData';
+import { navigation } from '@/utils/navigation';
+import { HomeScene } from './HomeScene';
 
 export class DungeonScene extends BaseScene {
-  constructor(app: PIXI.Application, sceneManager: SceneManager) {
-    super(app, sceneManager);
+  constructor() {
+    super();
   }
 
   init(): void {
@@ -16,12 +17,12 @@ export class DungeonScene extends BaseScene {
   }
 
   private createBackground(): void {
-    const bg = new PIXI.Graphics();
+    const bg = new Graphics();
     bg.fill(0x1a0e0a).rect(0, 0, this.gameWidth, this.gameHeight);
     
     // Add mystical atmosphere
     for (let i = 0; i < 15; i++) {
-      const orb = new PIXI.Graphics();
+      const orb = new Graphics();
       orb.fill({ color: 0x4a148c, alpha: 0.3 })
         .circle(
           Math.random() * this.gameWidth,
@@ -37,7 +38,7 @@ export class DungeonScene extends BaseScene {
   private createHeader(): void {
     const title = this.createTitle('Choose Your Adventure', this.gameWidth / 2, 60);
     
-    const subtitle = new PIXI.Text({
+    const subtitle = new Text({
       text: 'Select a dungeon to explore',
       style: {
         fontFamily: 'Kalam',
@@ -54,7 +55,7 @@ export class DungeonScene extends BaseScene {
   }
 
   private createDungeonList(): void {
-    const dungeonContainer = new PIXI.Container();
+    const dungeonContainer = new Container();
     
     mockDungeons.forEach((dungeon, index) => {
       const dungeonCard = this.createDungeonCard(dungeon, index);
@@ -66,22 +67,22 @@ export class DungeonScene extends BaseScene {
     this.addChild(dungeonContainer);
   }
 
-  private createDungeonCard(dungeon: any, index: number): PIXI.Container {
-    const card = new PIXI.Container();
+  private createDungeonCard(dungeon: any, index: number): Container {
+    const card = new Container();
     
     // Background
-    const bg = new PIXI.Graphics();
+    const bg = new Graphics();
     bg.fill({ color: 0x3e2723, alpha: 0.9 })
       .stroke({ width: 3, color: 0x8d6e63 })
       .roundRect(0, 0, 600, 160, 15);
     
     // Dungeon icon/preview
-    const iconBg = new PIXI.Graphics();
+    const iconBg = new Graphics();
     iconBg.fill(0x5d4037)
       .stroke({ width: 2, color: 0x8d6e63 })
       .roundRect(20, 20, 120, 120, 10);
     
-    const icon = new PIXI.Text({
+    const icon = new Text({
       text: '🏰',
       style: {
         fontSize: 48,
@@ -93,7 +94,7 @@ export class DungeonScene extends BaseScene {
     icon.y = 80;
     
     // Dungeon info
-    const title = new PIXI.Text({
+    const title = new Text({
       text: dungeon.name,
       style: {
         fontFamily: 'Kalam',
@@ -105,7 +106,7 @@ export class DungeonScene extends BaseScene {
     title.x = 160;
     title.y = 20;
     
-    const description = new PIXI.Text({
+    const description = new Text({
       text: dungeon.description,
       style: {
         fontFamily: 'Kalam',
@@ -118,7 +119,7 @@ export class DungeonScene extends BaseScene {
     description.x = 160;
     description.y = 50;
     
-    const requiredLevel = new PIXI.Text({
+    const requiredLevel = new Text({
       text: `Required Level: ${dungeon.requiredLevel}`,
       style: {
         fontFamily: 'Kalam',
@@ -130,7 +131,7 @@ export class DungeonScene extends BaseScene {
     requiredLevel.x = 160;
     requiredLevel.y = 90;
     
-    const chapters = new PIXI.Text({
+    const chapters = new Text({
       text: `Chapters: ${dungeon.chapters.length}`,
       style: {
         fontFamily: 'Kalam',
@@ -149,8 +150,7 @@ export class DungeonScene extends BaseScene {
       130,
       60,
       () => {
-        (this.sceneManager as any).selectedDungeon = dungeon;
-        this.sceneManager.switchTo(GameScene.STAGE);
+        navigation.showScreen(dungeon.screen, { selectedDungeon: dungeon });
       }
     );
     
@@ -175,25 +175,21 @@ export class DungeonScene extends BaseScene {
       this.gameHeight - 80,
       200,
       50,
-      () => this.sceneManager.switchTo(GameScene.HOME)
+      () => navigation.showScreen(HomeScene)
     );
     this.addChild(backButton);
   }
 
-  update(deltaTime: number): void {
+  update(time: Ticker): void {
     // Animate background orbs
     if (this.children[0] && this.children[0].children) {
       this.children[0].children.forEach((child: any, index) => {
-      if (child instanceof PIXI.Graphics) {
+      if (child instanceof Graphics) {
         child.alpha = 0.2 + Math.sin(Date.now() * 0.001 + index) * 0.1;
         child.x += Math.sin(Date.now() * 0.0005 + index) * 0.2;
         child.y += Math.cos(Date.now() * 0.0007 + index) * 0.15;
       }
       });
     }
-  }
-
-  destroy(): void {
-    this.removeChildren();
   }
 }

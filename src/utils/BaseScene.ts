@@ -1,16 +1,16 @@
-import * as PIXI from 'pixi.js';
-import { GameScene } from '@/types';
+import { Container, Graphics, Text } from 'pixi.js';
+import { app } from '@/app';
 
-export abstract class BaseScene extends PIXI.Container {
-  protected app: PIXI.Application;
-  protected sceneManager: SceneManager;
+export abstract class BaseScene extends Container {
+  /** Assets bundles required by this screen */
+  public static assetBundles = [];
+
   protected gameWidth: number;
   protected gameHeight: number;
 
-  constructor(app: PIXI.Application, sceneManager: SceneManager) {
+  constructor() {
     super();
-    this.app = app;
-    this.sceneManager = sceneManager;
+    
     this.gameWidth = Math.max(400, app.screen.width);
     this.gameHeight = app.screen.height;
     
@@ -18,7 +18,7 @@ export abstract class BaseScene extends PIXI.Container {
   }
 
   protected setupBackground() {
-    const bg = new PIXI.Graphics();
+    const bg = new Graphics();
     bg.fill(0x2c1810).rect(0, 0, this.gameWidth, this.gameHeight);
     this.addChild(bg);
   }
@@ -30,17 +30,17 @@ export abstract class BaseScene extends PIXI.Container {
     width: number = 200, 
     height: number = 50,
     onClick?: () => void
-  ): PIXI.Container {
-    const button = new PIXI.Container();
+  ): Container {
+    const button = new Container();
     
     // Button background with fantasy styling
-    const bg = new PIXI.Graphics();
+    const bg = new Graphics();
     bg.fill(0x8d6e63)
       .stroke({ width: 3, color: 0x5d4037 })
       .roundRect(0, 0, width, height, 8);
     
     // Button text
-    const buttonText = new PIXI.Text({
+    const buttonText = new Text({
       text: text,
       style: {
         fontFamily: 'Kalam',
@@ -75,8 +75,8 @@ export abstract class BaseScene extends PIXI.Container {
     return button;
   }
 
-  protected createTitle(text: string, x: number, y: number): PIXI.Text {
-    const title = new PIXI.Text({
+  protected createTitle(text: string, x: number, y: number): Text {
+    const title = new Text({
       text: text,
       style: {
         fontFamily: 'Kalam',
@@ -108,8 +108,8 @@ export abstract class BaseScene extends PIXI.Container {
     width: number = 120, 
     height: number = 160,
     rarity: string = 'common'
-  ): PIXI.Container {
-    const card = new PIXI.Container();
+  ): Container {
+    const card = new Container();
     
     const rarityColors: { [key: string]: number } = {
       common: 0x8d6e63,
@@ -119,7 +119,7 @@ export abstract class BaseScene extends PIXI.Container {
       legendary: 0xff9800
     };
     
-    const bg = new PIXI.Graphics();
+    const bg = new Graphics();
     bg.fill(rarityColors[rarity] || rarityColors.common)
       .stroke({ width: 2, color: 0x3e2723 })
       .roundRect(0, 0, width, height, 8);
@@ -131,47 +131,5 @@ export abstract class BaseScene extends PIXI.Container {
     card.cursor = 'pointer';
     
     return card;
-  }
-
-  abstract init(): void;
-  abstract update(deltaTime: number): void;
-  abstract destroy(): void;
-}
-
-export class SceneManager {
-  private app: PIXI.Application;
-  private currentScene: BaseScene | null = null;
-  private scenes: Map<GameScene, () => BaseScene> = new Map();
-
-  constructor(app: PIXI.Application) {
-    this.app = app;
-  }
-
-  registerScene(sceneType: GameScene, sceneFactory: () => BaseScene) {
-    this.scenes.set(sceneType, sceneFactory);
-  }
-
-  switchTo(sceneType: GameScene) {
-    if (this.currentScene) {
-      this.currentScene.destroy();
-      this.app.stage.removeChild(this.currentScene);
-    }
-
-    const sceneFactory = this.scenes.get(sceneType);
-    if (sceneFactory) {
-      this.currentScene = sceneFactory();
-      this.currentScene.init();
-      this.app.stage.addChild(this.currentScene);
-    }
-  }
-
-  getCurrentScene(): BaseScene | null {
-    return this.currentScene;
-  }
-
-  update(deltaTime: number) {
-    if (this.currentScene) {
-      this.currentScene.update(deltaTime);
-    }
   }
 }

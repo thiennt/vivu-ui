@@ -80,7 +80,7 @@ async function init() {
   //navigation.setBackground(TiledBackground);
 
   // Show initial loading screen
-  await navigation.showScreen(HomeScene);
+  //await navigation.showScreen(HomeScene);
 
   //Go to one of the screens if a shortcut is present in url params, otherwise go to home screen
   if (getUrlParam("combat") !== null) {

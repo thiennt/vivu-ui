@@ -1,11 +1,14 @@
 import * as PIXI from 'pixi.js';
-import { BaseScene, SceneManager } from '@/utils/SceneManager';
-import { GameScene } from '@/types';
+import { BaseScene } from '@/utils/BaseScene';
 import { mockPlayer } from '@/utils/mockData';
+import { navigation } from '@/utils/navigation';
+import { CharactersScene } from './CharactersScene';
+import { CharacterDetailScene } from './CharacterDetailScene';
+import { HomeScene } from './HomeScene';
 
 export class PlayerDetailScene extends BaseScene {
-  constructor(app: PIXI.Application, sceneManager: SceneManager) {
-    super(app, sceneManager);
+  constructor() {
+    super();
   }
 
   init(): void {
@@ -133,7 +136,7 @@ export class PlayerDetailScene extends BaseScene {
       420,
       200,
       50,
-      () => this.sceneManager.switchTo(GameScene.CHARACTERS)
+      () => navigation.showScreen(CharactersScene)
     );
     
     collectionContainer.addChild(collectionTitle, cardContainer, viewAllButton);
@@ -188,8 +191,7 @@ export class PlayerDetailScene extends BaseScene {
     // Click handler
     card.on('pointerdown', () => {
       // Store selected character for detail view
-      (this.sceneManager as any).selectedCharacter = character;
-      this.sceneManager.switchTo(GameScene.CHARACTER_DETAIL);
+      navigation.showScreen(CharacterDetailScene, { selectedCharacter: character });
     });
     
     return card;
@@ -202,7 +204,7 @@ export class PlayerDetailScene extends BaseScene {
       this.gameHeight - 80,
       200,
       50,
-      () => this.sceneManager.switchTo(GameScene.HOME)
+      () => navigation.showScreen(HomeScene)
     );
     this.addChild(backButton);
   }

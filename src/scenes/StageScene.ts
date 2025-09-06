@@ -1,19 +1,21 @@
-import * as PIXI from 'pixi.js';
-import { BaseScene, SceneManager } from '@/utils/SceneManager';
-import { GameScene, Dungeon } from '@/types';
+import { Container, Graphics, Text, Ticker } from 'pixi.js';
+import { BaseScene } from '@/utils/BaseScene';
+import { Dungeon } from '@/types';
+import { navigation } from '@/utils/navigation';
+import { HomeScene } from './HomeScene';
 
 export class StageScene extends BaseScene {
   private dungeon: Dungeon | null = null;
   private selectedChapter: number = 0;
 
-  constructor(app: PIXI.Application, sceneManager: SceneManager) {
-    super(app, sceneManager);
-    this.dungeon = (sceneManager as any).selectedDungeon || null;
+  constructor(params?: { selectedDungeon: Dungeon }) {
+    super();
+    this.dungeon = params?.selectedDungeon || null;
   }
 
   init(): void {
     if (!this.dungeon) {
-      this.sceneManager.switchTo(GameScene.DUNGEON);
+      navigation.showScreen(HomeScene);
       return;
     }
 
@@ -25,7 +27,7 @@ export class StageScene extends BaseScene {
   }
 
   private createBackground(): void {
-    const bg = new PIXI.Graphics();
+    const bg = new Graphics();
     bg.fill(0x1a0e0a).rect(0, 0, this.gameWidth, this.gameHeight);
     this.addChildAt(bg, 0);
   }
@@ -33,7 +35,7 @@ export class StageScene extends BaseScene {
   private createHeader(): void {
     const title = this.createTitle(this.dungeon!.name, this.gameWidth / 2, 60);
     
-    const subtitle = new PIXI.Text({
+    const subtitle = new Text({
       text: 'Choose your stage',
       style: {
         fontFamily: 'Kalam',
@@ -50,14 +52,14 @@ export class StageScene extends BaseScene {
   }
 
   private createChapterSelector(): void {
-    const selectorContainer = new PIXI.Container();
+    const selectorContainer = new Container();
     
-    const selectorBg = new PIXI.Graphics();
+    const selectorBg = new Graphics();
     selectorBg.fill({ color: 0x3e2723, alpha: 0.9 })
       .stroke({ width: 2, color: 0x8d6e63 })
       .roundRect(0, 0, this.gameWidth - 100, 60, 10);
     
-    const chapterTitle = new PIXI.Text('Chapters:', {
+    const chapterTitle = new Text('Chapters:', {
       fontFamily: 'Kalam',
       fontSize: 18,
       fontWeight: 'bold',
@@ -87,19 +89,19 @@ export class StageScene extends BaseScene {
     this.addChild(selectorContainer);
   }
 
-  private createChapterButton(text: string, x: number, y: number, width: number, height: number, chapterIndex: number): PIXI.Container {
-    const button = new PIXI.Container();
+  private createChapterButton(text: string, x: number, y: number, width: number, height: number, chapterIndex: number): Container {
+    const button = new Container();
     
     const isSelected = chapterIndex === this.selectedChapter;
     const bgColor = isSelected ? 0x8d6e63 : 0x5d4037;
     const textColor = isSelected ? 0xffecb3 : 0xd7ccc8;
     
-    const bg = new PIXI.Graphics();
+    const bg = new Graphics();
     bg.fill(bgColor)
       .stroke({ width: 2, color: 0x8d6e63 })
       .roundRect(0, 0, width, height, 8);
     
-    const buttonText = new PIXI.Text(text, {
+    const buttonText = new Text(text, {
       fontFamily: 'Kalam',
       fontSize: 14,
       fontWeight: 'bold',
@@ -128,7 +130,7 @@ export class StageScene extends BaseScene {
   }
 
   private createStageList(): void {
-    const stageContainer = new PIXI.Container();
+    const stageContainer = new Container();
     stageContainer.label = 'stageContainer';
     
     const chapter = this.dungeon!.chapters[this.selectedChapter];
@@ -147,33 +149,39 @@ export class StageScene extends BaseScene {
     this.addChild(stageContainer);
   }
 
-  private createStageCard(stage: any, index: number): PIXI.Container {
-    const card = new PIXI.Container();
+  private createStageCard(stage: any, index: number): Container {
+    const card = new Container();
     
     // Background
-    const bg = new PIXI.Graphics();
+    const bg = new Graphics();
     bg.fill({ color: 0x3e2723, alpha: 0.9 })
       .stroke({ width: 3, color: 0x8d6e63 })
       .roundRect(0, 0, 180, 130, 10);
     
     // Stage number
-    const stageNumber = new PIXI.Text(`Stage ${stage.stageNumber}`, {
-      fontFamily: 'Kalam',
-      fontSize: 16,
-      fontWeight: 'bold',
-      fill: 0xffecb3
+    const stageNumber = new Text({
+      text: `Stage ${stage.stageNumber}`,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 16,
+        fontWeight: 'bold',
+        fill: 0xffecb3
+      }
     });
     stageNumber.x = 10;
     stageNumber.y = 10;
     
     // Stage name
-    const stageName = new PIXI.Text(stage.name, {
-      fontFamily: 'Kalam',
-      fontSize: 14,
-      fontWeight: 'bold',
-      fill: 0xd7ccc8,
-      wordWrap: true,
-      wordWrapWidth: 160
+    const stageName = new Text({
+      text: stage.name,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 14,
+        fontWeight: 'bold',
+        fill: 0xd7ccc8,
+        wordWrap: true,
+        wordWrapWidth: 160
+      }
     });
     stageName.x = 10;
     stageName.y = 35;
@@ -185,21 +193,27 @@ export class StageScene extends BaseScene {
       hard: 0xf44336,
       nightmare: 0x9c27b0
     };
-    
-    const difficulty = new PIXI.Text(stage.difficulty.toUpperCase(), {
-      fontFamily: 'Kalam',
-      fontSize: 12,
-      fontWeight: 'bold',
-      fill: difficultyColors[stage.difficulty] || 0xffffff
+
+    const difficulty = new Text({
+      text: stage.difficulty.toUpperCase(),
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 12,
+        fontWeight: 'bold',
+        fill: difficultyColors[stage.difficulty] || 0xffffff
+      }
     });
     difficulty.x = 10;
     difficulty.y = 65;
     
     // Rewards preview
-    const rewardText = new PIXI.Text(`Rewards: ${stage.rewards.length} items`, {
-      fontFamily: 'Kalam',
-      fontSize: 10,
-      fill: 0xa1887f
+    const rewardText = new Text({
+      text: `Rewards: ${stage.rewards.length} items`,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 10,
+        fill: 0xa1887f
+      }
     });
     rewardText.x = 10;
     rewardText.y = 85;
@@ -232,7 +246,7 @@ export class StageScene extends BaseScene {
   }
 
   private refreshStageList(): void {
-    const existingContainer = this.getChildByName('stageContainer');
+    const existingContainer = this.getChildByLabel('stageContainer');
     if (existingContainer) {
       this.removeChild(existingContainer);
     }
@@ -252,16 +266,8 @@ export class StageScene extends BaseScene {
       this.gameHeight - 80,
       200,
       50,
-      () => this.sceneManager.switchTo(GameScene.DUNGEON)
+      () => navigation.showScreen(HomeScene)
     );
     this.addChild(backButton);
-  }
-
-  update(deltaTime: number): void {
-    // No specific animations needed
-  }
-
-  destroy(): void {
-    this.removeChildren();
   }
 }

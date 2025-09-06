@@ -1,17 +1,19 @@
-import * as PIXI from 'pixi.js';
-import { BaseScene, SceneManager } from '@/utils/SceneManager';
-import { GameScene, Character } from '@/types';
+import { Graphics, Text, Container, Ticker } from 'pixi.js';
+import { BaseScene } from '@/utils/BaseScene';
+import { Character } from '@/types';
 import { mockPlayer } from '@/utils/mockData';
+import { navigation } from '@/utils/navigation';
+import { HomeScene } from './HomeScene';
 
 export class FormationScene extends BaseScene {
   private formationPositions: (Character | null)[] = [];
   private availableCharacters: Character[] = [];
   private selectedCharacter: Character | null = null;
   private selectedPosition: number = -1;
-  private draggedCharacter: PIXI.Container | null = null;
+  private draggedCharacter: Container | null = null;
 
-  constructor(app: PIXI.Application, sceneManager: SceneManager) {
-    super(app, sceneManager);
+  constructor() {
+    super();
     this.formationPositions = [...mockPlayer.formation.positions];
     this.availableCharacters = mockPlayer.characters.filter(
       char => !this.formationPositions.includes(char)
@@ -28,13 +30,13 @@ export class FormationScene extends BaseScene {
   }
 
   private createBackground(): void {
-    const bgContainer = new PIXI.Container();
-    const bg = new PIXI.Graphics();
+    const bgContainer = new Container();
+    const bg = new Graphics();
     bg.fill(0x1a0e0a).rect(0, 0, this.gameWidth, this.gameHeight);
     
     // Battle field grid lines
     const gridSpacing = 40;
-    const grid = new PIXI.Graphics();
+    const grid = new Graphics();
     grid.stroke({ width: 1, color: 0x3e2723, alpha: 0.3 });
     
     for (let x = 0; x <= this.gameWidth; x += gridSpacing) {
@@ -53,7 +55,7 @@ export class FormationScene extends BaseScene {
   private createHeader(): void {
     const title = this.createTitle('Battle Formation', this.gameWidth / 2, 60);
     
-    const subtitle = new PIXI.Text({
+    const subtitle = new Text({
       text: 'Drag characters to formation positions',
       style: {
         fontFamily: 'Kalam',
@@ -70,7 +72,7 @@ export class FormationScene extends BaseScene {
   }
 
   private createFormationGrid(): void {
-    const formationContainer = new PIXI.Container();
+    const formationContainer = new Container();
     formationContainer.label = 'formationContainer';
     
     // Formation positions (3x2 grid)
@@ -100,7 +102,7 @@ export class FormationScene extends BaseScene {
     }
     
     // Row labels
-    const frontLabel = new PIXI.Text({
+    const frontLabel = new Text({
       text: 'FRONT',
       style: {
         fontFamily: 'Kalam',
@@ -113,7 +115,7 @@ export class FormationScene extends BaseScene {
     frontLabel.x = startX - 50;
     frontLabel.y = startY + slotSize / 2;
     
-    const backLabel = new PIXI.Text({
+    const backLabel = new Text({
       text: 'BACK',
       style: {
         fontFamily: 'Kalam',
@@ -130,15 +132,15 @@ export class FormationScene extends BaseScene {
     this.addChild(formationContainer);
   }
 
-  private createFormationSlot(x: number, y: number, size: number, positionIndex: number): PIXI.Container {
-    const slot = new PIXI.Container();
+  private createFormationSlot(x: number, y: number, size: number, positionIndex: number): Container {
+    const slot = new Container();
     
-    const bg = new PIXI.Graphics();
+    const bg = new Graphics();
     bg.fill({ color: 0x3e2723, alpha: 0.5 })
       .stroke({ width: 2, color: 0x8d6e63, alpha: 0.8 })
       .roundRect(0, 0, size, size, 8);
     
-    const positionText = new PIXI.Text({
+    const positionText = new Text({
       text: `${positionIndex + 1}`,
       style: {
         fontFamily: 'Kalam',
@@ -166,10 +168,10 @@ export class FormationScene extends BaseScene {
     return slot;
   }
 
-  private createFormationCharacterCard(character: Character, x: number, y: number, size: number, positionIndex: number): PIXI.Container {
+  private createFormationCharacterCard(character: Character, x: number, y: number, size: number, positionIndex: number): Container {
     const card = this.createCard(x, y, size, size, character.rarity);
     
-    const symbolText = new PIXI.Text({
+    const symbolText = new Text({
       text: character.tokenSymbol,
       style: {
         fontFamily: 'Kalam',
@@ -183,7 +185,7 @@ export class FormationScene extends BaseScene {
     symbolText.x = size / 2;
     symbolText.y = size / 2 - 10;
     
-    const levelText = new PIXI.Text({
+    const levelText = new Text({
       text: `Lv.${character.level}`,
       style: {
         fontFamily: 'Kalam',
@@ -205,16 +207,16 @@ export class FormationScene extends BaseScene {
   }
 
   private createCharacterPool(): void {
-    const poolContainer = new PIXI.Container();
+    const poolContainer = new Container();
     poolContainer.label = 'characterPool';
     
     // Pool background
-    const poolBg = new PIXI.Graphics();
+    const poolBg = new Graphics();
     poolBg.fill({ color: 0x3e2723, alpha: 0.8 })
       .stroke({ width: 2, color: 0x8d6e63 })
       .roundRect(0, 0, this.gameWidth - 100, 140, 12);
     
-    const poolTitle = new PIXI.Text({
+    const poolTitle = new Text({
       text: 'Available Characters',
       style: {
         fontFamily: 'Kalam',
@@ -240,10 +242,10 @@ export class FormationScene extends BaseScene {
     this.addChild(poolContainer);
   }
 
-  private createPoolCharacterCard(character: Character, x: number, y: number): PIXI.Container {
+  private createPoolCharacterCard(character: Character, x: number, y: number): Container {
     const card = this.createCard(x, y, 90, 80, character.rarity);
     
-    const symbolText = new PIXI.Text({
+    const symbolText = new Text({
       text: character.tokenSymbol,
       style: {
         fontFamily: 'Kalam',
@@ -257,7 +259,7 @@ export class FormationScene extends BaseScene {
     symbolText.x = 45;
     symbolText.y = 25;
     
-    const levelText = new PIXI.Text({
+    const levelText = new Text({
       text: `Lv.${character.level}`,
       style: {
         fontFamily: 'Kalam',
@@ -278,7 +280,7 @@ export class FormationScene extends BaseScene {
     return card;
   }
 
-  private makeCharacterDraggable(card: PIXI.Container, character: Character, currentPosition: number, isInFormation: boolean): void {
+  private makeCharacterDraggable(card: Container, character: Character, currentPosition: number, isInFormation: boolean): void {
     card.interactive = true;
     card.cursor = 'pointer';
     
@@ -368,8 +370,8 @@ export class FormationScene extends BaseScene {
 
   private refreshFormation(): void {
     // Remove existing formation and pool containers
-    const formationContainer = this.getChildByName('formationContainer');
-    const poolContainer = this.getChildByName('characterPool');
+    const formationContainer = this.getChildByLabel('formationContainer');
+    const poolContainer = this.getChildByLabel('characterPool');
     
     if (formationContainer) this.removeChild(formationContainer);
     if (poolContainer) this.removeChild(poolContainer);
@@ -419,7 +421,7 @@ export class FormationScene extends BaseScene {
       this.gameHeight - 80,
       200,
       50,
-      () => this.sceneManager.switchTo(GameScene.HOME)
+      () => navigation.showScreen(HomeScene)
     );
     this.addChild(backButton);
   }
