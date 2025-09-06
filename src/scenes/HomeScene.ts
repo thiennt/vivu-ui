@@ -19,16 +19,10 @@ export class HomeScene extends BaseScene {
     super();
 
     this.container = new Container();
-    this.gameWidth = 0;
-    this.gameHeight = 0;
   }
 
   /** Prepare screen, before showing */
   prepare(): void {
-    // Set up screen dimensions
-    this.gameWidth = Math.max(400, window.innerWidth);
-    this.gameHeight = window.innerHeight;
-    
     this.createBackground();
     this.createHomeTitle();
     this.createPlayerInfo();
