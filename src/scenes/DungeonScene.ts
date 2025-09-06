@@ -37,11 +37,14 @@ export class DungeonScene extends BaseScene {
   private createHeader(): void {
     const title = this.createTitle('Choose Your Adventure', this.gameWidth / 2, 60);
     
-    const subtitle = new PIXI.Text('Select a dungeon to explore', {
-      fontFamily: 'Kalam',
-      fontSize: 18,
-      fill: 0xd7ccc8,
-      align: 'center'
+    const subtitle = new PIXI.Text({
+      text: 'Select a dungeon to explore',
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 18,
+        fill: 0xd7ccc8,
+        align: 'center'
+      }
     });
     subtitle.anchor.set(0.5);
     subtitle.x = this.gameWidth / 2;
@@ -78,47 +81,62 @@ export class DungeonScene extends BaseScene {
       .stroke({ width: 2, color: 0x8d6e63 })
       .roundRect(20, 20, 120, 120, 10);
     
-    const icon = new PIXI.Text('🏰', {
-      fontSize: 48,
-      align: 'center'
+    const icon = new PIXI.Text({
+      text: '🏰',
+      style: {
+        fontSize: 48,
+        align: 'center'
+      }
     });
     icon.anchor.set(0.5);
     icon.x = 80;
     icon.y = 80;
     
     // Dungeon info
-    const title = new PIXI.Text(dungeon.name, {
-      fontFamily: 'Kalam',
-      fontSize: 24,
-      fontWeight: 'bold',
-      fill: 0xffecb3
+    const title = new PIXI.Text({
+      text: dungeon.name,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 24,
+        fontWeight: 'bold',
+        fill: 0xffecb3
+      }
     });
     title.x = 160;
     title.y = 20;
     
-    const description = new PIXI.Text(dungeon.description, {
-      fontFamily: 'Kalam',
-      fontSize: 14,
-      fill: 0xd7ccc8,
-      wordWrap: true,
-      wordWrapWidth: 380
+    const description = new PIXI.Text({
+      text: dungeon.description,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 14,
+        fill: 0xd7ccc8,
+        wordWrap: true,
+        wordWrapWidth: 380
+      }
     });
     description.x = 160;
     description.y = 50;
     
-    const requiredLevel = new PIXI.Text(`Required Level: ${dungeon.requiredLevel}`, {
-      fontFamily: 'Kalam',
-      fontSize: 16,
-      fontWeight: 'bold',
-      fill: 0xff9800
+    const requiredLevel = new PIXI.Text({
+      text: `Required Level: ${dungeon.requiredLevel}`,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 16,
+        fontWeight: 'bold',
+        fill: 0xff9800
+      }
     });
     requiredLevel.x = 160;
     requiredLevel.y = 90;
     
-    const chapters = new PIXI.Text(`Chapters: ${dungeon.chapters.length}`, {
-      fontFamily: 'Kalam',
-      fontSize: 14,
-      fill: 0xa1887f
+    const chapters = new PIXI.Text({
+      text: `Chapters: ${dungeon.chapters.length}`,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 14,
+        fill: 0xa1887f
+      }
     });
     chapters.x = 160;
     chapters.y = 115;

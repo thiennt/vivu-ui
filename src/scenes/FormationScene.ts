@@ -28,6 +28,7 @@ export class FormationScene extends BaseScene {
   }
 
   private createBackground(): void {
+    const bgContainer = new PIXI.Container();
     const bg = new PIXI.Graphics();
     bg.fill(0x1a0e0a).rect(0, 0, this.gameWidth, this.gameHeight);
     
@@ -45,8 +46,8 @@ export class FormationScene extends BaseScene {
       grid.lineTo(this.gameWidth, y);
     }
     
-    bg.addChild(grid);
-    this.addChildAt(bg, 0);
+    bgContainer.addChild(bg, grid);
+    this.addChildAt(bgContainer, 0);
   }
 
   private createHeader(): void {
