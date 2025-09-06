@@ -45,12 +45,15 @@ export class PlayerDetailScene implements AppScreen {
       .stroke({ width: 3, color: 0x5d4037 })
       .roundRect(0, 0, width, height, 8);
     
-    const buttonText = new PIXI.Text(text, {
-      fontFamily: 'Kalam',
-      fontSize: 18,
-      fontWeight: 'bold',
-      fill: 0xfff8e1,
-      align: 'center'
+    const buttonText = new PIXI.Text({
+      text: text,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 18,
+        fontWeight: 'bold',
+        fill: 0xfff8e1,
+        align: 'center'
+      }
     });
     buttonText.anchor.set(0.5);
     buttonText.x = width / 2;
@@ -81,10 +84,13 @@ export class FormationScene implements AppScreen {
   container = new PIXI.Container();
   static assetBundles = ['formation'];
   prepare() { 
-    const text = new PIXI.Text('Formation Scene - Coming Soon!', { 
-      fill: 0xffffff, 
-      fontSize: 24,
-      fontFamily: 'Kalam'
+    const text = new PIXI.Text({
+      text: 'Formation Scene - Coming Soon!',
+      style: { 
+        fill: 0xffffff, 
+        fontSize: 24,
+        fontFamily: 'Kalam'
+      }
     });
     text.anchor.set(0.5);
     text.x = 400;
@@ -115,12 +121,15 @@ export class FormationScene implements AppScreen {
       .stroke({ width: 3, color: 0x5d4037 })
       .roundRect(0, 0, width, height, 8);
     
-    const buttonText = new PIXI.Text(text, {
-      fontFamily: 'Kalam',
-      fontSize: 18,
-      fontWeight: 'bold',
-      fill: 0xfff8e1,
-      align: 'center'
+    const buttonText = new PIXI.Text({
+      text: text,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 18,
+        fontWeight: 'bold',
+        fill: 0xfff8e1,
+        align: 'center'
+      }
     });
     buttonText.anchor.set(0.5);
     buttonText.x = width / 2;
@@ -151,10 +160,13 @@ export class DungeonScene implements AppScreen {
   container = new PIXI.Container();
   static assetBundles = ['dungeon'];
   prepare() { 
-    const text = new PIXI.Text('Dungeon Scene - Coming Soon!', { 
-      fill: 0xffffff, 
-      fontSize: 24,
-      fontFamily: 'Kalam'
+    const text = new PIXI.Text({
+      text: 'Dungeon Scene - Coming Soon!',
+      style: { 
+        fill: 0xffffff, 
+        fontSize: 24,
+        fontFamily: 'Kalam'
+      }
     });
     text.anchor.set(0.5);
     text.x = 400;
@@ -185,12 +197,15 @@ export class DungeonScene implements AppScreen {
       .stroke({ width: 3, color: 0x5d4037 })
       .roundRect(0, 0, width, height, 8);
     
-    const buttonText = new PIXI.Text(text, {
-      fontFamily: 'Kalam',
-      fontSize: 18,
-      fontWeight: 'bold',
-      fill: 0xfff8e1,
-      align: 'center'
+    const buttonText = new PIXI.Text({
+      text: text,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 18,
+        fontWeight: 'bold',
+        fill: 0xfff8e1,
+        align: 'center'
+      }
     });
     buttonText.anchor.set(0.5);
     buttonText.x = width / 2;
@@ -305,10 +320,12 @@ export class HomeScene implements AppScreen {
 
   private createBackground(): void {
     // Create a mystical gradient background
-    const bg = new PIXI.Graphics();
+    const bgContainer = new PIXI.Container();
     
     // Main background with gradient effect
+    const bg = new PIXI.Graphics();
     bg.fill(0x1a0e0a).rect(0, 0, this.gameWidth, this.gameHeight);
+    bgContainer.addChild(bg);
     
     // Add some mystical patterns
     for (let i = 0; i < 15; i++) {
@@ -317,40 +334,46 @@ export class HomeScene implements AppScreen {
         .circle(0, 0, 2 + Math.random() * 3);
       star.x = Math.random() * this.gameWidth;
       star.y = Math.random() * this.gameHeight;
-      bg.addChild(star);
+      bgContainer.addChild(star);
     }
     
-    this.container.addChild(bg);
+    this.container.addChild(bgContainer);
   }
 
   private createHomeTitle(): void {
-    const title = new PIXI.Text('VIVU', {
-      fontFamily: 'Kalam',
-      fontSize: 72,
-      fontWeight: 'bold',
-      fill: 0xffecb3,
-      stroke: {
-        color: 0x3e2723,
-        width: 4,
-      },
-      dropShadow: {
-        color: 0x000000,
-        blur: 8,
-        angle: Math.PI / 6,
-        distance: 8,
-        alpha: 0.5,
-      },
+    const title = new PIXI.Text({
+      text: 'VIVU',
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 72,
+        fontWeight: 'bold',
+        fill: 0xffecb3,
+        stroke: {
+          color: 0x3e2723,
+          width: 4,
+        },
+        dropShadow: {
+          color: 0x000000,
+          blur: 8,
+          angle: Math.PI / 6,
+          distance: 8,
+          alpha: 0.5,
+        },
+      }
     });
     title.anchor.set(0.5);
     title.x = this.gameWidth / 2;
     title.y = 100;
     
-    const subtitle = new PIXI.Text('Crypto Card Adventures', {
-      fontFamily: 'Kalam',
-      fontSize: 24,
-      fontStyle: 'italic',
-      fill: 0xd7ccc8,
-      align: 'center'
+    const subtitle = new PIXI.Text({
+      text: 'Crypto Card Adventures',
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 24,
+        fontStyle: 'italic',
+        fill: 0xd7ccc8,
+        align: 'center'
+      }
     });
     subtitle.anchor.set(0.5);
     subtitle.x = this.gameWidth / 2;
@@ -369,27 +392,36 @@ export class HomeScene implements AppScreen {
       .roundRect(0, 0, 300, 100, 12);
     
     // Player info text
-    const playerName = new PIXI.Text(`Welcome, ${mockPlayer.username}!`, {
-      fontFamily: 'Kalam',
-      fontSize: 20,
-      fontWeight: 'bold',
-      fill: 0xffecb3
+    const playerName = new PIXI.Text({
+      text: `Welcome, ${mockPlayer.username}!`,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 20,
+        fontWeight: 'bold',
+        fill: 0xffecb3
+      }
     });
     playerName.x = 15;
     playerName.y = 15;
     
-    const playerLevel = new PIXI.Text(`Level: ${mockPlayer.level}`, {
-      fontFamily: 'Kalam',
-      fontSize: 16,
-      fill: 0xd7ccc8
+    const playerLevel = new PIXI.Text({
+      text: `Level: ${mockPlayer.level}`,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 16,
+        fill: 0xd7ccc8
+      }
     });
     playerLevel.x = 15;
     playerLevel.y = 45;
     
-    const playerExp = new PIXI.Text(`EXP: ${mockPlayer.experience}`, {
-      fontFamily: 'Kalam',
-      fontSize: 16,
-      fill: 0xd7ccc8
+    const playerExp = new PIXI.Text({
+      text: `EXP: ${mockPlayer.experience}`,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 16,
+        fill: 0xd7ccc8
+      }
     });
     playerExp.x = 15;
     playerExp.y = 65;
@@ -446,12 +478,15 @@ export class HomeScene implements AppScreen {
       .roundRect(0, 0, width, height, 8);
     
     // Button text
-    const buttonText = new PIXI.Text(text, {
-      fontFamily: 'Kalam',
-      fontSize: 18,
-      fontWeight: 'bold',
-      fill: 0xfff8e1,
-      align: 'center'
+    const buttonText = new PIXI.Text({
+      text: text,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 18,
+        fontWeight: 'bold',
+        fill: 0xfff8e1,
+        align: 'center'
+      }
     });
     buttonText.anchor.set(0.5);
     buttonText.x = width / 2;
