@@ -8,10 +8,13 @@ export class PlayerDetailScene implements AppScreen {
   container = new PIXI.Container();
   static assetBundles = ['player'];
   prepare() { 
-    const text = new PIXI.Text('Player Detail Scene - Coming Soon!', { 
-      fill: 0xffffff, 
-      fontSize: 24,
-      fontFamily: 'Kalam'
+    const text = new PIXI.Text({
+      text: 'Player Detail Scene - Coming Soon!',
+      style: { 
+        fill: 0xffffff, 
+        fontSize: 24,
+        fontFamily: 'Kalam'
+      }
     });
     text.anchor.set(0.5);
     text.x = 400;

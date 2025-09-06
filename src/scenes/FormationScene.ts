@@ -52,11 +52,14 @@ export class FormationScene extends BaseScene {
   private createHeader(): void {
     const title = this.createTitle('Battle Formation', this.gameWidth / 2, 60);
     
-    const subtitle = new PIXI.Text('Drag characters to formation positions', {
-      fontFamily: 'Kalam',
-      fontSize: 16,
-      fill: 0xd7ccc8,
-      align: 'center'
+    const subtitle = new PIXI.Text({
+      text: 'Drag characters to formation positions',
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 16,
+        fill: 0xd7ccc8,
+        align: 'center'
+      }
     });
     subtitle.anchor.set(0.5);
     subtitle.x = this.gameWidth / 2;
@@ -67,7 +70,7 @@ export class FormationScene extends BaseScene {
 
   private createFormationGrid(): void {
     const formationContainer = new PIXI.Container();
-    formationContainer.name = 'formationContainer';
+    formationContainer.label = 'formationContainer';
     
     // Formation positions (3x2 grid)
     const rows = 2;
@@ -96,21 +99,27 @@ export class FormationScene extends BaseScene {
     }
     
     // Row labels
-    const frontLabel = new PIXI.Text('FRONT', {
-      fontFamily: 'Kalam',
-      fontSize: 14,
-      fontWeight: 'bold',
-      fill: 0xf44336
+    const frontLabel = new PIXI.Text({
+      text: 'FRONT',
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 14,
+        fontWeight: 'bold',
+        fill: 0xf44336
+      }
     });
     frontLabel.anchor.set(0.5);
     frontLabel.x = startX - 50;
     frontLabel.y = startY + slotSize / 2;
     
-    const backLabel = new PIXI.Text('BACK', {
-      fontFamily: 'Kalam',
-      fontSize: 14,
-      fontWeight: 'bold',
-      fill: 0x2196f3
+    const backLabel = new PIXI.Text({
+      text: 'BACK',
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 14,
+        fontWeight: 'bold',
+        fill: 0x2196f3
+      }
     });
     backLabel.anchor.set(0.5);
     backLabel.x = startX - 50;
@@ -128,11 +137,14 @@ export class FormationScene extends BaseScene {
       .stroke({ width: 2, color: 0x8d6e63, alpha: 0.8 })
       .roundRect(0, 0, size, size, 8);
     
-    const positionText = new PIXI.Text(`${positionIndex + 1}`, {
-      fontFamily: 'Kalam',
-      fontSize: 24,
-      fill: 0x8d6e63,
-      align: 'center'
+    const positionText = new PIXI.Text({
+      text: `${positionIndex + 1}`,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 24,
+        fill: 0x8d6e63,
+        align: 'center'
+      }
     });
     positionText.anchor.set(0.5);
     positionText.x = size / 2;
@@ -156,22 +168,28 @@ export class FormationScene extends BaseScene {
   private createFormationCharacterCard(character: Character, x: number, y: number, size: number, positionIndex: number): PIXI.Container {
     const card = this.createCard(x, y, size, size, character.rarity);
     
-    const symbolText = new PIXI.Text(character.tokenSymbol, {
-      fontFamily: 'Kalam',
-      fontSize: 20,
-      fontWeight: 'bold',
-      fill: 0xffffff,
-      align: 'center'
+    const symbolText = new PIXI.Text({
+      text: character.tokenSymbol,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 20,
+        fontWeight: 'bold',
+        fill: 0xffffff,
+        align: 'center'
+      }
     });
     symbolText.anchor.set(0.5);
     symbolText.x = size / 2;
     symbolText.y = size / 2 - 10;
     
-    const levelText = new PIXI.Text(`Lv.${character.level}`, {
-      fontFamily: 'Kalam',
-      fontSize: 12,
-      fill: 0xd7ccc8,
-      align: 'center'
+    const levelText = new PIXI.Text({
+      text: `Lv.${character.level}`,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 12,
+        fill: 0xd7ccc8,
+        align: 'center'
+      }
     });
     levelText.anchor.set(0.5);
     levelText.x = size / 2;
@@ -187,7 +205,7 @@ export class FormationScene extends BaseScene {
 
   private createCharacterPool(): void {
     const poolContainer = new PIXI.Container();
-    poolContainer.name = 'characterPool';
+    poolContainer.label = 'characterPool';
     
     // Pool background
     const poolBg = new PIXI.Graphics();
@@ -195,11 +213,14 @@ export class FormationScene extends BaseScene {
       .stroke({ width: 2, color: 0x8d6e63 })
       .roundRect(0, 0, this.gameWidth - 100, 140, 12);
     
-    const poolTitle = new PIXI.Text('Available Characters', {
-      fontFamily: 'Kalam',
-      fontSize: 18,
-      fontWeight: 'bold',
-      fill: 0xffecb3
+    const poolTitle = new PIXI.Text({
+      text: 'Available Characters',
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 18,
+        fontWeight: 'bold',
+        fill: 0xffecb3
+      }
     });
     poolTitle.x = 20;
     poolTitle.y = 15;
@@ -221,22 +242,28 @@ export class FormationScene extends BaseScene {
   private createPoolCharacterCard(character: Character, x: number, y: number): PIXI.Container {
     const card = this.createCard(x, y, 90, 80, character.rarity);
     
-    const symbolText = new PIXI.Text(character.tokenSymbol, {
-      fontFamily: 'Kalam',
-      fontSize: 16,
-      fontWeight: 'bold',
-      fill: 0xffffff,
-      align: 'center'
+    const symbolText = new PIXI.Text({
+      text: character.tokenSymbol,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 16,
+        fontWeight: 'bold',
+        fill: 0xffffff,
+        align: 'center'
+      }
     });
     symbolText.anchor.set(0.5);
     symbolText.x = 45;
     symbolText.y = 25;
     
-    const levelText = new PIXI.Text(`Lv.${character.level}`, {
-      fontFamily: 'Kalam',
-      fontSize: 10,
-      fill: 0xd7ccc8,
-      align: 'center'
+    const levelText = new PIXI.Text({
+      text: `Lv.${character.level}`,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 10,
+        fill: 0xd7ccc8,
+        align: 'center'
+      }
     });
     levelText.anchor.set(0.5);
     levelText.x = 45;

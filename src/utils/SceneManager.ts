@@ -40,12 +40,15 @@ export abstract class BaseScene extends PIXI.Container {
       .roundRect(0, 0, width, height, 8);
     
     // Button text
-    const buttonText = new PIXI.Text(text, {
-      fontFamily: 'Kalam',
-      fontSize: 18,
-      fontWeight: 'bold',
-      fill: 0xfff8e1,
-      align: 'center'
+    const buttonText = new PIXI.Text({
+      text: text,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 18,
+        fontWeight: 'bold',
+        fill: 0xfff8e1,
+        align: 'center'
+      }
     });
     buttonText.anchor.set(0.5);
     buttonText.x = width / 2;
@@ -73,22 +76,25 @@ export abstract class BaseScene extends PIXI.Container {
   }
 
   protected createTitle(text: string, x: number, y: number): PIXI.Text {
-    const title = new PIXI.Text(text, {
-      fontFamily: 'Kalam',
-      fontSize: 36,
-      fontWeight: 'bold',
-      fill: 0xffecb3,
-      stroke: {
-        color: 0x3e2723,
-        width: 3,
-      },
-      dropShadow: {
-        color: 0x000000,
-        blur: 4,
-        angle: Math.PI / 6,
-        distance: 6,
-        alpha: 0.5,
-      },
+    const title = new PIXI.Text({
+      text: text,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 36,
+        fontWeight: 'bold',
+        fill: 0xffecb3,
+        stroke: {
+          color: 0x3e2723,
+          width: 3,
+        },
+        dropShadow: {
+          color: 0x000000,
+          blur: 4,
+          angle: Math.PI / 6,
+          distance: 6,
+          alpha: 0.5,
+        },
+      }
     });
     title.anchor.set(0.5);
     title.x = x;

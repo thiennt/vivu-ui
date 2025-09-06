@@ -135,7 +135,7 @@ export class CharactersScene implements AppScreen {
     this.maxScroll = Math.max(0, (totalRows * (cardHeight + spacing)) - (this.gameHeight - 200));
     
     this.container.addChild(gridContainer);
-    gridContainer.name = 'gridContainer';
+    gridContainer.label = 'gridContainer';
   }
 
   private createDetailedCharacterCard(character: any, x: number, y: number): PIXI.Container {

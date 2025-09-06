@@ -126,7 +126,7 @@ export class StageScene extends BaseScene {
 
   private createStageList(): void {
     const stageContainer = new PIXI.Container();
-    stageContainer.name = 'stageContainer';
+    stageContainer.label = 'stageContainer';
     
     const chapter = this.dungeon!.chapters[this.selectedChapter];
     if (chapter) {
