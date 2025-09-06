@@ -4,14 +4,7 @@ import { navigation } from './utils/navigation';
 import { HomeScene } from './scenes/HomeScene';
 
 /** The PixiJS app Application instance, shared across the project */
-export const app = new PIXI.Application({
-  width: Math.max(400, window.innerWidth * 0.8),
-  height: window.innerHeight * 0.9,
-  backgroundColor: 0x2c1810,
-  antialias: true,
-  resolution: window.devicePixelRatio || 1,
-  autoDensity: true
-});
+export const app = new PIXI.Application();
 
 /** Set up a resize function for the app */
 function resize() {
@@ -48,16 +41,26 @@ class Game {
 
   /** Setup app and initialise */
   private async init() {
+    // Initialize the PixiJS application
+    await app.init({
+      width: Math.max(400, window.innerWidth * 0.8),
+      height: window.innerHeight * 0.9,
+      backgroundColor: 0x2c1810,
+      antialias: true,
+      resolution: window.devicePixelRatio || 1,
+      autoDensity: true
+    });
+
     // Add pixi canvas element to the document's body
     const gameContainer = document.getElementById('game-container');
     if (gameContainer) {
-      gameContainer.appendChild(app.view as HTMLCanvasElement);
+      gameContainer.appendChild(app.canvas);
     } else {
-      document.body.appendChild(app.view as HTMLCanvasElement);
+      document.body.appendChild(app.canvas);
     }
 
     // Center the canvas
-    const canvas = app.view as HTMLCanvasElement;
+    const canvas = app.canvas;
     canvas.style.display = 'block';
     canvas.style.margin = 'auto';
 
