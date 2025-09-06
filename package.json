@@ -2,7 +2,6 @@
   "name": "vivu-ui",
   "version": "1.0.0",
   "description": "A whimsical fantasy turn-based card game UI built with PixiJS",
-  "main": "dist/index.js",
   "scripts": {
     "prestart": "run-s assets",
     "start": "vite --open",
