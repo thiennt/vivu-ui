@@ -18,9 +18,7 @@ export class PlayerDetailScene extends BaseScene {
 
   private createBackground(): void {
     const bg = new PIXI.Graphics();
-    bg.beginFill(0x2c1810);
-    bg.drawRect(0, 0, this.gameWidth, this.gameHeight);
-    bg.endFill();
+    bg.fill(0x2c1810).rect(0, 0, this.gameWidth, this.gameHeight);
     this.addChildAt(bg, 0);
   }
 
@@ -73,10 +71,9 @@ export class PlayerDetailScene extends BaseScene {
     
     // Background
     const bg = new PIXI.Graphics();
-    bg.beginFill(0x3e2723, 0.9);
-    bg.lineStyle(3, 0x8d6e63);
-    bg.drawRoundedRect(0, 0, width, height, 12);
-    bg.endFill();
+    bg.fill({ color: 0x3e2723, alpha: 0.9 })
+      .stroke({ width: 3, color: 0x8d6e63 })
+      .roundRect(0, 0, width, height, 12);
     
     // Title
     const titleText = new PIXI.Text(title, {

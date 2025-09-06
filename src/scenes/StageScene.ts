@@ -26,9 +26,7 @@ export class StageScene extends BaseScene {
 
   private createBackground(): void {
     const bg = new PIXI.Graphics();
-    bg.beginFill(0x1a0e0a);
-    bg.drawRect(0, 0, this.gameWidth, this.gameHeight);
-    bg.endFill();
+    bg.fill(0x1a0e0a).rect(0, 0, this.gameWidth, this.gameHeight);
     this.addChildAt(bg, 0);
   }
 
@@ -52,10 +50,9 @@ export class StageScene extends BaseScene {
     const selectorContainer = new PIXI.Container();
     
     const selectorBg = new PIXI.Graphics();
-    selectorBg.beginFill(0x3e2723, 0.9);
-    selectorBg.lineStyle(2, 0x8d6e63);
-    selectorBg.drawRoundedRect(0, 0, this.gameWidth - 100, 60, 10);
-    selectorBg.endFill();
+    selectorBg.fill({ color: 0x3e2723, alpha: 0.9 })
+      .stroke({ width: 2, color: 0x8d6e63 })
+      .roundRect(0, 0, this.gameWidth - 100, 60, 10);
     
     const chapterTitle = new PIXI.Text('Chapters:', {
       fontFamily: 'Kalam',
@@ -95,10 +92,9 @@ export class StageScene extends BaseScene {
     const textColor = isSelected ? 0xffecb3 : 0xd7ccc8;
     
     const bg = new PIXI.Graphics();
-    bg.beginFill(bgColor);
-    bg.lineStyle(2, 0x8d6e63);
-    bg.drawRoundedRect(0, 0, width, height, 8);
-    bg.endFill();
+    bg.fill(bgColor)
+      .stroke({ width: 2, color: 0x8d6e63 })
+      .roundRect(0, 0, width, height, 8);
     
     const buttonText = new PIXI.Text(text, {
       fontFamily: 'Kalam',
@@ -153,10 +149,9 @@ export class StageScene extends BaseScene {
     
     // Background
     const bg = new PIXI.Graphics();
-    bg.beginFill(0x3e2723, 0.9);
-    bg.lineStyle(3, 0x8d6e63);
-    bg.drawRoundedRect(0, 0, 180, 130, 10);
-    bg.endFill();
+    bg.fill({ color: 0x3e2723, alpha: 0.9 })
+      .stroke({ width: 3, color: 0x8d6e63 })
+      .roundRect(0, 0, 180, 130, 10);
     
     // Stage number
     const stageNumber = new PIXI.Text(`Stage ${stage.stageNumber}`, {
