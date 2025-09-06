@@ -33,11 +33,14 @@ export class StageScene extends BaseScene {
   private createHeader(): void {
     const title = this.createTitle(this.dungeon!.name, this.gameWidth / 2, 60);
     
-    const subtitle = new PIXI.Text('Choose your stage', {
-      fontFamily: 'Kalam',
-      fontSize: 18,
-      fill: 0xd7ccc8,
-      align: 'center'
+    const subtitle = new PIXI.Text({
+      text: 'Choose your stage',
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 18,
+        fill: 0xd7ccc8,
+        align: 'center'
+      }
     });
     subtitle.anchor.set(0.5);
     subtitle.x = this.gameWidth / 2;
@@ -126,7 +129,7 @@ export class StageScene extends BaseScene {
 
   private createStageList(): void {
     const stageContainer = new PIXI.Container();
-    stageContainer.name = 'stageContainer';
+    stageContainer.label = 'stageContainer';
     
     const chapter = this.dungeon!.chapters[this.selectedChapter];
     if (chapter) {
