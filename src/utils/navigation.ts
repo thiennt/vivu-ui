@@ -87,7 +87,11 @@ class Navigation {
 
         // Add update function if available
         if (screen.update) {
-            app.ticker.add(screen.update, screen);
+            const updateWrapper = (ticker: Ticker) => {
+                screen.update!(ticker.deltaTime);
+            };
+            (screen as any)._updateWrapper = updateWrapper;
+            app.ticker.add(updateWrapper);
         }
 
         // Show the new screen
@@ -111,8 +115,9 @@ class Navigation {
         }
 
         // Unlink update function if method is available
-        if (screen.update) {
-            app.ticker.remove(screen.update, screen);
+        if (screen.update && (screen as any)._updateWrapper) {
+            app.ticker.remove((screen as any)._updateWrapper);
+            delete (screen as any)._updateWrapper;
         }
 
         // Remove screen from its parent (usually app.stage, if not changed)

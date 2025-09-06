@@ -364,13 +364,17 @@ export class CharactersScene implements AppScreen {
       fontSize: 36,
       fontWeight: 'bold',
       fill: 0xffecb3,
-      stroke: 0x3e2723,
-      strokeThickness: 3,
-      dropShadow: true,
-      dropShadowColor: 0x000000,
-      dropShadowBlur: 4,
-      dropShadowAngle: Math.PI / 6,
-      dropShadowDistance: 6,
+      stroke: {
+        color: 0x3e2723,
+        width: 3,
+      },
+      dropShadow: {
+        color: 0x000000,
+        blur: 4,
+        angle: Math.PI / 6,
+        distance: 6,
+        alpha: 0.5,
+      },
     });
     title.anchor.set(0.5);
     title.x = x;

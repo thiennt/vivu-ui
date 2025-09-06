@@ -1,4 +1,5 @@
 import * as PIXI from 'pixi.js';
+import { initDevtools } from '@pixi/devtools';
 import { navigation } from './utils/navigation';
 import { HomeScene } from './scenes/HomeScene';
 
@@ -72,10 +73,8 @@ class Game {
     // Show initial home screen
     await navigation.showScreen(HomeScene);
 
-    // Enable PIXI dev tools if available
-    if ((window as any).__PIXI_DEVTOOLS__) {
-      (window as any).__PIXI_DEVTOOLS__.app = app;
-    }
+    // Initialize PIXI devtools
+    initDevtools({ app });
   }
 
   // Public methods for debugging

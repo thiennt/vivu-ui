@@ -331,14 +331,18 @@ export class HomeScene implements AppScreen {
       fontFamily: 'Kalam',
       fontSize: 72,
       fontWeight: 'bold',
-      fill: ['#ffecb3', '#ff8f00'],
-      stroke: 0x3e2723,
-      strokeThickness: 4,
-      dropShadow: true,
-      dropShadowColor: 0x000000,
-      dropShadowBlur: 8,
-      dropShadowAngle: Math.PI / 6,
-      dropShadowDistance: 8,
+      fill: 0xffecb3,
+      stroke: {
+        color: 0x3e2723,
+        width: 4,
+      },
+      dropShadow: {
+        color: 0x000000,
+        blur: 8,
+        angle: Math.PI / 6,
+        distance: 8,
+        alpha: 0.5,
+      },
     });
     title.anchor.set(0.5);
     title.x = this.gameWidth / 2;
