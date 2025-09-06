@@ -4,7 +4,9 @@ import { app } from "../app";
 import { pool } from "./pool";
 
 /** Interface for app screens */
-interface AppScreen extends Container {
+export interface AppScreen {
+  /** Container for the screen */
+  container: Container;
   /** Show the screen */
   show?(): Promise<void>;
   /** Hide the screen */
@@ -28,7 +30,7 @@ interface AppScreen extends Container {
 }
 
 /** Interface for app screens constructors */
-interface AppScreenConstructor {
+export interface AppScreenConstructor {
   new (params?: any): AppScreen;
   /** List of assets bundles required by the screen */
   assetBundles?: string[];
@@ -67,7 +69,7 @@ class Navigation {
     }
 
     // Add screen to stage
-    this.container.addChild(screen);
+    this.container.addChild(screen.container);
 
     // Setup things and pre-organise screen before showing
     if (screen.prepare) {
@@ -87,16 +89,16 @@ class Navigation {
 
     // Show the new screen
     if (screen.show) {
-      screen.interactiveChildren = false;
+      screen.container.interactiveChildren = false;
       await screen.show();
-      screen.interactiveChildren = true;
+      screen.container.interactiveChildren = true;
     }
   }
 
   /** Remove screen from the stage, unlink update & resize functions */
   private async hideAndRemoveScreen(screen: AppScreen) {
     // Prevent interaction in the screen
-    screen.interactiveChildren = false;
+    screen.container.interactiveChildren = false;
 
     // Hide screen if method is available
     if (screen.hide) {
@@ -109,8 +111,8 @@ class Navigation {
     }
 
     // Remove screen from its parent (usually app.stage, if not changed)
-    if (screen.parent) {
-      screen.parent.removeChild(screen);
+    if (screen.container.parent) {
+      screen.container.parent.removeChild(screen.container);
     }
 
     // Clean up the screen so that instance can be reused again later
@@ -126,7 +128,7 @@ class Navigation {
   public async showScreen(ctor: AppScreenConstructor, params?: any) {
     // Block interactivity in current screen
     if (this.currentScreen) {
-      this.currentScreen.interactiveChildren = false;
+      this.currentScreen.container.interactiveChildren = false;
     }
 
     // Load assets for the new screen, if available
@@ -163,7 +165,7 @@ class Navigation {
    */
   public async presentPopup(ctor: AppScreenConstructor) {
     if (this.currentScreen) {
-      this.currentScreen.interactiveChildren = false;
+      this.currentScreen.container.interactiveChildren = false;
       await this.currentScreen.pause?.();
     }
 
@@ -184,7 +186,7 @@ class Navigation {
     this.currentPopup = undefined;
     await this.hideAndRemoveScreen(popup);
     if (this.currentScreen) {
-      this.currentScreen.interactiveChildren = true;
+      this.currentScreen.container.interactiveChildren = true;
       this.currentScreen.resume?.();
     }
   }

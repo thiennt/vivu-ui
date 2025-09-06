@@ -1,23 +1,13 @@
 import { Application } from 'pixi.js';
 import { initDevtools } from '@pixi/devtools';
-import { SceneManager } from './utils/SceneManager';
-import { GameScene } from './types';
+import { navigation } from './utils/navigation';
 import { HomeScene } from './scenes/HomeScene';
-import { CharactersScene } from './scenes/CharactersScene';
-import { CharacterDetailScene } from './scenes/CharacterDetailScene';
-import { DungeonScene } from './scenes/DungeonScene';
-import { StageScene } from './scenes/StageScene';
-import { FormationScene } from './scenes/FormationScene';
-import { PlayerDetailScene } from './scenes/PlayerDetailScene';
 import { initAssets } from "./utils/assets";
 import { getUrlParam } from './utils/getUrlParams';
 
 
 /** The PixiJS app Application instance, shared across the project */
 export const app = new Application();
-
-/** The scene manager for handling navigation */
-export const sceneManager = new SceneManager(app);
 
 initDevtools({ app });
 
@@ -35,27 +25,17 @@ function resize() {
     const width = windowWidth * scale;
     const height = windowHeight * scale;
 
-    // Update renderer dimensions
+    // Update renderer and navigation screens dimensions
     app.renderer.resize(width, height);
-    
-    // Update current scene if it exists
-    const currentScene = sceneManager.getCurrentScene();
-    if (currentScene) {
-        currentScene.gameWidth = width;
-        currentScene.gameHeight = height;
-        // Refresh the scene by recreating it
-        currentScene.removeChildren();
-        currentScene.init();
-    }
+    navigation.resize(width, height);
 }
 
 /** Fire when document visibility changes - lose or regain focus */
 function visibilityChange() {
-    // We can add scene-specific focus/blur logic here if needed
     if (document.hidden) {
-        // Scene is now hidden
+        navigation.blur();
     } else {
-        // Scene is now visible
+        navigation.focus();
     }
 }
 
@@ -96,25 +76,17 @@ async function init() {
   // Setup assets bundles (see assets.ts) and start up loading everything in background
   await initAssets();
 
-  // Register all scenes with the scene manager
-  sceneManager.registerScene(GameScene.HOME, () => new HomeScene(app, sceneManager));
-  sceneManager.registerScene(GameScene.CHARACTERS, () => new CharactersScene(app, sceneManager));
-  sceneManager.registerScene(GameScene.CHARACTER_DETAIL, () => new CharacterDetailScene(app, sceneManager));
-  sceneManager.registerScene(GameScene.DUNGEON, () => new DungeonScene(app, sceneManager));
-  sceneManager.registerScene(GameScene.STAGE, () => new StageScene(app, sceneManager));
-  sceneManager.registerScene(GameScene.FORMATION, () => new FormationScene(app, sceneManager));
-  sceneManager.registerScene(GameScene.PLAYER_DETAIL, () => new PlayerDetailScene(app, sceneManager));
+  // Add a persisting background shared by all screens
+  //navigation.setBackground(TiledBackground);
 
-  // Start the update loop
-  app.ticker.add(() => {
-    sceneManager.update(app.ticker.deltaMS);
-  });
+  // Show initial loading screen
+  await navigation.showScreen(HomeScene);
 
-  // Show initial screen or navigate based on URL params
+  //Go to one of the screens if a shortcut is present in url params, otherwise go to home screen
   if (getUrlParam("combat") !== null) {
-    sceneManager.switchTo(GameScene.STAGE);
+    //await navigation.showScreen(CombatScreen);
   } else {
-    sceneManager.switchTo(GameScene.HOME);
+    await navigation.showScreen(HomeScene);
   }
 }
 

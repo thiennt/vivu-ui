@@ -1,27 +1,321 @@
 import * as PIXI from 'pixi.js';
-import { BaseScene, SceneManager } from '@/utils/SceneManager';
-import { GameScene } from '@/types';
+import { AppScreen, navigation } from '@/utils/navigation';
 import { mockPlayer } from '@/utils/mockData';
+import { CharactersScene } from './CharactersScene';
 
-export class HomeScene extends BaseScene {
+// Placeholder scenes for other buttons - these would be implemented similarly
+export class PlayerDetailScene implements AppScreen {
+  container = new PIXI.Container();
+  static assetBundles = ['player'];
+  prepare() { 
+    const text = new PIXI.Text({
+      text: 'Player Detail Scene - Coming Soon!',
+      style: { 
+        fill: 0xffffff, 
+        fontSize: 24,
+        fontFamily: 'Kalam'
+      }
+    });
+    text.anchor.set(0.5);
+    text.x = 400;
+    text.y = 300;
+    this.container.addChild(text);
+    
+    const backBtn = this.createButton('← Back to Home', 50, 500, 200, 50, () => {
+      navigation.showScreen(HomeScene);
+    });
+    this.container.addChild(backBtn);
+  }
+  async show() { this.container.alpha = 1; }
+  async hide() { this.container.alpha = 0; }
+  reset() { this.container.removeChildren(); }
+  resize() {}
+  
+  private createButton(
+    text: string, 
+    x: number, 
+    y: number, 
+    width: number = 200, 
+    height: number = 50,
+    onClick?: () => void
+  ): PIXI.Container {
+    const button = new PIXI.Container();
+    const bg = new PIXI.Graphics();
+    bg.fill(0x8d6e63)
+      .stroke({ width: 3, color: 0x5d4037 })
+      .roundRect(0, 0, width, height, 8);
+    
+    const buttonText = new PIXI.Text({
+      text: text,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 18,
+        fontWeight: 'bold',
+        fill: 0xfff8e1,
+        align: 'center'
+      }
+    });
+    buttonText.anchor.set(0.5);
+    buttonText.x = width / 2;
+    buttonText.y = height / 2;
+    
+    button.addChild(bg, buttonText);
+    button.x = x;
+    button.y = y;
+    button.interactive = true;
+    button.cursor = 'pointer';
+    
+    button.on('pointerover', () => {
+      bg.tint = 0xa1887f;
+    });
+    button.on('pointerout', () => {
+      bg.tint = 0xffffff;
+    });
+    
+    if (onClick) {
+      button.on('pointerdown', onClick);
+    }
+    
+    return button;
+  }
+}
+
+export class FormationScene implements AppScreen {
+  container = new PIXI.Container();
+  static assetBundles = ['formation'];
+  prepare() { 
+    const text = new PIXI.Text({
+      text: 'Formation Scene - Coming Soon!',
+      style: { 
+        fill: 0xffffff, 
+        fontSize: 24,
+        fontFamily: 'Kalam'
+      }
+    });
+    text.anchor.set(0.5);
+    text.x = 400;
+    text.y = 300;
+    this.container.addChild(text);
+    
+    const backBtn = this.createButton('← Back to Home', 50, 500, 200, 50, () => {
+      navigation.showScreen(HomeScene);
+    });
+    this.container.addChild(backBtn);
+  }
+  async show() { this.container.alpha = 1; }
+  async hide() { this.container.alpha = 0; }
+  reset() { this.container.removeChildren(); }
+  resize() {}
+  
+  private createButton(
+    text: string, 
+    x: number, 
+    y: number, 
+    width: number = 200, 
+    height: number = 50,
+    onClick?: () => void
+  ): PIXI.Container {
+    const button = new PIXI.Container();
+    const bg = new PIXI.Graphics();
+    bg.fill(0x8d6e63)
+      .stroke({ width: 3, color: 0x5d4037 })
+      .roundRect(0, 0, width, height, 8);
+    
+    const buttonText = new PIXI.Text({
+      text: text,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 18,
+        fontWeight: 'bold',
+        fill: 0xfff8e1,
+        align: 'center'
+      }
+    });
+    buttonText.anchor.set(0.5);
+    buttonText.x = width / 2;
+    buttonText.y = height / 2;
+    
+    button.addChild(bg, buttonText);
+    button.x = x;
+    button.y = y;
+    button.interactive = true;
+    button.cursor = 'pointer';
+    
+    button.on('pointerover', () => {
+      bg.tint = 0xa1887f;
+    });
+    button.on('pointerout', () => {
+      bg.tint = 0xffffff;
+    });
+    
+    if (onClick) {
+      button.on('pointerdown', onClick);
+    }
+    
+    return button;
+  }
+}
+
+export class DungeonScene implements AppScreen {
+  container = new PIXI.Container();
+  static assetBundles = ['dungeon'];
+  prepare() { 
+    const text = new PIXI.Text({
+      text: 'Dungeon Scene - Coming Soon!',
+      style: { 
+        fill: 0xffffff, 
+        fontSize: 24,
+        fontFamily: 'Kalam'
+      }
+    });
+    text.anchor.set(0.5);
+    text.x = 400;
+    text.y = 300;
+    this.container.addChild(text);
+    
+    const backBtn = this.createButton('← Back to Home', 50, 500, 200, 50, () => {
+      navigation.showScreen(HomeScene);
+    });
+    this.container.addChild(backBtn);
+  }
+  async show() { this.container.alpha = 1; }
+  async hide() { this.container.alpha = 0; }
+  reset() { this.container.removeChildren(); }
+  resize() {}
+  
+  private createButton(
+    text: string, 
+    x: number, 
+    y: number, 
+    width: number = 200, 
+    height: number = 50,
+    onClick?: () => void
+  ): PIXI.Container {
+    const button = new PIXI.Container();
+    const bg = new PIXI.Graphics();
+    bg.fill(0x8d6e63)
+      .stroke({ width: 3, color: 0x5d4037 })
+      .roundRect(0, 0, width, height, 8);
+    
+    const buttonText = new PIXI.Text({
+      text: text,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 18,
+        fontWeight: 'bold',
+        fill: 0xfff8e1,
+        align: 'center'
+      }
+    });
+    buttonText.anchor.set(0.5);
+    buttonText.x = width / 2;
+    buttonText.y = height / 2;
+    
+    button.addChild(bg, buttonText);
+    button.x = x;
+    button.y = y;
+    button.interactive = true;
+    button.cursor = 'pointer';
+    
+    button.on('pointerover', () => {
+      bg.tint = 0xa1887f;
+    });
+    button.on('pointerout', () => {
+      bg.tint = 0xffffff;
+    });
+    
+    if (onClick) {
+      button.on('pointerdown', onClick);
+    }
+    
+    return button;
+  }
+}
+
+export class HomeScene implements AppScreen {
   /** Assets bundles required by this screen */
   public static assetBundles = ['home', 'common'];
   
+  public container: PIXI.Container;
   private decorativeElements: PIXI.Container[] = [];
+  private gameWidth: number;
+  private gameHeight: number;
 
-  constructor(app: PIXI.Application, sceneManager: SceneManager) {
-    super(app, sceneManager);
-    this.decorativeElements = [];
+  constructor() {
+    this.container = new PIXI.Container();
+    this.gameWidth = 0;
+    this.gameHeight = 0;
   }
 
-  /** Initialize the screen */
-  init(): void {
+  /** Prepare screen, before showing */
+  prepare(): void {
     // Set up screen dimensions
+    this.gameWidth = Math.max(400, window.innerWidth);
+    this.gameHeight = window.innerHeight;
+    
     this.createBackground();
     this.createHomeTitle();
     this.createPlayerInfo();
     this.createMenuButtons();
     this.createDecorations();
+  }
+
+  /** Show the screen with animation */
+  async show(): Promise<void> {
+    // Animate elements in
+    this.container.alpha = 0;
+    const tween = { alpha: 0 };
+    
+    return new Promise((resolve) => {
+      const animate = () => {
+        tween.alpha += 0.05;
+        this.container.alpha = tween.alpha;
+        
+        if (tween.alpha >= 1) {
+          this.container.alpha = 1;
+          resolve();
+        } else {
+          requestAnimationFrame(animate);
+        }
+      };
+      animate();
+    });
+  }
+
+  /** Hide the screen with animation */
+  async hide(): Promise<void> {
+    const tween = { alpha: 1 };
+    
+    return new Promise((resolve) => {
+      const animate = () => {
+        tween.alpha -= 0.1;
+        this.container.alpha = tween.alpha;
+        
+        if (tween.alpha <= 0) {
+          this.container.alpha = 0;
+          resolve();
+        } else {
+          requestAnimationFrame(animate);
+        }
+      };
+      animate();
+    });
+  }
+
+  /** Reset screen after hidden */
+  reset(): void {
+    this.container.removeChildren();
+    this.decorativeElements = [];
+  }
+
+  /** Resize the screen */
+  resize(width: number, height: number): void {
+    this.gameWidth = Math.max(400, width);
+    this.gameHeight = height;
+    
+    // Reset and recreate with new dimensions
+    this.reset();
+    this.prepare();
   }
 
   private createBackground(): void {
@@ -43,7 +337,7 @@ export class HomeScene extends BaseScene {
       bgContainer.addChild(star);
     }
     
-    this.addChild(bgContainer);
+    this.container.addChild(bgContainer);
   }
 
   private createHomeTitle(): void {
@@ -85,7 +379,7 @@ export class HomeScene extends BaseScene {
     subtitle.x = this.gameWidth / 2;
     subtitle.y = 150;
     
-    this.addChild(title, subtitle);
+    this.container.addChild(title, subtitle);
   }
 
   private createPlayerInfo(): void {
@@ -136,17 +430,17 @@ export class HomeScene extends BaseScene {
     playerPanel.x = (this.gameWidth - 300) / 2;
     playerPanel.y = 200;
     
-    this.addChild(playerPanel);
+    this.container.addChild(playerPanel);
   }
 
   private createMenuButtons(): void {
     const buttonContainer = new PIXI.Container();
     
     const buttons = [
-      { text: 'Adventure', scene: GameScene.DUNGEON },
-      { text: 'Characters', scene: GameScene.CHARACTERS },
-      { text: 'Player Profile', scene: GameScene.PLAYER_DETAIL },
-      { text: 'Formation', scene: GameScene.FORMATION }
+      { text: 'Adventure', screen: DungeonScene },
+      { text: 'Characters', screen: CharactersScene },
+      { text: 'Player Profile', screen: PlayerDetailScene },
+      { text: 'Formation', screen: FormationScene }
     ];
     
     buttons.forEach((buttonData, index) => {
@@ -156,7 +450,7 @@ export class HomeScene extends BaseScene {
         index * 70,
         250,
         60,
-        () => this.sceneManager.switchTo(buttonData.scene)
+        () => navigation.showScreen(buttonData.screen)
       );
       buttonContainer.addChild(button);
     });
@@ -164,7 +458,59 @@ export class HomeScene extends BaseScene {
     buttonContainer.x = (this.gameWidth - 250) / 2;
     buttonContainer.y = 350;
     
-    this.addChild(buttonContainer);
+    this.container.addChild(buttonContainer);
+  }
+
+  private createButton(
+    text: string, 
+    x: number, 
+    y: number, 
+    width: number = 200, 
+    height: number = 50,
+    onClick?: () => void
+  ): PIXI.Container {
+    const button = new PIXI.Container();
+    
+    // Button background with fantasy styling
+    const bg = new PIXI.Graphics();
+    bg.fill(0x8d6e63)
+      .stroke({ width: 3, color: 0x5d4037 })
+      .roundRect(0, 0, width, height, 8);
+    
+    // Button text
+    const buttonText = new PIXI.Text({
+      text: text,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 18,
+        fontWeight: 'bold',
+        fill: 0xfff8e1,
+        align: 'center'
+      }
+    });
+    buttonText.anchor.set(0.5);
+    buttonText.x = width / 2;
+    buttonText.y = height / 2;
+    
+    button.addChild(bg, buttonText);
+    button.x = x;
+    button.y = y;
+    button.interactive = true;
+    button.cursor = 'pointer';
+    
+    // Hover effects
+    button.on('pointerover', () => {
+      bg.tint = 0xa1887f;
+    });
+    button.on('pointerout', () => {
+      bg.tint = 0xffffff;
+    });
+    
+    if (onClick) {
+      button.on('pointerdown', onClick);
+    }
+    
+    return button;
   }
 
   private createDecorations(): void {
@@ -178,11 +524,11 @@ export class HomeScene extends BaseScene {
       decoration.y = Math.random() * this.gameHeight;
       
       this.decorativeElements.push(decoration);
-      this.addChild(decoration);
+      this.container.addChild(decoration);
     }
   }
 
-  update(deltaTime: number): void {
+  update(time: PIXI.Ticker): void {
     // Animate decorative elements
     this.decorativeElements.forEach((element, index) => {
       element.y += Math.sin(Date.now() * 0.001 + index) * 0.5;
@@ -199,6 +545,6 @@ export class HomeScene extends BaseScene {
 
   destroy(): void {
     this.decorativeElements = [];
-    this.removeChildren();
+    this.container.removeChildren();
   }
 }
