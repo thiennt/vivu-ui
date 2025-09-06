@@ -1,126 +1,90 @@
 import * as PIXI from 'pixi.js';
-import { SceneManager } from '@/utils/SceneManager';
-import { GameScene } from '@/types';
+import { navigation } from './utils/navigation';
+import { HomeScene } from './scenes/HomeScene';
 
-// Import all scenes
-import { HomeScene } from '@/scenes/HomeScene';
-import { PlayerDetailScene } from '@/scenes/PlayerDetailScene';
-import { CharactersScene } from '@/scenes/CharactersScene';
-import { CharacterDetailScene } from '@/scenes/CharacterDetailScene';
-import { DungeonScene } from '@/scenes/DungeonScene';
-import { StageScene } from '@/scenes/StageScene';
-import { FormationScene } from '@/scenes/FormationScene';
+/** The PixiJS app Application instance, shared across the project */
+export const app = new PIXI.Application({
+  width: Math.max(400, window.innerWidth * 0.8),
+  height: window.innerHeight * 0.9,
+  backgroundColor: 0x2c1810,
+  antialias: true,
+  resolution: window.devicePixelRatio || 1,
+  autoDensity: true
+});
+
+/** Set up a resize function for the app */
+function resize() {
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
+    const minWidth = 400;
+    const minHeight = 600;
+
+    // Calculate renderer and canvas sizes based on current dimensions
+    const scaleX = windowWidth < minWidth ? minWidth / windowWidth : 1;
+    const scaleY = windowHeight < minHeight ? minHeight / windowHeight : 1;
+    const scale = scaleX > scaleY ? scaleX : scaleY;
+    const width = windowWidth * scale;
+    const height = windowHeight * scale;
+
+    // Update renderer and navigation screens dimensions
+    app.renderer.resize(width, height);
+    navigation.resize(width, height);
+}
+
+/** Fire when document visibility changes - lose or regain focus */
+function visibilityChange() {
+    if (document.hidden) {
+        navigation.blur();
+    } else {
+        navigation.focus();
+    }
+}
 
 class Game {
-  private app: PIXI.Application;
-  private sceneManager: SceneManager;
-
   constructor() {
-    // Initialize PIXI Application
-    this.app = new PIXI.Application({
-      width: Math.max(400, window.innerWidth * 0.8),
-      height: window.innerHeight * 0.9,
-      backgroundColor: 0x2c1810,
-      antialias: true,
-      resolution: window.devicePixelRatio || 1,
-      autoDensity: true
-    });
+    this.init();
+  }
 
-    // Add canvas to DOM
+  /** Setup app and initialise */
+  private async init() {
+    // Add pixi canvas element to the document's body
     const gameContainer = document.getElementById('game-container');
     if (gameContainer) {
-      gameContainer.appendChild(this.app.view as HTMLCanvasElement);
+      gameContainer.appendChild(app.view as HTMLCanvasElement);
+    } else {
+      document.body.appendChild(app.view as HTMLCanvasElement);
     }
 
-    // Center the game canvas
-    this.centerCanvas();
-
-    // Initialize scene manager
-    this.sceneManager = new SceneManager(this.app);
-    this.registerScenes();
-
-    // Handle window resize
-    window.addEventListener('resize', () => {
-      this.handleResize();
-    });
-
-    // Start the game
-    this.start();
-  }
-
-  private centerCanvas(): void {
-    const canvas = this.app.view as HTMLCanvasElement;
+    // Center the canvas
+    const canvas = app.view as HTMLCanvasElement;
     canvas.style.display = 'block';
     canvas.style.margin = 'auto';
-  }
 
-  private handleResize(): void {
-    const newWidth = Math.max(400, window.innerWidth * 0.8);
-    const newHeight = window.innerHeight * 0.9;
-    
-    this.app.renderer.resize(newWidth, newHeight);
-    this.centerCanvas();
-  }
+    // Whenever the window resizes, call the 'resize' function
+    window.addEventListener('resize', resize);
 
-  private registerScenes(): void {
-    // Register all game scenes
-    this.sceneManager.registerScene(GameScene.HOME, () => 
-      new HomeScene(this.app, this.sceneManager)
-    );
-    
-    this.sceneManager.registerScene(GameScene.PLAYER_DETAIL, () => 
-      new PlayerDetailScene(this.app, this.sceneManager)
-    );
-    
-    this.sceneManager.registerScene(GameScene.CHARACTERS, () => 
-      new CharactersScene(this.app, this.sceneManager)
-    );
-    
-    this.sceneManager.registerScene(GameScene.CHARACTER_DETAIL, () => 
-      new CharacterDetailScene(this.app, this.sceneManager)
-    );
-    
-    this.sceneManager.registerScene(GameScene.DUNGEON, () => 
-      new DungeonScene(this.app, this.sceneManager)
-    );
-    
-    this.sceneManager.registerScene(GameScene.STAGE, () => 
-      new StageScene(this.app, this.sceneManager)
-    );
-    
-    this.sceneManager.registerScene(GameScene.FORMATION, () => 
-      new FormationScene(this.app, this.sceneManager)
-    );
-  }
+    // Trigger the first resize
+    resize();
 
-  private start(): void {
-    // Start with the home scene
-    this.sceneManager.switchTo(GameScene.HOME);
+    // Add a visibility listener, so the app can pause screens
+    document.addEventListener('visibilitychange', visibilityChange);
 
-    // Start the game loop
-    this.app.ticker.add((deltaTime) => {
-      this.update(deltaTime);
-    });
+    // Show initial home screen
+    await navigation.showScreen(HomeScene);
 
     // Enable PIXI dev tools if available
     if ((window as any).__PIXI_DEVTOOLS__) {
-      (window as any).__PIXI_DEVTOOLS__.app = this.app;
+      (window as any).__PIXI_DEVTOOLS__.app = app;
     }
   }
 
-  private update(deltaTime: number): void {
-    this.sceneManager.update(deltaTime);
+  // Public methods for debugging
+  public async switchToScreen(ScreenClass: any): Promise<void> {
+    await navigation.showScreen(ScreenClass);
   }
 
-  // Public method to switch scenes (useful for debugging)
-  public switchToScene(scene: GameScene): void {
-    this.sceneManager.switchTo(scene);
-  }
-
-  // Get current scene (useful for debugging)
-  public getCurrentScene(): string {
-    const scene = this.sceneManager.getCurrentScene();
-    return scene ? scene.constructor.name : 'None';
+  public getCurrentScreen(): string {
+    return navigation.currentScreen ? navigation.currentScreen.constructor.name : 'None';
   }
 }
 
@@ -132,8 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
   (window as any).game = game;
   
   console.log('🎮 Vivu - Fantasy Card Game loaded!');
-  console.log('Available scenes:', Object.values(GameScene));
-  console.log('Use game.switchToScene(GameScene.SCENE_NAME) to navigate');
+  console.log('Use game.switchToScreen(ScreenClass) to navigate');
 });
 
 export default Game;

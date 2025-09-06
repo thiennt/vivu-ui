@@ -1,17 +1,31 @@
 import * as PIXI from 'pixi.js';
-import { BaseScene, SceneManager } from '@/utils/SceneManager';
-import { GameScene } from '@/types';
+import { AppScreen, navigation } from '@/utils/navigation';
 import { mockCharacters } from '@/utils/mockData';
+import { HomeScene } from './HomeScene';
 
-export class CharactersScene extends BaseScene {
+export class CharactersScene implements AppScreen {
+  /** Assets bundles required by this screen */
+  public static assetBundles = ['characters', 'common'];
+  
+  public container: PIXI.Container;
   private scrollOffset: number = 0;
   private maxScroll: number = 0;
+  private gameWidth: number;
+  private gameHeight: number;
 
-  constructor(app: PIXI.Application, sceneManager: SceneManager) {
-    super(app, sceneManager);
+  constructor() {
+    this.container = new PIXI.Container();
+    this.scrollOffset = 0;
+    this.maxScroll = 0;
+    this.gameWidth = 0;
+    this.gameHeight = 0;
   }
 
-  init(): void {
+  /** Prepare screen, before showing */
+  prepare(): void {
+    this.gameWidth = Math.max(400, window.innerWidth);
+    this.gameHeight = window.innerHeight;
+    
     this.createBackground();
     this.createHeader();
     this.createCharacterGrid();
@@ -19,12 +33,69 @@ export class CharactersScene extends BaseScene {
     this.setupScrolling();
   }
 
+  /** Show the screen with animation */
+  async show(): Promise<void> {
+    this.container.alpha = 0;
+    const tween = { alpha: 0 };
+    
+    return new Promise((resolve) => {
+      const animate = () => {
+        tween.alpha += 0.05;
+        this.container.alpha = tween.alpha;
+        
+        if (tween.alpha >= 1) {
+          this.container.alpha = 1;
+          resolve();
+        } else {
+          requestAnimationFrame(animate);
+        }
+      };
+      animate();
+    });
+  }
+
+  /** Hide the screen with animation */
+  async hide(): Promise<void> {
+    const tween = { alpha: 1 };
+    
+    return new Promise((resolve) => {
+      const animate = () => {
+        tween.alpha -= 0.1;
+        this.container.alpha = tween.alpha;
+        
+        if (tween.alpha <= 0) {
+          this.container.alpha = 0;
+          resolve();
+        } else {
+          requestAnimationFrame(animate);
+        }
+      };
+      animate();
+    });
+  }
+
+  /** Reset screen after hidden */
+  reset(): void {
+    this.container.removeChildren();
+    this.scrollOffset = 0;
+    this.maxScroll = 0;
+  }
+
+  /** Resize the screen */
+  resize(width: number, height: number): void {
+    this.gameWidth = Math.max(400, width);
+    this.gameHeight = height;
+    
+    this.reset();
+    this.prepare();
+  }
+
   private createBackground(): void {
     const bg = new PIXI.Graphics();
     bg.beginFill(0x2c1810);
     bg.drawRect(0, 0, this.gameWidth, this.gameHeight);
     bg.endFill();
-    this.addChildAt(bg, 0);
+    this.container.addChildAt(bg, 0);
   }
 
   private createHeader(): void {
@@ -40,7 +111,7 @@ export class CharactersScene extends BaseScene {
     subtitle.x = this.gameWidth / 2;
     subtitle.y = 100;
     
-    this.addChild(title, subtitle);
+    this.container.addChild(title, subtitle);
   }
 
   private createCharacterGrid(): void {
@@ -65,7 +136,7 @@ export class CharactersScene extends BaseScene {
     const totalRows = Math.ceil(mockCharacters.length / cardsPerRow);
     this.maxScroll = Math.max(0, (totalRows * (cardHeight + spacing)) - (this.gameHeight - 200));
     
-    this.addChild(gridContainer);
+    this.container.addChild(gridContainer);
     gridContainer.name = 'gridContainer';
   }
 
@@ -158,10 +229,10 @@ export class CharactersScene extends BaseScene {
     
     card.addChild(symbolText, nameText, levelText, expText, statsContainer, elementIndicator);
     
-    // Click handler
+    // Click handler - for now just show an alert, will implement character detail screen later
     card.on('pointerdown', () => {
-      (this.sceneManager as any).selectedCharacter = character;
-      this.sceneManager.switchTo(GameScene.CHARACTER_DETAIL);
+      console.log('Character clicked:', character.name);
+      // TODO: Implement character detail navigation
     });
     
     // Hover effects
@@ -176,13 +247,13 @@ export class CharactersScene extends BaseScene {
   }
 
   private setupScrolling(): void {
-    this.interactive = true;
-    this.on('wheel', (event: any) => {
+    this.container.interactive = true;
+    this.container.on('wheel', (event: any) => {
       const delta = event.deltaY;
       this.scrollOffset += delta * 0.5;
       this.scrollOffset = Math.max(0, Math.min(this.maxScroll, this.scrollOffset));
       
-      const gridContainer = this.getChildByName('gridContainer');
+      const gridContainer = this.container.getChildByName('gridContainer');
       if (gridContainer) {
         gridContainer.y = -this.scrollOffset;
       }
@@ -196,16 +267,118 @@ export class CharactersScene extends BaseScene {
       this.gameHeight - 80,
       150,
       50,
-      () => this.sceneManager.switchTo(GameScene.HOME)
+      () => navigation.showScreen(HomeScene)
     );
-    this.addChild(backButton);
+    this.container.addChild(backButton);
   }
 
   update(deltaTime: number): void {
     // No specific animations needed
   }
 
+  private createButton(
+    text: string, 
+    x: number, 
+    y: number, 
+    width: number = 200, 
+    height: number = 50,
+    onClick?: () => void
+  ): PIXI.Container {
+    const button = new PIXI.Container();
+    
+    // Button background with fantasy styling
+    const bg = new PIXI.Graphics();
+    bg.beginFill(0x8d6e63);
+    bg.lineStyle(3, 0x5d4037);
+    bg.drawRoundedRect(0, 0, width, height, 8);
+    bg.endFill();
+    
+    // Button text
+    const buttonText = new PIXI.Text(text, {
+      fontFamily: 'Kalam',
+      fontSize: 18,
+      fontWeight: 'bold',
+      fill: 0xfff8e1,
+      align: 'center'
+    });
+    buttonText.anchor.set(0.5);
+    buttonText.x = width / 2;
+    buttonText.y = height / 2;
+    
+    button.addChild(bg, buttonText);
+    button.x = x;
+    button.y = y;
+    button.interactive = true;
+    button.cursor = 'pointer';
+    
+    // Hover effects
+    button.on('pointerover', () => {
+      bg.tint = 0xa1887f;
+    });
+    button.on('pointerout', () => {
+      bg.tint = 0xffffff;
+    });
+    
+    if (onClick) {
+      button.on('pointerdown', onClick);
+    }
+    
+    return button;
+  }
+
+  private createCard(
+    x: number, 
+    y: number, 
+    width: number = 120, 
+    height: number = 160,
+    rarity: string = 'common'
+  ): PIXI.Container {
+    const card = new PIXI.Container();
+    
+    const rarityColors: { [key: string]: number } = {
+      common: 0x8d6e63,
+      uncommon: 0x66bb6a,
+      rare: 0x42a5f5,
+      epic: 0xab47bc,
+      legendary: 0xff9800
+    };
+    
+    const bg = new PIXI.Graphics();
+    bg.beginFill(rarityColors[rarity] || rarityColors.common);
+    bg.lineStyle(2, 0x3e2723);
+    bg.drawRoundedRect(0, 0, width, height, 8);
+    bg.endFill();
+    
+    card.addChild(bg);
+    card.x = x;
+    card.y = y;
+    card.interactive = true;
+    card.cursor = 'pointer';
+    
+    return card;
+  }
+
+  private createTitle(text: string, x: number, y: number): PIXI.Text {
+    const title = new PIXI.Text(text, {
+      fontFamily: 'Kalam',
+      fontSize: 36,
+      fontWeight: 'bold',
+      fill: 0xffecb3,
+      stroke: 0x3e2723,
+      strokeThickness: 3,
+      dropShadow: true,
+      dropShadowColor: 0x000000,
+      dropShadowBlur: 4,
+      dropShadowAngle: Math.PI / 6,
+      dropShadowDistance: 6,
+    });
+    title.anchor.set(0.5);
+    title.x = x;
+    title.y = y;
+    return title;
+  }
+
   destroy(): void {
-    this.removeChildren();
+    this.container.removeChildren();
   }
 }
