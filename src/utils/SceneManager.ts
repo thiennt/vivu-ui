@@ -4,8 +4,8 @@ import { GameScene } from '@/types';
 export abstract class BaseScene extends PIXI.Container {
   protected app: PIXI.Application;
   protected sceneManager: SceneManager;
-  protected gameWidth: number;
-  protected gameHeight: number;
+  public gameWidth: number;
+  public gameHeight: number;
 
   constructor(app: PIXI.Application, sceneManager: SceneManager) {
     super();

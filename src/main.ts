@@ -1,7 +1,7 @@
 import * as PIXI from 'pixi.js';
 import { initDevtools } from '@pixi/devtools';
-import { navigation } from './utils/navigation';
-import { HomeScene } from './scenes/HomeScene';
+import { sceneManager } from './app';
+import { GameScene } from './types';
 
 /** The PixiJS app Application instance, shared across the project */
 export const app = new PIXI.Application();
@@ -20,17 +20,27 @@ function resize() {
     const width = windowWidth * scale;
     const height = windowHeight * scale;
 
-    // Update renderer and navigation screens dimensions
+    // Update renderer dimensions
     app.renderer.resize(width, height);
-    navigation.resize(width, height);
+    
+    // Update current scene if it exists
+    const currentScene = sceneManager.getCurrentScene();
+    if (currentScene) {
+        currentScene.gameWidth = width;
+        currentScene.gameHeight = height;
+        // Refresh the scene by recreating it
+        currentScene.removeChildren();
+        currentScene.init();
+    }
 }
 
 /** Fire when document visibility changes - lose or regain focus */
 function visibilityChange() {
+    // We can add scene-specific focus/blur logic here if needed
     if (document.hidden) {
-        navigation.blur();
+        // Scene is now hidden
     } else {
-        navigation.focus();
+        // Scene is now visible
     }
 }
 
@@ -74,19 +84,19 @@ class Game {
     document.addEventListener('visibilitychange', visibilityChange);
 
     // Show initial home screen
-    await navigation.showScreen(HomeScene);
+    sceneManager.switchTo(GameScene.HOME);
 
     // Initialize PIXI devtools
     initDevtools({ app });
   }
 
   // Public methods for debugging
-  public async switchToScreen(ScreenClass: any): Promise<void> {
-    await navigation.showScreen(ScreenClass);
+  public switchToScreen(scene: GameScene): void {
+    sceneManager.switchTo(scene);
   }
 
   public getCurrentScreen(): string {
-    return navigation.currentScreen ? navigation.currentScreen.constructor.name : 'None';
+    return sceneManager.getCurrentScene()?.constructor.name || 'None';
   }
 }
 
@@ -98,7 +108,8 @@ document.addEventListener('DOMContentLoaded', () => {
   (window as any).game = game;
   
   console.log('🎮 Vivu - Fantasy Card Game loaded!');
-  console.log('Use game.switchToScreen(ScreenClass) to navigate');
+  console.log('Use game.switchToScreen(GameScene.HOME) to navigate');
+  console.log('Available scenes:', Object.values(GameScene));
 });
 
 export default Game;

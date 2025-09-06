@@ -61,18 +61,28 @@ async function fetchAssetsManifest(url: string) {
 
 /** Initialise and start background loading of all assets */
 export async function initAssets() {
-  // Load assets manifest
-  assetsManifest = await fetchAssetsManifest("assets/assets-manifest.json");
+  try {
+    // Load assets manifest
+    assetsManifest = await fetchAssetsManifest("assets/assets-manifest.json");
 
-  // Init PixiJS assets with this asset manifest
-  await Assets.init({ manifest: assetsManifest, basePath: "assets" });
+    // Init PixiJS assets with this asset manifest
+    await Assets.init({ manifest: assetsManifest, basePath: "assets" });
 
-  // Load assets for the load screen
-  await loadBundles("preload");
+    // Try to load assets for the load screen if preload bundle exists
+    if (checkBundleExists("preload")) {
+      await loadBundles("preload");
+    }
 
-  // List all existing bundles names
-  const allBundles = assetsManifest.bundles.map((item) => item.name);
+    // List all existing bundles names
+    const allBundles = assetsManifest.bundles.map((item) => item.name);
 
-  // Start up background loading of all bundles
-  Assets.backgroundLoadBundle(allBundles);
+    // Start up background loading of all bundles
+    if (allBundles.length > 0) {
+      Assets.backgroundLoadBundle(allBundles);
+    }
+  } catch (error) {
+    console.warn("[Assets] Failed to load assets manifest, continuing without assets:", error);
+    // Initialize with empty manifest if assets are not available
+    assetsManifest = { bundles: [] };
+  }
 }
