@@ -48,10 +48,15 @@ function visibilityChange() {
 
 /** Setup app and initialise assets */
 async function init() {
-  const canvas = document.querySelector('canvas')!;
+  const canvas = document.querySelector('#game-canvas') as HTMLCanvasElement;
+  if (!canvas) {
+    console.error('Canvas element not found!');
+    return;
+  }
+  
   // Initialize the PixiJS application
   await app.init({
-    view: canvas,
+    canvas: canvas,
     backgroundColor: Colors.BACKGROUND_PRIMARY,
     antialias: true,
     resolution: Math.max(window.devicePixelRatio, 2),
@@ -62,13 +67,14 @@ async function init() {
   canvas.style.display = 'block';
   canvas.style.margin = 'auto';
 
+  // Canvas is already in the HTML, no need to append it again
   // Add pixi canvas element to the document's body
-  const gameContainer = document.getElementById('game-container');
-  if (gameContainer) {
-    gameContainer.appendChild(canvas);
-  } else {
-    document.body.appendChild(canvas);
-  }
+  // const gameContainer = document.getElementById('game-container');
+  // if (gameContainer) {
+  //   gameContainer.appendChild(canvas);
+  // } else {
+  //   document.body.appendChild(canvas);
+  // }
 
   // Whenever the window resizes, call the 'resize' function
   window.addEventListener("resize", resize);
