@@ -128,12 +128,12 @@ export class PlayerDetailScene extends BaseScene {
     const startX = (this.gameWidth - totalCardsWidth) / 2;
     
     // Title - centered
-    const collectionTitle = new Text('Character Collection', {
+    const collectionTitle = new Text({ text: 'Character Collection', style: {
       fontFamily: 'Kalam',
       fontSize: 24,
       fontWeight: 'bold',
       fill: Colors.TEXT_PRIMARY
-    });
+    }});
     collectionTitle.anchor.set(0.5, 0);
     collectionTitle.x = this.gameWidth / 2;
     collectionTitle.y = 360;

@@ -23,9 +23,12 @@ export class DungeonScene extends BaseScene {
   }
 
   private createBackground(): void {
+    const bgContainer = new Container();
     const bg = new Graphics();
     bg.fill(0x1a0e0a).rect(0, 0, this.gameWidth, this.gameHeight);
-    
+
+    bgContainer.addChild(bg);
+
     // Add mystical atmosphere
     for (let i = 0; i < 15; i++) {
       const orb = new Graphics();
@@ -35,10 +38,10 @@ export class DungeonScene extends BaseScene {
           Math.random() * this.gameHeight,
           5 + Math.random() * 10
         );
-      bg.addChild(orb);
+      bgContainer.addChild(orb);
     }
-    
-    this.addChildAt(bg, 0);
+
+    this.addChildAt(bgContainer, 0);
   }
 
   private createHeader(): void {
