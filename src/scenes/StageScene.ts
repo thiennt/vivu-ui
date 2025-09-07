@@ -4,6 +4,7 @@ import { Dungeon } from '@/types';
 import { navigation } from '@/utils/navigation';
 import { HomeScene } from './HomeScene';
 import { Colors } from '@/utils/colors';
+import { DungeonScene } from './DungeonScene';
 
 export class StageScene extends BaseScene {
   private dungeon: Dungeon | null = null;
@@ -296,7 +297,7 @@ export class StageScene extends BaseScene {
       this.gameHeight - 80,
       200,
       50,
-      () => navigation.showScreen(HomeScene)
+      () => navigation.showScreen(DungeonScene)
     );
     this.addChild(backButton);
   }

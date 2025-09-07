@@ -106,15 +106,15 @@ export class CharactersScene extends BaseScene {
 
   private createCharacterGrid(): void {
     const gridContainer = new Container();
-    const cardsPerRow = Math.floor((this.gameWidth - 100) / 150);
+    const cardsPerRow = 3;
     const cardWidth = 140;
     const cardHeight = 180;
     const spacing = 10;
     
     // Calculate starting position to center the grid
     const totalGridWidth = cardsPerRow * cardWidth + (cardsPerRow - 1) * spacing;
-    const startX = (this.gameWidth - totalGridWidth) / 2;
-    
+    const startX = (this.gameWidth - totalGridWidth) / 4;
+
     mockCharacters.forEach((character, index) => {
       const row = Math.floor(index / cardsPerRow);
       const col = index % cardsPerRow;
@@ -143,12 +143,12 @@ export class CharactersScene extends BaseScene {
     });
     
     // Hover effects
-    card.on('pointerover', () => {
-      card.scale.set(1.05);
-    });
-    card.on('pointerout', () => {
-      card.scale.set(1.0);
-    });
+    // card.on('pointerover', () => {
+    //   card.scale.set(1.05);
+    // });
+    // card.on('pointerout', () => {
+    //   card.scale.set(1.0);
+    // });
     
     return card;
   }
@@ -170,7 +170,7 @@ export class CharactersScene extends BaseScene {
   private createBackButton(): void {
     const backButton = this.createButton(
       '← Back',
-      50,
+      5,
       this.gameHeight - 80,
       150,
       50,

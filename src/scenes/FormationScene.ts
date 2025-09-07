@@ -63,7 +63,6 @@ export class FormationScene extends BaseScene {
     this.createFormationGrid();
     this.createCharacterPool();
     this.createActionButtons();
-    this.createBackButton();
   }
 
   private createBackground(): void {
@@ -91,18 +90,25 @@ export class FormationScene extends BaseScene {
 
   private createHeader(): void {
     const title = this.createTitle('Battle Formation', this.gameWidth / 2, 60);
+    title.anchor.set(0.5, 0.5);
+    title.x = this.gameWidth / 2;
+    title.y = 60;
+
     const subtitle = new Text({
       text: 'Drag to swap positions in formation. Click to move between formation and pool.',
       style: {
         fontFamily: 'Kalam',
         fontSize: 16,
         fill: Colors.TEXT_SECONDARY,
-        align: 'center'
+        align: 'center',
+        wordWrap: true,
+        wordWrapWidth: this.gameWidth - 40
       }
     });
-    subtitle.anchor.set(0.5);
+    subtitle.anchor.set(0.5, 0.5);
     subtitle.x = this.gameWidth / 2;
     subtitle.y = 100;
+
     this.addChild(title, subtitle);
   }
 
@@ -115,17 +121,18 @@ export class FormationScene extends BaseScene {
     const cols = 2;
     const slotSize = 100;
     const spacing = 20;
-    const startX = (this.gameWidth - (cols * slotSize + (cols - 1) * spacing)) / 2;
+    const gridWidth = cols * slotSize + (cols - 1) * spacing;
+    const startX = (this.gameWidth - gridWidth) / 2;
     const startY = 150;
 
     this.slotHitBoxes = [];
     for (let row = 0; row < rows; row++) {
       for (let col = 0; col < cols; col++) {
         const positionIndex = row * cols + col;
-        const x = startX + col * (slotSize + spacing);
-        const y = startY + row * (slotSize + spacing);
+        const x = col * (slotSize + spacing);
+        const y = row * (slotSize + spacing);
 
-        this.slotHitBoxes.push({index: positionIndex, x, y, size: slotSize});
+        this.slotHitBoxes.push({index: positionIndex, x: startX + x, y: startY + y, size: slotSize});
 
         const slot = this.createFormationSlot(x, y, slotSize, positionIndex);
         formationContainer.addChild(slot);
@@ -150,8 +157,8 @@ export class FormationScene extends BaseScene {
       }
     });
     frontLabel.anchor.set(0.5);
-    frontLabel.x = startX - 50;
-    frontLabel.y = startY + slotSize / 2;
+    frontLabel.x = -50;
+    frontLabel.y = slotSize / 2;
 
     const backLabel = new Text({
       text: 'BACK',
@@ -163,10 +170,15 @@ export class FormationScene extends BaseScene {
       }
     });
     backLabel.anchor.set(0.5);
-    backLabel.x = startX - 50;
-    backLabel.y = startY + slotSize + spacing + slotSize / 2;
+    backLabel.x = -50;
+    backLabel.y = slotSize + spacing + slotSize / 2;
 
     formationContainer.addChild(frontLabel, backLabel);
+
+    // Center the grid container horizontally
+    formationContainer.x = startX;
+    formationContainer.y = startY;
+
     this.addChild(formationContainer);
 
     app.stage.eventMode = 'static';
@@ -240,13 +252,12 @@ export class FormationScene extends BaseScene {
     const cardWidth = 90;
     const cardHeight = 80;
     const colCount = 4;
-    const spacing = 20;
-    const marginLeft = 20;
+    const spacing = 20; // Always fixed
     const marginTop = 45;
     const lineHeight = cardHeight + 10;
     const cardsPerRow = colCount;
-    const totalCards = this.availableCharacters.length;
-    const rowCount = Math.ceil(totalCards / cardsPerRow);
+    const totalRowWidth = cardsPerRow * cardWidth + (cardsPerRow - 1) * spacing;
+    let marginLeft = (poolWidth - totalRowWidth) / 2;
 
     if (this.poolScrollContainer) {
       this.poolScrollContainer.destroy({children: true});
@@ -257,12 +268,14 @@ export class FormationScene extends BaseScene {
     this.availableCharacters.forEach((character, index) => {
       const col = index % cardsPerRow;
       const row = Math.floor(index / cardsPerRow);
+
       const x = marginLeft + col * (cardWidth + spacing);
       const y = marginTop + row * lineHeight;
       const characterCard = this.createPoolCharacterCard(character, x, y);
       scrollContainer.addChild(characterCard);
     });
 
+    // Mask for scroll area
     const mask = new Graphics();
     mask.rect(0, 0, poolWidth, poolHeight).fill(0xffffff);
 
@@ -466,44 +479,61 @@ export class FormationScene extends BaseScene {
   }
 
   private createActionButtons(): void {
+    const buttonWidth = 150;
+    const buttonHeight = 50;
+    const buttonSpacing = 30;
+    const buttonCount = 3;
+
+    // Calculate total width for all buttons and spacing
+    const totalWidth = buttonWidth * buttonCount + buttonSpacing * (buttonCount - 1);
+    const startX = (this.gameWidth - totalWidth) / 2;
+    const y = this.gameHeight - 80;
+
+    // Back button
+    const backButton = this.createButton(
+      '← Back to Home',
+      5,
+      y,
+      buttonWidth,
+      buttonHeight,
+      () => navigation.showScreen(HomeScene)
+    );
+
+    // Save button
     const saveButton = this.createButton(
       'Save Formation',
-      this.gameWidth - 200,
-      this.gameHeight - 140,
-      150,
-      50,
+      startX + buttonWidth + buttonSpacing,
+      y,
+      buttonWidth,
+      buttonHeight,
       () => {
         mockPlayer.formation.positions = [...this.formationPositions];
         alert('Formation saved successfully!');
       }
     );
-    const resetButton = this.createButton(
-      'Reset',
-      this.gameWidth - 370,
-      this.gameHeight - 140,
-      150,
-      50,
+
+    // Auto button: fill formation with available characters
+    const autoButton = this.createButton(
+      'Auto',
+      startX + (buttonWidth + buttonSpacing) * 2,
+      y,
+      buttonWidth,
+      buttonHeight,
       () => {
-        this.cleanUpFloatingCards();
-        this.formationPositions = [...mockPlayer.formation.positions];
+        // Fill empty slots in formation with available characters
+        let available = [...this.availableCharacters];
+        this.formationPositions = this.formationPositions.map(pos => {
+          if (pos) return pos;
+          return available.shift() || null;
+        });
+        // Remove filled characters from pool
         this.availableCharacters = mockPlayer.characters.filter(
           char => !this.formationPositions.includes(char)
         );
         this.refreshFormation();
       }
     );
-    this.addChild(saveButton, resetButton);
-  }
 
-  private createBackButton(): void {
-    const backButton = this.createButton(
-      '← Back to Home',
-      50,
-      this.gameHeight - 80,
-      200,
-      50,
-      () => navigation.showScreen(HomeScene)
-    );
-    this.addChild(backButton);
+    this.addChild(backButton, saveButton, autoButton);
   }
 }

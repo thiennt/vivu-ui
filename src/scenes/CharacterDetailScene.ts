@@ -3,6 +3,7 @@ import { Character } from '@/types';
 import { navigation } from '@/utils/navigation';
 import { HomeScene } from './HomeScene';
 import { BaseScene } from '@/utils/BaseScene';
+import { CharactersScene } from './CharactersScene';
 
 export class CharacterDetailScene extends BaseScene {
   /** Assets bundles required by this screen */
@@ -48,7 +49,9 @@ export class CharacterDetailScene extends BaseScene {
     
     // Large character card
     const largeCard = this.createCard(50, 120, 200, 250, this.character!.rarity);
-    
+
+    const marginLeft = 30;
+
     // Token symbol
     const symbolText = new Text({
       text: this.character!.tokenSymbol,
@@ -61,7 +64,7 @@ export class CharacterDetailScene extends BaseScene {
         }
       });
     symbolText.anchor.set(0.5);
-    symbolText.x = 100;
+    symbolText.x = marginLeft;
     symbolText.y = 60;
     
     // Level
@@ -76,7 +79,7 @@ export class CharacterDetailScene extends BaseScene {
       }
     });
     levelText.anchor.set(0.5);
-    levelText.x = 100;
+    levelText.x = marginLeft;
     levelText.y = 120;
     
     // Experience
@@ -90,7 +93,7 @@ export class CharacterDetailScene extends BaseScene {
       }
     });
     expText.anchor.set(0.5);
-    expText.x = 100;
+    expText.x = marginLeft;
     expText.y = 150;
     
     // Rarity
@@ -105,7 +108,7 @@ export class CharacterDetailScene extends BaseScene {
       }
     });
     rarityText.anchor.set(0.5);
-    rarityText.x = 100;
+    rarityText.x = marginLeft;
     rarityText.y = 180;
     
     // Element
@@ -119,7 +122,7 @@ export class CharacterDetailScene extends BaseScene {
       }
     });
     elementText.anchor.set(0.5);
-    elementText.x = 100;
+    elementText.x = marginLeft;
     elementText.y = 210;
     
     largeCard.addChild(symbolText, levelText, expText, rarityText, elementText);
@@ -130,13 +133,16 @@ export class CharacterDetailScene extends BaseScene {
 
   private createStatsDisplay(): void {
     const statsContainer = new Container();
+    const spacing = 20;
 
-    // Stats panel
-    const statsPanel = new Graphics();
-    statsPanel.fill({ color: 0x3e2723, alpha: 0.9 })
+    // Stats panel background
+    const statsPanelBg = new Graphics();
+    statsPanelBg.fill({ color: 0x3e2723, alpha: 0.9 })
       .stroke({ width: 3, color: 0x8d6e63 })
       .roundRect(0, 0, 300, 250, 12);
-    
+
+    statsContainer.addChild(statsPanelBg);
+
     // Title
     const title = new Text({
       text: 'Character Statistics',
@@ -147,9 +153,10 @@ export class CharacterDetailScene extends BaseScene {
         fill: 0xffecb3
       }
     });
-    title.x = 15;
+    title.x = 15 + spacing;
     title.y = 15;
-    
+    statsContainer.addChild(title);
+
     // Stats
     const stats = [
       { name: 'Health', value: this.character!.stats.health, color: 0x4caf50 },
@@ -159,10 +166,12 @@ export class CharacterDetailScene extends BaseScene {
       { name: 'Crit Rate', value: this.character!.stats.criticalRate + '%', color: 0xff9800 },
       { name: 'Crit Damage', value: this.character!.stats.criticalDamage + '%', color: 0x9c27b0 }
     ];
-    
+
+    const maxValue = Math.max(...stats.filter(s => typeof s.value === 'number').map(s => s.value as number));
+
     stats.forEach((stat, index) => {
       const y = 50 + (index * 30);
-      
+
       // Stat name
       const nameText = new Text({
         text: stat.name + ':',
@@ -172,9 +181,10 @@ export class CharacterDetailScene extends BaseScene {
           fill: 0xd7ccc8
         }
       });
-      nameText.x = 15;
+      nameText.x = 15 + spacing;
       nameText.y = y;
-      
+      statsContainer.addChild(nameText);
+
       // Stat value
       const valueText = new Text({
         text: stat.value.toString(),
@@ -185,31 +195,31 @@ export class CharacterDetailScene extends BaseScene {
           fill: stat.color
         }
       });
-      valueText.x = 200;
+      valueText.x = 200 + spacing;
       valueText.y = y;
-      
-      // Stat bar
+      statsContainer.addChild(valueText);
+
+      // Stat bar background
       const barBg = new Graphics();
       barBg.fill(0x424242).rect(15, y + 20, 270, 4);
-      
-      const maxValue = Math.max(...stats.filter(s => typeof s.value === 'number').map(s => s.value as number));
+      statsContainer.addChild(barBg);
+
+      // Stat bar
       const barWidth = (typeof stat.value === 'number' ? stat.value : 0) / maxValue * 270;
-      
       const bar = new Graphics();
       bar.fill(stat.color).rect(15, y + 20, barWidth, 4);
-      
-      statsPanel.addChild(nameText, valueText, barBg, bar);
+      statsContainer.addChild(bar);
     });
-    
-    statsContainer.addChild(statsPanel, title);
+
     statsContainer.x = this.gameWidth - 350;
     statsContainer.y = 120;
-    
+
     this.addChild(statsContainer);
   }
 
   private createSkillsDisplay(): void {
     const skillsContainer = new Container();
+    const marginLeft = 0;
 
     // Skills panel
     const skillsPanel = new Graphics();
@@ -227,7 +237,7 @@ export class CharacterDetailScene extends BaseScene {
         fill: 0xffecb3
       }
     });
-    title.x = 15;
+    title.x = marginLeft;
     title.y = 15;
     
     skillsContainer.addChild(skillsPanel, title);
@@ -252,7 +262,7 @@ export class CharacterDetailScene extends BaseScene {
           fill: 0xffecb3
         }
       });
-      skillName.x = 10;
+      skillName.x = marginLeft;
       skillName.y = 10;
       
       // Skill description
@@ -266,7 +276,7 @@ export class CharacterDetailScene extends BaseScene {
           wordWrapWidth: 260
         }
       });
-      skillDesc.x = 10;
+      skillDesc.x = marginLeft;
       skillDesc.y = 30;
       
       // Skill stats
@@ -278,17 +288,17 @@ export class CharacterDetailScene extends BaseScene {
           fill: 0xa1887f
         }
       });
-      skillStats.x = 10;
+      skillStats.x = marginLeft;
       skillStats.y = 60;
       
       skillCard.addChild(skillBg, skillName, skillDesc, skillStats);
-      skillCard.x = 15 + (index * 300);
+      skillCard.x = marginLeft + (index * 300);
       skillCard.y = 50;
       
       skillsContainer.addChild(skillCard);
     });
     
-    skillsContainer.x = 50;
+    skillsContainer.x = marginLeft + 15;
     skillsContainer.y = this.gameHeight - 220;
     
     this.addChild(skillsContainer);
@@ -308,11 +318,11 @@ export class CharacterDetailScene extends BaseScene {
   private createBackButton(): void {
     const backButton = this.createButton(
       '← Back to Characters',
-      50,
+      5,
       this.gameHeight - 80,
       200,
       50,
-      () => navigation.showScreen(HomeScene)
+      () => navigation.showScreen(CharactersScene)
     );
     this.addChild(backButton);
   }

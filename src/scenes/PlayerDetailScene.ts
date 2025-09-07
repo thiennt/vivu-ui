@@ -6,6 +6,7 @@ import { CharactersScene } from './CharactersScene';
 import { CharacterDetailScene } from './CharacterDetailScene';
 import { HomeScene } from './HomeScene';
 import { Colors } from '@/utils/colors';
+import { ScrollBox } from '@pixi/ui';
 
 export class PlayerDetailScene extends BaseScene {
   constructor() {
@@ -118,15 +119,13 @@ export class PlayerDetailScene extends BaseScene {
 
   private createCharacterCollection(): void {
     const collectionContainer = new Container();
-    
-    // Calculate responsive layout - updated for new card dimensions
+
+    // Card layout
     const cardWidth = 120;
     const cardHeight = 140;
     const cardSpacing = 10;
-    const cardsToShow = Math.min(5, mockPlayer.characters.length);
-    const totalCardsWidth = (cardWidth * cardsToShow) + (cardSpacing * (cardsToShow - 1));
-    const startX = (this.gameWidth - totalCardsWidth) / 2;
-    
+    const totalCards = mockPlayer.characters.length;
+
     // Title - centered
     const collectionTitle = new Text({ text: 'Character Collection', style: {
       fontFamily: 'Kalam',
@@ -137,30 +136,42 @@ export class PlayerDetailScene extends BaseScene {
     collectionTitle.anchor.set(0.5, 0);
     collectionTitle.x = this.gameWidth / 2;
     collectionTitle.y = 360;
-    
-    // Character preview cards - centered
-    const cardContainer = new Container();
-    
-    mockPlayer.characters.slice(0, cardsToShow).forEach((character, index) => {
-      const card = this.createCharacterPreviewCard(character, index * (cardWidth + cardSpacing), 0);
-      cardContainer.addChild(card);
+
+    // --- ScrollBox setup ---
+    const visibleCards = Math.min(5, totalCards);
+    const scrollBoxWidth = (cardWidth * visibleCards) + (cardSpacing * (visibleCards - 1));
+    const scrollBoxHeight = cardHeight;
+    const scrollBox = new ScrollBox({
+      width: scrollBoxWidth,
+      height: scrollBoxHeight,
+      elementsMargin: 0,
     });
-    
-    cardContainer.x = startX;
-    cardContainer.y = 400;
-    
-    // View all button - adjusted position for new card height
+
+    // Add cards to ScrollBox content
+    mockPlayer.characters.forEach((character, index) => {
+      const card = this.createCharacterPreviewCard(character, index * (cardWidth + cardSpacing), 0);
+      scrollBox.addItem(card);
+    });
+
+    // Set content width for scrolling
+    scrollBox.width = (cardWidth + cardSpacing) * totalCards - cardSpacing;
+
+    // Position ScrollBox centered horizontally
+    scrollBox.x = (this.gameWidth - scrollBoxWidth) / 2;
+    scrollBox.y = 400;
+
+    // View all button
     const buttonWidth = 200;
     const viewAllButton = this.createButton(
       'View All Characters',
       (this.gameWidth - buttonWidth) / 2,
-      cardContainer.y + cardHeight + 20,
+      scrollBox.y + cardHeight + 20,
       buttonWidth,
       50,
       () => navigation.showScreen(CharactersScene)
     );
-    
-    collectionContainer.addChild(collectionTitle, cardContainer, viewAllButton);
+
+    collectionContainer.addChild(collectionTitle, scrollBox, viewAllButton);
     this.addChild(collectionContainer);
   }
 
@@ -178,7 +189,7 @@ export class PlayerDetailScene extends BaseScene {
   private createBackButton(): void {
     const backButton = this.createButton(
       '← Back to Home',
-      50,
+      5,
       this.gameHeight - 80,
       200,
       50,

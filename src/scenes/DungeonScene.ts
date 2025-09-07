@@ -67,7 +67,7 @@ export class DungeonScene extends BaseScene {
     const dungeonContainer = new Container();
     
     // Calculate responsive card width and centering
-    const cardWidth = Math.min(600, this.gameWidth - 100);
+    const cardWidth = Math.min(600, this.gameWidth);
     const cardHeight = 160;
     const verticalSpacing = 20;
     const startY = 150;
@@ -79,7 +79,7 @@ export class DungeonScene extends BaseScene {
     });
     
     // Center the entire container horizontally
-    dungeonContainer.x = (this.gameWidth - cardWidth) / 2;
+    dungeonContainer.x = 0;
     this.addChild(dungeonContainer);
   }
 
@@ -94,10 +94,10 @@ export class DungeonScene extends BaseScene {
     
     // Calculate responsive sizes
     const iconSize = 120;
-    const iconX = 20;
+    const iconX = 0;
     const iconY = 20;
-    const contentStartX = iconX + iconSize + 20;
-    const contentWidth = cardWidth - contentStartX - 20;
+    const contentStartX = iconX + iconSize;
+    const contentWidth = cardWidth - contentStartX - 10;
     const buttonWidth = Math.min(130, contentWidth / 3);
     
     // Dungeon icon/preview
@@ -198,7 +198,7 @@ export class DungeonScene extends BaseScene {
   private createBackButton(): void {
     const backButton = this.createButton(
       '← Back to Home',
-      50,
+      0,
       this.gameHeight - 80,
       200,
       50,
