@@ -6,6 +6,7 @@ import { CharactersScene } from './CharactersScene';
 import { DungeonScene } from './DungeonScene';
 import { PlayerDetailScene } from './PlayerDetailScene';
 import { FormationScene } from './FormationScene';
+import { app } from '@/app';
 
 
 export class HomeScene extends BaseScene {
@@ -19,6 +20,11 @@ export class HomeScene extends BaseScene {
     super();
 
     this.container = new Container();
+    this.addChild(this.container);
+    
+    // Initialize dimensions
+    this.gameWidth = Math.max(400, app.screen.width);
+    this.gameHeight = app.screen.height;
   }
 
   /** Prepare screen, before showing */
@@ -83,6 +89,15 @@ export class HomeScene extends BaseScene {
     this.gameWidth = Math.max(400, width);
     this.gameHeight = height;
 
+    // Update the container to match the new dimensions
+    // Recreate the background with new dimensions
+    this.container.removeChildren();
+    this.createBackground();
+    this.createHomeTitle();
+    this.createPlayerInfo();
+    this.createMenuButtons();
+    this.createDecorations();
+
     // Animate decorative elements
     this.decorativeElements.forEach((element, index) => {
       element.y += Math.sin(Date.now() * 0.001 + index) * 0.5;
@@ -90,10 +105,10 @@ export class HomeScene extends BaseScene {
       element.alpha = 0.3 + Math.sin(Date.now() * 0.002 + index) * 0.3;
 
       // Wrap around screen
-      if (element.x > this.container.width + 20) element.x = -20;
-      if (element.x < -20) element.x = this.container.width + 20;
-      if (element.y > this.container.height + 20) element.y = -20;
-      if (element.y < -20) element.y = this.container.height + 20;
+      if (element.x > this.gameWidth + 20) element.x = -20;
+      if (element.x < -20) element.x = this.gameWidth + 20;
+      if (element.y > this.gameHeight + 20) element.y = -20;
+      if (element.y < -20) element.y = this.gameHeight + 20;
     });
   }
 

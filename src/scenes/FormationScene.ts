@@ -426,7 +426,7 @@ export class FormationScene extends BaseScene {
     this.addChild(backButton);
   }
 
-  update(deltaTime: number): void {
+  update(time: Ticker): void {
     // No specific animations needed
   }
 

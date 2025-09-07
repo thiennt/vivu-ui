@@ -209,7 +209,7 @@ export class PlayerDetailScene extends BaseScene {
     this.addChild(backButton);
   }
 
-  update(deltaTime: number): void {
+  update(time: PIXI.Ticker): void {
     // No animations needed for this scene
   }
 
