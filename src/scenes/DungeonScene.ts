@@ -4,6 +4,7 @@ import { mockDungeons } from '@/utils/mockData';
 import { navigation } from '@/utils/navigation';
 import { HomeScene } from './HomeScene';
 import { StageScene } from './StageScene';
+import { Colors } from '@/utils/colors';
 
 export class DungeonScene extends BaseScene {
   constructor() {
@@ -28,7 +29,7 @@ export class DungeonScene extends BaseScene {
     // Add mystical atmosphere
     for (let i = 0; i < 15; i++) {
       const orb = new Graphics();
-      orb.fill({ color: 0x4a148c, alpha: 0.3 })
+      orb.fill({ color: Colors.DECORATION_MAGIC, alpha: 0.3 })
         .circle(
           Math.random() * this.gameWidth,
           Math.random() * this.gameHeight,
@@ -48,7 +49,7 @@ export class DungeonScene extends BaseScene {
       style: {
         fontFamily: 'Kalam',
         fontSize: 18,
-        fill: 0xd7ccc8,
+        fill: Colors.TEXT_SECONDARY,
         align: 'center'
       }
     });
@@ -62,30 +63,45 @@ export class DungeonScene extends BaseScene {
   private createDungeonList(): void {
     const dungeonContainer = new Container();
     
+    // Calculate responsive card width and centering
+    const cardWidth = Math.min(600, this.gameWidth - 100);
+    const cardHeight = 160;
+    const verticalSpacing = 20;
+    const startY = 150;
+    
     mockDungeons.forEach((dungeon, index) => {
-      const dungeonCard = this.createDungeonCard(dungeon, index);
-      dungeonCard.y = 150 + (index * 180);
+      const dungeonCard = this.createDungeonCard(dungeon, index, cardWidth, cardHeight);
+      dungeonCard.y = startY + (index * (cardHeight + verticalSpacing));
       dungeonContainer.addChild(dungeonCard);
     });
     
-    dungeonContainer.x = (this.gameWidth - 600) / 2;
+    // Center the entire container horizontally
+    dungeonContainer.x = (this.gameWidth - cardWidth) / 2;
     this.addChild(dungeonContainer);
   }
 
-  private createDungeonCard(dungeon: any, index: number): Container {
+  private createDungeonCard(dungeon: any, index: number, cardWidth: number, cardHeight: number): Container {
     const card = new Container();
     
     // Background
     const bg = new Graphics();
-    bg.fill({ color: 0x3e2723, alpha: 0.9 })
-      .stroke({ width: 3, color: 0x8d6e63 })
-      .roundRect(0, 0, 600, 160, 15);
+    bg.fill({ color: Colors.BACKGROUND_SECONDARY, alpha: 0.9 })
+      .stroke({ width: 3, color: Colors.BUTTON_PRIMARY })
+      .roundRect(0, 0, cardWidth, cardHeight, 15);
+    
+    // Calculate responsive sizes
+    const iconSize = 120;
+    const iconX = 20;
+    const iconY = 20;
+    const contentStartX = iconX + iconSize + 20;
+    const contentWidth = cardWidth - contentStartX - 20;
+    const buttonWidth = Math.min(130, contentWidth / 3);
     
     // Dungeon icon/preview
     const iconBg = new Graphics();
-    iconBg.fill(0x5d4037)
-      .stroke({ width: 2, color: 0x8d6e63 })
-      .roundRect(20, 20, 120, 120, 10);
+    iconBg.fill(Colors.BUTTON_BORDER)
+      .stroke({ width: 2, color: Colors.BUTTON_PRIMARY })
+      .roundRect(iconX, iconY, iconSize, iconSize, 10);
     
     const icon = new Text({
       text: '🏰',
@@ -95,8 +111,8 @@ export class DungeonScene extends BaseScene {
       }
     });
     icon.anchor.set(0.5);
-    icon.x = 80;
-    icon.y = 80;
+    icon.x = iconX + iconSize / 2;
+    icon.y = iconY + iconSize / 2;
     
     // Dungeon info
     const title = new Text({
@@ -105,10 +121,10 @@ export class DungeonScene extends BaseScene {
         fontFamily: 'Kalam',
         fontSize: 24,
         fontWeight: 'bold',
-        fill: 0xffecb3
+        fill: Colors.TEXT_PRIMARY
       }
     });
-    title.x = 160;
+    title.x = contentStartX;
     title.y = 20;
     
     const description = new Text({
@@ -116,12 +132,12 @@ export class DungeonScene extends BaseScene {
       style: {
         fontFamily: 'Kalam',
         fontSize: 14,
-        fill: 0xd7ccc8,
+        fill: Colors.TEXT_SECONDARY,
         wordWrap: true,
-        wordWrapWidth: 380
+        wordWrapWidth: contentWidth - buttonWidth - 20
       }
     });
-    description.x = 160;
+    description.x = contentStartX;
     description.y = 50;
     
     const requiredLevel = new Text({
@@ -130,10 +146,10 @@ export class DungeonScene extends BaseScene {
         fontFamily: 'Kalam',
         fontSize: 16,
         fontWeight: 'bold',
-        fill: 0xff9800
+        fill: Colors.RARITY_LEGENDARY
       }
     });
-    requiredLevel.x = 160;
+    requiredLevel.x = contentStartX;
     requiredLevel.y = 90;
     
     const chapters = new Text({
@@ -141,18 +157,21 @@ export class DungeonScene extends BaseScene {
       style: {
         fontFamily: 'Kalam',
         fontSize: 14,
-        fill: 0xa1887f
+        fill: Colors.TEXT_TERTIARY
       }
     });
-    chapters.x = 160;
+    chapters.x = contentStartX;
     chapters.y = 115;
     
-    // Enter button
+    // Enter button - positioned responsively
+    const buttonX = cardWidth - buttonWidth - 20;
+    const buttonY = (cardHeight - 60) / 2;
+    
     const enterButton = this.createButton(
       'Enter Dungeon',
-      450,
-      50,
-      130,
+      buttonX,
+      buttonY,
+      buttonWidth,
       60,
       () => {
         navigation.showScreen(StageScene, { selectedDungeon: dungeon });

@@ -3,6 +3,7 @@ import { BaseScene } from '@/utils/BaseScene';
 import { Dungeon } from '@/types';
 import { navigation } from '@/utils/navigation';
 import { HomeScene } from './HomeScene';
+import { Colors } from '@/utils/colors';
 
 export class StageScene extends BaseScene {
   private dungeon: Dungeon | null = null;
@@ -43,7 +44,7 @@ export class StageScene extends BaseScene {
       style: {
         fontFamily: 'Kalam',
         fontSize: 18,
-        fill: 0xd7ccc8,
+        fill: Colors.TEXT_SECONDARY,
         align: 'center'
       }
     });
@@ -57,10 +58,14 @@ export class StageScene extends BaseScene {
   private createChapterSelector(): void {
     const selectorContainer = new Container();
     
+    // Calculate responsive sizing
+    const selectorWidth = Math.min(this.gameWidth - 100, 800);
+    const buttonWidth = Math.min(160, (selectorWidth - 140) / this.dungeon!.chapters.length);
+    
     const selectorBg = new Graphics();
-    selectorBg.fill({ color: 0x3e2723, alpha: 0.9 })
-      .stroke({ width: 2, color: 0x8d6e63 })
-      .roundRect(0, 0, this.gameWidth - 100, 60, 10);
+    selectorBg.fill({ color: Colors.BACKGROUND_SECONDARY, alpha: 0.9 })
+      .stroke({ width: 2, color: Colors.BUTTON_PRIMARY })
+      .roundRect(0, 0, selectorWidth, 60, 10);
     
     const chapterTitle = new Text({
       text: 'Chapters:',
@@ -68,7 +73,7 @@ export class StageScene extends BaseScene {
         fontFamily: 'Kalam',
         fontSize: 18,
         fontWeight: 'bold',
-        fill: 0xffecb3
+        fill: Colors.TEXT_PRIMARY
       }
     });
     chapterTitle.x = 20;
@@ -76,20 +81,23 @@ export class StageScene extends BaseScene {
     
     selectorContainer.addChild(selectorBg, chapterTitle);
     
-    // Chapter buttons
+    // Chapter buttons - responsive positioning
+    let currentX = 120;
     this.dungeon!.chapters.forEach((chapter, index) => {
       const chapterButton = this.createChapterButton(
         chapter.name,
-        120 + (index * 180),
+        currentX,
         10,
-        160,
+        buttonWidth,
         40,
         index
       );
       selectorContainer.addChild(chapterButton);
+      currentX += buttonWidth + 10;
     });
     
-    selectorContainer.x = 50;
+    // Center the selector horizontally
+    selectorContainer.x = (this.gameWidth - selectorWidth) / 2;
     selectorContainer.y = 140;
     
     this.addChild(selectorContainer);
@@ -99,12 +107,12 @@ export class StageScene extends BaseScene {
     const button = new Container();
     
     const isSelected = chapterIndex === this.selectedChapter;
-    const bgColor = isSelected ? 0x8d6e63 : 0x5d4037;
-    const textColor = isSelected ? 0xffecb3 : 0xd7ccc8;
+    const bgColor = isSelected ? Colors.BUTTON_PRIMARY : Colors.BUTTON_BORDER;
+    const textColor = isSelected ? Colors.TEXT_PRIMARY : Colors.TEXT_SECONDARY;
     
     const bg = new Graphics();
     bg.fill(bgColor)
-      .stroke({ width: 2, color: 0x8d6e63 })
+      .stroke({ width: 2, color: Colors.BUTTON_PRIMARY })
       .roundRect(0, 0, width, height, 8);
 
     const buttonText = new Text({
@@ -144,17 +152,31 @@ export class StageScene extends BaseScene {
     
     const chapter = this.dungeon!.chapters[this.selectedChapter];
     if (chapter) {
+      // Calculate responsive grid layout
+      const cardWidth = 180;
+      const cardHeight = 130;
+      const cardSpacing = 20;
+      const maxColumns = Math.floor((this.gameWidth - 100) / (cardWidth + cardSpacing));
+      const columns = Math.min(3, maxColumns);
+      const gridWidth = (cardWidth * columns) + (cardSpacing * (columns - 1));
+      
       chapter.stages.forEach((stage, index) => {
         const stageCard = this.createStageCard(stage, index);
-        stageCard.x = (index % 3) * 200;
-        stageCard.y = Math.floor(index / 3) * 150;
+        const col = index % columns;
+        const row = Math.floor(index / columns);
+        
+        stageCard.x = col * (cardWidth + cardSpacing);
+        stageCard.y = row * (cardHeight + cardSpacing);
         stageContainer.addChild(stageCard);
       });
+      
+      // Center the stage grid
+      stageContainer.x = (this.gameWidth - gridWidth) / 2;
+    } else {
+      stageContainer.x = (this.gameWidth - 600) / 2;
     }
     
-    stageContainer.x = (this.gameWidth - 600) / 2;
     stageContainer.y = 240;
-    
     this.addChild(stageContainer);
   }
 
@@ -163,8 +185,8 @@ export class StageScene extends BaseScene {
     
     // Background
     const bg = new Graphics();
-    bg.fill({ color: 0x3e2723, alpha: 0.9 })
-      .stroke({ width: 3, color: 0x8d6e63 })
+    bg.fill({ color: Colors.BACKGROUND_SECONDARY, alpha: 0.9 })
+      .stroke({ width: 3, color: Colors.BUTTON_PRIMARY })
       .roundRect(0, 0, 180, 130, 10);
     
     // Stage number
@@ -174,7 +196,7 @@ export class StageScene extends BaseScene {
         fontFamily: 'Kalam',
         fontSize: 16,
         fontWeight: 'bold',
-        fill: 0xffecb3
+        fill: Colors.TEXT_PRIMARY
       }
     });
     stageNumber.x = 10;
@@ -187,7 +209,7 @@ export class StageScene extends BaseScene {
         fontFamily: 'Kalam',
         fontSize: 14,
         fontWeight: 'bold',
-        fill: 0xd7ccc8,
+        fill: Colors.TEXT_SECONDARY,
         wordWrap: true,
         wordWrapWidth: 160
       }
@@ -197,10 +219,10 @@ export class StageScene extends BaseScene {
     
     // Difficulty
     const difficultyColors: { [key: string]: number } = {
-      easy: 0x4caf50,
-      normal: 0xff9800,
-      hard: 0xf44336,
-      nightmare: 0x9c27b0
+      easy: Colors.ELEMENT_EARTH,
+      normal: Colors.RARITY_LEGENDARY,
+      hard: Colors.ELEMENT_FIRE,
+      nightmare: Colors.ELEMENT_DARK
     };
 
     const difficulty = new Text({
@@ -209,7 +231,7 @@ export class StageScene extends BaseScene {
         fontFamily: 'Kalam',
         fontSize: 12,
         fontWeight: 'bold',
-        fill: difficultyColors[stage.difficulty] || 0xffffff
+        fill: difficultyColors[stage.difficulty] || Colors.TEXT_WHITE
       }
     });
     difficulty.x = 10;
@@ -221,7 +243,7 @@ export class StageScene extends BaseScene {
       style: {
         fontFamily: 'Kalam',
         fontSize: 10,
-        fill: 0xa1887f
+        fill: Colors.TEXT_TERTIARY
       }
     });
     rewardText.x = 10;

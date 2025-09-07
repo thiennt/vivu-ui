@@ -7,6 +7,7 @@ import { DungeonScene } from './DungeonScene';
 import { PlayerDetailScene } from './PlayerDetailScene';
 import { FormationScene } from './FormationScene';
 import { app } from '@/app';
+import { Colors } from '@/utils/colors';
 
 
 export class HomeScene extends BaseScene {
@@ -104,13 +105,13 @@ export class HomeScene extends BaseScene {
     
     // Main background with gradient effect
     const bg = new Graphics();
-    bg.fill(0x1a0e0a).rect(0, 0, this.gameWidth, this.gameHeight);
+    bg.fill(Colors.BACKGROUND_PRIMARY).rect(0, 0, this.gameWidth, this.gameHeight);
     bgContainer.addChild(bg);
     
     // Add some mystical patterns
     for (let i = 0; i < 15; i++) {
       const star = new Graphics();
-      star.fill({ color: 0x4a90e2, alpha: 0.3 + Math.random() * 0.4 })
+      star.fill({ color: Colors.DECORATION_MAGIC, alpha: 0.3 + Math.random() * 0.4 })
         .circle(0, 0, 2 + Math.random() * 3);
       star.x = Math.random() * this.gameWidth;
       star.y = Math.random() * this.gameHeight;
@@ -127,13 +128,13 @@ export class HomeScene extends BaseScene {
         fontFamily: 'Kalam',
         fontSize: 72,
         fontWeight: 'bold',
-        fill: 0xffecb3,
+        fill: Colors.TEXT_PRIMARY,
         stroke: {
-          color: 0x3e2723,
+          color: Colors.BACKGROUND_SECONDARY,
           width: 4,
         },
         dropShadow: {
-          color: 0x000000,
+          color: Colors.SHADOW_COLOR,
           blur: 8,
           angle: Math.PI / 6,
           distance: 8,
@@ -151,7 +152,7 @@ export class HomeScene extends BaseScene {
         fontFamily: 'Kalam',
         fontSize: 24,
         fontStyle: 'italic',
-        fill: 0xd7ccc8,
+        fill: Colors.TEXT_SECONDARY,
         align: 'center'
       }
     });
@@ -167,8 +168,8 @@ export class HomeScene extends BaseScene {
     
     // Background panel
     const bg = new Graphics();
-    bg.fill({ color: 0x3e2723, alpha: 0.8 })
-      .stroke({ width: 2, color: 0x8d6e63 })
+    bg.fill({ color: Colors.BACKGROUND_SECONDARY, alpha: 0.8 })
+      .stroke({ width: 2, color: Colors.BUTTON_PRIMARY })
       .roundRect(0, 0, 300, 100, 12);
     
     // Player info text
@@ -178,7 +179,7 @@ export class HomeScene extends BaseScene {
         fontFamily: 'Kalam',
         fontSize: 20,
         fontWeight: 'bold',
-        fill: 0xffecb3
+        fill: Colors.TEXT_PRIMARY
       }
     });
     playerName.x = 15;
@@ -189,7 +190,7 @@ export class HomeScene extends BaseScene {
       style: {
         fontFamily: 'Kalam',
         fontSize: 16,
-        fill: 0xd7ccc8
+        fill: Colors.TEXT_SECONDARY
       }
     });
     playerLevel.x = 15;
@@ -200,7 +201,7 @@ export class HomeScene extends BaseScene {
       style: {
         fontFamily: 'Kalam',
         fontSize: 16,
-        fill: 0xd7ccc8
+        fill: Colors.TEXT_SECONDARY
       }
     });
     playerExp.x = 15;
@@ -235,8 +236,9 @@ export class HomeScene extends BaseScene {
       buttonContainer.addChild(button);
     });
     
+    // Center horizontally and position vertically based on screen height
     buttonContainer.x = (this.gameWidth - 250) / 2;
-    buttonContainer.y = 350;
+    buttonContainer.y = Math.max(350, this.gameHeight * 0.55);
     
     this.container.addChild(buttonContainer);
   }
@@ -245,7 +247,7 @@ export class HomeScene extends BaseScene {
     // Add some floating magical elements
     for (let i = 0; i < 8; i++) {
       const decoration = new Graphics();
-      decoration.fill({ color: 0x4fc3f7, alpha: 0.6 })
+      decoration.fill({ color: Colors.DECORATION_MAGIC, alpha: 0.6 })
         .circle(0, 0, 3 + Math.random() * 5);
       
       decoration.x = Math.random() * this.gameWidth;

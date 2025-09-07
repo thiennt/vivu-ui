@@ -4,6 +4,7 @@ import { navigation } from './utils/navigation';
 import { HomeScene } from './scenes/HomeScene';
 import { initAssets } from "./utils/assets";
 import { getUrlParam } from './utils/getUrlParams';
+import { Colors } from './utils/colors';
 
 
 /** The PixiJS app Application instance, shared across the project */
@@ -51,7 +52,7 @@ async function init() {
   // Initialize the PixiJS application
   await app.init({
     view: canvas,
-    backgroundColor: 0x2c1810,
+    backgroundColor: Colors.BACKGROUND_PRIMARY,
     antialias: true,
     resolution: Math.max(window.devicePixelRatio, 2),
     autoDensity: true

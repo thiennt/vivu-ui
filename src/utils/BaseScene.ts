@@ -1,6 +1,7 @@
 import { Container, Graphics, Text } from 'pixi.js';
 import { app } from '@/app';
 import { navigation } from './navigation';
+import { Colors } from './colors';
 
 export abstract class BaseScene extends Container {
   /** Assets bundles required by this screen */
@@ -19,7 +20,7 @@ export abstract class BaseScene extends Container {
     // Only create background if dimensions are properly set
     if (this.gameWidth && this.gameHeight) {
       const bg = new Graphics();
-      bg.fill(0x2c1810).rect(0, 0, this.gameWidth, this.gameHeight);
+      bg.fill(Colors.BACKGROUND_PRIMARY).rect(0, 0, this.gameWidth, this.gameHeight);
       this.addChild(bg);
     }
   }
@@ -41,8 +42,8 @@ export abstract class BaseScene extends Container {
     
     // Button background with fantasy styling
     const bg = new Graphics();
-    bg.fill(0x8d6e63)
-      .stroke({ width: 3, color: 0x5d4037 })
+    bg.fill(Colors.BUTTON_PRIMARY)
+      .stroke({ width: 3, color: Colors.BUTTON_BORDER })
       .roundRect(0, 0, width, height, 8);
     
     // Button text
@@ -52,7 +53,7 @@ export abstract class BaseScene extends Container {
         fontFamily: 'Kalam',
         fontSize: 18,
         fontWeight: 'bold',
-        fill: 0xfff8e1,
+        fill: Colors.TEXT_BUTTON,
         align: 'center'
       }
     });
@@ -68,7 +69,7 @@ export abstract class BaseScene extends Container {
     
     // Hover effects
     button.on('pointerover', () => {
-      bg.tint = 0xa1887f;
+      bg.tint = Colors.BUTTON_HOVER;
     });
     button.on('pointerout', () => {
       bg.tint = 0xffffff;
@@ -88,13 +89,13 @@ export abstract class BaseScene extends Container {
         fontFamily: 'Kalam',
         fontSize: 36,
         fontWeight: 'bold',
-        fill: 0xffecb3,
+        fill: Colors.TEXT_PRIMARY,
         stroke: {
-          color: 0x3e2723,
+          color: Colors.BACKGROUND_SECONDARY,
           width: 3,
         },
         dropShadow: {
-          color: 0x000000,
+          color: Colors.SHADOW_COLOR,
           blur: 4,
           angle: Math.PI / 6,
           distance: 6,
@@ -118,16 +119,16 @@ export abstract class BaseScene extends Container {
     const card = new Container();
     
     const rarityColors: { [key: string]: number } = {
-      common: 0x8d6e63,
-      uncommon: 0x66bb6a,
-      rare: 0x42a5f5,
-      epic: 0xab47bc,
-      legendary: 0xff9800
+      common: Colors.RARITY_COMMON,
+      uncommon: Colors.RARITY_UNCOMMON,
+      rare: Colors.RARITY_RARE,
+      epic: Colors.RARITY_EPIC,
+      legendary: Colors.RARITY_LEGENDARY
     };
     
     const bg = new Graphics();
     bg.fill(rarityColors[rarity] || rarityColors.common)
-      .stroke({ width: 2, color: 0x3e2723 })
+      .stroke({ width: 2, color: Colors.CARD_BORDER })
       .roundRect(0, 0, width, height, 8);
     
     card.addChild(bg);

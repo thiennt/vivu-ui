@@ -5,6 +5,7 @@ import { navigation } from '@/utils/navigation';
 import { CharactersScene } from './CharactersScene';
 import { CharacterDetailScene } from './CharacterDetailScene';
 import { HomeScene } from './HomeScene';
+import { Colors } from '@/utils/colors';
 
 export class PlayerDetailScene extends BaseScene {
   constructor() {
@@ -24,7 +25,7 @@ export class PlayerDetailScene extends BaseScene {
 
   private createBackground(): void {
     const bg = new Graphics();
-    bg.fill(0x2c1810).rect(0, 0, this.gameWidth, this.gameHeight);
+    bg.fill(Colors.BACKGROUND_PRIMARY).rect(0, 0, this.gameWidth, this.gameHeight);
     this.addChildAt(bg, 0);
   }
 
@@ -36,6 +37,12 @@ export class PlayerDetailScene extends BaseScene {
   private createPlayerStats(): void {
     const statsContainer = new Container();
     
+    // Calculate responsive panel sizes and positioning
+    const panelWidth = Math.min(280, (this.gameWidth - 100) / 2.2);
+    const panelGap = 40;
+    const totalWidth = (panelWidth * 2) + panelGap;
+    const startX = (this.gameWidth - totalWidth) / 2;
+    
     // Main info panel
     const mainPanel = this.createStatsPanel(
       'Player Information',
@@ -45,7 +52,7 @@ export class PlayerDetailScene extends BaseScene {
         `Experience: ${mockPlayer.experience}`,
         `Characters: ${mockPlayer.characters.length}`
       ],
-      300, 160
+      panelWidth, 160
     );
     
     // Stats panel
@@ -59,13 +66,14 @@ export class PlayerDetailScene extends BaseScene {
         `Intelligence: ${mockPlayer.stats.intelligence}`,
         `Vitality: ${mockPlayer.stats.vitality}`
       ],
-      280, 200
+      panelWidth, 200
     );
     
-    mainPanel.x = 50;
+    // Center both panels horizontally
+    mainPanel.x = startX;
     mainPanel.y = 120;
     
-    statsPanel.x = this.gameWidth - 330;
+    statsPanel.x = startX + panelWidth + panelGap;
     statsPanel.y = 120;
     
     statsContainer.addChild(mainPanel, statsPanel);
@@ -77,8 +85,8 @@ export class PlayerDetailScene extends BaseScene {
     
     // Background
     const bg = new Graphics();
-    bg.fill({ color: 0x3e2723, alpha: 0.9 })
-      .stroke({ width: 3, color: 0x8d6e63 })
+    bg.fill({ color: Colors.BACKGROUND_SECONDARY, alpha: 0.9 })
+      .stroke({ width: 3, color: Colors.BUTTON_PRIMARY })
       .roundRect(0, 0, width, height, 12);
     
     // Title
@@ -86,7 +94,7 @@ export class PlayerDetailScene extends BaseScene {
       fontFamily: 'Kalam',
       fontSize: 20,
       fontWeight: 'bold',
-      fill: 0xffecb3
+      fill: Colors.TEXT_PRIMARY
     }});
     titleText.x = 15;
     titleText.y = 15;
@@ -98,7 +106,7 @@ export class PlayerDetailScene extends BaseScene {
       const statText = new Text({text: stat, style: {
         fontFamily: 'Kalam',
         fontSize: 16,
-        fill: 0xd7ccc8
+        fill: Colors.TEXT_SECONDARY
       }});
       statText.x = 15;
       statText.y = 50 + (index * 22);
@@ -111,33 +119,42 @@ export class PlayerDetailScene extends BaseScene {
   private createCharacterCollection(): void {
     const collectionContainer = new Container();
     
-    // Title
+    // Calculate responsive layout
+    const cardWidth = 120;
+    const cardSpacing = 10;
+    const cardsToShow = Math.min(5, mockPlayer.characters.length);
+    const totalCardsWidth = (cardWidth * cardsToShow) + (cardSpacing * (cardsToShow - 1));
+    const startX = (this.gameWidth - totalCardsWidth) / 2;
+    
+    // Title - centered
     const collectionTitle = new Text('Character Collection', {
       fontFamily: 'Kalam',
       fontSize: 24,
       fontWeight: 'bold',
-      fill: 0xffecb3
+      fill: Colors.TEXT_PRIMARY
     });
-    collectionTitle.x = 50;
+    collectionTitle.anchor.set(0.5, 0);
+    collectionTitle.x = this.gameWidth / 2;
     collectionTitle.y = 360;
     
-    // Character preview cards
+    // Character preview cards - centered
     const cardContainer = new Container();
     
-    mockPlayer.characters.slice(0, 5).forEach((character, index) => {
-      const card = this.createCharacterPreviewCard(character, index * 130, 0);
+    mockPlayer.characters.slice(0, cardsToShow).forEach((character, index) => {
+      const card = this.createCharacterPreviewCard(character, index * (cardWidth + cardSpacing), 0);
       cardContainer.addChild(card);
     });
     
-    cardContainer.x = 50;
+    cardContainer.x = startX;
     cardContainer.y = 400;
     
-    // View all button
+    // View all button - responsive positioning
+    const buttonWidth = 200;
     const viewAllButton = this.createButton(
       'View All Characters',
-      this.gameWidth - 250,
-      420,
-      200,
+      (this.gameWidth - buttonWidth) / 2,
+      480,
+      buttonWidth,
       50,
       () => navigation.showScreen(CharactersScene)
     );
@@ -154,7 +171,7 @@ export class PlayerDetailScene extends BaseScene {
       fontFamily: 'Kalam',
       fontSize: 14,
       fontWeight: 'bold',
-      fill: 0xffffff,
+      fill: Colors.TEXT_WHITE,
       align: 'center'
     }});
     nameText.anchor.set(0.5);
@@ -165,7 +182,7 @@ export class PlayerDetailScene extends BaseScene {
     const levelText = new Text({text: `Lv.${character.level}`, style: {
       fontFamily: 'Kalam',
       fontSize: 12,
-      fill: 0xd7ccc8,
+      fill: Colors.TEXT_SECONDARY,
       align: 'center'
     }});
     levelText.anchor.set(0.5);
@@ -176,7 +193,7 @@ export class PlayerDetailScene extends BaseScene {
     const hpText = new Text({text: `HP: ${character.stats.health}`, style: {
       fontFamily: 'Kalam',
       fontSize: 10,
-      fill: 0xd7ccc8
+      fill: Colors.TEXT_SECONDARY
     }});
     hpText.x = 10;
     hpText.y = 70;
@@ -184,7 +201,7 @@ export class PlayerDetailScene extends BaseScene {
     const atkText = new Text({text: `ATK: ${character.stats.attack}`, style: {
       fontFamily: 'Kalam',
       fontSize: 10,
-      fill: 0xd7ccc8
+      fill: Colors.TEXT_SECONDARY
     }});
     atkText.x = 10;
     atkText.y = 85;
