@@ -4,6 +4,7 @@ import { Character } from '@/types';
 import { mockPlayer } from '@/utils/mockData';
 import { navigation } from '@/utils/navigation';
 import { HomeScene } from './HomeScene';
+import { Colors } from '@/utils/colors';
 
 export class FormationScene extends BaseScene {
   private formationPositions: (Character | null)[] = [];
@@ -35,12 +36,12 @@ export class FormationScene extends BaseScene {
   private createBackground(): void {
     const bgContainer = new Container();
     const bg = new Graphics();
-    bg.fill(0x1a0e0a).rect(0, 0, this.gameWidth, this.gameHeight);
+    bg.fill(Colors.BACKGROUND_PRIMARY).rect(0, 0, this.gameWidth, this.gameHeight);
     
     // Battle field grid lines
     const gridSpacing = 40;
     const grid = new Graphics();
-    grid.stroke({ width: 1, color: 0x3e2723, alpha: 0.3 });
+    grid.stroke({ width: 1, color: Colors.BACKGROUND_SECONDARY, alpha: 0.3 });
     
     for (let x = 0; x <= this.gameWidth; x += gridSpacing) {
       grid.moveTo(x, 0);
@@ -63,7 +64,7 @@ export class FormationScene extends BaseScene {
       style: {
         fontFamily: 'Kalam',
         fontSize: 16,
-        fill: 0xd7ccc8,
+        fill: Colors.TEXT_SECONDARY,
         align: 'center'
       }
     });
@@ -111,7 +112,7 @@ export class FormationScene extends BaseScene {
         fontFamily: 'Kalam',
         fontSize: 14,
         fontWeight: 'bold',
-        fill: 0xf44336
+        fill: Colors.FORMATION_FRONT
       }
     });
     frontLabel.anchor.set(0.5);
@@ -124,7 +125,7 @@ export class FormationScene extends BaseScene {
         fontFamily: 'Kalam',
         fontSize: 14,
         fontWeight: 'bold',
-        fill: 0x2196f3
+        fill: Colors.FORMATION_BACK
       }
     });
     backLabel.anchor.set(0.5);
@@ -139,8 +140,8 @@ export class FormationScene extends BaseScene {
     const slot = new Container();
     
     const bg = new Graphics();
-    bg.fill({ color: 0x3e2723, alpha: 0.5 })
-      .stroke({ width: 2, color: 0x8d6e63, alpha: 0.8 })
+    bg.fill({ color: Colors.BACKGROUND_SECONDARY, alpha: 0.5 })
+      .stroke({ width: 2, color: Colors.BUTTON_PRIMARY, alpha: 0.8 })
       .roundRect(0, 0, size, size, 8);
     
     const positionText = new Text({

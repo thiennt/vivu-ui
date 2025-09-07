@@ -3,19 +3,17 @@ import { navigation } from '@/utils/navigation';
 import { mockCharacters } from '@/utils/mockData';
 import { HomeScene } from './HomeScene';
 import { BaseScene } from '@/utils/BaseScene';
+import { Colors } from '@/utils/colors';
 
 export class CharactersScene extends BaseScene {
   /** Assets bundles required by this screen */
   public static assetBundles = [];
   
-  public container: Container;
   private scrollOffset: number = 0;
   private maxScroll: number = 0;
 
   constructor() {
     super();
-
-    this.container = new Container();
     this.scrollOffset = 0;
     this.maxScroll = 0;
   }
@@ -34,16 +32,16 @@ export class CharactersScene extends BaseScene {
 
   /** Show the screen with animation */
   async show(): Promise<void> {
-    this.container.alpha = 0;
+    this.alpha = 0;
     const tween = { alpha: 0 };
     
     return new Promise((resolve) => {
       const animate = () => {
         tween.alpha += 0.05;
-        this.container.alpha = tween.alpha;
+        this.alpha = tween.alpha;
         
         if (tween.alpha >= 1) {
-          this.container.alpha = 1;
+          this.alpha = 1;
           resolve();
         } else {
           requestAnimationFrame(animate);
@@ -60,10 +58,10 @@ export class CharactersScene extends BaseScene {
     return new Promise((resolve) => {
       const animate = () => {
         tween.alpha -= 0.1;
-        this.container.alpha = tween.alpha;
+        this.alpha = tween.alpha;
         
         if (tween.alpha <= 0) {
-          this.container.alpha = 0;
+          this.alpha = 0;
           resolve();
         } else {
           requestAnimationFrame(animate);
@@ -75,15 +73,15 @@ export class CharactersScene extends BaseScene {
 
   /** Reset screen after hidden */
   reset(): void {
-    this.container.removeChildren();
+    this.removeChildren();
     this.scrollOffset = 0;
     this.maxScroll = 0;
   }
 
   private createBackground(): void {
     const bg = new Graphics();
-    bg.fill(0x2c1810).rect(0, 0, this.gameWidth, this.gameHeight);
-    this.container.addChildAt(bg, 0);
+    bg.fill(Colors.BACKGROUND_PRIMARY).rect(0, 0, this.gameWidth, this.gameHeight);
+    this.addChildAt(bg, 0);
   }
 
   private createHeader(): void {
@@ -94,7 +92,7 @@ export class CharactersScene extends BaseScene {
       style: {
         fontFamily: 'Kalam',
         fontSize: 18,
-        fill: 0xd7ccc8,
+        fill: Colors.TEXT_SECONDARY,
         align: 'center'
       }
     });
@@ -102,7 +100,7 @@ export class CharactersScene extends BaseScene {
     subtitle.x = this.gameWidth / 2;
     subtitle.y = 100;
     
-    this.container.addChild(title, subtitle);
+    this.addChild(title, subtitle);
   }
 
   private createCharacterGrid(): void {
@@ -112,11 +110,15 @@ export class CharactersScene extends BaseScene {
     const cardHeight = 180;
     const spacing = 10;
     
+    // Calculate starting position to center the grid
+    const totalGridWidth = cardsPerRow * cardWidth + (cardsPerRow - 1) * spacing;
+    const startX = (this.gameWidth - totalGridWidth) / 2;
+    
     mockCharacters.forEach((character, index) => {
       const row = Math.floor(index / cardsPerRow);
       const col = index % cardsPerRow;
       
-      const x = 50 + col * (cardWidth + spacing);
+      const x = startX + col * (cardWidth + spacing);
       const y = 140 + row * (cardHeight + spacing);
       
       const characterCard = this.createDetailedCharacterCard(character, x, y);
@@ -127,7 +129,7 @@ export class CharactersScene extends BaseScene {
     const totalRows = Math.ceil(mockCharacters.length / cardsPerRow);
     this.maxScroll = Math.max(0, (totalRows * (cardHeight + spacing)) - (this.gameHeight - 200));
     
-    this.container.addChild(gridContainer);
+    this.addChild(gridContainer);
     gridContainer.label = 'gridContainer';
   }
 
@@ -141,7 +143,7 @@ export class CharactersScene extends BaseScene {
         fontFamily: 'Kalam',
         fontSize: 24,
         fontWeight: 'bold',
-        fill: 0xffffff,
+        fill: Colors.TEXT_WHITE,
         align: 'center'
       }
     });
@@ -156,7 +158,7 @@ export class CharactersScene extends BaseScene {
         fontFamily: 'Kalam',
         fontSize: 12,
         fontWeight: 'bold',
-        fill: 0xffecb3,
+        fill: Colors.TEXT_PRIMARY,
         align: 'center',
         wordWrap: true,
         wordWrapWidth: 120
@@ -173,7 +175,7 @@ export class CharactersScene extends BaseScene {
         fontFamily: 'Kalam',
         fontSize: 14,
         fontWeight: 'bold',
-        fill: 0xd7ccc8,
+        fill: Colors.TEXT_SECONDARY,
         align: 'center'
       }
     });
@@ -186,7 +188,7 @@ export class CharactersScene extends BaseScene {
       style: {
         fontFamily: 'Kalam',
         fontSize: 10,
-        fill: 0xd7ccc8,
+        fill: Colors.TEXT_SECONDARY,
         align: 'center'
       }
     });
@@ -210,7 +212,7 @@ export class CharactersScene extends BaseScene {
         style: {
           fontFamily: 'Kalam',
           fontSize: 9,
-          fill: 0xd7ccc8
+          fill: Colors.TEXT_SECONDARY
         }
       });
       statText.x = 10 + (index % 2) * 60;
@@ -220,16 +222,16 @@ export class CharactersScene extends BaseScene {
     
     // Element indicator
     const elementColors: { [key: string]: number } = {
-      fire: 0xff5722,
-      water: 0x2196f3,
-      earth: 0x4caf50,
-      air: 0xffeb3b,
-      light: 0xffc107,
-      dark: 0x9c27b0
+      fire: Colors.ELEMENT_FIRE,
+      water: Colors.ELEMENT_WATER,
+      earth: Colors.ELEMENT_EARTH,
+      air: Colors.ELEMENT_AIR,
+      light: Colors.ELEMENT_LIGHT,
+      dark: Colors.ELEMENT_DARK
     };
     
     const elementIndicator = new Graphics();
-    elementIndicator.fill(elementColors[character.element] || 0x888888)
+    elementIndicator.fill(elementColors[character.element] || Colors.ELEMENT_DEFAULT)
       .circle(120, 20, 8);
     
     card.addChild(symbolText, nameText, levelText, expText, statsContainer, elementIndicator);
@@ -252,13 +254,13 @@ export class CharactersScene extends BaseScene {
   }
 
   private setupScrolling(): void {
-    this.container.interactive = true;
-    this.container.on('wheel', (event: any) => {
+    this.interactive = true;
+    this.on('wheel', (event: any) => {
       const delta = event.deltaY;
       this.scrollOffset += delta * 0.5;
       this.scrollOffset = Math.max(0, Math.min(this.maxScroll, this.scrollOffset));
 
-      const gridContainer = this.container.getChildByLabel('gridContainer');
+      const gridContainer = this.getChildByLabel('gridContainer');
       if (gridContainer) {
         gridContainer.y = -this.scrollOffset;
       }
@@ -274,7 +276,7 @@ export class CharactersScene extends BaseScene {
       50,
       () => navigation.showScreen(HomeScene)
     );
-    this.container.addChild(backButton);
+    this.addChild(backButton);
   }
 
   update(time: Ticker): void {
