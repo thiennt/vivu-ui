@@ -2,7 +2,6 @@ import { Application } from 'pixi.js';
 import { initDevtools } from '@pixi/devtools';
 import { navigation } from './utils/navigation';
 import { HomeScene } from './scenes/HomeScene';
-import { CharactersScene } from './scenes/CharactersScene';
 import { initAssets } from "./utils/assets";
 import { getUrlParam } from './utils/getUrlParams';
 import { Colors } from './utils/colors';
@@ -92,8 +91,6 @@ async function init() {
   //Go to one of the screens if a shortcut is present in url params, otherwise go to home screen
   if (getUrlParam("combat") !== null) {
     //await navigation.showScreen(CombatScreen);
-  } else if (getUrlParam("characters") !== null) {
-    await navigation.showScreen(CharactersScene);
   } else {
     await navigation.showScreen(HomeScene);
   }
