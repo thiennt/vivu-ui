@@ -4,6 +4,7 @@ import { mockCharacters } from '@/utils/mockData';
 import { HomeScene } from './HomeScene';
 import { BaseScene } from '@/utils/BaseScene';
 import { Colors } from '@/utils/colors';
+import { CharacterDetailScene } from './CharacterDetailScene';
 
 export class CharactersScene extends BaseScene {
   /** Assets bundles required by this screen */
@@ -238,8 +239,7 @@ export class CharactersScene extends BaseScene {
     
     // Click handler - for now just show an alert, will implement character detail screen later
     card.on('pointerdown', () => {
-      console.log('Character clicked:', character.name);
-      // TODO: Implement character detail navigation
+      navigation.showScreen(CharacterDetailScene, { selectedCharacter: character });
     });
     
     // Hover effects

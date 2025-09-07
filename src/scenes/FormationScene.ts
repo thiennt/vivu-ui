@@ -81,7 +81,7 @@ export class FormationScene extends BaseScene {
     
     // Formation positions (3x2 grid)
     const rows = 2;
-    const cols = 3;
+    const cols = 2;
     const slotSize = 100;
     const spacing = 20;
     const startX = (this.gameWidth - (cols * slotSize + (cols - 1) * spacing)) / 2;
