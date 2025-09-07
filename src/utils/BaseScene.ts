@@ -139,4 +139,171 @@ export abstract class BaseScene extends Container {
     
     return card;
   }
+
+  protected createHeroCard(
+    character: any,
+    x: number,
+    y: number,
+    cardType: 'preview' | 'detailed' | 'formation' | 'pool' = 'detailed',
+    positionIndex?: number
+  ): Container {
+    // Define card dimensions based on type
+    const cardSizes = {
+      preview: { width: 120, height: 140 },
+      detailed: { width: 140, height: 180 },
+      formation: { width: 100, height: 100 },
+      pool: { width: 90, height: 90 }
+    };
+    
+    const { width, height } = cardSizes[cardType];
+    const card = this.createCard(x, y, width, height, character.rarity);
+    
+    // Character symbol (crypto token) - always at top center
+    const symbolSize = cardType === 'detailed' ? 24 : (cardType === 'preview' ? 18 : 16);
+    const symbolText = new Text({
+      text: character.tokenSymbol,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: symbolSize,
+        fontWeight: 'bold',
+        fill: Colors.TEXT_WHITE,
+        align: 'center'
+      }
+    });
+    symbolText.anchor.set(0.5);
+    symbolText.x = width / 2;
+    symbolText.y = cardType === 'formation' || cardType === 'pool' ? height / 2 - 15 : 25;
+    
+    // Level text - positioned below symbol
+    const levelSize = cardType === 'detailed' ? 14 : (cardType === 'preview' ? 12 : 10);
+    const levelText = new Text({
+      text: `Lv.${character.level}`,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: levelSize,
+        fill: Colors.TEXT_SECONDARY,
+        align: 'center'
+      }
+    });
+    levelText.anchor.set(0.5);
+    levelText.x = width / 2;
+    levelText.y = cardType === 'formation' || cardType === 'pool' ? height / 2 + 10 : 50;
+    
+    card.addChild(symbolText, levelText);
+    
+    // Add additional elements based on card type
+    if (cardType === 'detailed') {
+      this.addDetailedCardElements(card, character, width, height);
+    } else if (cardType === 'preview') {
+      this.addPreviewCardElements(card, character, width, height);
+    }
+    
+    // Add element indicator for all types except formation/pool
+    if (cardType !== 'formation' && cardType !== 'pool') {
+      this.addElementIndicator(card, character, width);
+    }
+    
+    return card;
+  }
+
+  private addDetailedCardElements(card: Container, character: any, width: number, height: number): void {
+    // Character name - below level
+    const nameText = new Text({
+      text: character.name,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 11,
+        fontWeight: 'bold',
+        fill: Colors.TEXT_PRIMARY,
+        align: 'center',
+        wordWrap: true,
+        wordWrapWidth: width - 20
+      }
+    });
+    nameText.anchor.set(0.5);
+    nameText.x = width / 2;
+    nameText.y = 75;
+    
+    // Experience
+    const expText = new Text({
+      text: `EXP: ${character.experience}`,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 9,
+        fill: Colors.TEXT_SECONDARY,
+        align: 'center'
+      }
+    });
+    expText.anchor.set(0.5);
+    expText.x = width / 2;
+    expText.y = 95;
+    
+    // Stats in a compact grid
+    const stats = [
+      `HP: ${character.stats.health}`,
+      `ATK: ${character.stats.attack}`,
+      `DEF: ${character.stats.defense}`,
+      `SPD: ${character.stats.speed}`
+    ];
+    
+    stats.forEach((stat, index) => {
+      const statText = new Text({
+        text: stat,
+        style: {
+          fontFamily: 'Kalam',
+          fontSize: 8,
+          fill: Colors.TEXT_SECONDARY
+        }
+      });
+      statText.x = 10 + (index % 2) * (width / 2 - 10);
+      statText.y = 115 + Math.floor(index / 2) * 18;
+      card.addChild(statText);
+    });
+    
+    card.addChild(nameText, expText);
+  }
+
+  private addPreviewCardElements(card: Container, character: any, width: number, height: number): void {
+    // Basic stats for preview
+    const hpText = new Text({
+      text: `HP: ${character.stats.health}`,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 9,
+        fill: Colors.TEXT_SECONDARY
+      }
+    });
+    hpText.x = 10;
+    hpText.y = 75;
+
+    const atkText = new Text({
+      text: `ATK: ${character.stats.attack}`,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 9,
+        fill: Colors.TEXT_SECONDARY
+      }
+    });
+    atkText.x = 10;
+    atkText.y = 90;
+    
+    card.addChild(hpText, atkText);
+  }
+
+  private addElementIndicator(card: Container, character: any, width: number): void {
+    const elementColors: { [key: string]: number } = {
+      fire: Colors.ELEMENT_FIRE,
+      water: Colors.ELEMENT_WATER,
+      earth: Colors.ELEMENT_EARTH,
+      air: Colors.ELEMENT_AIR,
+      light: Colors.ELEMENT_LIGHT,
+      dark: Colors.ELEMENT_DARK
+    };
+    
+    const elementIndicator = new Graphics();
+    elementIndicator.fill(elementColors[character.element] || Colors.ELEMENT_DEFAULT)
+      .circle(width - 15, 15, 6);
+    
+    card.addChild(elementIndicator);
+  }
 }
