@@ -5,27 +5,28 @@ import { mockPlayer } from '@/utils/mockData';
 import { navigation } from '@/utils/navigation';
 import { HomeScene } from './HomeScene';
 import { Colors } from '@/utils/colors';
-
-// --- Smoother Drag Handling: Use global pointermove, avoid per-card pointermove, detach card to root during drag ---
+import { app } from '../app';
 
 export class FormationScene extends BaseScene {
   private formationPositions: (Character | null)[] = [];
   private availableCharacters: Character[] = [];
-  private selectedCharacter: Character | null = null;
-  private selectedPosition: number = -1;
 
   // Drag state
-  private isDragging = false;
   private dragOffset = { x: 0, y: 0 };
   private dragTarget: Container | null = null;
-  private dragPointerGlobal: { x: number, y: number } | null = null;
-  private dragOriginalX = 0;
-  private dragOriginalY = 0;
-  private dragOriginalPosition = -1;
+  private isDragging: boolean = false;
+  
   private slotHitBoxes: {index: number, x: number, y: number, size: number}[] = [];
 
-  // For detaching/reattaching card during drag
-  private dragOriginalParent: Container | null = null;
+  // Pool scroll
+  private poolScrollContainer: Container | null = null;
+  private poolScrollOffset: number = 0;
+  private poolScrollBar: Graphics | null = null;
+  private poolMaxScroll: number = 0;
+  private poolScrolling: boolean = false;
+  private poolScrollStartY: number = 0;
+  private poolScrollStartOffset: number = 0;
+
 
   constructor() {
     super();
@@ -35,10 +36,28 @@ export class FormationScene extends BaseScene {
     );
   }
 
+  // Utility: Clean up any floating/dragged card and any card that is a direct child of the scene
+  private cleanUpFloatingCards() {
+    if (this.dragTarget && this.dragTarget.parent) {
+      this.dragTarget.parent.removeChild(this.dragTarget);
+      this.dragTarget.destroy({ children: true });
+      this.dragTarget = null;
+    }
+    this.children
+      .filter(child =>
+        child &&
+        (child as any).label === undefined &&
+        typeof (child as any).destroy === "function"
+      )
+      .forEach(child => {
+        this.removeChild(child);
+        (child as any).destroy({ children: true });
+      });
+  }
+
   resize(width: number, height: number): void {
     this.gameWidth = width;
     this.gameHeight = height;
-
     this.createBackground();
     this.createHeader();
     this.createFormationGrid();
@@ -72,9 +91,8 @@ export class FormationScene extends BaseScene {
 
   private createHeader(): void {
     const title = this.createTitle('Battle Formation', this.gameWidth / 2, 60);
-
     const subtitle = new Text({
-      text: 'Drag characters to formation positions',
+      text: 'Drag to swap positions in formation. Click to move between formation and pool.',
       style: {
         fontFamily: 'Kalam',
         fontSize: 16,
@@ -85,7 +103,6 @@ export class FormationScene extends BaseScene {
     subtitle.anchor.set(0.5);
     subtitle.x = this.gameWidth / 2;
     subtitle.y = 100;
-
     this.addChild(title, subtitle);
   }
 
@@ -108,7 +125,6 @@ export class FormationScene extends BaseScene {
         const x = startX + col * (slotSize + spacing);
         const y = startY + row * (slotSize + spacing);
 
-        // Save slot hitboxes for drop detection
         this.slotHitBoxes.push({index: positionIndex, x, y, size: slotSize});
 
         const slot = this.createFormationSlot(x, y, slotSize, positionIndex);
@@ -152,11 +168,15 @@ export class FormationScene extends BaseScene {
 
     formationContainer.addChild(frontLabel, backLabel);
     this.addChild(formationContainer);
+
+    app.stage.eventMode = 'static';
+    app.stage.on('pointerup', this.onDragEnd, this);
+    app.stage.on('pointerupoutside', this.onDragEnd, this);
+    app.stage.hitArea = app.screen;
   }
 
   private createFormationSlot(x: number, y: number, size: number, positionIndex: number): Container {
     const slot = new Container();
-
     const bg = new Graphics();
     bg.fill({ color: Colors.BACKGROUND_SECONDARY, alpha: 0.5 })
       .stroke({ width: 2, color: Colors.BUTTON_PRIMARY, alpha: 0.8 })
@@ -179,17 +199,16 @@ export class FormationScene extends BaseScene {
     slot.x = x;
     slot.y = y;
     slot.interactive = true;
-
-    // Drop zone: handled by drag release hit testing instead
+    slot.zIndex = 0;
+    slot.eventMode = 'static';
     return slot;
   }
 
   private createFormationCharacterCard(character: Character, x: number, y: number, size: number, positionIndex: number): Container {
     const card = this.createHeroCard(character, x, y, 'formation', positionIndex);
-
-    // Make draggable
-    this.makeCharacterDraggable(card, character, positionIndex, true);
-
+    (card as any).character = character;
+    this.makeFormationCardInteractive(card, character, positionIndex);
+    card.zIndex = 1;
     return card;
   }
 
@@ -197,11 +216,14 @@ export class FormationScene extends BaseScene {
     const poolContainer = new Container();
     poolContainer.label = 'characterPool';
 
-    // Pool background
+    // --- Fixed size for pool area ---
+    const poolWidth = Math.min(this.gameWidth * 0.9, 400);
+    const poolHeight = 180;
+
     const poolBg = new Graphics();
     poolBg.fill({ color: 0x3e2723, alpha: 0.8 })
       .stroke({ width: 2, color: 0x8d6e63 })
-      .roundRect(0, 0, this.gameWidth - 100, 140, 12);
+      .roundRect(0, 0, poolWidth, poolHeight, 12);
 
     const poolTitle = new Text({
       text: 'Available Characters',
@@ -215,241 +237,230 @@ export class FormationScene extends BaseScene {
     poolTitle.x = 20;
     poolTitle.y = 15;
 
-    poolContainer.addChild(poolBg, poolTitle);
+    const cardWidth = 90;
+    const cardHeight = 80;
+    const colCount = 4;
+    const spacing = 20;
+    const marginLeft = 20;
+    const marginTop = 45;
+    const lineHeight = cardHeight + 10;
+    const cardsPerRow = colCount;
+    const totalCards = this.availableCharacters.length;
+    const rowCount = Math.ceil(totalCards / cardsPerRow);
 
-    // Available characters
+    if (this.poolScrollContainer) {
+      this.poolScrollContainer.destroy({children: true});
+    }
+    const scrollContainer = new Container();
+    this.poolScrollContainer = scrollContainer;
+
     this.availableCharacters.forEach((character, index) => {
-      const characterCard = this.createPoolCharacterCard(character, 20 + (index * 110), 45);
-      poolContainer.addChild(characterCard);
+      const col = index % cardsPerRow;
+      const row = Math.floor(index / cardsPerRow);
+      const x = marginLeft + col * (cardWidth + spacing);
+      const y = marginTop + row * lineHeight;
+      const characterCard = this.createPoolCharacterCard(character, x, y);
+      scrollContainer.addChild(characterCard);
     });
 
-    poolContainer.x = 50;
+    const mask = new Graphics();
+    mask.rect(0, 0, poolWidth, poolHeight).fill(0xffffff);
 
-    // --- Place pool just below the "BACK" row ---
+    poolContainer.addChild(mask, scrollContainer);
+    scrollContainer.mask = mask;
+
+    poolContainer.addChild(poolBg, poolTitle, scrollContainer);
+
+    // --- Center horizontally at the bottom ---
+    poolContainer.x = (this.gameWidth - poolWidth) / 2;
+    // Place below formation grid as before
     const startY = 150;
     const slotSize = 100;
-    const spacing = 20;
-    const backRowY = startY + slotSize + spacing;
+    const poolSpacing = 20;
+    const backRowY = startY + slotSize + poolSpacing;
     const backRowBottom = backRowY + slotSize;
-    poolContainer.y = backRowBottom + 20; // 20px below the back row
+    poolContainer.y = backRowBottom + 20;
 
     this.addChild(poolContainer);
   }
 
+  private updatePoolScrollBar() {
+    if (!this.poolScrollBar || this.poolMaxScroll === 0) {
+      if (this.poolScrollBar) this.poolScrollBar.visible = false;
+      return;
+    }
+    this.poolScrollBar.visible = true;
+    const visibleHeight = 140;
+    const contentHeight = this.poolScrollContainer
+      ? this.poolScrollContainer.height
+      : visibleHeight;
+    const scrollBarAreaHeight = visibleHeight - 20;
+    const barHeight = Math.max(30, scrollBarAreaHeight * (visibleHeight / contentHeight));
+    const barY = 10 + Math.abs(this.poolScrollOffset) * (scrollBarAreaHeight - barHeight) / (this.poolMaxScroll || 1);
+
+    this.poolScrollBar.clear();
+    this.poolScrollBar.fill({ color: 0xffffff, alpha: 0.5 })
+      .roundRect(0, barY, 6, barHeight, 3);
+    this.poolScrollBar.stroke({ width: 1, color: 0x8d6e63 });
+  }
+
+  private onPoolBarPointerMove = (event: any) => {
+    if (!this.poolScrolling || !this.poolScrollBar) return;
+    const visibleHeight = 140;
+    const contentHeight = this.poolScrollContainer
+      ? this.poolScrollContainer.height
+      : visibleHeight;
+    const scrollBarAreaHeight = visibleHeight - 20;
+    const barHeight = Math.max(30, scrollBarAreaHeight * (visibleHeight / contentHeight));
+    const deltaY = event.global.y - this.poolScrollStartY;
+    const scrollRange = scrollBarAreaHeight - barHeight;
+    let scrollRatio = 0;
+    if (scrollRange > 0) {
+      scrollRatio = deltaY / scrollRange;
+    }
+    let newOffset = this.poolScrollStartOffset - scrollRatio * this.poolMaxScroll;
+    newOffset = Math.max(Math.min(newOffset, 0), -this.poolMaxScroll);
+    this.poolScrollOffset = newOffset;
+    if (this.poolScrollContainer) {
+      this.poolScrollContainer.y = this.poolScrollOffset;
+    }
+    this.updatePoolScrollBar();
+  };
+
+  private onPoolBarPointerUp = () => {
+    this.poolScrolling = false;
+    this.off('pointermove', this.onPoolBarPointerMove);
+    this.off('pointerup', this.onPoolBarPointerUp);
+    this.off('pointerupoutside', this.onPoolBarPointerUp);
+  };
+
   private createPoolCharacterCard(character: Character, x: number, y: number): Container {
     const card = this.createHeroCard(character, x, y, 'pool');
-    this.makeCharacterDraggable(card, character, -1, false);
+    card.interactive = true;
+    card.cursor = 'pointer';
+    card.on('pointertap', () => {
+      this.cleanUpFloatingCards();
+      const emptyIndex = this.formationPositions.findIndex(pos => pos === null);
+      if (emptyIndex !== -1) {
+        this.formationPositions[emptyIndex] = character;
+        this.availableCharacters = this.availableCharacters.filter(c => c !== character);
+        this.refreshFormation();
+      } else {
+        alert('No available slot in formation!');
+      }
+    });
     return card;
   }
 
-  // --- Drag handling: use global pointermove, detach card to root ---
-  private onScenePointerMove = (event: any) => {
-  if (this.isDragging && this.dragTarget) {
-    const globalPos = event.global;
-    this.dragPointerGlobal = { x: globalPos.x, y: globalPos.y };
-    // Update card position immediately for smooth dragging
-    this.dragTarget.x = globalPos.x - this.dragOffset.x;
-    this.dragTarget.y = globalPos.y - this.dragOffset.y;
-  }
-};
-
-  private enableGlobalDragEvents() {
-    this.interactive = true;
-    // Add pointermove to scene (not card)
-    this.on('pointermove', this.onScenePointerMove);
-  }
-
-  private disableGlobalDragEvents() {
-    this.off('pointermove', this.onScenePointerMove);
-    this.interactive = false;
-  }
-
-  private makeCharacterDraggable(card: Container, character: Character, currentPosition: number, isInFormation: boolean): void {
+  private makeFormationCardInteractive(card: Container, character: Character, currentPosition: number): void {
     card.interactive = true;
     card.cursor = 'pointer';
 
-    if (!isInFormation) {
-      // Tap to add from pool to formation (only if slot available)
-      card.on('pointertap', () => {
-        const filledSlots = this.formationPositions.filter(pos => pos !== null).length;
-        if (filledSlots < 4) {
-          const emptyIndex = this.formationPositions.findIndex(pos => pos === null);
-          if (emptyIndex !== -1) {
-            this.formationPositions[emptyIndex] = character;
-            this.availableCharacters = this.availableCharacters.filter(c => c !== character);
-            this.refreshFormation();
-          }
-        } else {
-          alert('Formation is full!');
-        }
-      });
-      return;
-    }
-
-    // Tap to remove from formation to pool (use only this, not direct array manipulation)
-    card.on('pointertap', () => {
-      this.removeCharacterFromFormation(currentPosition);
-    });
-
-    // Drag logic (only for formation cards)
-    let dragStarted = false;
-    let pointerDownPos = { x: 0, y: 0 };
-
-    card.on('pointerdown', (event) => {
-      dragStarted = false;
-      const globalPos = event.global;
-      pointerDownPos = { x: globalPos.x, y: globalPos.y };
-
-      this.isDragging = true;
-      this.dragTarget = card;
-      this.selectedCharacter = character;
-      this.selectedPosition = currentPosition;
-
-      // Save original position and parent
-      this.dragOriginalX = card.x;
-      this.dragOriginalY = card.y;
-      this.dragOriginalPosition = currentPosition;
-      this.dragOriginalParent = card.parent as Container;
-
-      // Detach card to scene root and convert position immediately
-      const parent = card.parent as Container;
-      const globalCardPos = parent.toGlobal({ x: card.x, y: card.y });
-      if (parent && parent !== this) {
-        parent.removeChild(card);
-        this.addChild(card);
-        const localToScene = this.toLocal(globalCardPos);
-        card.x = localToScene.x;
-        card.y = localToScene.y;
-      }
-
-      this.dragOffset.x = globalPos.x - card.x;
-      this.dragOffset.y = globalPos.y - card.y;
-      this.dragPointerGlobal = { x: globalPos.x, y: globalPos.y };
-
-      card.alpha = 0.8;
-      card.scale.set(1.1);
-      card.zIndex = 9999;
-
-      this.enableGlobalDragEvents();
-    });
-
-    card.on('pointermove', (event) => {
-      if (this.isDragging && this.dragTarget === card) {
-        const globalPos = event.global;
-        if (
-          Math.abs(globalPos.x - pointerDownPos.x) > 10 ||
-          Math.abs(globalPos.y - pointerDownPos.y) > 10
-        ) {
-          dragStarted = true;
-        }
-      }
-    });
-
-    card.on('pointerup', (event) => {
-      if (this.isDragging && this.dragTarget === card) {
-        this.isDragging = false;
-        card.alpha = 1;
-        card.scale.set(1);
-        card.zIndex = 0;
-
-        const pointer = event.global;
-        let placed = false;
-
-        // If it was a drag, check for drop in slot
-        if (dragStarted) {
-          for (const slot of this.slotHitBoxes) {
-            if (
-              pointer.x >= slot.x && pointer.x <= slot.x + slot.size &&
-              pointer.y >= slot.y && pointer.y <= slot.y + slot.size
-            ) {
-              if (slot.index !== this.dragOriginalPosition) {
-                // Swap or move character in formation
-                const movingChar = this.formationPositions[this.dragOriginalPosition];
-                const targetChar = this.formationPositions[slot.index];
-                this.formationPositions[this.dragOriginalPosition] = targetChar || null;
-                this.formationPositions[slot.index] = movingChar;
-                this.refreshFormation();
-              }
-              placed = true;
-              break;
-            }
-          }
-          if (!placed) {
-            // Not dropped in slot: return card to original parent and position
-            this.removeChild(card);
-            if (this.dragOriginalParent) {
-              this.dragOriginalParent.addChild(card);
-            }
-            card.x = this.dragOriginalX;
-            card.y = this.dragOriginalY;
-          }
-        }
-
-        this.dragTarget = null;
-        this.dragPointerGlobal = null;
-        this.selectedCharacter = null;
-        this.selectedPosition = -1;
-        this.disableGlobalDragEvents();
-      }
-    });
+    card.on('pointerdown', (event) => this.onDragStart(event, card, character, currentPosition));
   }
 
-  private placeCharacterInFormation(character: Character, positionIndex: number): void {
-    // Remove dragged card from scene to avoid duplicate
-    if (this.dragTarget && this.dragTarget.parent) {
-      this.dragTarget.parent.removeChild(this.dragTarget);
-      this.dragTarget = null;
+  private onDragStart(event: any, card: Container, character: Character, currentPosition: number) {
+    card.alpha = 0.5;
+    this.dragTarget = card;
+
+    // Calculate and store drag offset
+    const globalCardPos = card.parent?.toGlobal({ x: card.x, y: card.y });
+    this.dragOffset = {
+      x: event.global.x - (globalCardPos?.x || 0),
+      y: event.global.y - (globalCardPos?.y || 0)
+    };
+
+    // Attach pointermove to stage
+    app.stage.on('pointermove', this.onDragMove, this);
+  }
+
+  private onDragMove(event: any) {
+    if (this.dragTarget) {
+      // Use dragOffset to keep the pointer at the same relative position on the card
+      const parent = this.dragTarget.parent;
+      if (parent) {
+        const newPos = parent.toLocal({
+          x: event.global.x - this.dragOffset.x,
+          y: event.global.y - this.dragOffset.y
+        });
+        this.dragTarget.position.set(newPos.x, newPos.y);
+        this.isDragging = true;
+      }
     }
-    // Remove character from current position if it's in formation
-    if (this.selectedPosition >= 0) {
-      this.formationPositions[this.selectedPosition] = null;
-    } else {
-      // Remove from available characters
-      const index = this.availableCharacters.indexOf(character);
-      if (index > -1) {
-        this.availableCharacters.splice(index, 1);
+  }
+
+  private onDragEnd(event?: any) {
+    if (!this.dragTarget) return;
+
+    // Restore card appearance
+    this.dragTarget.alpha = 1;
+
+    // Get pointer position
+    const pointer = event?.global ?? app.renderer.events.pointer.global;
+
+    // Find which slot (if any) the pointer is over
+    let targetSlotIndex: number | null = null;
+    for (const slot of this.slotHitBoxes) {
+      if (
+        pointer.x >= slot.x && pointer.x <= slot.x + slot.size &&
+        pointer.y >= slot.y && pointer.y <= slot.y + slot.size
+      ) {
+        targetSlotIndex = slot.index;
+        break;
       }
     }
 
-    // If target position is occupied, swap characters
-    const existingCharacter = this.formationPositions[positionIndex];
-    if (existingCharacter) {
-      if (this.selectedPosition >= 0) {
-        this.formationPositions[this.selectedPosition] = existingCharacter;
+    // Find the original slot index of the dragged card
+    let originalSlotIndex: number | null = null;
+    for (let i = 0; i < this.formationPositions.length; i++) {
+      const slotChar = this.formationPositions[i];
+      if (
+        slotChar &&
+        this.dragTarget &&
+        slotChar.id === ((this.dragTarget as any).character?.id)
+      ) {
+        originalSlotIndex = i;
+        break;
+      }
+    }
+
+    if (this.isDragging) {
+      // If dropped on a different slot, swap
+      if (
+        targetSlotIndex !== null &&
+        originalSlotIndex !== null &&
+        targetSlotIndex !== originalSlotIndex
+      ) {
+        const temp = this.formationPositions[originalSlotIndex];
+        this.formationPositions[originalSlotIndex] = this.formationPositions[targetSlotIndex];
+        this.formationPositions[targetSlotIndex] = temp;
+        this.refreshFormation();
       } else {
-        this.availableCharacters.push(existingCharacter);
+        // Snap back to original position if not swapped
+        if (this.dragTarget.parent) {
+          this.refreshFormation();
+        }
       }
-    }
-
-    // Place character in new position
-    this.formationPositions[positionIndex] = character;
-
-    this.refreshFormation();
-  }
-
-  private removeCharacterFromFormation(positionIndex: number): void {
-    // Remove dragged card from scene to avoid duplicate
-    if (this.dragTarget && this.dragTarget.parent) {
-      this.dragTarget.parent.removeChild(this.dragTarget);
-      this.dragTarget = null;
-    }
-    const character = this.formationPositions[positionIndex];
-    if (character) {
-      this.formationPositions[positionIndex] = null;
-      this.availableCharacters.push(character);
+    } else if (originalSlotIndex !== null) {
+      // Not a drag: treat as click, move to Character pool
+      this.formationPositions[originalSlotIndex] = null;
+      if (!this.availableCharacters.find(c => c.id === (this.dragTarget as any).character?.id)) {
+        this.availableCharacters.push((this.dragTarget as any).character);
+      }
       this.refreshFormation();
     }
+
+    this.isDragging = false;
+    app.stage.off('pointermove', this.onDragMove, this);
+    this.dragTarget = null;
   }
 
   private refreshFormation(): void {
-    // Remove existing formation and pool containers
+    this.cleanUpFloatingCards();
     const formationContainer = this.getChildByLabel('formationContainer');
     const poolContainer = this.getChildByLabel('characterPool');
-
     if (formationContainer) this.removeChild(formationContainer);
     if (poolContainer) this.removeChild(poolContainer);
-
-    // Recreate them
     this.createFormationGrid();
     this.createCharacterPool();
   }
@@ -462,12 +473,10 @@ export class FormationScene extends BaseScene {
       150,
       50,
       () => {
-        // Save formation to player data
         mockPlayer.formation.positions = [...this.formationPositions];
         alert('Formation saved successfully!');
       }
     );
-
     const resetButton = this.createButton(
       'Reset',
       this.gameWidth - 370,
@@ -475,7 +484,7 @@ export class FormationScene extends BaseScene {
       150,
       50,
       () => {
-        // Reset to original formation
+        this.cleanUpFloatingCards();
         this.formationPositions = [...mockPlayer.formation.positions];
         this.availableCharacters = mockPlayer.characters.filter(
           char => !this.formationPositions.includes(char)
@@ -483,7 +492,6 @@ export class FormationScene extends BaseScene {
         this.refreshFormation();
       }
     );
-
     this.addChild(saveButton, resetButton);
   }
 

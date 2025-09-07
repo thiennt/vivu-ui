@@ -24,7 +24,7 @@ export const mockPlayer: Player = {
   },
   characters: [],
   formation: {
-    positions: [null, null, null, null, null, null],
+    positions: [null, null, null, null],
     maxSize: 6
   },
   progress: {
