@@ -119,8 +119,9 @@ export class PlayerDetailScene extends BaseScene {
   private createCharacterCollection(): void {
     const collectionContainer = new Container();
     
-    // Calculate responsive layout
+    // Calculate responsive layout - updated for new card dimensions
     const cardWidth = 120;
+    const cardHeight = 140;
     const cardSpacing = 10;
     const cardsToShow = Math.min(5, mockPlayer.characters.length);
     const totalCardsWidth = (cardWidth * cardsToShow) + (cardSpacing * (cardsToShow - 1));
@@ -148,12 +149,12 @@ export class PlayerDetailScene extends BaseScene {
     cardContainer.x = startX;
     cardContainer.y = 400;
     
-    // View all button - responsive positioning
+    // View all button - adjusted position for new card height
     const buttonWidth = 200;
     const viewAllButton = this.createButton(
       'View All Characters',
       (this.gameWidth - buttonWidth) / 2,
-      480,
+      cardContainer.y + cardHeight + 20,
       buttonWidth,
       50,
       () => navigation.showScreen(CharactersScene)
@@ -164,53 +165,10 @@ export class PlayerDetailScene extends BaseScene {
   }
 
   private createCharacterPreviewCard(character: any, x: number, y: number): Container {
-    const card = this.createCard(x, y, 120, 120, character.rarity);
-    
-    // Character name
-    const nameText = new Text({text: character.tokenSymbol, style: {
-      fontFamily: 'Kalam',
-      fontSize: 14,
-      fontWeight: 'bold',
-      fill: Colors.TEXT_WHITE,
-      align: 'center'
-    }});
-    nameText.anchor.set(0.5);
-    nameText.x = 60;
-    nameText.y = 20;
-    
-    // Level
-    const levelText = new Text({text: `Lv.${character.level}`, style: {
-      fontFamily: 'Kalam',
-      fontSize: 12,
-      fill: Colors.TEXT_SECONDARY,
-      align: 'center'
-    }});
-    levelText.anchor.set(0.5);
-    levelText.x = 60;
-    levelText.y = 40;
-    
-    // Stats preview
-    const hpText = new Text({text: `HP: ${character.stats.health}`, style: {
-      fontFamily: 'Kalam',
-      fontSize: 10,
-      fill: Colors.TEXT_SECONDARY
-    }});
-    hpText.x = 10;
-    hpText.y = 70;
-
-    const atkText = new Text({text: `ATK: ${character.stats.attack}`, style: {
-      fontFamily: 'Kalam',
-      fontSize: 10,
-      fill: Colors.TEXT_SECONDARY
-    }});
-    atkText.x = 10;
-    atkText.y = 85;
-    
-    card.addChild(nameText, levelText, hpText, atkText);
+    const card = this.createHeroCard(character, x, y, 'preview');
     
     // Click handler
     card.on('pointerdown', () => {
-      // Store selected character for detail view
       navigation.showScreen(CharacterDetailScene, { selectedCharacter: character });
     });
     

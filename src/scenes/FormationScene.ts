@@ -180,36 +180,7 @@ export class FormationScene extends BaseScene {
   }
 
   private createFormationCharacterCard(character: Character, x: number, y: number, size: number, positionIndex: number): Container {
-    const card = this.createCard(x, y, size, size, character.rarity);
-
-    const symbolText = new Text({
-      text: character.tokenSymbol,
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 20,
-        fontWeight: 'bold',
-        fill: 0xffffff,
-        align: 'center'
-      }
-    });
-    symbolText.anchor.set(0.5);
-    symbolText.x = size / 2;
-    symbolText.y = size / 2 - 10;
-
-    const levelText = new Text({
-      text: `Lv.${character.level}`,
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 12,
-        fill: 0xd7ccc8,
-        align: 'center'
-      }
-    });
-    levelText.anchor.set(0.5);
-    levelText.x = size / 2;
-    levelText.y = size / 2 + 15;
-
-    card.addChild(symbolText, levelText);
+    const card = this.createHeroCard(character, x, y, 'formation', positionIndex);
 
     // Make draggable
     this.makeCharacterDraggable(card, character, positionIndex, true);
@@ -254,36 +225,7 @@ export class FormationScene extends BaseScene {
   }
 
   private createPoolCharacterCard(character: Character, x: number, y: number): Container {
-    const card = this.createCard(x, y, 90, 80, character.rarity);
-
-    const symbolText = new Text({
-      text: character.tokenSymbol,
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 16,
-        fontWeight: 'bold',
-        fill: 0xffffff,
-        align: 'center'
-      }
-    });
-    symbolText.anchor.set(0.5);
-    symbolText.x = 45;
-    symbolText.y = 25;
-
-    const levelText = new Text({
-      text: `Lv.${character.level}`,
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 10,
-        fill: 0xd7ccc8,
-        align: 'center'
-      }
-    });
-    levelText.anchor.set(0.5);
-    levelText.x = 45;
-    levelText.y = 50;
-
-    card.addChild(symbolText, levelText);
+    const card = this.createHeroCard(character, x, y, 'pool');
 
     // Make draggable
     this.makeCharacterDraggable(card, character, -1, false);
