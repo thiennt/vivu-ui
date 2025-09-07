@@ -12,8 +12,6 @@ export abstract class BaseScene extends Container {
 
   constructor() {
     super();
-    
-    // Don't initialize dimensions and background here - wait for prepare() or resize()
   }
 
   protected setupBackground() {
