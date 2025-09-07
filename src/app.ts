@@ -41,8 +41,6 @@ function visibilityChange() {
 
 /** Setup app and initialise assets */
 async function init() {
-  console.log('Init: Starting...');
-  
   // Initialize the PixiJS application
   await app.init({
     width: Math.max(400, window.innerWidth * 0.8),
@@ -52,7 +50,6 @@ async function init() {
     resolution: window.devicePixelRatio || 1,
     autoDensity: true
   });
-  console.log('Init: PIXI app initialized');
 
   // Center the canvas
   const canvas = app.canvas;
@@ -66,21 +63,18 @@ async function init() {
   } else {
     document.body.appendChild(app.canvas);
   }
-  console.log('Init: Canvas added to DOM');
 
   // Whenever the window resizes, call the 'resize' function
   window.addEventListener("resize", resize);
 
   // Trigger the first resize
   resize();
-  console.log('Init: Resize setup complete');
 
   // Add a visibility listener, so the app can pause sounds and screens
   document.addEventListener("visibilitychange", visibilityChange);
 
   // Setup assets bundles (see assets.ts) and start up loading everything in background
   await initAssets();
-  console.log('Init: Assets initialized');
 
   // Add a persisting background shared by all screens
   //navigation.setBackground(TiledBackground);
@@ -91,17 +85,10 @@ async function init() {
   //Go to one of the screens if a shortcut is present in url params, otherwise go to home screen
   if (getUrlParam("combat") !== null) {
     //await navigation.showScreen(CombatScreen);
-    console.log('Init: Would show combat screen');
   } else {
-    console.log('Init: Showing home screen...');
     await navigation.showScreen(HomeScene);
-    console.log('Init: Home screen shown');
   }
-  
-  console.log('Init: Complete!');
 }
 
 // Init everything
-init().catch(error => {
-  console.error('Init function failed:', error);
-});
+init();
