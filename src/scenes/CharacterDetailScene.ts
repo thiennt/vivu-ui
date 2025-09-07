@@ -15,7 +15,10 @@ export class CharacterDetailScene extends BaseScene {
     this.character = params?.selectedCharacter || null;
   }
 
-  init(): void {
+  resize(width: number, height: number): void {
+    this.gameWidth = width;
+    this.gameHeight = height;
+    
     if (!this.character) {
       navigation.showScreen(HomeScene);
       return;

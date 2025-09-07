@@ -3,13 +3,18 @@ import { BaseScene } from '@/utils/BaseScene';
 import { mockDungeons } from '@/utils/mockData';
 import { navigation } from '@/utils/navigation';
 import { HomeScene } from './HomeScene';
+import { StageScene } from './StageScene';
 
 export class DungeonScene extends BaseScene {
   constructor() {
     super();
   }
 
-  init(): void {
+  /** Resize the screen */
+  resize(width: number, height: number): void {
+    this.gameWidth = width;
+    this.gameHeight = height;
+
     this.createBackground();
     this.createHeader();
     this.createDungeonList();
@@ -150,7 +155,7 @@ export class DungeonScene extends BaseScene {
       130,
       60,
       () => {
-        navigation.showScreen(dungeon.screen, { selectedDungeon: dungeon });
+        navigation.showScreen(StageScene, { selectedDungeon: dungeon });
       }
     );
     

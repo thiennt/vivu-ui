@@ -13,7 +13,10 @@ export class StageScene extends BaseScene {
     this.dungeon = params?.selectedDungeon || null;
   }
 
-  init(): void {
+  resize(width: number, height: number): void {
+    this.gameWidth = width;
+    this.gameHeight = height;
+    
     if (!this.dungeon) {
       navigation.showScreen(HomeScene);
       return;
@@ -59,11 +62,14 @@ export class StageScene extends BaseScene {
       .stroke({ width: 2, color: 0x8d6e63 })
       .roundRect(0, 0, this.gameWidth - 100, 60, 10);
     
-    const chapterTitle = new Text('Chapters:', {
-      fontFamily: 'Kalam',
-      fontSize: 18,
-      fontWeight: 'bold',
-      fill: 0xffecb3
+    const chapterTitle = new Text({
+      text: 'Chapters:',
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 18,
+        fontWeight: 'bold',
+        fill: 0xffecb3
+      }
     });
     chapterTitle.x = 20;
     chapterTitle.y = 20;
@@ -100,15 +106,18 @@ export class StageScene extends BaseScene {
     bg.fill(bgColor)
       .stroke({ width: 2, color: 0x8d6e63 })
       .roundRect(0, 0, width, height, 8);
-    
-    const buttonText = new Text(text, {
-      fontFamily: 'Kalam',
-      fontSize: 14,
-      fontWeight: 'bold',
-      fill: textColor,
-      align: 'center',
-      wordWrap: true,
-      wordWrapWidth: width - 10
+
+    const buttonText = new Text({
+      text,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 14,
+        fontWeight: 'bold',
+        fill: textColor,
+        align: 'center',
+        wordWrap: true,
+        wordWrapWidth: width - 10
+      }
     });
     buttonText.anchor.set(0.5);
     buttonText.x = width / 2;
@@ -256,7 +265,6 @@ export class StageScene extends BaseScene {
   private refreshChapterSelector(): void {
     // This is a simplified refresh - in a real app you'd update the existing buttons
     this.removeChildren();
-    this.init();
   }
 
   private createBackButton(): void {

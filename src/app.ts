@@ -13,21 +13,27 @@ initDevtools({ app });
 
 /** Set up a resize function for the app */
 function resize() {
-    const windowWidth = window.innerWidth;
-    const windowHeight = window.innerHeight;
-    const minWidth = 400;
-    const minHeight = 600;
+  const maxWidth = 500;
+  const windowWidth = Math.min(window.innerWidth, maxWidth);
+  const windowHeight = window.innerHeight;
+  const minWidth = 400;
+  const minHeight = 600;
 
-    // Calculate renderer and canvas sizes based on current dimensions
-    const scaleX = windowWidth < minWidth ? minWidth / windowWidth : 1;
-    const scaleY = windowHeight < minHeight ? minHeight / windowHeight : 1;
-    const scale = scaleX > scaleY ? scaleX : scaleY;
-    const width = windowWidth * scale;
-    const height = windowHeight * scale;
+  // Calculate renderer and canvas sizes based on current dimensions
+  const scaleX = windowWidth < minWidth ? minWidth / windowWidth : 1;
+  const scaleY = windowHeight < minHeight ? minHeight / windowHeight : 1;
+  const scale = scaleX > scaleY ? scaleX : scaleY;
+  const width = windowWidth * scale;
+  const height = windowHeight * scale;
 
-    // Update renderer and navigation screens dimensions
-    app.renderer.resize(width, height);
-    navigation.resize(width, height);
+  // Update canvas style dimensions and scroll window up to avoid issues on mobile resize
+  app.renderer.canvas.style.width = `${windowWidth}px`;
+  app.renderer.canvas.style.height = `${windowHeight}px`;
+  window.scrollTo(0, 0);
+
+  // Update renderer  and navigation screens dimensions
+  app.renderer.resize(width, height);
+  navigation.resize(width, height);
 }
 
 /** Fire when document visibility changes - lose or regain focus */
@@ -41,27 +47,26 @@ function visibilityChange() {
 
 /** Setup app and initialise assets */
 async function init() {
+  const canvas = document.querySelector('canvas')!;
   // Initialize the PixiJS application
   await app.init({
-    width: Math.max(400, window.innerWidth * 0.8),
-    height: window.innerHeight * 0.9,
+    view: canvas,
     backgroundColor: 0x2c1810,
     antialias: true,
-    resolution: window.devicePixelRatio || 1,
+    resolution: Math.max(window.devicePixelRatio, 2),
     autoDensity: true
   });
 
-  // Center the canvas
-  const canvas = app.canvas;
+  // Center the canvas in the page
   canvas.style.display = 'block';
   canvas.style.margin = 'auto';
 
   // Add pixi canvas element to the document's body
   const gameContainer = document.getElementById('game-container');
   if (gameContainer) {
-    gameContainer.appendChild(app.canvas);
+    gameContainer.appendChild(canvas);
   } else {
-    document.body.appendChild(app.canvas);
+    document.body.appendChild(canvas);
   }
 
   // Whenever the window resizes, call the 'resize' function

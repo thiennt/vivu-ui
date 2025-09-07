@@ -18,14 +18,12 @@ export class CharactersScene extends BaseScene {
     this.container = new Container();
     this.scrollOffset = 0;
     this.maxScroll = 0;
-    this.gameWidth = 0;
-    this.gameHeight = 0;
   }
 
-  /** Prepare screen, before showing */
-  prepare(): void {
-    this.gameWidth = Math.max(400, window.innerWidth);
-    this.gameHeight = window.innerHeight;
+  /** Resize the screen */
+  resize(width: number, height: number): void {
+    this.gameWidth = width;
+    this.gameHeight = height;
     
     this.createBackground();
     this.createHeader();
@@ -80,15 +78,6 @@ export class CharactersScene extends BaseScene {
     this.container.removeChildren();
     this.scrollOffset = 0;
     this.maxScroll = 0;
-  }
-
-  /** Resize the screen */
-  resize(width: number, height: number): void {
-    this.gameWidth = Math.max(400, width);
-    this.gameHeight = height;
-    
-    this.reset();
-    this.prepare();
   }
 
   private createBackground(): void {
@@ -291,6 +280,4 @@ export class CharactersScene extends BaseScene {
   update(time: Ticker): void {
     // No specific animations needed
   }
-
-
 }

@@ -23,16 +23,31 @@ export class HomeScene extends BaseScene {
     this.addChild(this.container);
   }
 
-  /** Prepare screen, before showing */
-  prepare(): void {
-    // Initialize dimensions first
-    this.initializeDimensions();
-    
+  resize(width: number, height: number): void {
+    this.gameWidth = width
+    this.gameHeight = height;
+
+    // Update the container to match the new dimensions
+    this.container.removeChildren();
     this.createBackground();
     this.createHomeTitle();
     this.createPlayerInfo();
     this.createMenuButtons();
     this.createDecorations();
+    
+
+    // Animate decorative elements
+    this.decorativeElements.forEach((element, index) => {
+      element.y += Math.sin(Date.now() * 0.001 + index) * 0.5;
+      element.x += Math.cos(Date.now() * 0.0008 + index) * 0.3;
+      element.alpha = 0.3 + Math.sin(Date.now() * 0.002 + index) * 0.3;
+
+      // Wrap around screen
+      if (element.x > this.gameWidth + 20) element.x = -20;
+      if (element.x < -20) element.x = this.gameWidth + 20;
+      if (element.y > this.gameHeight + 20) element.y = -20;
+      if (element.y < -20) element.y = this.gameHeight + 20;
+    });
   }
 
   /** Show the screen with animation */
@@ -41,20 +56,20 @@ export class HomeScene extends BaseScene {
     this.container.alpha = 1;
     const tween = { alpha: 0 };
     
-    // return new Promise((resolve) => {
-    //   const animate = () => {
-    //     tween.alpha += 0.05;
-    //     this.container.alpha = tween.alpha;
+    return new Promise((resolve) => {
+      const animate = () => {
+        tween.alpha += 0.05;
+        this.container.alpha = tween.alpha;
         
-    //     if (tween.alpha >= 1) {
-    //       this.container.alpha = 1;
-    //       resolve();
-    //     } else {
-    //       requestAnimationFrame(animate);
-    //     }
-    //   };
-    //   animate();
-    // });
+        if (tween.alpha >= 1) {
+          this.container.alpha = 1;
+          resolve();
+        } else {
+          requestAnimationFrame(animate);
+        }
+      };
+      animate();
+    });
   }
 
   /** Hide the screen with animation */
@@ -81,37 +96,6 @@ export class HomeScene extends BaseScene {
   reset(): void {
     this.container.removeChildren();
     this.decorativeElements = [];
-  }
-
-  /** Resize the screen */
-  resize(width: number, height: number): void {
-    this.gameWidth = Math.max(400, width);
-    this.gameHeight = height;
-
-    // Only recreate content if it was already created
-    if (this.container.children.length > 0) {
-      // Update the container to match the new dimensions
-      // Recreate the background with new dimensions
-      this.container.removeChildren();
-      this.createBackground();
-      this.createHomeTitle();
-      this.createPlayerInfo();
-      this.createMenuButtons();
-      this.createDecorations();
-    }
-
-    // Animate decorative elements
-    this.decorativeElements.forEach((element, index) => {
-      element.y += Math.sin(Date.now() * 0.001 + index) * 0.5;
-      element.x += Math.cos(Date.now() * 0.0008 + index) * 0.3;
-      element.alpha = 0.3 + Math.sin(Date.now() * 0.002 + index) * 0.3;
-
-      // Wrap around screen
-      if (element.x > this.gameWidth + 20) element.x = -20;
-      if (element.x < -20) element.x = this.gameWidth + 20;
-      if (element.y > this.gameHeight + 20) element.y = -20;
-      if (element.y < -20) element.y = this.gameHeight + 20;
-    });
   }
 
   private createBackground(): void {

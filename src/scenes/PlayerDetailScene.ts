@@ -1,4 +1,4 @@
-import * as PIXI from 'pixi.js';
+import { Graphics, Container, Text, Ticker } from 'pixi.js';
 import { BaseScene } from '@/utils/BaseScene';
 import { mockPlayer } from '@/utils/mockData';
 import { navigation } from '@/utils/navigation';
@@ -11,7 +11,10 @@ export class PlayerDetailScene extends BaseScene {
     super();
   }
 
-  init(): void {
+  resize(width: number, height: number): void {
+    this.gameWidth = width;
+    this.gameHeight = height;
+
     this.createBackground();
     this.createHeader();
     this.createPlayerStats();
@@ -20,7 +23,7 @@ export class PlayerDetailScene extends BaseScene {
   }
 
   private createBackground(): void {
-    const bg = new PIXI.Graphics();
+    const bg = new Graphics();
     bg.fill(0x2c1810).rect(0, 0, this.gameWidth, this.gameHeight);
     this.addChildAt(bg, 0);
   }
@@ -31,7 +34,7 @@ export class PlayerDetailScene extends BaseScene {
   }
 
   private createPlayerStats(): void {
-    const statsContainer = new PIXI.Container();
+    const statsContainer = new Container();
     
     // Main info panel
     const mainPanel = this.createStatsPanel(
@@ -69,22 +72,22 @@ export class PlayerDetailScene extends BaseScene {
     this.addChild(statsContainer);
   }
 
-  private createStatsPanel(title: string, stats: string[], width: number, height: number): PIXI.Container {
-    const panel = new PIXI.Container();
+  private createStatsPanel(title: string, stats: string[], width: number, height: number): Container {
+    const panel = new Container();
     
     // Background
-    const bg = new PIXI.Graphics();
+    const bg = new Graphics();
     bg.fill({ color: 0x3e2723, alpha: 0.9 })
       .stroke({ width: 3, color: 0x8d6e63 })
       .roundRect(0, 0, width, height, 12);
     
     // Title
-    const titleText = new PIXI.Text(title, {
+    const titleText = new Text({text: title, style: {
       fontFamily: 'Kalam',
       fontSize: 20,
       fontWeight: 'bold',
       fill: 0xffecb3
-    });
+    }});
     titleText.x = 15;
     titleText.y = 15;
     
@@ -92,11 +95,11 @@ export class PlayerDetailScene extends BaseScene {
     
     // Stats
     stats.forEach((stat, index) => {
-      const statText = new PIXI.Text(stat, {
+      const statText = new Text({text: stat, style: {
         fontFamily: 'Kalam',
         fontSize: 16,
         fill: 0xd7ccc8
-      });
+      }});
       statText.x = 15;
       statText.y = 50 + (index * 22);
       panel.addChild(statText);
@@ -106,10 +109,10 @@ export class PlayerDetailScene extends BaseScene {
   }
 
   private createCharacterCollection(): void {
-    const collectionContainer = new PIXI.Container();
+    const collectionContainer = new Container();
     
     // Title
-    const collectionTitle = new PIXI.Text('Character Collection', {
+    const collectionTitle = new Text('Character Collection', {
       fontFamily: 'Kalam',
       fontSize: 24,
       fontWeight: 'bold',
@@ -119,7 +122,7 @@ export class PlayerDetailScene extends BaseScene {
     collectionTitle.y = 360;
     
     // Character preview cards
-    const cardContainer = new PIXI.Container();
+    const cardContainer = new Container();
     
     mockPlayer.characters.slice(0, 5).forEach((character, index) => {
       const card = this.createCharacterPreviewCard(character, index * 130, 0);
@@ -143,46 +146,46 @@ export class PlayerDetailScene extends BaseScene {
     this.addChild(collectionContainer);
   }
 
-  private createCharacterPreviewCard(character: any, x: number, y: number): PIXI.Container {
+  private createCharacterPreviewCard(character: any, x: number, y: number): Container {
     const card = this.createCard(x, y, 120, 120, character.rarity);
     
     // Character name
-    const nameText = new PIXI.Text(character.tokenSymbol, {
+    const nameText = new Text({text: character.tokenSymbol, style: {
       fontFamily: 'Kalam',
       fontSize: 14,
       fontWeight: 'bold',
       fill: 0xffffff,
       align: 'center'
-    });
+    }});
     nameText.anchor.set(0.5);
     nameText.x = 60;
     nameText.y = 20;
     
     // Level
-    const levelText = new PIXI.Text(`Lv.${character.level}`, {
+    const levelText = new Text({text: `Lv.${character.level}`, style: {
       fontFamily: 'Kalam',
       fontSize: 12,
       fill: 0xd7ccc8,
       align: 'center'
-    });
+    }});
     levelText.anchor.set(0.5);
     levelText.x = 60;
     levelText.y = 40;
     
     // Stats preview
-    const hpText = new PIXI.Text(`HP: ${character.stats.health}`, {
+    const hpText = new Text({text: `HP: ${character.stats.health}`, style: {
       fontFamily: 'Kalam',
       fontSize: 10,
       fill: 0xd7ccc8
-    });
+    }});
     hpText.x = 10;
     hpText.y = 70;
-    
-    const atkText = new PIXI.Text(`ATK: ${character.stats.attack}`, {
+
+    const atkText = new Text({text: `ATK: ${character.stats.attack}`, style: {
       fontFamily: 'Kalam',
       fontSize: 10,
       fill: 0xd7ccc8
-    });
+    }});
     atkText.x = 10;
     atkText.y = 85;
     
@@ -209,11 +212,7 @@ export class PlayerDetailScene extends BaseScene {
     this.addChild(backButton);
   }
 
-  update(time: PIXI.Ticker): void {
+  update(time: Ticker): void {
     // No animations needed for this scene
-  }
-
-  destroy(): void {
-    this.removeChildren();
   }
 }

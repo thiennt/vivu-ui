@@ -20,7 +20,10 @@ export class FormationScene extends BaseScene {
     );
   }
 
-  init(): void {
+  resize(width: number, height: number): void {
+    this.gameWidth = width;
+    this.gameHeight = height;
+    
     this.createBackground();
     this.createHeader();
     this.createFormationGrid();
@@ -428,9 +431,5 @@ export class FormationScene extends BaseScene {
 
   update(time: Ticker): void {
     // No specific animations needed
-  }
-
-  destroy(): void {
-    this.removeChildren();
   }
 }

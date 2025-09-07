@@ -1,12 +1,13 @@
 import { Container, Graphics, Text } from 'pixi.js';
 import { app } from '@/app';
+import { navigation } from './navigation';
 
 export abstract class BaseScene extends Container {
   /** Assets bundles required by this screen */
   public static assetBundles = [];
 
-  protected gameWidth: number;
-  protected gameHeight: number;
+  protected gameWidth: number = navigation.width;
+  protected gameHeight: number = navigation.height;
 
   constructor() {
     super();
