@@ -21,14 +21,13 @@ export class HomeScene extends BaseScene {
 
     this.container = new Container();
     this.addChild(this.container);
-    
-    // Initialize dimensions
-    this.gameWidth = Math.max(400, app.screen.width);
-    this.gameHeight = app.screen.height;
   }
 
   /** Prepare screen, before showing */
   prepare(): void {
+    // Initialize dimensions first
+    this.initializeDimensions();
+    
     this.createBackground();
     this.createHomeTitle();
     this.createPlayerInfo();
@@ -89,14 +88,17 @@ export class HomeScene extends BaseScene {
     this.gameWidth = Math.max(400, width);
     this.gameHeight = height;
 
-    // Update the container to match the new dimensions
-    // Recreate the background with new dimensions
-    this.container.removeChildren();
-    this.createBackground();
-    this.createHomeTitle();
-    this.createPlayerInfo();
-    this.createMenuButtons();
-    this.createDecorations();
+    // Only recreate content if it was already created
+    if (this.container.children.length > 0) {
+      // Update the container to match the new dimensions
+      // Recreate the background with new dimensions
+      this.container.removeChildren();
+      this.createBackground();
+      this.createHomeTitle();
+      this.createPlayerInfo();
+      this.createMenuButtons();
+      this.createDecorations();
+    }
 
     // Animate decorative elements
     this.decorativeElements.forEach((element, index) => {
