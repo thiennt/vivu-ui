@@ -11,7 +11,16 @@ export class FormationScene extends BaseScene {
   private availableCharacters: Character[] = [];
   private selectedCharacter: Character | null = null;
   private selectedPosition: number = -1;
-  private draggedCharacter: Container | null = null;
+
+  // Drag state
+  private isDragging = false;
+  private dragOffset = { x: 0, y: 0 };
+  private dragTarget: Container | null = null;
+  private dragPointerGlobal: { x: number, y: number } | null = null;
+  private dragOriginalX = 0;
+  private dragOriginalY = 0;
+  private dragOriginalPosition = -1;
+  private slotHitBoxes: {index: number, x: number, y: number, size: number}[] = [];
 
   constructor() {
     super();
@@ -24,7 +33,7 @@ export class FormationScene extends BaseScene {
   resize(width: number, height: number): void {
     this.gameWidth = width;
     this.gameHeight = height;
-    
+
     this.createBackground();
     this.createHeader();
     this.createFormationGrid();
@@ -37,12 +46,12 @@ export class FormationScene extends BaseScene {
     const bgContainer = new Container();
     const bg = new Graphics();
     bg.fill(Colors.BACKGROUND_PRIMARY).rect(0, 0, this.gameWidth, this.gameHeight);
-    
+
     // Battle field grid lines
     const gridSpacing = 40;
     const grid = new Graphics();
     grid.stroke({ width: 1, color: Colors.BACKGROUND_SECONDARY, alpha: 0.3 });
-    
+
     for (let x = 0; x <= this.gameWidth; x += gridSpacing) {
       grid.moveTo(x, 0);
       grid.lineTo(x, this.gameHeight);
@@ -51,14 +60,14 @@ export class FormationScene extends BaseScene {
       grid.moveTo(0, y);
       grid.lineTo(this.gameWidth, y);
     }
-    
+
     bgContainer.addChild(bg, grid);
     this.addChildAt(bgContainer, 0);
   }
 
   private createHeader(): void {
     const title = this.createTitle('Battle Formation', this.gameWidth / 2, 60);
-    
+
     const subtitle = new Text({
       text: 'Drag characters to formation positions',
       style: {
@@ -71,31 +80,35 @@ export class FormationScene extends BaseScene {
     subtitle.anchor.set(0.5);
     subtitle.x = this.gameWidth / 2;
     subtitle.y = 100;
-    
+
     this.addChild(title, subtitle);
   }
 
   private createFormationGrid(): void {
     const formationContainer = new Container();
     formationContainer.label = 'formationContainer';
-    
-    // Formation positions (3x2 grid)
+
+    // Formation positions (2x2 grid)
     const rows = 2;
     const cols = 2;
     const slotSize = 100;
     const spacing = 20;
     const startX = (this.gameWidth - (cols * slotSize + (cols - 1) * spacing)) / 2;
     const startY = 150;
-    
+
+    this.slotHitBoxes = [];
     for (let row = 0; row < rows; row++) {
       for (let col = 0; col < cols; col++) {
         const positionIndex = row * cols + col;
         const x = startX + col * (slotSize + spacing);
         const y = startY + row * (slotSize + spacing);
-        
+
+        // Save slot hitboxes for drop detection
+        this.slotHitBoxes.push({index: positionIndex, x, y, size: slotSize});
+
         const slot = this.createFormationSlot(x, y, slotSize, positionIndex);
         formationContainer.addChild(slot);
-        
+
         // Add character if present
         const character = this.formationPositions[positionIndex];
         if (character) {
@@ -104,7 +117,7 @@ export class FormationScene extends BaseScene {
         }
       }
     }
-    
+
     // Row labels
     const frontLabel = new Text({
       text: 'FRONT',
@@ -118,7 +131,7 @@ export class FormationScene extends BaseScene {
     frontLabel.anchor.set(0.5);
     frontLabel.x = startX - 50;
     frontLabel.y = startY + slotSize / 2;
-    
+
     const backLabel = new Text({
       text: 'BACK',
       style: {
@@ -131,19 +144,19 @@ export class FormationScene extends BaseScene {
     backLabel.anchor.set(0.5);
     backLabel.x = startX - 50;
     backLabel.y = startY + slotSize + spacing + slotSize / 2;
-    
+
     formationContainer.addChild(frontLabel, backLabel);
     this.addChild(formationContainer);
   }
 
   private createFormationSlot(x: number, y: number, size: number, positionIndex: number): Container {
     const slot = new Container();
-    
+
     const bg = new Graphics();
     bg.fill({ color: Colors.BACKGROUND_SECONDARY, alpha: 0.5 })
       .stroke({ width: 2, color: Colors.BUTTON_PRIMARY, alpha: 0.8 })
       .roundRect(0, 0, size, size, 8);
-    
+
     const positionText = new Text({
       text: `${positionIndex + 1}`,
       style: {
@@ -156,25 +169,19 @@ export class FormationScene extends BaseScene {
     positionText.anchor.set(0.5);
     positionText.x = size / 2;
     positionText.y = size / 2;
-    
+
     slot.addChild(bg, positionText);
     slot.x = x;
     slot.y = y;
     slot.interactive = true;
-    
-    // Drop zone
-    slot.on('pointerup', () => {
-      if (this.selectedCharacter) {
-        this.placeCharacterInFormation(this.selectedCharacter, positionIndex);
-      }
-    });
-    
+
+    // Drop zone: handled by drag release hit testing instead
     return slot;
   }
 
   private createFormationCharacterCard(character: Character, x: number, y: number, size: number, positionIndex: number): Container {
     const card = this.createCard(x, y, size, size, character.rarity);
-    
+
     const symbolText = new Text({
       text: character.tokenSymbol,
       style: {
@@ -188,7 +195,7 @@ export class FormationScene extends BaseScene {
     symbolText.anchor.set(0.5);
     symbolText.x = size / 2;
     symbolText.y = size / 2 - 10;
-    
+
     const levelText = new Text({
       text: `Lv.${character.level}`,
       style: {
@@ -201,25 +208,25 @@ export class FormationScene extends BaseScene {
     levelText.anchor.set(0.5);
     levelText.x = size / 2;
     levelText.y = size / 2 + 15;
-    
+
     card.addChild(symbolText, levelText);
-    
+
     // Make draggable
     this.makeCharacterDraggable(card, character, positionIndex, true);
-    
+
     return card;
   }
 
   private createCharacterPool(): void {
     const poolContainer = new Container();
     poolContainer.label = 'characterPool';
-    
+
     // Pool background
     const poolBg = new Graphics();
     poolBg.fill({ color: 0x3e2723, alpha: 0.8 })
       .stroke({ width: 2, color: 0x8d6e63 })
       .roundRect(0, 0, this.gameWidth - 100, 140, 12);
-    
+
     const poolTitle = new Text({
       text: 'Available Characters',
       style: {
@@ -231,24 +238,24 @@ export class FormationScene extends BaseScene {
     });
     poolTitle.x = 20;
     poolTitle.y = 15;
-    
+
     poolContainer.addChild(poolBg, poolTitle);
-    
+
     // Available characters
     this.availableCharacters.forEach((character, index) => {
       const characterCard = this.createPoolCharacterCard(character, 20 + (index * 110), 45);
       poolContainer.addChild(characterCard);
     });
-    
+
     poolContainer.x = 50;
     poolContainer.y = this.gameHeight - 200;
-    
+
     this.addChild(poolContainer);
   }
 
   private createPoolCharacterCard(character: Character, x: number, y: number): Container {
     const card = this.createCard(x, y, 90, 80, character.rarity);
-    
+
     const symbolText = new Text({
       text: character.tokenSymbol,
       style: {
@@ -262,7 +269,7 @@ export class FormationScene extends BaseScene {
     symbolText.anchor.set(0.5);
     symbolText.x = 45;
     symbolText.y = 25;
-    
+
     const levelText = new Text({
       text: `Lv.${character.level}`,
       style: {
@@ -275,59 +282,83 @@ export class FormationScene extends BaseScene {
     levelText.anchor.set(0.5);
     levelText.x = 45;
     levelText.y = 50;
-    
+
     card.addChild(symbolText, levelText);
-    
+
     // Make draggable
     this.makeCharacterDraggable(card, character, -1, false);
-    
+
     return card;
   }
 
   private makeCharacterDraggable(card: Container, character: Character, currentPosition: number, isInFormation: boolean): void {
     card.interactive = true;
     card.cursor = 'pointer';
-    
-    let isDragging = false;
-    let dragOffset = { x: 0, y: 0 };
-    
+
     card.on('pointerdown', (event) => {
-      isDragging = true;
+      this.isDragging = true;
+      this.dragTarget = card;
       this.selectedCharacter = character;
       this.selectedPosition = currentPosition;
-      
-      const globalPos = event.data.global;
-      dragOffset.x = globalPos.x - card.x;
-      dragOffset.y = globalPos.y - card.y;
-      
+      const globalPos = event.global;
+      this.dragOffset.x = globalPos.x - card.x;
+      this.dragOffset.y = globalPos.y - card.y;
+      this.dragPointerGlobal = { x: globalPos.x, y: globalPos.y };
+
+      // Save original position
+      this.dragOriginalX = card.x;
+      this.dragOriginalY = card.y;
+      this.dragOriginalPosition = currentPosition;
+
       card.alpha = 0.8;
       card.scale.set(1.1);
+      card.zIndex = 9999; // bring to front
+      // Optionally: this.addChild(card) if you want to move to top
     });
-    
+
     card.on('pointermove', (event) => {
-      if (isDragging) {
-        const globalPos = event.data.global;
-        card.x = globalPos.x - dragOffset.x;
-        card.y = globalPos.y - dragOffset.y;
+      if (this.isDragging && this.dragTarget === card) {
+        const globalPos = event.global;
+        this.dragPointerGlobal = { x: globalPos.x, y: globalPos.y };
       }
     });
-    
-    card.on('pointerup', () => {
-      if (isDragging) {
-        isDragging = false;
+
+    card.on('pointerup', (event) => {
+      if (this.isDragging && this.dragTarget === card) {
+        this.isDragging = false;
         card.alpha = 1;
         card.scale.set(1);
-        
-        // Reset character selection
+        card.zIndex = 0;
+
+        // Hit test to check if dropped inside a slot
+        const pointer = event.global;
+        let placed = false;
+        for (const slot of this.slotHitBoxes) {
+          if (
+            pointer.x >= slot.x && pointer.x <= slot.x + slot.size &&
+            pointer.y >= slot.y && pointer.y <= slot.y + slot.size
+          ) {
+            // Place character in the slot, only if not already present
+            if (slot.index !== this.dragOriginalPosition) {
+              this.placeCharacterInFormation(character, slot.index);
+            }
+            placed = true;
+            break;
+          }
+        }
+        if (!placed) {
+          // Not dropped in slot: reset card to original position
+          card.x = this.dragOriginalX;
+          card.y = this.dragOriginalY;
+        }
+
+        this.dragTarget = null;
+        this.dragPointerGlobal = null;
         this.selectedCharacter = null;
         this.selectedPosition = -1;
-        
-        // Refresh the display
-        this.refreshFormation();
       }
     });
-    
-    // Right-click to remove from formation
+
     if (isInFormation) {
       card.on('rightdown', () => {
         this.removeCharacterFromFormation(currentPosition);
@@ -346,7 +377,7 @@ export class FormationScene extends BaseScene {
         this.availableCharacters.splice(index, 1);
       }
     }
-    
+
     // If target position is occupied, swap characters
     const existingCharacter = this.formationPositions[positionIndex];
     if (existingCharacter) {
@@ -356,10 +387,10 @@ export class FormationScene extends BaseScene {
         this.availableCharacters.push(existingCharacter);
       }
     }
-    
+
     // Place character in new position
     this.formationPositions[positionIndex] = character;
-    
+
     this.refreshFormation();
   }
 
@@ -376,10 +407,10 @@ export class FormationScene extends BaseScene {
     // Remove existing formation and pool containers
     const formationContainer = this.getChildByLabel('formationContainer');
     const poolContainer = this.getChildByLabel('characterPool');
-    
+
     if (formationContainer) this.removeChild(formationContainer);
     if (poolContainer) this.removeChild(poolContainer);
-    
+
     // Recreate them
     this.createFormationGrid();
     this.createCharacterPool();
@@ -398,7 +429,7 @@ export class FormationScene extends BaseScene {
         alert('Formation saved successfully!');
       }
     );
-    
+
     const resetButton = this.createButton(
       'Reset',
       this.gameWidth - 370,
@@ -414,7 +445,7 @@ export class FormationScene extends BaseScene {
         this.refreshFormation();
       }
     );
-    
+
     this.addChild(saveButton, resetButton);
   }
 
@@ -430,7 +461,11 @@ export class FormationScene extends BaseScene {
     this.addChild(backButton);
   }
 
+  // Update loop: smooth drag update per frame
   update(time: Ticker): void {
-    // No specific animations needed
+    if (this.isDragging && this.dragTarget && this.dragPointerGlobal) {
+      this.dragTarget.x = this.dragPointerGlobal.x - this.dragOffset.x;
+      this.dragTarget.y = this.dragPointerGlobal.y - this.dragOffset.y;
+    }
   }
 }
