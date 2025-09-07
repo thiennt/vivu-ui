@@ -67,8 +67,8 @@ export async function initAssets() {
   // Init PixiJS assets with this asset manifest
   await Assets.init({ manifest: assetsManifest, basePath: "assets" });
 
-  // Load assets for the load screen
-  await loadBundles("preload");
+  // Load assets for the load screen (using default bundle since preload doesn't exist)
+  // await loadBundles("preload");
 
   // List all existing bundles names
   const allBundles = assetsManifest.bundles.map((item) => item.name);

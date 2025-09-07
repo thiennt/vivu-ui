@@ -11,16 +11,21 @@ export abstract class BaseScene extends Container {
   constructor() {
     super();
     
-    this.gameWidth = Math.max(400, app.screen.width);
-    this.gameHeight = app.screen.height;
-    
-    this.setupBackground();
+    // Don't initialize dimensions and background here - wait for prepare() or resize()
   }
 
   protected setupBackground() {
-    const bg = new Graphics();
-    bg.fill(0x2c1810).rect(0, 0, this.gameWidth, this.gameHeight);
-    this.addChild(bg);
+    // Only create background if dimensions are properly set
+    if (this.gameWidth && this.gameHeight) {
+      const bg = new Graphics();
+      bg.fill(0x2c1810).rect(0, 0, this.gameWidth, this.gameHeight);
+      this.addChild(bg);
+    }
+  }
+
+  protected initializeDimensions() {
+    this.gameWidth = Math.max(400, app.screen?.width || 800);
+    this.gameHeight = app.screen?.height || 600;
   }
 
   protected createButton(

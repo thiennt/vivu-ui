@@ -61,8 +61,12 @@ class Navigation {
 
   /** Add screen to the stage, link update & resize functions */
   private async addAndShowScreen(screen: AppScreen) {
-    // Add navigation container to stage if it does not have a parent yet
-    if (!this.container.parent) {
+    // Add navigation container to stage if it's not already there
+    if (!app.stage.children.includes(this.container)) {
+      // Remove from current parent if any
+      if (this.container.parent) {
+        this.container.parent.removeChild(this.container);
+      }
       app.stage.addChild(this.container);
     }
 

@@ -41,7 +41,7 @@ function visibilityChange() {
 
 /** Setup app and initialise assets */
 async function init() {
-    // Initialize the PixiJS application
+  // Initialize the PixiJS application
   await app.init({
     width: Math.max(400, window.innerWidth * 0.8),
     height: window.innerHeight * 0.9,
