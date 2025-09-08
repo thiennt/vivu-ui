@@ -535,7 +535,7 @@ export class FormationScene extends BaseScene {
       buttonHeight,
       () => {
         // Fill empty slots in formation with available characters
-        let available = [...this.availableCharacters];
+        const available = [...this.availableCharacters];
         this.formationPositions = this.formationPositions.map(pos => {
           if (pos) return pos;
           return available.shift() || null;

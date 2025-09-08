@@ -16,9 +16,18 @@ export class PlayerDetailScene extends BaseScene {
   private statsContainer: Container;
   private collectionContainer: Container;
   private buttonContainer: Container;
+  private pointDistributionContainer: Container;
+
+  // Point distribution state
+  private tempStatChanges = { sta: 0, str: 0, agi: 0 };
+  private remainingPoints: number;
 
   constructor() {
     super();
+    
+    // Initialize point distribution state
+    this.remainingPoints = mockPlayer.points;
+    this.tempStatChanges = { sta: 0, str: 0, agi: 0 };
     
     // Create containers once
     this.container = new Container();
@@ -27,12 +36,14 @@ export class PlayerDetailScene extends BaseScene {
     this.statsContainer = new Container();
     this.collectionContainer = new Container();
     this.buttonContainer = new Container();
+    this.pointDistributionContainer = new Container();
     
     this.addChild(this.container);
     this.container.addChild(
       this.backgroundContainer,
       this.headerContainer,
       this.statsContainer,
+      this.pointDistributionContainer,
       this.collectionContainer,
       this.buttonContainer
     );
@@ -45,6 +56,7 @@ export class PlayerDetailScene extends BaseScene {
     this.createBackground();
     this.createHeader();
     this.createPlayerStats();
+    this.createPointDistributionPanel();
     this.createCharacterCollection();
     this.createBackButton();
   }
@@ -62,6 +74,7 @@ export class PlayerDetailScene extends BaseScene {
     this.backgroundContainer.removeChildren();
     this.headerContainer.removeChildren();
     this.statsContainer.removeChildren();
+    this.pointDistributionContainer.removeChildren();
     this.collectionContainer.removeChildren();
     this.buttonContainer.removeChildren();
     
@@ -69,6 +82,7 @@ export class PlayerDetailScene extends BaseScene {
     this.createBackground();
     this.createHeader();
     this.createPlayerStats();
+    this.createPointDistributionPanel();
     this.createCharacterCollection();
     this.createBackButton();
   }
@@ -103,15 +117,21 @@ export class PlayerDetailScene extends BaseScene {
       panelWidth, 160
     );
     
-    // Stats panel
+    // Stats panel with temporary changes applied
+    const currentSta = mockPlayer.sta + this.tempStatChanges.sta;
+    const currentStr = mockPlayer.str + this.tempStatChanges.str;
+    const currentAgi = mockPlayer.agi + this.tempStatChanges.agi;
+    
+    const statsText = [
+      `Stamina: ${currentSta}${this.tempStatChanges.sta !== 0 ? ` (${this.tempStatChanges.sta > 0 ? '+' : ''}${this.tempStatChanges.sta})` : ''}`,
+      `Strength: ${currentStr}${this.tempStatChanges.str !== 0 ? ` (${this.tempStatChanges.str > 0 ? '+' : ''}${this.tempStatChanges.str})` : ''}`,
+      `Agility: ${currentAgi}${this.tempStatChanges.agi !== 0 ? ` (${this.tempStatChanges.agi > 0 ? '+' : ''}${this.tempStatChanges.agi})` : ''}`,
+      `Luck: ${mockPlayer.luck}`
+    ];
+    
     const statsPanel = this.createStatsPanel(
       'Statistics',
-      [
-        `Stamina: ${mockPlayer.sta}`,
-        `Strength: ${mockPlayer.str}`,
-        `Agility: ${mockPlayer.agi}`,
-        `Luck: ${mockPlayer.luck}`
-      ],
+      statsText,
       panelWidth, 200
     );
     
@@ -161,11 +181,199 @@ export class PlayerDetailScene extends BaseScene {
     return panel;
   }
 
+  private createPointDistributionPanel(): void {
+    // Only show the panel if the player has points to distribute
+    if (mockPlayer.points <= 0) {
+      return;
+    }
+
+    const panelWidth = Math.min(600, this.gameWidth - 2 * this.STANDARD_PADDING);
+    const panelHeight = 200;
+    const startX = (this.gameWidth - panelWidth) / 2;
+    const startY = 340; // Position below the stats panels
+
+    const panel = new Container();
+    
+    // Background
+    const bg = new Graphics();
+    bg.fill({ color: Colors.BACKGROUND_SECONDARY, alpha: 0.9 })
+      .stroke({ width: 3, color: Colors.BUTTON_PRIMARY })
+      .roundRect(0, 0, panelWidth, panelHeight, 12);
+    
+    // Title
+    const titleText = new Text({text: 'Distribute Attribute Points', style: {
+      fontFamily: 'Kalam',
+      fontSize: 20,
+      fontWeight: 'bold',
+      fill: Colors.TEXT_PRIMARY
+    }});
+    titleText.x = 15;
+    titleText.y = 15;
+    
+    // Remaining points display
+    const remainingText = new Text({text: `Remaining Points: ${this.remainingPoints}`, style: {
+      fontFamily: 'Kalam',
+      fontSize: 16,
+      fill: Colors.TEXT_SECONDARY
+    }});
+    remainingText.x = panelWidth - 200;
+    remainingText.y = 20;
+    
+    panel.addChild(bg, titleText, remainingText);
+    
+    // Stat controls
+    const stats = [
+      { name: 'Stamina', key: 'sta' as keyof typeof this.tempStatChanges, current: mockPlayer.sta },
+      { name: 'Strength', key: 'str' as keyof typeof this.tempStatChanges, current: mockPlayer.str },
+      { name: 'Agility', key: 'agi' as keyof typeof this.tempStatChanges, current: mockPlayer.agi }
+    ];
+    
+    stats.forEach((stat, index) => {
+      const yPos = 60 + (index * 40);
+      
+      // Stat name
+      const nameText = new Text({text: stat.name, style: {
+        fontFamily: 'Kalam',
+        fontSize: 16,
+        fill: Colors.TEXT_PRIMARY
+      }});
+      nameText.x = 20;
+      nameText.y = yPos;
+      
+      // Current value display
+      const currentValue = stat.current + this.tempStatChanges[stat.key];
+      const valueText = new Text({text: `${currentValue}`, style: {
+        fontFamily: 'Kalam',
+        fontSize: 16,
+        fontWeight: 'bold',
+        fill: Colors.TEXT_PRIMARY
+      }});
+      valueText.x = 150;
+      valueText.y = yPos;
+      
+      // Minus button
+      const minusButton = this.createStatButton('-', 200, yPos - 5, 30, 30, () => {
+        if (this.tempStatChanges[stat.key] > 0) {
+          this.tempStatChanges[stat.key]--;
+          this.remainingPoints++;
+          this.refreshPointDistributionPanel();
+        }
+      });
+      
+      // Plus button
+      const plusButton = this.createStatButton('+', 240, yPos - 5, 30, 30, () => {
+        if (this.remainingPoints > 0) {
+          this.tempStatChanges[stat.key]++;
+          this.remainingPoints--;
+          this.refreshPointDistributionPanel();
+        }
+      });
+      
+      panel.addChild(nameText, valueText, minusButton, plusButton);
+    });
+    
+    // Action buttons
+    const resetButton = this.createButton(
+      'Reset',
+      panelWidth - 280,
+      panelHeight - 50,
+      80,
+      40,
+      () => {
+        this.tempStatChanges = { sta: 0, str: 0, agi: 0 };
+        this.remainingPoints = mockPlayer.points;
+        this.refreshPointDistributionPanel();
+      }
+    );
+    
+    const confirmButton = this.createButton(
+      'Confirm',
+      panelWidth - 190,
+      panelHeight - 50,
+      100,
+      40,
+      () => {
+        // Apply changes to mock player data
+        mockPlayer.sta += this.tempStatChanges.sta;
+        mockPlayer.str += this.tempStatChanges.str;
+        mockPlayer.agi += this.tempStatChanges.agi;
+        mockPlayer.points = this.remainingPoints;
+        
+        // Reset temporary changes
+        this.tempStatChanges = { sta: 0, str: 0, agi: 0 };
+        
+        // Refresh the entire UI
+        this.updateLayout();
+      }
+    );
+    
+    panel.addChild(resetButton, confirmButton);
+    
+    panel.x = startX;
+    panel.y = startY;
+    
+    this.pointDistributionContainer.addChild(panel);
+  }
+
+  private createStatButton(text: string, x: number, y: number, width: number, height: number, onClick: () => void): Container {
+    const button = new Container();
+    
+    // Button background
+    const bg = new Graphics();
+    bg.roundRect(0, 0, width, height, 4)
+      .fill(Colors.BUTTON_PRIMARY)
+      .stroke({ width: 2, color: Colors.BUTTON_BORDER });
+
+    // Button text
+    const buttonText = new Text({
+      text: text,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 16,
+        fontWeight: 'bold',
+        fill: Colors.TEXT_BUTTON,
+        align: 'center'
+      }
+    });
+    buttonText.anchor.set(0.5);
+    buttonText.x = width / 2;
+    buttonText.y = height / 2;
+    
+    button.addChild(bg, buttonText);
+    button.x = x;
+    button.y = y;
+    button.interactive = true;
+    button.cursor = 'pointer';
+    
+    // Hover effects
+    button.on('pointerover', () => {
+      bg.tint = Colors.BUTTON_HOVER;
+    });
+    button.on('pointerout', () => {
+      bg.tint = 0xffffff;
+    });
+    
+    button.on('pointerdown', onClick);
+    
+    return button;
+  }
+
+  private refreshPointDistributionPanel(): void {
+    // Clear and recreate just the point distribution panel and stats
+    this.pointDistributionContainer.removeChildren();
+    this.statsContainer.removeChildren();
+    this.createPlayerStats();
+    this.createPointDistributionPanel();
+  }
+
   private createCharacterCollection(): void {
     // Card layout with standard spacing
     const cardWidth = 120;
     const cardHeight = 140;
     const totalCards = mockPlayer.characters.length;
+
+    // Calculate Y position based on whether point distribution panel is shown
+    const baseY = mockPlayer.points > 0 ? 560 : 360; // Add 200px offset if point panel is shown
 
     // Title - centered
     const collectionTitle = new Text({ text: 'Character Collection', style: {
@@ -176,7 +384,7 @@ export class PlayerDetailScene extends BaseScene {
     }});
     collectionTitle.anchor.set(0.5, 0);
     collectionTitle.x = this.gameWidth / 2;
-    collectionTitle.y = 360;
+    collectionTitle.y = baseY;
 
     // ScrollBox setup (no padding/overflow/verticalScroll/horizontalScroll options)
     const availableWidth = this.gameWidth - 2 * this.STANDARD_PADDING;
@@ -205,7 +413,7 @@ export class PlayerDetailScene extends BaseScene {
 
     // Position ScrollBox centered horizontally
     scrollBox.x = this.STANDARD_PADDING;
-    scrollBox.y = 400;
+    scrollBox.y = baseY + 40;
 
     // View all button - responsive width
     const buttonWidth = Math.min(250, this.gameWidth - 2 * this.STANDARD_PADDING);
@@ -244,7 +452,7 @@ export class PlayerDetailScene extends BaseScene {
     this.buttonContainer.addChild(backButton);
   }
 
-  update(time: Ticker): void {
+  update(_time: Ticker): void {
     // No animations needed for this scene
   }
 }
