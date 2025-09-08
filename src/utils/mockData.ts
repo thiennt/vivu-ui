@@ -207,39 +207,37 @@ export const mockCharacters = [
 ];
 
 // ---- Player ----
-export const mockPlayers = [
-  {
-    id: "P1",
-    username: "Satoshi",
-    farcaster_id: "player_fc_001",
-    level: 15,
-    exp: 3500,
-    awaking: 2,
-    star: 2,
-    points: 0,
-    created_at: "2025-09-01T00:00:00.000Z",
-    updated_at: "2025-09-08T06:00:00.000Z",
-    stats: {
-      stamina: 12,
-      strength: 18,
-      agility: 14,
-      luck: 9,
-      intelligence: 15,
-      vitality: 16,
-    },
-    characters: ["1","2","3","4","5","6","7","8","9","10"],
-    formation: {
-      positions: ["1", "2", null, null]
-    },
-    inventory: [
-      { id: "I1", name: "Healing Potion", quantity: 5 },
-      { id: "I2", name: "Mana Potion", quantity: 3 }
-    ]
-  }
-];
+export const mockPlayer = {
+  id: "P1",
+  username: "Satoshi",
+  farcaster_id: "player_fc_001",
+  level: 15,
+  exp: 3500,
+  awaking: 2,
+  star: 2,
+  points: 0,
+  created_at: "2025-09-01T00:00:00.000Z",
+  updated_at: "2025-09-08T06:00:00.000Z",
+  stats: {
+    stamina: 12,
+    strength: 18,
+    agility: 14,
+    luck: 9,
+    intelligence: 15,
+    vitality: 16,
+  },
+  characters: ["1","2","3","4","5","6","7","8","9","10"],
+  formation: {
+    positions: ["1", "2", null, null]
+  },
+  inventory: [
+    { id: "I1", name: "Healing Potion", quantity: 5 },
+    { id: "I2", name: "Mana Potion", quantity: 3 }
+  ]
+};
 
 // ---- Stages ----
-export const mockStages = [
+export const mockDungeons = [
   {
     id: "stage-1",
     name: "Genesis Valley",
@@ -259,7 +257,7 @@ export const mockStages = [
     ],
     is_boss_stage: false,
     battles: [],
-    stages: [
+    chapters: [
       {
         id: "stage-1-1",
         name: "Genesis 1",
@@ -381,7 +379,7 @@ export const mockStages = [
     ],
     is_boss_stage: false,
     battles: [],
-    children: [
+    chapters: [
       {
         id: "stage-2-1",
         name: "Island 1",
