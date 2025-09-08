@@ -18,9 +18,18 @@ export class FormationScene extends BaseScene {
   private isDragging: boolean = false;
   
   private slotHitBoxes: {index: number, x: number, y: number, size: number}[] = [];
+  
+  // UI containers
+  public container: Container;
+  private backgroundContainer: Container;
+  private headerContainer: Container;
+  private formationContainer: Container;
+  private poolContainer: Container;
+  private buttonContainer: Container;
 
   constructor() {
     super();
+    
     // Convert string IDs to Character objects
     this.formationPositions = mockPlayer.formation.positions.map(id => 
       id ? mockCharacters.find(c => c.id === id) || null : null
@@ -31,6 +40,26 @@ export class FormationScene extends BaseScene {
     this.availableCharacters = mockCharacters.filter(
       char => !formationCharacterIds.includes(char.id)
     );
+    
+    // Create containers once
+    this.container = new Container();
+    this.backgroundContainer = new Container();
+    this.headerContainer = new Container();
+    this.formationContainer = new Container();
+    this.poolContainer = new Container();
+    this.buttonContainer = new Container();
+    
+    this.addChild(this.container);
+    this.container.addChild(
+      this.backgroundContainer,
+      this.headerContainer,
+      this.formationContainer,
+      this.poolContainer,
+      this.buttonContainer
+    );
+    
+    // Create UI once
+    this.initializeUI();
   }
 
   // Utility: Clean up any floating/dragged card and any card that is a direct child of the scene
@@ -52,10 +81,31 @@ export class FormationScene extends BaseScene {
       });
   }
 
+  private initializeUI(): void {
+    this.createBackground();
+    this.createHeader();
+    this.createFormationGrid();
+    this.createCharacterPool();
+    this.createActionButtons();
+  }
+
   resize(width: number, height: number): void {
     this.gameWidth = width;
     this.gameHeight = height;
-    this.cleanupBeforeResize();
+    
+    // Update UI layout without recreating
+    this.updateLayout();
+  }
+  
+  private updateLayout(): void {
+    // Clear and recreate layout - this is more efficient than destroying/recreating all elements
+    this.backgroundContainer.removeChildren();
+    this.headerContainer.removeChildren();
+    this.formationContainer.removeChildren();
+    this.poolContainer.removeChildren();
+    this.buttonContainer.removeChildren();
+    
+    // Recreate layout with current dimensions
     this.createBackground();
     this.createHeader();
     this.createFormationGrid();
@@ -64,7 +114,6 @@ export class FormationScene extends BaseScene {
   }
 
   private createBackground(): void {
-    const bgContainer = new Container();
     const bg = new Graphics();
     bg.rect(0, 0, this.gameWidth, this.gameHeight).fill(Colors.BACKGROUND_PRIMARY);
 
@@ -82,8 +131,7 @@ export class FormationScene extends BaseScene {
       grid.lineTo(this.gameWidth, y);
     }
 
-    bgContainer.addChild(bg, grid);
-    this.addChildAt(bgContainer, 0);
+    this.backgroundContainer.addChild(bg, grid);
   }
 
   private createHeader(): void {
@@ -107,12 +155,11 @@ export class FormationScene extends BaseScene {
     subtitle.x = this.gameWidth / 2;
     subtitle.y = 100;
 
-    this.addChild(title, subtitle);
+    this.headerContainer.addChild(title, subtitle);
   }
 
   private createFormationGrid(): void {
-    const formationContainer = new Container();
-    formationContainer.label = 'formationContainer';
+    this.formationContainer.label = 'formationContainer';
 
     // Formation positions (2x2 grid) with standard spacing
     const rows = 2;
@@ -132,13 +179,13 @@ export class FormationScene extends BaseScene {
         this.slotHitBoxes.push({index: positionIndex, x: startX + x, y: startY + y, size: slotSize});
 
         const slot = this.createFormationSlot(x, y, slotSize, positionIndex);
-        formationContainer.addChild(slot);
+        this.formationContainer.addChild(slot);
 
         // Add character if present
         const character = this.formationPositions[positionIndex];
         if (character) {
           const characterCard = this.createFormationCharacterCard(character, x, y, slotSize, positionIndex);
-          formationContainer.addChild(characterCard);
+          this.formationContainer.addChild(characterCard);
         }
       }
     }
@@ -170,13 +217,11 @@ export class FormationScene extends BaseScene {
     backLabel.x = -50;
     backLabel.y = slotSize + this.STANDARD_SPACING + slotSize / 2;
 
-    formationContainer.addChild(frontLabel, backLabel);
+    this.formationContainer.addChild(frontLabel, backLabel);
 
     // Center the grid container horizontally
-    formationContainer.x = startX;
-    formationContainer.y = startY;
-
-    this.addChild(formationContainer);
+    this.formationContainer.x = startX;
+    this.formationContainer.y = startY;
 
     app.stage.eventMode = 'static';
     app.stage.on('pointerup', this.onDragEnd, this);
@@ -221,8 +266,7 @@ export class FormationScene extends BaseScene {
   }
 
   private createCharacterPool(): void {
-    const poolContainer = new Container();
-    poolContainer.label = 'characterPool';
+    this.poolContainer.label = 'characterPool';
 
     // Calculate available area
     const poolTop = 150 + 2 * 100 + 2 * this.STANDARD_SPACING; // formation grid bottom
@@ -296,13 +340,11 @@ export class FormationScene extends BaseScene {
 
     scrollBox.addItem(content);
 
-    poolContainer.addChild(poolBg, poolTitle, scrollBox);
+    this.poolContainer.addChild(poolBg, poolTitle, scrollBox);
 
     // Align pool to fit screen
-    poolContainer.x = this.STANDARD_PADDING;
-    poolContainer.y = poolTop;
-
-    this.addChild(poolContainer);
+    this.poolContainer.x = this.STANDARD_PADDING;
+    this.poolContainer.y = poolTop;
   }
 
   private createPoolCharacterCard(character: any, x: number, y: number): Container {
@@ -428,10 +470,9 @@ export class FormationScene extends BaseScene {
 
   private refreshFormation(): void {
     this.cleanUpFloatingCards();
-    const formationContainer = this.getChildByLabel('formationContainer');
-    const poolContainer = this.getChildByLabel('characterPool');
-    if (formationContainer) this.removeChild(formationContainer);
-    if (poolContainer) this.removeChild(poolContainer);
+    // Clear and recreate only formation and pool containers
+    this.formationContainer.removeChildren();
+    this.poolContainer.removeChildren();
     this.createFormationGrid();
     this.createCharacterPool();
   }
@@ -492,6 +533,6 @@ export class FormationScene extends BaseScene {
       }
     );
 
-    this.addChild(backButton, saveButton, autoButton);
+    this.buttonContainer.addChild(backButton, saveButton, autoButton);
   }
 }

@@ -7,8 +7,40 @@ import { StageScene } from './StageScene';
 import { Colors } from '@/utils/colors';
 
 export class DungeonScene extends BaseScene {
+  // UI containers
+  public container: Container;
+  private backgroundContainer: Container;
+  private headerContainer: Container;
+  private listContainer: Container;
+  private buttonContainer: Container;
+
   constructor() {
     super();
+    
+    // Create containers once
+    this.container = new Container();
+    this.backgroundContainer = new Container();
+    this.headerContainer = new Container();
+    this.listContainer = new Container();
+    this.buttonContainer = new Container();
+    
+    this.addChild(this.container);
+    this.container.addChild(
+      this.backgroundContainer,
+      this.headerContainer,
+      this.listContainer,
+      this.buttonContainer
+    );
+    
+    // Create UI once
+    this.initializeUI();
+  }
+  
+  private initializeUI(): void {
+    this.createBackground();
+    this.createHeader();
+    this.createDungeonList();
+    this.createBackButton();
   }
 
   /** Resize the screen */
@@ -16,7 +48,18 @@ export class DungeonScene extends BaseScene {
     this.gameWidth = width;
     this.gameHeight = height;
 
-    this.cleanupBeforeResize();
+    // Update UI layout without recreating
+    this.updateLayout();
+  }
+  
+  private updateLayout(): void {
+    // Clear and recreate layout - this is more efficient than destroying/recreating all elements
+    this.backgroundContainer.removeChildren();
+    this.headerContainer.removeChildren();
+    this.listContainer.removeChildren();
+    this.buttonContainer.removeChildren();
+    
+    // Recreate layout with current dimensions
     this.createBackground();
     this.createHeader();
     this.createDungeonList();
@@ -24,7 +67,6 @@ export class DungeonScene extends BaseScene {
   }
 
   private createBackground(): void {
-    const bgContainer = new Container();
     const bg = new Graphics();
     // bg.rect(0, 0, this.gameWidth, this.gameHeight).fill(0x1a0e0a);
 
@@ -38,10 +80,8 @@ export class DungeonScene extends BaseScene {
           Math.random() * this.gameHeight,
           5 + Math.random() * 10
       ).fill({ color: Colors.DECORATION_MAGIC, alpha: 0.3 });
-      bgContainer.addChild(orb);
+      this.backgroundContainer.addChild(orb);
     }
-
-    this.addChildAt(bgContainer, 0);
   }
 
   private createHeader(): void {
@@ -60,12 +100,10 @@ export class DungeonScene extends BaseScene {
     subtitle.x = this.gameWidth / 2;
     subtitle.y = 100;
     
-    this.addChild(title, subtitle);
+    this.headerContainer.addChild(title, subtitle);
   }
 
   private createDungeonList(): void {
-    const dungeonContainer = new Container();
-    
     // Calculate responsive card dimensions with standard padding
     const availableWidth = this.gameWidth - 2 * this.STANDARD_PADDING;
     const cardWidth = Math.min(availableWidth, 500); // Limit max width but use available space
@@ -76,10 +114,8 @@ export class DungeonScene extends BaseScene {
       const dungeonCard = this.createDungeonCard(dungeon, index, cardWidth, cardHeight);
       dungeonCard.x = (this.gameWidth - cardWidth) / 2; // Center each card
       dungeonCard.y = startY + (index * (cardHeight + this.STANDARD_SPACING));
-      dungeonContainer.addChild(dungeonCard);
+      this.listContainer.addChild(dungeonCard);
     });
-    
-    this.addChild(dungeonContainer);
   }
 
   private createDungeonCard(dungeon: any, index: number, cardWidth: number, cardHeight: number): Container {
@@ -200,7 +236,7 @@ export class DungeonScene extends BaseScene {
       50,
       () => navigation.showScreen(HomeScene)
     );
-    this.addChild(backButton);
+    this.buttonContainer.addChild(backButton);
   }
 
   update(time: Ticker): void {

@@ -13,11 +13,43 @@ export class CharactersScene extends BaseScene {
   
   private scrollOffset: number = 0;
   private maxScroll: number = 0;
+  
+  // UI containers
+  public container: Container;
+  private backgroundContainer: Container;
+  private headerContainer: Container;
+  private gridContainer: Container;
+  private buttonContainer: Container;
 
   constructor() {
     super();
     this.scrollOffset = 0;
     this.maxScroll = 0;
+    
+    // Create containers once
+    this.container = new Container();
+    this.backgroundContainer = new Container();
+    this.headerContainer = new Container();
+    this.gridContainer = new Container();
+    this.buttonContainer = new Container();
+    
+    this.addChild(this.container);
+    this.container.addChild(
+      this.backgroundContainer,
+      this.headerContainer,
+      this.gridContainer,
+      this.buttonContainer
+    );
+    
+    // Create UI once
+    this.initializeUI();
+  }
+  
+  private initializeUI(): void {
+    this.createBackground();
+    this.createHeader();
+    this.createCharacterGrid();
+    this.createBackButton();
   }
 
   /** Resize the screen */
@@ -25,12 +57,22 @@ export class CharactersScene extends BaseScene {
     this.gameWidth = width;
     this.gameHeight = height;
     
-    this.cleanupBeforeResize();
+    // Update UI layout without recreating
+    this.updateLayout();
+  }
+  
+  private updateLayout(): void {
+    // Clear and recreate layout - this is more efficient than destroying/recreating all elements
+    this.backgroundContainer.removeChildren();
+    this.headerContainer.removeChildren();
+    this.gridContainer.removeChildren();
+    this.buttonContainer.removeChildren();
+    
+    // Recreate layout with current dimensions
     this.createBackground();
     this.createHeader();
     this.createCharacterGrid();
     this.createBackButton();
-    //this.setupScrolling();
   }
 
   /** Show the screen with animation */
@@ -76,7 +118,7 @@ export class CharactersScene extends BaseScene {
 
   /** Reset screen after hidden */
   reset(): void {
-    this.removeChildren();
+    this.container.removeChildren();
     this.scrollOffset = 0;
     this.maxScroll = 0;
   }
@@ -84,7 +126,7 @@ export class CharactersScene extends BaseScene {
   private createBackground(): void {
     const bg = new Graphics();
     bg.rect(0, 0, this.gameWidth, this.gameHeight).fill(Colors.BACKGROUND_PRIMARY);
-    this.addChildAt(bg, 0);
+    this.backgroundContainer.addChild(bg);
   }
 
   private createHeader(): void {
@@ -103,7 +145,7 @@ export class CharactersScene extends BaseScene {
     subtitle.x = this.gameWidth / 2;
     subtitle.y = 100;
     
-    this.addChild(title, subtitle);
+    this.headerContainer.addChild(title, subtitle);
   }
 
   private createCharacterGrid(): void {
@@ -163,7 +205,7 @@ export class CharactersScene extends BaseScene {
     // Set gridContent height for proper scrolling
     gridContent.height = contentHeight;
 
-    this.addChild(scrollBox);
+    this.gridContainer.addChild(scrollBox);
     scrollBox.label = 'gridContainer';
   }
 
@@ -209,7 +251,7 @@ export class CharactersScene extends BaseScene {
       50,
       () => navigation.showScreen(HomeScene)
     );
-    this.addChild(backButton);
+    this.buttonContainer.addChild(backButton);
   }
 
   update(time: Ticker): void {
