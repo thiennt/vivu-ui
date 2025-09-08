@@ -1,4 +1,6 @@
 // ---- Skills ----
+import { CharacterRarity, Element } from '@/types';
+
 export const mockSkills = [
   {
     id: "S1",
@@ -213,7 +215,7 @@ export const mockPlayers = [
     username: "Satoshi",
     farcaster_id: "player_fc_001",
     level: 15,
-    exp: 3500,
+    experience: 3500,
     awaking: 2,
     star: 2,
     points: 0,
@@ -237,6 +239,45 @@ export const mockPlayers = [
     ]
   }
 ];
+
+// Helper function to adapt old character format to new interface format
+const adaptCharacter = (oldChar: any) => ({
+  id: oldChar.id,
+  name: oldChar.name,
+  tokenSymbol: oldChar.ticker,
+  rarity: oldChar.level <= 5 ? CharacterRarity.COMMON : oldChar.level <= 8 ? CharacterRarity.UNCOMMON : oldChar.level <= 10 ? CharacterRarity.RARE : oldChar.level <= 12 ? CharacterRarity.EPIC : CharacterRarity.LEGENDARY,
+  level: oldChar.level,
+  experience: oldChar.exp,
+  stats: {
+    health: oldChar.max_hp,
+    attack: oldChar.atk,
+    defense: oldChar.def,
+    speed: oldChar.agi,
+    criticalRate: oldChar.crit_rate,
+    criticalDamage: oldChar.crit_dmg
+  },
+  skills: oldChar.equipped_skills?.map((skillId: string) => 
+    mockSkills.find(skill => skill.id === skillId)
+  ).filter(Boolean) || [],
+  element: Element.FIRE // Default element, could be made more sophisticated
+});
+
+// Export singular player for convenience
+export const mockPlayer = {
+  ...mockPlayers[0],
+  characters: mockPlayers[0].characters.map(id => {
+    const char = mockCharacters.find(c => c.id === id);
+    return char ? adaptCharacter(char) : null;
+  }).filter((char): char is NonNullable<typeof char> => char !== null),
+  formation: {
+    positions: mockPlayers[0].formation.positions.map(id => {
+      if (!id) return null;
+      const char = mockCharacters.find(c => c.id === id);
+      return char ? adaptCharacter(char) : null;
+    }),
+    maxSize: 4
+  }
+};
 
 // ---- Stages ----
 export const mockStages = [
@@ -481,6 +522,70 @@ export const mockStages = [
         ],
         is_boss_stage: true,
         battles: []
+      }
+    ]
+  }
+];
+
+// ---- Dungeons ----
+export const mockDungeons = [
+  {
+    id: "dungeon-1",
+    name: "Genesis Valley",
+    description: "The first world on your crypto adventure.",
+    requiredLevel: 1,
+    rewards: [
+      { type: "experience", amount: 1000 },
+      { type: "gold", amount: 1000 }
+    ],
+    chapters: [
+      {
+        id: "chapter-1",
+        name: "Genesis Valley",
+        description: "The first world on your crypto adventure.",
+        chapterNumber: 1,
+        stages: (mockStages[0].stages || mockStages[0].children || []).map((stage: any, index: number) => ({
+          id: stage.id,
+          name: stage.name,
+          description: stage.description,
+          stageNumber: index + 1,
+          difficulty: stage.difficulty === 1 ? "easy" : stage.difficulty === 2 ? "normal" : stage.difficulty >= 3 ? "hard" : "easy",
+          enemies: [], // Empty for now, can be populated later
+          rewards: stage.rewards.map((reward: any) => ({
+            type: reward.type === "exp" ? "experience" : reward.type,
+            amount: reward.amount
+          }))
+        }))
+      }
+    ]
+  },
+  {
+    id: "dungeon-2", 
+    name: "Altcoin Archipelago",
+    description: "Islands ruled by powerful altcoin spirits.",
+    requiredLevel: 5,
+    rewards: [
+      { type: "experience", amount: 1200 },
+      { type: "gold", amount: 1100 }
+    ],
+    chapters: [
+      {
+        id: "chapter-2",
+        name: "Altcoin Archipelago",
+        description: "Islands ruled by powerful altcoin spirits.",
+        chapterNumber: 1,
+        stages: (mockStages[1].children || mockStages[1].stages || []).map((stage: any, index: number) => ({
+          id: stage.id,
+          name: stage.name,
+          description: stage.description,
+          stageNumber: index + 1,
+          difficulty: stage.difficulty === 1 ? "easy" : stage.difficulty === 2 ? "normal" : stage.difficulty >= 3 ? "hard" : "easy",
+          enemies: [], // Empty for now, can be populated later
+          rewards: stage.rewards.map((reward: any) => ({
+            type: reward.type === "exp" ? "experience" : reward.type,
+            amount: reward.amount
+          }))
+        }))
       }
     ]
   }
