@@ -68,7 +68,7 @@ export class FormationScene extends BaseScene {
   private createBackground(): void {
     const bgContainer = new Container();
     const bg = new Graphics();
-    bg.fill(Colors.BACKGROUND_PRIMARY).rect(0, 0, this.gameWidth, this.gameHeight);
+    bg.rect(0, 0, this.gameWidth, this.gameHeight).fill(Colors.BACKGROUND_PRIMARY);
 
     // Battle field grid lines
     const gridSpacing = 40;
@@ -190,9 +190,9 @@ export class FormationScene extends BaseScene {
   private createFormationSlot(x: number, y: number, size: number, positionIndex: number): Container {
     const slot = new Container();
     const bg = new Graphics();
-    bg.fill({ color: Colors.BACKGROUND_SECONDARY, alpha: 0.5 })
-      .stroke({ width: 2, color: Colors.BUTTON_PRIMARY, alpha: 0.8 })
-      .roundRect(0, 0, size, size, 8);
+    bg.roundRect(0, 0, 100, size, 8)
+      .fill({ color: Colors.BACKGROUND_SECONDARY, alpha: 0.5 })
+      .stroke({ width: 2, color: Colors.BUTTON_PRIMARY, alpha: 0.8 });
 
     const positionText = new Text({
       text: `${positionIndex + 1}`,
@@ -218,7 +218,6 @@ export class FormationScene extends BaseScene {
 
   private createFormationCharacterCard(character: Character, x: number, y: number, size: number, positionIndex: number): Container {
     const card = this.createHeroCard(character, x, y, 'formation', positionIndex);
-    (card as any).character = character;
     this.makeFormationCardInteractive(card, character, positionIndex);
     card.zIndex = 1;
     return card;
@@ -233,9 +232,9 @@ export class FormationScene extends BaseScene {
     const poolHeight = 180;
 
     const poolBg = new Graphics();
-    poolBg.fill({ color: 0x3e2723, alpha: 0.8 })
-      .stroke({ width: 2, color: 0x8d6e63 })
-      .roundRect(0, 0, poolWidth, poolHeight, 12);
+    poolBg.roundRect(0, 0, poolWidth, poolHeight, 12)
+      .fill({ color: 0x3e2723, alpha: 0.8 })
+      .stroke({ width: 2, color: 0x8d6e63 });
 
     const poolTitle = new Text({
       text: 'Available Characters',

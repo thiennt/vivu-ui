@@ -33,7 +33,7 @@ export class StageScene extends BaseScene {
 
   private createBackground(): void {
     const bg = new Graphics();
-    bg.fill(0x1a0e0a).rect(0, 0, this.gameWidth, this.gameHeight);
+    bg.rect(0, 0, this.gameWidth, this.gameHeight).fill(0x1a0e0a);
     this.addChildAt(bg, 0);
   }
 
@@ -64,9 +64,9 @@ export class StageScene extends BaseScene {
     const buttonWidth = Math.min(160, (selectorWidth - 140) / this.dungeon!.chapters.length);
     
     const selectorBg = new Graphics();
-    selectorBg.fill({ color: Colors.BACKGROUND_SECONDARY, alpha: 0.9 })
-      .stroke({ width: 2, color: Colors.BUTTON_PRIMARY })
-      .roundRect(0, 0, selectorWidth, 60, 10);
+    selectorBg.roundRect(0, 0, selectorWidth, 60, 10)
+      .fill({ color: Colors.BACKGROUND_SECONDARY, alpha: 0.9 })
+      .stroke({ width: 2, color: Colors.BUTTON_PRIMARY });
     
     const chapterTitle = new Text({
       text: 'Chapters:',
@@ -112,9 +112,9 @@ export class StageScene extends BaseScene {
     const textColor = isSelected ? Colors.TEXT_PRIMARY : Colors.TEXT_SECONDARY;
     
     const bg = new Graphics();
-    bg.fill(bgColor)
-      .stroke({ width: 2, color: Colors.BUTTON_PRIMARY })
-      .roundRect(0, 0, width, height, 8);
+    bg.roundRect(0, 0, width, height, 8)
+      .fill(bgColor)
+      .stroke({ width: 2, color: Colors.BUTTON_PRIMARY });
 
     const buttonText = new Text({
       text,
@@ -186,9 +186,9 @@ export class StageScene extends BaseScene {
     
     // Background
     const bg = new Graphics();
-    bg.fill({ color: Colors.BACKGROUND_SECONDARY, alpha: 0.9 })
-      .stroke({ width: 3, color: Colors.BUTTON_PRIMARY })
-      .roundRect(0, 0, 180, 130, 10);
+    bg.roundRect(0, 0, 180, 130, 10)
+      .fill({ color: Colors.BACKGROUND_SECONDARY, alpha: 0.9 })
+      .stroke({ width: 3, color: Colors.BUTTON_PRIMARY });
     
     // Stage number
     const stageNumber = new Text({
@@ -293,7 +293,7 @@ export class StageScene extends BaseScene {
   private createBackButton(): void {
     const backButton = this.createButton(
       '← Back to Dungeons',
-      50,
+      5,
       this.gameHeight - 80,
       200,
       50,

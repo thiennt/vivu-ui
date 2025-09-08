@@ -106,30 +106,42 @@ export class CharactersScene extends BaseScene {
 
   private createCharacterGrid(): void {
     const gridContainer = new Container();
-    const cardsPerRow = 3;
-    const cardWidth = 140;
-    const cardHeight = 180;
+    const padding = 10;
     const spacing = 10;
-    
-    // Calculate starting position to center the grid
-    const totalGridWidth = cardsPerRow * cardWidth + (cardsPerRow - 1) * spacing;
-    const startX = (this.gameWidth - totalGridWidth) / 4;
+    const minCardWidth = 120;
+    const maxCardWidth = 180;
+    let cardsPerRow = Math.floor((this.gameWidth - 2 * padding + spacing) / (minCardWidth + spacing));
+    cardsPerRow = Math.max(1, cardsPerRow);
 
+    // Responsive card width
+    const availableWidth = this.gameWidth - 2 * padding;
+    const totalSpacing = (cardsPerRow - 1) * spacing;
+    let cardWidth = (availableWidth - totalSpacing) / cardsPerRow;
+    cardWidth = Math.max(minCardWidth, Math.min(cardWidth, maxCardWidth));
+    const cardHeight = 180;
+
+    // Layout cards
     mockCharacters.forEach((character, index) => {
       const row = Math.floor(index / cardsPerRow);
       const col = index % cardsPerRow;
-      
-      const x = startX + col * (cardWidth + spacing);
+
+      const x = padding + col * (cardWidth + spacing);
       const y = 140 + row * (cardHeight + spacing);
-      
-      const characterCard = this.createDetailedCharacterCard(character, x, y);
+
+      const characterCard = this.createHeroCard(character, x, y, 'detailed');
+      characterCard.width = cardWidth;
+      characterCard.height = cardHeight;
+
+      characterCard.on('pointerdown', () => {
+        navigation.showScreen(CharacterDetailScene, { selectedCharacter: character });
+      });
+
       gridContainer.addChild(characterCard);
     });
-    
-    // Calculate max scroll
+
     const totalRows = Math.ceil(mockCharacters.length / cardsPerRow);
     this.maxScroll = Math.max(0, (totalRows * (cardHeight + spacing)) - (this.gameHeight - 200));
-    
+
     this.addChild(gridContainer);
     gridContainer.label = 'gridContainer';
   }

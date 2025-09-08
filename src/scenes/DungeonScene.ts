@@ -25,19 +25,18 @@ export class DungeonScene extends BaseScene {
   private createBackground(): void {
     const bgContainer = new Container();
     const bg = new Graphics();
-    bg.fill(0x1a0e0a).rect(0, 0, this.gameWidth, this.gameHeight);
+    // bg.rect(0, 0, this.gameWidth, this.gameHeight).fill(0x1a0e0a);
 
-    bgContainer.addChild(bg);
+    // bgContainer.addChild(bg);
 
     // Add mystical atmosphere
     for (let i = 0; i < 15; i++) {
       const orb = new Graphics();
-      orb.fill({ color: Colors.DECORATION_MAGIC, alpha: 0.3 })
-        .circle(
+      orb.circle(
           Math.random() * this.gameWidth,
           Math.random() * this.gameHeight,
           5 + Math.random() * 10
-        );
+      ).fill({ color: Colors.DECORATION_MAGIC, alpha: 0.3 });
       bgContainer.addChild(orb);
     }
 
@@ -67,9 +66,9 @@ export class DungeonScene extends BaseScene {
     const dungeonContainer = new Container();
     
     // Calculate responsive card width and centering
-    const cardWidth = Math.min(600, this.gameWidth);
+    const cardWidth = this.gameWidth;
     const cardHeight = 160;
-    const verticalSpacing = 20;
+    const verticalSpacing = 10;
     const startY = 150;
     
     mockDungeons.forEach((dungeon, index) => {
@@ -88,23 +87,23 @@ export class DungeonScene extends BaseScene {
     
     // Background
     const bg = new Graphics();
-    bg.fill({ color: Colors.BACKGROUND_SECONDARY, alpha: 0.9 })
-      .stroke({ width: 3, color: Colors.BUTTON_PRIMARY })
-      .roundRect(0, 0, cardWidth, cardHeight, 15);
-    
+    bg.roundRect(0, 0, cardWidth, cardHeight, 15)
+      .fill({ color: Colors.BACKGROUND_SECONDARY, alpha: 0.9 })
+      .stroke({ width: 3, color: Colors.BUTTON_PRIMARY });
+
     // Calculate responsive sizes
-    const iconSize = 120;
+    const iconSize = 100;
     const iconX = 0;
-    const iconY = 20;
+    const iconY = 30;
     const contentStartX = iconX + iconSize;
     const contentWidth = cardWidth - contentStartX - 10;
     const buttonWidth = Math.min(130, contentWidth / 3);
     
     // Dungeon icon/preview
     const iconBg = new Graphics();
-    iconBg.fill(Colors.BUTTON_BORDER)
-      .stroke({ width: 2, color: Colors.BUTTON_PRIMARY })
-      .roundRect(iconX, iconY, iconSize, iconSize, 10);
+    // iconBg.roundRect(iconX, iconY, iconSize - 10, iconSize, 10)
+    //   .fill(Colors.BUTTON_BORDER)
+    //   .stroke({ width: 2, color: Colors.BUTTON_PRIMARY });
     
     const icon = new Text({
       text: '🏰',
@@ -198,7 +197,7 @@ export class DungeonScene extends BaseScene {
   private createBackButton(): void {
     const backButton = this.createButton(
       '← Back to Home',
-      0,
+      5,
       this.gameHeight - 80,
       200,
       50,

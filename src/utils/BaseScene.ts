@@ -18,7 +18,7 @@ export abstract class BaseScene extends Container {
     // Only create background if dimensions are properly set
     if (this.gameWidth && this.gameHeight) {
       const bg = new Graphics();
-      bg.fill(Colors.BACKGROUND_PRIMARY).rect(0, 0, this.gameWidth, this.gameHeight);
+      bg.rect(0, 0, this.gameWidth, this.gameHeight).fill(Colors.BACKGROUND_PRIMARY);
       this.addChild(bg);
     }
   }
@@ -40,10 +40,10 @@ export abstract class BaseScene extends Container {
     
     // Button background with fantasy styling
     const bg = new Graphics();
-    bg.fill(Colors.BUTTON_PRIMARY)
-      .stroke({ width: 3, color: Colors.BUTTON_BORDER })
-      .roundRect(0, 0, width, height, 8);
-    
+    bg.roundRect(0, 0, width, height, 8)
+      .fill(Colors.BUTTON_PRIMARY)
+      .stroke({ width: 3, color: Colors.BUTTON_BORDER });
+
     // Button text
     const buttonText = new Text({
       text: text,
@@ -125,10 +125,10 @@ export abstract class BaseScene extends Container {
     };
     
     const bg = new Graphics();
-    bg.fill(rarityColors[rarity] || rarityColors.common)
-      .stroke({ width: 2, color: Colors.CARD_BORDER })
-      .roundRect(0, 0, width, height, 8);
-    
+    bg.roundRect(0, 0, width, height, 8)
+      .fill(rarityColors[rarity] || rarityColors.common)
+      .stroke({ width: 2, color: Colors.CARD_BORDER });
+
     card.addChild(bg);
     card.x = x;
     card.y = y;
@@ -155,6 +155,7 @@ export abstract class BaseScene extends Container {
     
     const { width, height } = cardSizes[cardType];
     const card = this.createCard(x, y, width, height, character.rarity);
+    (card as any).character = character;
     
     // Character symbol (crypto token) - always at top center
     const symbolSize = cardType === 'detailed' ? 24 : (cardType === 'preview' ? 18 : 16);
@@ -299,8 +300,8 @@ export abstract class BaseScene extends Container {
     };
     
     const elementIndicator = new Graphics();
-    elementIndicator.fill(elementColors[character.element] || Colors.ELEMENT_DEFAULT)
-      .circle(width - 15, 15, 6);
+    elementIndicator.circle(width - 15, 15, 6)
+      .fill(elementColors[character.element] || Colors.ELEMENT_DEFAULT);
     
     card.addChild(elementIndicator);
   }
