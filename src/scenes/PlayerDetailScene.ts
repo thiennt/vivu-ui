@@ -136,7 +136,7 @@ export class PlayerDetailScene extends BaseScene {
     collectionTitle.x = this.gameWidth / 2;
     collectionTitle.y = 360;
 
-    // ScrollBox setup with responsive width considering padding
+    // ScrollBox setup (no padding/overflow/verticalScroll/horizontalScroll options)
     const availableWidth = this.gameWidth - 2 * this.STANDARD_PADDING;
     const visibleCards = Math.min(Math.floor(availableWidth / (cardWidth + this.STANDARD_SPACING)), totalCards);
     const scrollBoxWidth = (cardWidth * visibleCards) + (this.STANDARD_SPACING * (visibleCards - 1));
@@ -144,20 +144,22 @@ export class PlayerDetailScene extends BaseScene {
     const scrollBox = new ScrollBox({
       width: scrollBoxWidth,
       height: scrollBoxHeight,
-      elementsMargin: 0,
     });
 
-    // Add cards to ScrollBox content
+    // Add cards to ScrollBox viewport, always from left (no marginLeft)
     mockPlayer.characters.forEach((character, index) => {
-      const card = this.createCharacterPreviewCard(character, index * (cardWidth + this.STANDARD_SPACING), 0);
+      const card = this.createCharacterPreviewCard(character, this.STANDARD_PADDING + index * (cardWidth + this.STANDARD_SPACING), 0);
+      // Position cards horizontally with spacing, always from left
+      card.x = index * (cardWidth + this.STANDARD_SPACING);
+      card.y = 0;
       scrollBox.addItem(card);
     });
 
-    // Set content width for scrolling
-    scrollBox.width = (cardWidth + this.STANDARD_SPACING) * totalCards - this.STANDARD_SPACING;
+    // Set viewport width for scrolling (include padding)
+    scrollBox.width = this.STANDARD_PADDING + totalCards * cardWidth + (totalCards - 1) * this.STANDARD_SPACING + this.STANDARD_PADDING;
 
     // Position ScrollBox centered horizontally
-    scrollBox.x = (this.gameWidth - scrollBoxWidth) / 2;
+    scrollBox.x = this.STANDARD_PADDING;
     scrollBox.y = 400;
 
     // View all button - responsive width

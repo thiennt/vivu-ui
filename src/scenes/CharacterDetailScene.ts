@@ -46,27 +46,35 @@ export class CharacterDetailScene extends BaseScene {
 
   private createCharacterInfo(): void {
     const infoContainer = new Container();
-    
-    // Large character card
-    const largeCard = this.createCard(50, 120, 200, 250, this.character!.rarity);
 
-    const marginLeft = 30;
+    // Responsive card width: 1/3 of screen
+    const panelPadding = 10;
+    const panelWidth = Math.floor(this.gameWidth / 3) - panelPadding * 1.5;
+    const cardWidth = panelWidth;
+    const cardHeight = 250;
+    const cardX = panelPadding;
+    const cardY = 120;
 
-    // Token symbol
+    const largeCard = this.createCard(0, 0, cardWidth, cardHeight, this.character!.rarity);
+
+    // Center X for elements inside the card
+    const centerX = cardWidth / 2;
+
+    // Symbol
     const symbolText = new Text({
       text: this.character!.tokenSymbol,
-        style: {
-          fontFamily: 'Kalam',
-          fontSize: 48,
-          fontWeight: 'bold',
-          fill: 0xffffff,
-          align: 'center'
-        }
-      });
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 48,
+        fontWeight: 'bold',
+        fill: 0xffffff,
+        align: 'center'
+      }
+    });
     symbolText.anchor.set(0.5);
-    symbolText.x = marginLeft;
+    symbolText.x = centerX;
     symbolText.y = 60;
-    
+
     // Level
     const levelText = new Text({
       text: `Level ${this.character!.level}`,
@@ -79,9 +87,9 @@ export class CharacterDetailScene extends BaseScene {
       }
     });
     levelText.anchor.set(0.5);
-    levelText.x = marginLeft;
+    levelText.x = centerX;
     levelText.y = 120;
-    
+
     // Experience
     const expText = new Text({
       text: `EXP: ${this.character!.experience}`,
@@ -93,9 +101,9 @@ export class CharacterDetailScene extends BaseScene {
       }
     });
     expText.anchor.set(0.5);
-    expText.x = marginLeft;
+    expText.x = centerX;
     expText.y = 150;
-    
+
     // Rarity
     const rarityText = new Text({
       text: `★ ${this.character!.rarity.toUpperCase()} ★`,
@@ -108,9 +116,9 @@ export class CharacterDetailScene extends BaseScene {
       }
     });
     rarityText.anchor.set(0.5);
-    rarityText.x = marginLeft;
+    rarityText.x = centerX;
     rarityText.y = 180;
-    
+
     // Element
     const elementText = new Text({
       text: `Element: ${this.character!.element.toUpperCase()}`,
@@ -122,24 +130,32 @@ export class CharacterDetailScene extends BaseScene {
       }
     });
     elementText.anchor.set(0.5);
-    elementText.x = marginLeft;
+    elementText.x = centerX;
     elementText.y = 210;
-    
+
     largeCard.addChild(symbolText, levelText, expText, rarityText, elementText);
     infoContainer.addChild(largeCard);
-    
+
+    // Position infoContainer with padding
+    infoContainer.x = panelPadding;
+    infoContainer.y = cardY;
+
     this.addChild(infoContainer);
   }
 
   private createStatsDisplay(): void {
     const statsContainer = new Container();
-    const spacing = 20;
+
+    // Responsive panel width: 2/3 of screen
+    const panelPadding = 10;
+    const panelWidth = Math.floor(this.gameWidth * 2 / 3) - panelPadding * 1.5 - this.STANDARD_PADDING;
+    const panelHeight = 250;
 
     // Stats panel background
     const statsPanelBg = new Graphics();
-    statsPanelBg.fill({ color: 0x3e2723, alpha: 0.9 })
-      .stroke({ width: 3, color: 0x8d6e63 })
-      .roundRect(0, 0, 300, 250, 12);
+    statsPanelBg.roundRect(0, 0, panelWidth, panelHeight, 12)
+      .fill({ color: 0x3e2723, alpha: 0.9 })
+      .stroke({ width: 3, color: 0x8d6e63 });
 
     statsContainer.addChild(statsPanelBg);
 
@@ -153,7 +169,7 @@ export class CharacterDetailScene extends BaseScene {
         fill: 0xffecb3
       }
     });
-    title.x = 15 + spacing;
+    title.x = panelPadding;
     title.y = 15;
     statsContainer.addChild(title);
 
@@ -181,7 +197,7 @@ export class CharacterDetailScene extends BaseScene {
           fill: 0xd7ccc8
         }
       });
-      nameText.x = 15 + spacing;
+      nameText.x = panelPadding;
       nameText.y = y;
       statsContainer.addChild(nameText);
 
@@ -195,23 +211,24 @@ export class CharacterDetailScene extends BaseScene {
           fill: stat.color
         }
       });
-      valueText.x = 200 + spacing;
+      valueText.x = panelWidth - 80;
       valueText.y = y;
       statsContainer.addChild(valueText);
 
       // Stat bar background
       const barBg = new Graphics();
-      barBg.fill(0x424242).rect(15, y + 20, 270, 4);
+      barBg.fill(0x424242).rect(panelPadding, y + 20, panelWidth - 2 * panelPadding, 4);
       statsContainer.addChild(barBg);
 
       // Stat bar
-      const barWidth = (typeof stat.value === 'number' ? stat.value : 0) / maxValue * 270;
+      const barWidth = (typeof stat.value === 'number' ? stat.value : 0) / maxValue * (panelWidth - 2 * panelPadding);
       const bar = new Graphics();
-      bar.fill(stat.color).rect(15, y + 20, barWidth, 4);
+      bar.fill(stat.color).rect(panelPadding, y + 20, barWidth, 4);
       statsContainer.addChild(bar);
     });
 
-    statsContainer.x = this.gameWidth - 350;
+    // Position statsContainer to the right of character info with padding
+    statsContainer.x = Math.floor(this.gameWidth / 3) + panelPadding * 1.5;
     statsContainer.y = 120;
 
     this.addChild(statsContainer);
@@ -219,14 +236,20 @@ export class CharacterDetailScene extends BaseScene {
 
   private createSkillsDisplay(): void {
     const skillsContainer = new Container();
-    const marginLeft = 0;
+    const panelPadding = 15;
+    const panelWidth = this.gameWidth - 2 * panelPadding;
+    const panelHeight = 150;
 
-    // Skills panel
+    // Place skills panel above the back button with padding
+    const bottomPadding = 100; // Height of back button + extra space
+    const skillsPanelY = this.gameHeight - panelHeight - bottomPadding;
+
+    // Skills panel background
     const skillsPanel = new Graphics();
-    skillsPanel.fill({ color: 0x3e2723, alpha: 0.9 })
-      .stroke({ width: 3, color: 0x8d6e63 })
-      .roundRect(0, 0, this.gameWidth - 100, 150, 12);
-    
+    skillsPanel.roundRect(0, 0, panelWidth, panelHeight, 12)
+      .fill({ color: 0x3e2723, alpha: 0.9 })
+      .stroke({ width: 3, color: 0x8d6e63 });
+
     // Title
     const title = new Text({
       text: 'Skills & Abilities',
@@ -237,21 +260,33 @@ export class CharacterDetailScene extends BaseScene {
         fill: 0xffecb3
       }
     });
-    title.x = marginLeft;
+    title.x = panelPadding;
     title.y = 15;
-    
+
     skillsContainer.addChild(skillsPanel, title);
-    
-    // Skills
+
+    // Layout skill cards horizontally, wrap if needed
+    const skillCardWidth = 280;
+    const skillCardHeight = 80;
+    const skillSpacing = 20;
+    let x = panelPadding;
+    let y = 50;
+    const maxRowWidth = panelWidth - panelPadding;
+
     this.character!.skills.forEach((skill, index) => {
+      if (x + skillCardWidth > maxRowWidth) {
+        x = panelPadding;
+        y += skillCardHeight + 10;
+      }
+
       const skillCard = new Container();
-      
+
       // Skill background
       const skillBg = new Graphics();
-      skillBg.fill({ color: 0x5d4037, alpha: 0.8 })
-        .stroke({ width: 2, color: 0x8d6e63 })
-        .roundRect(0, 0, 280, 80, 8);
-      
+      skillBg.roundRect(0, 0, skillCardWidth, skillCardHeight, 8)
+        .fill({ color: 0x5d4037, alpha: 0.8 })
+        .stroke({ width: 2, color: 0x8d6e63 });
+
       // Skill name
       const skillName = new Text({
         text: skill.name,
@@ -262,9 +297,9 @@ export class CharacterDetailScene extends BaseScene {
           fill: 0xffecb3
         }
       });
-      skillName.x = marginLeft;
+      skillName.x = 10;
       skillName.y = 10;
-      
+
       // Skill description
       const skillDesc = new Text({
         text: skill.description,
@@ -273,12 +308,12 @@ export class CharacterDetailScene extends BaseScene {
           fontSize: 12,
           fill: 0xd7ccc8,
           wordWrap: true,
-          wordWrapWidth: 260
+          wordWrapWidth: skillCardWidth - 20
         }
       });
-      skillDesc.x = marginLeft;
+      skillDesc.x = 10;
       skillDesc.y = 30;
-      
+
       // Skill stats
       const skillStats = new Text({
         text: `Damage: ${skill.damage} | Cooldown: ${skill.cooldown}s | Mana: ${skill.manaCost}`,
@@ -288,19 +323,21 @@ export class CharacterDetailScene extends BaseScene {
           fill: 0xa1887f
         }
       });
-      skillStats.x = marginLeft;
+      skillStats.x = 10;
       skillStats.y = 60;
-      
+
       skillCard.addChild(skillBg, skillName, skillDesc, skillStats);
-      skillCard.x = marginLeft + (index * 300);
-      skillCard.y = 50;
-      
+      skillCard.x = x;
+      skillCard.y = y;
+
       skillsContainer.addChild(skillCard);
+
+      x += skillCardWidth + skillSpacing;
     });
-    
-    skillsContainer.x = marginLeft + 15;
-    skillsContainer.y = this.gameHeight - 220;
-    
+
+    skillsContainer.x = panelPadding;
+    skillsContainer.y = skillsPanelY;
+
     this.addChild(skillsContainer);
   }
 
