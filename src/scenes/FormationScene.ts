@@ -1,15 +1,15 @@
 import { Graphics, Text, Container, Ticker } from 'pixi.js';
 import { BaseScene } from '@/utils/BaseScene';
 import { Character } from '@/types';
-import { mockPlayer } from '@/utils/mockData';
+import { mockPlayer, mockCharacters } from '@/utils/mockData';
 import { navigation } from '@/utils/navigation';
 import { HomeScene } from './HomeScene';
 import { Colors } from '@/utils/colors';
 import { app } from '../app';
 
 export class FormationScene extends BaseScene {
-  private formationPositions: (Character | null)[] = [];
-  private availableCharacters: Character[] = [];
+  private formationPositions: (any | null)[] = [];
+  private availableCharacters: any[] = [];
 
   // Drag state
   private dragOffset = { x: 0, y: 0 };
@@ -30,9 +30,15 @@ export class FormationScene extends BaseScene {
 
   constructor() {
     super();
-    this.formationPositions = [...mockPlayer.formation.positions];
-    this.availableCharacters = mockPlayer.characters.filter(
-      char => !this.formationPositions.includes(char)
+    // Convert string IDs to Character objects
+    this.formationPositions = mockPlayer.formation.positions.map(id => 
+      id ? mockCharacters.find(c => c.id === id) || null : null
+    );
+    
+    // Get available characters (all characters not in formation)
+    const formationCharacterIds = mockPlayer.formation.positions.filter(id => id !== null);
+    this.availableCharacters = mockCharacters.filter(
+      char => !formationCharacterIds.includes(char.id)
     );
   }
 
@@ -215,7 +221,7 @@ export class FormationScene extends BaseScene {
     return slot;
   }
 
-  private createFormationCharacterCard(character: Character, x: number, y: number, size: number, positionIndex: number): Container {
+  private createFormationCharacterCard(character: any, x: number, y: number, size: number, positionIndex: number): Container {
     const card = this.createHeroCard(character, x, y, 'formation', positionIndex);
     this.makeFormationCardInteractive(card, character, positionIndex);
     card.zIndex = 1;
@@ -343,7 +349,7 @@ export class FormationScene extends BaseScene {
     this.off('pointerupoutside', this.onPoolBarPointerUp);
   };
 
-  private createPoolCharacterCard(character: Character, x: number, y: number): Container {
+  private createPoolCharacterCard(character: any, x: number, y: number): Container {
     const card = this.createHeroCard(character, x, y, 'pool');
     card.interactive = true;
     card.cursor = 'pointer';
@@ -361,14 +367,14 @@ export class FormationScene extends BaseScene {
     return card;
   }
 
-  private makeFormationCardInteractive(card: Container, character: Character, currentPosition: number): void {
+  private makeFormationCardInteractive(card: Container, character: any, currentPosition: number): void {
     card.interactive = true;
     card.cursor = 'pointer';
 
     card.on('pointerdown', (event) => this.onDragStart(event, card, character, currentPosition));
   }
 
-  private onDragStart(event: any, card: Container, character: Character, currentPosition: number) {
+  private onDragStart(event: any, card: Container, character: any, currentPosition: number) {
     card.alpha = 0.5;
     this.dragTarget = card;
 
@@ -502,7 +508,8 @@ export class FormationScene extends BaseScene {
       buttonWidth,
       buttonHeight,
       () => {
-        mockPlayer.formation.positions = [...this.formationPositions];
+        // Convert Character objects back to string IDs for saving
+        mockPlayer.formation.positions = this.formationPositions.map(char => char ? char.id : null);
         alert('Formation saved successfully!');
       }
     );
@@ -522,8 +529,8 @@ export class FormationScene extends BaseScene {
           return available.shift() || null;
         });
         // Remove filled characters from pool
-        this.availableCharacters = mockPlayer.characters.filter(
-          char => !this.formationPositions.includes(char)
+        this.availableCharacters = mockCharacters.filter(
+          char => !this.formationPositions.some(pos => pos && pos.id === char.id)
         );
         this.refreshFormation();
       }

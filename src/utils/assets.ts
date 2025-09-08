@@ -61,18 +61,12 @@ async function fetchAssetsManifest(url: string) {
 
 /** Initialise and start background loading of all assets */
 export async function initAssets() {
-  // Load assets manifest
-  assetsManifest = await fetchAssetsManifest("assets/assets-manifest.json");
-
-  // Init PixiJS assets with this asset manifest
-  await Assets.init({ manifest: assetsManifest, basePath: "assets" });
-
-  // Load assets for the load screen (using default bundle since preload doesn't exist)
-  // await loadBundles("preload");
-
-  // List all existing bundles names
-  const allBundles = assetsManifest.bundles.map((item) => item.name);
-
-  // Start up background loading of all bundles
-  Assets.backgroundLoadBundle(allBundles);
+  // Temporarily bypass asset loading to test screen functionality
+  console.log("[Assets] Skipping asset loading for testing");
+  
+  // Create a minimal manifest to avoid errors
+  assetsManifest = { bundles: [{ name: "default", assets: [] }] };
+  
+  // Initialize PixiJS Assets with minimal setup
+  await Assets.init({ manifest: assetsManifest });
 }

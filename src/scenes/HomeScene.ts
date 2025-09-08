@@ -200,7 +200,7 @@ export class HomeScene extends BaseScene {
     playerLevel.y = 45;
     
     const playerExp = new Text({
-      text: `EXP: ${mockPlayer.experience}`,
+      text: `EXP: ${mockPlayer.exp}`,
       style: {
         fontFamily: 'Kalam',
         fontSize: 16,

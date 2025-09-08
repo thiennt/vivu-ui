@@ -197,13 +197,13 @@ export abstract class BaseScene extends Container {
     };
     
     const { width, height } = cardSizes[cardType];
-    const card = this.createCard(x, y, width, height, character.rarity);
+    const card = this.createCard(x, y, width, height, character.rarity || 'common');
     (card as any).character = character;
     
     // Character symbol (crypto token) - always at top center
     const symbolSize = cardType === 'detailed' ? 24 : (cardType === 'preview' ? 18 : 16);
     const symbolText = new Text({
-      text: character.tokenSymbol,
+      text: character.ticker,
       style: {
         fontFamily: 'Kalam',
         fontSize: symbolSize,
@@ -268,7 +268,7 @@ export abstract class BaseScene extends Container {
     
     // Experience
     const expText = new Text({
-      text: `EXP: ${character.experience}`,
+      text: `EXP: ${character.exp}`,
       style: {
         fontFamily: 'Kalam',
         fontSize: 9,
@@ -282,10 +282,10 @@ export abstract class BaseScene extends Container {
     
     // Stats in a compact grid
     const stats = [
-      `HP: ${character.stats.health}`,
-      `ATK: ${character.stats.attack}`,
-      `DEF: ${character.stats.defense}`,
-      `SPD: ${character.stats.speed}`
+      `HP: ${character.max_hp}`,
+      `ATK: ${character.atk}`,
+      `DEF: ${character.def}`,
+      `AGI: ${character.agi}`
     ];
     
     stats.forEach((stat, index) => {
@@ -308,7 +308,7 @@ export abstract class BaseScene extends Container {
   private addPreviewCardElements(card: Container, character: any, width: number, height: number): void {
     // Basic stats for preview
     const hpText = new Text({
-      text: `HP: ${character.stats.health}`,
+      text: `HP: ${character.max_hp}`,
       style: {
         fontFamily: 'Kalam',
         fontSize: 9,
@@ -319,7 +319,7 @@ export abstract class BaseScene extends Container {
     hpText.y = 75;
 
     const atkText = new Text({
-      text: `ATK: ${character.stats.attack}`,
+      text: `ATK: ${character.atk}`,
       style: {
         fontFamily: 'Kalam',
         fontSize: 9,
@@ -344,7 +344,7 @@ export abstract class BaseScene extends Container {
     
     const elementIndicator = new Graphics();
     elementIndicator.circle(width - 15, 15, 6)
-      .fill(elementColors[character.element] || Colors.ELEMENT_DEFAULT);
+      .fill(elementColors[character.element || 'earth'] || Colors.ELEMENT_DEFAULT);
     
     card.addChild(elementIndicator);
   }

@@ -1,6 +1,6 @@
 import { Graphics, Container, Text, Ticker } from 'pixi.js';
 import { BaseScene } from '@/utils/BaseScene';
-import { mockPlayer } from '@/utils/mockData';
+import { mockPlayer, mockCharacters } from '@/utils/mockData';
 import { navigation } from '@/utils/navigation';
 import { CharactersScene } from './CharactersScene';
 import { CharacterDetailScene } from './CharacterDetailScene';
@@ -50,7 +50,7 @@ export class PlayerDetailScene extends BaseScene {
       [
         `Username: ${mockPlayer.username}`,
         `Level: ${mockPlayer.level}`,
-        `Experience: ${mockPlayer.experience}`,
+        `Experience: ${mockPlayer.exp}`,
         `Characters: ${mockPlayer.characters.length}`
       ],
       panelWidth, 160
@@ -147,12 +147,15 @@ export class PlayerDetailScene extends BaseScene {
     });
 
     // Add cards to ScrollBox viewport, always from left (no marginLeft)
-    mockPlayer.characters.forEach((character, index) => {
-      const card = this.createCharacterPreviewCard(character, this.STANDARD_PADDING + index * (cardWidth + this.STANDARD_SPACING), 0);
-      // Position cards horizontally with spacing, always from left
-      card.x = index * (cardWidth + this.STANDARD_SPACING);
-      card.y = 0;
-      scrollBox.addItem(card);
+    mockPlayer.characters.forEach((characterId, index) => {
+      const character = mockCharacters.find(c => c.id === characterId);
+      if (character) {
+        const card = this.createCharacterPreviewCard(character, this.STANDARD_PADDING + index * (cardWidth + this.STANDARD_SPACING), 0);
+        // Position cards horizontally with spacing, always from left
+        card.x = index * (cardWidth + this.STANDARD_SPACING);
+        card.y = 0;
+        scrollBox.addItem(card);
+      }
     });
 
     // Set viewport width for scrolling (include padding)
