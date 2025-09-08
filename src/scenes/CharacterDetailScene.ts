@@ -18,6 +18,7 @@ export class CharacterDetailScene extends BaseScene {
   private infoContainer: Container;
   private statsContainer: Container;
   private skillsContainer: Container;
+  private equipmentContainer: Container;
   private buttonContainer: Container;
 
   constructor(params?: { selectedCharacter: any }) {
@@ -32,6 +33,7 @@ export class CharacterDetailScene extends BaseScene {
     this.infoContainer = new Container();
     this.statsContainer = new Container();
     this.skillsContainer = new Container();
+    this.equipmentContainer = new Container();
     this.buttonContainer = new Container();
     
     this.addChild(this.container);
@@ -41,6 +43,7 @@ export class CharacterDetailScene extends BaseScene {
       this.infoContainer,
       this.statsContainer,
       this.skillsContainer,
+      this.equipmentContainer,
       this.buttonContainer
     );
     
@@ -59,6 +62,7 @@ export class CharacterDetailScene extends BaseScene {
     this.createCharacterInfo();
     this.createStatsDisplay();
     this.createSkillsDisplay();
+    this.createEquipmentDisplay();
     this.createBackButton();
   }
 
@@ -82,6 +86,7 @@ export class CharacterDetailScene extends BaseScene {
     this.infoContainer.removeChildren();
     this.statsContainer.removeChildren();
     this.skillsContainer.removeChildren();
+    this.equipmentContainer.removeChildren();
     this.buttonContainer.removeChildren();
     
     // Recreate layout with current dimensions
@@ -90,6 +95,7 @@ export class CharacterDetailScene extends BaseScene {
     this.createCharacterInfo();
     this.createStatsDisplay();
     this.createSkillsDisplay();
+    this.createEquipmentDisplay();
     this.createBackButton();
   }
 
@@ -105,181 +111,214 @@ export class CharacterDetailScene extends BaseScene {
   }
 
   private createCharacterInfo(): void {
-    // Responsive card width: 1/3 of screen
-    const panelPadding = 10;
-    const panelWidth = Math.floor(this.gameWidth / 3) - panelPadding * 1.5;
-    const cardWidth = panelWidth;
-    const cardHeight = 250;
-    const cardX = panelPadding;
-    const cardY = 120;
-
-    const largeCard = this.createCard(0, 0, cardWidth, cardHeight, this.character!.rarity);
-
-    // Center X for elements inside the card
-    const centerX = cardWidth / 2;
-
-    // Symbol
-    const symbolText = new Text({
+    const padding = 15;
+    const panelWidth = this.gameWidth - 2 * padding;
+    
+    // Header panel background
+    const headerPanel = new Graphics();
+    headerPanel.roundRect(0, 0, panelWidth, 120, 12)
+      .fill({ color: 0x3e2723, alpha: 0.9 })
+      .stroke({ width: 3, color: 0x8d6e63 });
+    
+    // Avatar placeholder (left side)
+    const avatarSize = 80;
+    const avatar = new Graphics();
+    avatar.roundRect(padding, 20, avatarSize, avatarSize, 8)
+      .fill({ color: 0x5d4037, alpha: 0.8 })
+      .stroke({ width: 2, color: 0x8d6e63 });
+    
+    // Avatar text (ticker symbol)
+    const avatarText = new Text({
       text: this.character!.ticker,
       style: {
         fontFamily: 'Kalam',
-        fontSize: 48,
+        fontSize: 24,
         fontWeight: 'bold',
-        fill: 0xffffff,
-        align: 'center'
+        fill: 0xffffff
       }
     });
-    symbolText.anchor.set(0.5);
-    symbolText.x = centerX;
-    symbolText.y = 60;
+    avatarText.anchor.set(0.5);
+    avatarText.x = padding + avatarSize / 2;
+    avatarText.y = 20 + avatarSize / 2;
 
-    // Level
-    const levelText = new Text({
-      text: `Level ${this.character!.level}`,
+    // Character name (center-left)
+    const nameText = new Text({
+      text: this.character!.name,
       style: {
         fontFamily: 'Kalam',
-        fontSize: 20,
-        fontWeight: 'bold',
-        fill: 0xffecb3,
-        align: 'center'
-      }
-    });
-    levelText.anchor.set(0.5);
-    levelText.x = centerX;
-    levelText.y = 120;
-
-    // Experience
-    const expText = new Text({
-      text: `EXP: ${this.character!.exp}`,
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 16,
-        fill: 0xd7ccc8,
-        align: 'center'
-      }
-    });
-    expText.anchor.set(0.5);
-    expText.x = centerX;
-    expText.y = 150;
-
-    // Rarity
-    const rarityText = new Text({
-      text: `★ ${this.character!.rarity.toUpperCase()} ★`,
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 14,
-        fontWeight: 'bold',
-        fill: this.getRarityColor(this.character!.rarity),
-        align: 'center'
-      }
-    });
-    rarityText.anchor.set(0.5);
-    rarityText.x = centerX;
-    rarityText.y = 180;
-
-    largeCard.addChild(symbolText, levelText, expText, rarityText);
-
-    // Position infoContainer with padding
-    this.infoContainer.x = panelPadding;
-    this.infoContainer.y = cardY;
-    this.infoContainer.addChild(largeCard);
-  }
-
-  private createStatsDisplay(): void {
-    // Responsive panel width: 2/3 of screen
-    const panelPadding = 10;
-    const panelWidth = Math.floor(this.gameWidth * 2 / 3) - panelPadding * 1.5 - this.STANDARD_PADDING;
-    const panelHeight = 250;
-
-    // Stats panel background
-    const statsPanelBg = new Graphics();
-    statsPanelBg.roundRect(0, 0, panelWidth, panelHeight, 12)
-      .fill({ color: 0x3e2723, alpha: 0.9 })
-      .stroke({ width: 3, color: 0x8d6e63 });
-
-    this.statsContainer.addChild(statsPanelBg);
-
-    // Title
-    const title = new Text({
-      text: 'Character Statistics',
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 20,
+        fontSize: 28,
         fontWeight: 'bold',
         fill: 0xffecb3
       }
     });
-    title.x = panelPadding;
-    title.y = 15;
-    this.statsContainer.addChild(title);
+    nameText.x = padding + avatarSize + 20;
+    nameText.y = 25;
 
-    // Stats
-    const stats = [
-      { name: 'Health', value: this.character!.max_hp, color: 0x4caf50 },
-      { name: 'Attack', value: this.character!.atk, color: 0xf44336 },
-      { name: 'Defense', value: this.character!.def, color: 0x2196f3 },
-      { name: 'Agility', value: this.character!.agi, color: 0xffeb3b },
-      { name: 'Crit Rate', value: this.character!.crit_rate + '%', color: 0xff9800 },
-      { name: 'Crit Damage', value: this.character!.crit_dmg + '%', color: 0x9c27b0 }
+    // Ticker badge (right of name)
+    const tickerBadge = new Graphics();
+    const tickerWidth = 60;
+    tickerBadge.roundRect(nameText.x + nameText.width + 15, 25, tickerWidth, 30, 4)
+      .fill({ color: this.getRarityColor(this.character!.rarity), alpha: 0.8 })
+      .stroke({ width: 1, color: 0xffffff });
+    
+    const tickerText = new Text({
+      text: this.character!.ticker,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 14,
+        fontWeight: 'bold',
+        fill: 0xffffff
+      }
+    });
+    tickerText.anchor.set(0.5);
+    tickerText.x = nameText.x + nameText.width + 15 + tickerWidth / 2;
+    tickerText.y = 40;
+
+    // Class and level (right side)
+    const classLevelText = new Text({
+      text: `${this.character!.c_class} L${this.character!.level}`,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 20,
+        fontWeight: 'bold',
+        fill: 0xd7ccc8
+      }
+    });
+    classLevelText.x = panelWidth - classLevelText.width - padding;
+    classLevelText.y = 25;
+
+    // Description (below name)
+    const descText = new Text({
+      text: `"${this.character!.description}"`,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 14,
+        fill: 0xa1887f,
+        wordWrap: true,
+        wordWrapWidth: panelWidth - padding - avatarSize - 40
+      }
+    });
+    descText.x = padding + avatarSize + 20;
+    descText.y = 65;
+
+    headerPanel.addChild(avatar, avatarText, nameText, tickerBadge, tickerText, classLevelText, descText);
+    
+    this.infoContainer.x = padding;
+    this.infoContainer.y = 120;
+    this.infoContainer.addChild(headerPanel);
+  }
+
+  private createStatsDisplay(): void {
+    const padding = 15;
+    const panelWidth = this.gameWidth - 2 * padding;
+    
+    // Core Stats Section
+    const coreStatsHeight = 80;
+    const coreStatsPanel = new Graphics();
+    coreStatsPanel.roundRect(0, 0, panelWidth, coreStatsHeight, 12)
+      .fill({ color: 0x3e2723, alpha: 0.9 })
+      .stroke({ width: 3, color: 0x8d6e63 });
+
+    // Core stats: HP, ATK, DEF, AGI (prominent display)
+    const coreStats = [
+      { name: 'HP', value: this.character!.max_hp, color: 0x4caf50 },
+      { name: 'ATK', value: this.character!.atk, color: 0xf44336 },
+      { name: 'DEF', value: this.character!.def, color: 0x2196f3 },
+      { name: 'AGI', value: this.character!.agi, color: 0xffeb3b }
     ];
 
-    const maxValue = Math.max(...stats.filter(s => typeof s.value === 'number').map(s => s.value as number));
-
-    stats.forEach((stat, index) => {
-      const y = 50 + (index * 30);
-
+    const statWidth = (panelWidth - 2 * padding) / 4;
+    coreStats.forEach((stat, index) => {
+      const x = padding + (index * statWidth);
+      
       // Stat name
       const nameText = new Text({
         text: stat.name + ':',
         style: {
           fontFamily: 'Kalam',
-          fontSize: 16,
+          fontSize: 18,
+          fontWeight: 'bold',
           fill: 0xd7ccc8
         }
       });
-      nameText.x = panelPadding;
-      nameText.y = y;
-      this.statsContainer.addChild(nameText);
-
+      nameText.x = x;
+      nameText.y = 20;
+      
       // Stat value
       const valueText = new Text({
         text: stat.value.toString(),
         style: {
           fontFamily: 'Kalam',
-          fontSize: 16,
+          fontSize: 24,
           fontWeight: 'bold',
           fill: stat.color
         }
       });
-      valueText.x = panelWidth - 80;
-      valueText.y = y;
-      this.statsContainer.addChild(valueText);
-
-      // Stat bar background
-      const barBg = new Graphics();
-      barBg.fill(0x424242).rect(panelPadding, y + 20, panelWidth - 2 * panelPadding, 4);
-      this.statsContainer.addChild(barBg);
-
-      // Stat bar
-      const barWidth = (typeof stat.value === 'number' ? stat.value : 0) / maxValue * (panelWidth - 2 * panelPadding);
-      const bar = new Graphics();
-      bar.fill(stat.color).rect(panelPadding, y + 20, barWidth, 4);
-      this.statsContainer.addChild(bar);
+      valueText.x = x;
+      valueText.y = 45;
+      
+      coreStatsPanel.addChild(nameText, valueText);
     });
 
-    // Position statsContainer to the right of character info with padding
-    this.statsContainer.x = Math.floor(this.gameWidth / 3) + panelPadding * 1.5;
-    this.statsContainer.y = 120;
+    // Other Stats Section
+    const otherStatsHeight = 120;
+    const otherStatsPanel = new Graphics();
+    otherStatsPanel.roundRect(0, 0, panelWidth, otherStatsHeight, 12)
+      .fill({ color: 0x3e2723, alpha: 0.9 })
+      .stroke({ width: 3, color: 0x8d6e63 });
+
+    // Other stats in grid layout
+    const otherStats = [
+      { name: 'CritRate', value: this.character!.crit_rate + '%', color: 0xff9800 },
+      { name: 'CritDmg', value: this.character!.crit_dmg + '%', color: 0x9c27b0 },
+      { name: 'Res', value: this.character!.res, color: 0x607d8b },
+      { name: 'Damage', value: this.character!.damage, color: 0xff5722 },
+      { name: 'Mitig', value: this.character!.mitigation, color: 0x795548 },
+      { name: 'Hit', value: this.character!.hit_rate, color: 0x4caf50 },
+      { name: 'Dodge', value: this.character!.dodge, color: 0x9e9e9e }
+    ];
+
+    const colWidth = (panelWidth - 2 * padding) / 3;
+    const rowHeight = 35;
+    
+    otherStats.forEach((stat, index) => {
+      const col = index % 3;
+      const row = Math.floor(index / 3);
+      const x = padding + (col * colWidth);
+      const y = 20 + (row * rowHeight);
+      
+      // Stat name and value on same line
+      const statText = new Text({
+        text: `${stat.name}: ${stat.value}`,
+        style: {
+          fontFamily: 'Kalam',
+          fontSize: 14,
+          fill: stat.color
+        }
+      });
+      statText.x = x;
+      statText.y = y;
+      
+      otherStatsPanel.addChild(statText);
+    });
+
+    // Position both panels vertically
+    const startY = 260; // Below header
+    coreStatsPanel.x = 0;
+    coreStatsPanel.y = 0;
+    
+    otherStatsPanel.x = 0;
+    otherStatsPanel.y = coreStatsHeight + 15;
+
+    this.statsContainer.x = padding;
+    this.statsContainer.y = startY;
+    this.statsContainer.addChild(coreStatsPanel, otherStatsPanel);
   }
 
   private createSkillsDisplay(): void {
-    const panelPadding = 15;
-    const panelWidth = this.gameWidth - 2 * panelPadding;
-    const panelHeight = 150;
-
-    // Place skills panel above the back button with padding
-    const bottomPadding = 100; // Height of back button + extra space
-    const skillsPanelY = this.gameHeight - panelHeight - bottomPadding;
+    const padding = 15;
+    const panelWidth = this.gameWidth - 2 * padding;
+    const panelHeight = 120;
 
     // Skills panel background
     const skillsPanel = new Graphics();
@@ -289,94 +328,176 @@ export class CharacterDetailScene extends BaseScene {
 
     // Title
     const title = new Text({
-      text: 'Skills & Abilities',
+      text: 'Skills:',
       style: {
         fontFamily: 'Kalam',
-        fontSize: 20,
+        fontSize: 18,
         fontWeight: 'bold',
         fill: 0xffecb3
       }
     });
-    title.x = panelPadding;
+    title.x = padding;
     title.y = 15;
 
     this.skillsContainer.addChild(skillsPanel, title);
 
-    // Layout skill cards horizontally, wrap if needed
-    const skillCardWidth = 280;
-    const skillCardHeight = 80;
-    const skillSpacing = 20;
-    let x = panelPadding;
-    let y = 50;
-    const maxRowWidth = panelWidth - panelPadding;
-
+    // Skills layout - one per row
+    let y = 45;
+    
     this.character!.equipped_skills.forEach((skillId: string, index: number) => {
       const skill = mockSkills.find(s => s.id === skillId);
       if (!skill) return;
       
-      if (x + skillCardWidth > maxRowWidth) {
-        x = panelPadding;
-        y += skillCardHeight + 10;
-      }
-
-      const skillCard = new Container();
-
-      // Skill background
-      const skillBg = new Graphics();
-      skillBg.roundRect(0, 0, skillCardWidth, skillCardHeight, 8)
-        .fill({ color: 0x5d4037, alpha: 0.8 })
-        .stroke({ width: 2, color: 0x8d6e63 });
+      // Skill type badge
+      const badgeColors: { [key: string]: number } = {
+        'normal_attack': 0x9e9e9e,
+        'active_skill': 0x2196f3,
+        'passive_skill': 0x4caf50
+      };
+      
+      const badgeLabels: { [key: string]: string } = {
+        'normal_attack': 'Normal',
+        'active_skill': 'Active',
+        'passive_skill': 'Passive'
+      };
+      
+      const badgeColor = badgeColors[skill.skill_type] || 0x9e9e9e;
+      const badgeLabel = badgeLabels[skill.skill_type] || 'Unknown';
+      
+      // Badge background
+      const badge = new Graphics();
+      badge.roundRect(padding, y - 5, 70, 20, 4)
+        .fill({ color: badgeColor, alpha: 0.8 })
+        .stroke({ width: 1, color: 0xffffff });
+      
+      // Badge text
+      const badgeText = new Text({
+        text: badgeLabel,
+        style: {
+          fontFamily: 'Kalam',
+          fontSize: 10,
+          fontWeight: 'bold',
+          fill: 0xffffff
+        }
+      });
+      badgeText.anchor.set(0.5);
+      badgeText.x = padding + 35;
+      badgeText.y = y + 5;
 
       // Skill name
       const skillName = new Text({
         text: skill.name,
         style: {
           fontFamily: 'Kalam',
-          fontSize: 16,
+          fontSize: 14,
           fontWeight: 'bold',
           fill: 0xffecb3
         }
       });
-      skillName.x = 10;
-      skillName.y = 10;
+      skillName.x = padding + 80;
+      skillName.y = y;
 
-      // Skill description
+      // Skill description (truncated)
+      const maxDescLength = 50;
+      const truncatedDesc = skill.description.length > maxDescLength 
+        ? skill.description.substring(0, maxDescLength) + '...'
+        : skill.description;
+        
       const skillDesc = new Text({
-        text: skill.description,
+        text: truncatedDesc,
         style: {
           fontFamily: 'Kalam',
           fontSize: 12,
-          fill: 0xd7ccc8,
-          wordWrap: true,
-          wordWrapWidth: skillCardWidth - 20
+          fill: 0xd7ccc8
         }
       });
-      skillDesc.x = 10;
-      skillDesc.y = 30;
+      skillDesc.x = padding + 80 + skillName.width + 10;
+      skillDesc.y = y;
 
-      // Skill stats - use available properties or defaults
-      const skillStats = new Text({
-        text: `Type: ${skill.skill_type || 'unknown'} | Level: ${skill.level || 1}`,
-        style: {
-          fontFamily: 'Kalam',
-          fontSize: 10,
-          fill: 0xa1887f
-        }
-      });
-      skillStats.x = 10;
-      skillStats.y = 60;
-
-      skillCard.addChild(skillBg, skillName, skillDesc, skillStats);
-      skillCard.x = x;
-      skillCard.y = y;
-
-      this.skillsContainer.addChild(skillCard);
-
-      x += skillCardWidth + skillSpacing;
+      this.skillsContainer.addChild(badge, badgeText, skillName, skillDesc);
+      
+      y += 25;
     });
 
-    this.skillsContainer.x = panelPadding;
-    this.skillsContainer.y = skillsPanelY;
+    this.skillsContainer.x = padding;
+    this.skillsContainer.y = 475; // Below stats sections
+  }
+
+  private createEquipmentDisplay(): void {
+    const padding = 15;
+    const panelWidth = this.gameWidth - 2 * padding;
+    const panelHeight = 100;
+
+    // Equipment panel background
+    const equipmentPanel = new Graphics();
+    equipmentPanel.roundRect(0, 0, panelWidth, panelHeight, 12)
+      .fill({ color: 0x3e2723, alpha: 0.9 })
+      .stroke({ width: 3, color: 0x8d6e63 });
+
+    // Title
+    const title = new Text({
+      text: 'Equipment:',
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 18,
+        fontWeight: 'bold',
+        fill: 0xffecb3
+      }
+    });
+    title.x = padding;
+    title.y = 15;
+
+    this.equipmentContainer.addChild(equipmentPanel, title);
+
+    // Equipment slots
+    const equipmentSlots = [
+      { name: 'Weapon', item: 'Sword' },
+      { name: 'Armor', item: 'Plate' },
+      { name: 'Accessory', item: '(empty)' }
+    ];
+
+    const slotWidth = (panelWidth - 2 * padding) / 3;
+    
+    equipmentSlots.forEach((slot, index) => {
+      const x = padding + (index * slotWidth);
+      const y = 45;
+      
+      // Slot background
+      const slotBg = new Graphics();
+      slotBg.roundRect(x, y, slotWidth - 10, 40, 6)
+        .fill({ color: slot.item === '(empty)' ? 0x424242 : 0x5d4037, alpha: 0.8 })
+        .stroke({ width: 1, color: 0x8d6e63 });
+      
+      // Slot type label
+      const slotLabel = new Text({
+        text: `[${slot.name}]`,
+        style: {
+          fontFamily: 'Kalam',
+          fontSize: 12,
+          fontWeight: 'bold',
+          fill: 0xd7ccc8
+        }
+      });
+      slotLabel.x = x + 5;
+      slotLabel.y = y + 5;
+      
+      // Item name
+      const itemText = new Text({
+        text: slot.item,
+        style: {
+          fontFamily: 'Kalam',
+          fontSize: 14,
+          fill: slot.item === '(empty)' ? 0x9e9e9e : 0xffecb3
+        }
+      });
+      itemText.x = x + 5;
+      itemText.y = y + 22;
+      
+      this.equipmentContainer.addChild(slotBg, slotLabel, itemText);
+    });
+
+    this.equipmentContainer.x = padding;
+    this.equipmentContainer.y = 615; // Below skills section
   }
 
   private getRarityColor(rarity: string): number {
@@ -393,8 +514,8 @@ export class CharacterDetailScene extends BaseScene {
   private createBackButton(): void {
     const backButton = this.createButton(
       '← Back to Characters',
-      5,
-      this.gameHeight - 80,
+      (this.gameWidth - 200) / 2, // Center the button
+      this.gameHeight - 60, // Adjust for new layout
       200,
       50,
       () => navigation.showScreen(CharactersScene)
