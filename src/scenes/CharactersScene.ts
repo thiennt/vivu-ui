@@ -106,30 +106,35 @@ export class CharactersScene extends BaseScene {
 
   private createCharacterGrid(): void {
     const gridContainer = new Container();
-    const padding = 10;
-    const spacing = 10;
+    
+    // Use standard padding and improved layout calculations
+    const availableWidth = this.gameWidth - 2 * this.STANDARD_PADDING;
     const minCardWidth = 120;
     const maxCardWidth = 180;
-    let cardsPerRow = Math.floor((this.gameWidth - 2 * padding + spacing) / (minCardWidth + spacing));
-    cardsPerRow = Math.max(1, cardsPerRow);
-
-    // Responsive card width
-    const availableWidth = this.gameWidth - 2 * padding;
-    const totalSpacing = (cardsPerRow - 1) * spacing;
-    let cardWidth = (availableWidth - totalSpacing) / cardsPerRow;
-    cardWidth = Math.max(minCardWidth, Math.min(cardWidth, maxCardWidth));
+    
+    const layout = this.calculateGridLayout(
+      availableWidth, 
+      minCardWidth, 
+      maxCardWidth, 
+      this.STANDARD_SPACING
+    );
+    
     const cardHeight = 180;
+
+    // Center the grid container horizontally
+    const gridStartX = (this.gameWidth - layout.totalWidth) / 2;
+    gridContainer.x = gridStartX;
 
     // Layout cards
     mockCharacters.forEach((character, index) => {
-      const row = Math.floor(index / cardsPerRow);
-      const col = index % cardsPerRow;
+      const row = Math.floor(index / layout.itemsPerRow);
+      const col = index % layout.itemsPerRow;
 
-      const x = padding + col * (cardWidth + spacing);
-      const y = 140 + row * (cardHeight + spacing);
+      const x = col * (layout.itemWidth + this.STANDARD_SPACING);
+      const y = 140 + row * (cardHeight + this.STANDARD_SPACING);
 
       const characterCard = this.createHeroCard(character, x, y, 'detailed');
-      characterCard.width = cardWidth;
+      characterCard.width = layout.itemWidth;
       characterCard.height = cardHeight;
 
       characterCard.on('pointerdown', () => {
@@ -139,8 +144,8 @@ export class CharactersScene extends BaseScene {
       gridContainer.addChild(characterCard);
     });
 
-    const totalRows = Math.ceil(mockCharacters.length / cardsPerRow);
-    this.maxScroll = Math.max(0, (totalRows * (cardHeight + spacing)) - (this.gameHeight - 200));
+    const totalRows = Math.ceil(mockCharacters.length / layout.itemsPerRow);
+    this.maxScroll = Math.max(0, (totalRows * (cardHeight + this.STANDARD_SPACING)) - (this.gameHeight - 200));
 
     this.addChild(gridContainer);
     gridContainer.label = 'gridContainer';
@@ -182,7 +187,7 @@ export class CharactersScene extends BaseScene {
   private createBackButton(): void {
     const backButton = this.createButton(
       '← Back',
-      5,
+      this.STANDARD_PADDING,
       this.gameHeight - 80,
       150,
       50,

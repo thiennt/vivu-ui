@@ -116,12 +116,11 @@ export class FormationScene extends BaseScene {
     const formationContainer = new Container();
     formationContainer.label = 'formationContainer';
 
-    // Formation positions (2x2 grid)
+    // Formation positions (2x2 grid) with standard spacing
     const rows = 2;
     const cols = 2;
     const slotSize = 100;
-    const spacing = 20;
-    const gridWidth = cols * slotSize + (cols - 1) * spacing;
+    const gridWidth = cols * slotSize + (cols - 1) * this.STANDARD_SPACING;
     const startX = (this.gameWidth - gridWidth) / 2;
     const startY = 150;
 
@@ -129,8 +128,8 @@ export class FormationScene extends BaseScene {
     for (let row = 0; row < rows; row++) {
       for (let col = 0; col < cols; col++) {
         const positionIndex = row * cols + col;
-        const x = col * (slotSize + spacing);
-        const y = row * (slotSize + spacing);
+        const x = col * (slotSize + this.STANDARD_SPACING);
+        const y = row * (slotSize + this.STANDARD_SPACING);
 
         this.slotHitBoxes.push({index: positionIndex, x: startX + x, y: startY + y, size: slotSize});
 
@@ -146,7 +145,7 @@ export class FormationScene extends BaseScene {
       }
     }
 
-    // Row labels
+    // Row labels with better positioning
     const frontLabel = new Text({
       text: 'FRONT',
       style: {
@@ -171,7 +170,7 @@ export class FormationScene extends BaseScene {
     });
     backLabel.anchor.set(0.5);
     backLabel.x = -50;
-    backLabel.y = slotSize + spacing + slotSize / 2;
+    backLabel.y = slotSize + this.STANDARD_SPACING + slotSize / 2;
 
     formationContainer.addChild(frontLabel, backLabel);
 
@@ -227,8 +226,8 @@ export class FormationScene extends BaseScene {
     const poolContainer = new Container();
     poolContainer.label = 'characterPool';
 
-    // --- Fixed size for pool area ---
-    const poolWidth = Math.min(this.gameWidth * 0.9, 400);
+    // Make pool wider to use more screen space with standard padding
+    const poolWidth = Math.min(this.gameWidth - 2 * this.STANDARD_PADDING, 450);
     const poolHeight = 180;
 
     const poolBg = new Graphics();
@@ -245,17 +244,16 @@ export class FormationScene extends BaseScene {
         fill: 0xffecb3
       }
     });
-    poolTitle.x = 20;
+    poolTitle.x = this.STANDARD_PADDING + 10;
     poolTitle.y = 15;
 
     const cardWidth = 90;
     const cardHeight = 80;
-    const colCount = 4;
-    const spacing = 20; // Always fixed
+    const colCount = Math.floor((poolWidth - 2 * this.STANDARD_PADDING) / (cardWidth + this.STANDARD_SPACING));
     const marginTop = 45;
-    const lineHeight = cardHeight + 10;
-    const cardsPerRow = colCount;
-    const totalRowWidth = cardsPerRow * cardWidth + (cardsPerRow - 1) * spacing;
+    const lineHeight = cardHeight + this.STANDARD_SPACING;
+    const cardsPerRow = Math.max(1, colCount);
+    const totalRowWidth = cardsPerRow * cardWidth + (cardsPerRow - 1) * this.STANDARD_SPACING;
     let marginLeft = (poolWidth - totalRowWidth) / 2;
 
     if (this.poolScrollContainer) {
@@ -268,7 +266,7 @@ export class FormationScene extends BaseScene {
       const col = index % cardsPerRow;
       const row = Math.floor(index / cardsPerRow);
 
-      const x = marginLeft + col * (cardWidth + spacing);
+      const x = marginLeft + col * (cardWidth + this.STANDARD_SPACING);
       const y = marginTop + row * lineHeight;
       const characterCard = this.createPoolCharacterCard(character, x, y);
       scrollContainer.addChild(characterCard);
@@ -283,15 +281,14 @@ export class FormationScene extends BaseScene {
 
     poolContainer.addChild(poolBg, poolTitle, scrollContainer);
 
-    // --- Center horizontally at the bottom ---
+    // Center horizontally with standard padding consideration
     poolContainer.x = (this.gameWidth - poolWidth) / 2;
-    // Place below formation grid as before
+    // Place below formation grid
     const startY = 150;
     const slotSize = 100;
-    const poolSpacing = 20;
-    const backRowY = startY + slotSize + poolSpacing;
+    const backRowY = startY + slotSize + this.STANDARD_SPACING;
     const backRowBottom = backRowY + slotSize;
-    poolContainer.y = backRowBottom + 20;
+    poolContainer.y = backRowBottom + this.STANDARD_SPACING * 2;
 
     this.addChild(poolContainer);
   }
@@ -480,28 +477,27 @@ export class FormationScene extends BaseScene {
   private createActionButtons(): void {
     const buttonWidth = 150;
     const buttonHeight = 50;
-    const buttonSpacing = 30;
     const buttonCount = 3;
 
-    // Calculate total width for all buttons and spacing
-    const totalWidth = buttonWidth * buttonCount + buttonSpacing * (buttonCount - 1);
+    // Calculate total width for all buttons with standard spacing
+    const totalWidth = buttonWidth * buttonCount + this.STANDARD_SPACING * (buttonCount - 1);
     const startX = (this.gameWidth - totalWidth) / 2;
     const y = this.gameHeight - 80;
 
-    // Back button
+    // Back button - positioned separately at left with standard padding
     const backButton = this.createButton(
       '← Back to Home',
-      5,
+      this.STANDARD_PADDING,
       y,
       buttonWidth,
       buttonHeight,
       () => navigation.showScreen(HomeScene)
     );
 
-    // Save button
+    // Save button - centered
     const saveButton = this.createButton(
       'Save Formation',
-      startX + buttonWidth + buttonSpacing,
+      startX + buttonWidth + this.STANDARD_SPACING,
       y,
       buttonWidth,
       buttonHeight,
@@ -511,10 +507,10 @@ export class FormationScene extends BaseScene {
       }
     );
 
-    // Auto button: fill formation with available characters
+    // Auto button - centered
     const autoButton = this.createButton(
       'Auto',
-      startX + (buttonWidth + buttonSpacing) * 2,
+      startX + (buttonWidth + this.STANDARD_SPACING) * 2,
       y,
       buttonWidth,
       buttonHeight,

@@ -9,6 +9,10 @@ export abstract class BaseScene extends Container {
 
   protected gameWidth: number = navigation.width;
   protected gameHeight: number = navigation.height;
+  
+  // Standard layout constants
+  protected readonly STANDARD_PADDING = 10;
+  protected readonly STANDARD_SPACING = 10;
 
   constructor() {
     super();
@@ -26,6 +30,45 @@ export abstract class BaseScene extends Container {
   protected initializeDimensions() {
     this.gameWidth = Math.max(400, app.screen?.width || 800);
     this.gameHeight = app.screen?.height || 600;
+  }
+
+  /**
+   * Creates a centered container with standard padding
+   */
+  protected createCenteredContainer(
+    width?: number, 
+    height?: number, 
+    padding: number = this.STANDARD_PADDING
+  ): Container {
+    const container = new Container();
+    const containerWidth = width || (this.gameWidth - 2 * padding);
+    const containerHeight = height || (this.gameHeight - 2 * padding);
+    
+    container.x = (this.gameWidth - containerWidth) / 2;
+    container.y = padding;
+    
+    return container;
+  }
+
+  /**
+   * Calculates responsive grid layout with consistent spacing
+   */
+  protected calculateGridLayout(
+    availableWidth: number,
+    minItemWidth: number,
+    maxItemWidth: number,
+    spacing: number = this.STANDARD_SPACING
+  ): { itemsPerRow: number; itemWidth: number; totalWidth: number } {
+    let itemsPerRow = Math.floor((availableWidth + spacing) / (minItemWidth + spacing));
+    itemsPerRow = Math.max(1, itemsPerRow);
+    
+    const totalSpacing = (itemsPerRow - 1) * spacing;
+    let itemWidth = (availableWidth - totalSpacing) / itemsPerRow;
+    itemWidth = Math.max(minItemWidth, Math.min(itemWidth, maxItemWidth));
+    
+    const totalWidth = itemsPerRow * itemWidth + (itemsPerRow - 1) * spacing;
+    
+    return { itemsPerRow, itemWidth, totalWidth };
   }
 
   protected createButton(
