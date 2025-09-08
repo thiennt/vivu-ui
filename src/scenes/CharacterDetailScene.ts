@@ -4,13 +4,14 @@ import { navigation } from '@/utils/navigation';
 import { HomeScene } from './HomeScene';
 import { BaseScene } from '@/utils/BaseScene';
 import { CharactersScene } from './CharactersScene';
+import { mockSkills } from '@/utils/mockData';
 
 export class CharacterDetailScene extends BaseScene {
   /** Assets bundles required by this screen */
   public static assetBundles = [];
-  private character: Character | null = null;
+  private character: any = null;
 
-  constructor(params?: { selectedCharacter: Character }) {
+  constructor(params?: { selectedCharacter: any }) {
     super();
     
     this.character = params?.selectedCharacter || null;
@@ -62,7 +63,7 @@ export class CharacterDetailScene extends BaseScene {
 
     // Symbol
     const symbolText = new Text({
-      text: this.character!.tokenSymbol,
+      text: this.character!.ticker,
       style: {
         fontFamily: 'Kalam',
         fontSize: 48,
@@ -92,7 +93,7 @@ export class CharacterDetailScene extends BaseScene {
 
     // Experience
     const expText = new Text({
-      text: `EXP: ${this.character!.experience}`,
+      text: `EXP: ${this.character!.exp}`,
       style: {
         fontFamily: 'Kalam',
         fontSize: 16,
@@ -175,12 +176,12 @@ export class CharacterDetailScene extends BaseScene {
 
     // Stats
     const stats = [
-      { name: 'Health', value: this.character!.stats.health, color: 0x4caf50 },
-      { name: 'Attack', value: this.character!.stats.attack, color: 0xf44336 },
-      { name: 'Defense', value: this.character!.stats.defense, color: 0x2196f3 },
-      { name: 'Speed', value: this.character!.stats.speed, color: 0xffeb3b },
-      { name: 'Crit Rate', value: this.character!.stats.criticalRate + '%', color: 0xff9800 },
-      { name: 'Crit Damage', value: this.character!.stats.criticalDamage + '%', color: 0x9c27b0 }
+      { name: 'Health', value: this.character!.max_hp, color: 0x4caf50 },
+      { name: 'Attack', value: this.character!.atk, color: 0xf44336 },
+      { name: 'Defense', value: this.character!.def, color: 0x2196f3 },
+      { name: 'Agility', value: this.character!.agi, color: 0xffeb3b },
+      { name: 'Crit Rate', value: this.character!.crit_rate + '%', color: 0xff9800 },
+      { name: 'Crit Damage', value: this.character!.crit_dmg + '%', color: 0x9c27b0 }
     ];
 
     const maxValue = Math.max(...stats.filter(s => typeof s.value === 'number').map(s => s.value as number));
@@ -273,7 +274,10 @@ export class CharacterDetailScene extends BaseScene {
     let y = 50;
     const maxRowWidth = panelWidth - panelPadding;
 
-    this.character!.skills.forEach((skill, index) => {
+    this.character!.equipped_skills.forEach((skillId: string, index: number) => {
+      const skill = mockSkills.find(s => s.id === skillId);
+      if (!skill) return;
+      
       if (x + skillCardWidth > maxRowWidth) {
         x = panelPadding;
         y += skillCardHeight + 10;
@@ -314,9 +318,9 @@ export class CharacterDetailScene extends BaseScene {
       skillDesc.x = 10;
       skillDesc.y = 30;
 
-      // Skill stats
+      // Skill stats - use available properties or defaults
       const skillStats = new Text({
-        text: `Damage: ${skill.damage} | Cooldown: ${skill.cooldown}s | Mana: ${skill.manaCost}`,
+        text: `Type: ${skill.skill_type || 'unknown'} | Level: ${skill.level || 1}`,
         style: {
           fontFamily: 'Kalam',
           fontSize: 10,
