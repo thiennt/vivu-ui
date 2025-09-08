@@ -38,10 +38,10 @@ export class PlayerDetailScene extends BaseScene {
   private createPlayerStats(): void {
     const statsContainer = new Container();
     
-    // Calculate responsive panel sizes and positioning
-    const panelWidth = Math.min(280, (this.gameWidth - 100) / 2.2);
-    const panelGap = 40;
-    const totalWidth = (panelWidth * 2) + panelGap;
+    // Calculate responsive panel sizes with standard padding
+    const availableWidth = this.gameWidth - 2 * this.STANDARD_PADDING;
+    const panelWidth = Math.min(280, (availableWidth - this.STANDARD_SPACING) / 2);
+    const totalWidth = (panelWidth * 2) + this.STANDARD_SPACING;
     const startX = (this.gameWidth - totalWidth) / 2;
     
     // Main info panel
@@ -74,7 +74,7 @@ export class PlayerDetailScene extends BaseScene {
     mainPanel.x = startX;
     mainPanel.y = 120;
     
-    statsPanel.x = startX + panelWidth + panelGap;
+    statsPanel.x = startX + panelWidth + this.STANDARD_SPACING;
     statsPanel.y = 120;
     
     statsContainer.addChild(mainPanel, statsPanel);
@@ -120,10 +120,9 @@ export class PlayerDetailScene extends BaseScene {
   private createCharacterCollection(): void {
     const collectionContainer = new Container();
 
-    // Card layout
+    // Card layout with standard spacing
     const cardWidth = 120;
     const cardHeight = 140;
-    const cardSpacing = 10;
     const totalCards = mockPlayer.characters.length;
 
     // Title - centered
@@ -137,9 +136,10 @@ export class PlayerDetailScene extends BaseScene {
     collectionTitle.x = this.gameWidth / 2;
     collectionTitle.y = 360;
 
-    // --- ScrollBox setup ---
-    const visibleCards = Math.min(5, totalCards);
-    const scrollBoxWidth = (cardWidth * visibleCards) + (cardSpacing * (visibleCards - 1));
+    // ScrollBox setup with responsive width considering padding
+    const availableWidth = this.gameWidth - 2 * this.STANDARD_PADDING;
+    const visibleCards = Math.min(Math.floor(availableWidth / (cardWidth + this.STANDARD_SPACING)), totalCards);
+    const scrollBoxWidth = (cardWidth * visibleCards) + (this.STANDARD_SPACING * (visibleCards - 1));
     const scrollBoxHeight = cardHeight;
     const scrollBox = new ScrollBox({
       width: scrollBoxWidth,
@@ -149,23 +149,23 @@ export class PlayerDetailScene extends BaseScene {
 
     // Add cards to ScrollBox content
     mockPlayer.characters.forEach((character, index) => {
-      const card = this.createCharacterPreviewCard(character, index * (cardWidth + cardSpacing), 0);
+      const card = this.createCharacterPreviewCard(character, index * (cardWidth + this.STANDARD_SPACING), 0);
       scrollBox.addItem(card);
     });
 
     // Set content width for scrolling
-    scrollBox.width = (cardWidth + cardSpacing) * totalCards - cardSpacing;
+    scrollBox.width = (cardWidth + this.STANDARD_SPACING) * totalCards - this.STANDARD_SPACING;
 
     // Position ScrollBox centered horizontally
     scrollBox.x = (this.gameWidth - scrollBoxWidth) / 2;
     scrollBox.y = 400;
 
-    // View all button
-    const buttonWidth = 200;
+    // View all button - responsive width
+    const buttonWidth = Math.min(250, this.gameWidth - 2 * this.STANDARD_PADDING);
     const viewAllButton = this.createButton(
       'View All Characters',
       (this.gameWidth - buttonWidth) / 2,
-      scrollBox.y + cardHeight + 20,
+      scrollBox.y + cardHeight + this.STANDARD_SPACING * 2,
       buttonWidth,
       50,
       () => navigation.showScreen(CharactersScene)
@@ -189,7 +189,7 @@ export class PlayerDetailScene extends BaseScene {
   private createBackButton(): void {
     const backButton = this.createButton(
       '← Back to Home',
-      5,
+      this.STANDARD_PADDING,
       this.gameHeight - 80,
       200,
       50,

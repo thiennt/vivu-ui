@@ -65,20 +65,19 @@ export class DungeonScene extends BaseScene {
   private createDungeonList(): void {
     const dungeonContainer = new Container();
     
-    // Calculate responsive card width and centering
-    const cardWidth = this.gameWidth;
+    // Calculate responsive card dimensions with standard padding
+    const availableWidth = this.gameWidth - 2 * this.STANDARD_PADDING;
+    const cardWidth = Math.min(availableWidth, 500); // Limit max width but use available space
     const cardHeight = 160;
-    const verticalSpacing = 10;
     const startY = 150;
     
     mockDungeons.forEach((dungeon, index) => {
       const dungeonCard = this.createDungeonCard(dungeon, index, cardWidth, cardHeight);
-      dungeonCard.y = startY + (index * (cardHeight + verticalSpacing));
+      dungeonCard.x = (this.gameWidth - cardWidth) / 2; // Center each card
+      dungeonCard.y = startY + (index * (cardHeight + this.STANDARD_SPACING));
       dungeonContainer.addChild(dungeonCard);
     });
     
-    // Center the entire container horizontally
-    dungeonContainer.x = 0;
     this.addChild(dungeonContainer);
   }
 
@@ -91,19 +90,16 @@ export class DungeonScene extends BaseScene {
       .fill({ color: Colors.BACKGROUND_SECONDARY, alpha: 0.9 })
       .stroke({ width: 3, color: Colors.BUTTON_PRIMARY });
 
-    // Calculate responsive sizes
+    // Calculate responsive sizes with standard padding
     const iconSize = 100;
-    const iconX = 0;
+    const iconX = this.STANDARD_PADDING;
     const iconY = 30;
-    const contentStartX = iconX + iconSize;
-    const contentWidth = cardWidth - contentStartX - 10;
-    const buttonWidth = Math.min(130, contentWidth / 3);
+    const contentStartX = iconX + iconSize + this.STANDARD_SPACING;
+    const contentWidth = cardWidth - contentStartX - this.STANDARD_PADDING;
+    const buttonWidth = Math.min(140, contentWidth / 3);
     
     // Dungeon icon/preview
     const iconBg = new Graphics();
-    // iconBg.roundRect(iconX, iconY, iconSize - 10, iconSize, 10)
-    //   .fill(Colors.BUTTON_BORDER)
-    //   .stroke({ width: 2, color: Colors.BUTTON_PRIMARY });
     
     const icon = new Text({
       text: '🏰',
@@ -136,7 +132,7 @@ export class DungeonScene extends BaseScene {
         fontSize: 14,
         fill: Colors.TEXT_SECONDARY,
         wordWrap: true,
-        wordWrapWidth: contentWidth - buttonWidth - 20
+        wordWrapWidth: contentWidth - buttonWidth - this.STANDARD_SPACING
       }
     });
     description.x = contentStartX;
@@ -165,8 +161,8 @@ export class DungeonScene extends BaseScene {
     chapters.x = contentStartX;
     chapters.y = 115;
     
-    // Enter button - positioned responsively
-    const buttonX = cardWidth - buttonWidth - 20;
+    // Enter button - positioned with standard padding
+    const buttonX = cardWidth - buttonWidth - this.STANDARD_PADDING;
     const buttonY = (cardHeight - 60) / 2;
     
     const enterButton = this.createButton(
@@ -197,7 +193,7 @@ export class DungeonScene extends BaseScene {
   private createBackButton(): void {
     const backButton = this.createButton(
       '← Back to Home',
-      5,
+      this.STANDARD_PADDING,
       this.gameHeight - 80,
       200,
       50,

@@ -166,11 +166,14 @@ export class HomeScene extends BaseScene {
   private createPlayerInfo(): void {
     const playerPanel = new Container();
     
+    // Make panel wider to utilize more screen width
+    const panelWidth = Math.min(this.gameWidth - 2 * this.STANDARD_PADDING, 350);
+    
     // Background panel
     const bg = new Graphics();
     bg.fill({ color: Colors.BACKGROUND_SECONDARY, alpha: 0.8 })
       .stroke({ width: 2, color: Colors.BUTTON_PRIMARY })
-      .roundRect(0, 0, 300, 100, 12);
+      .roundRect(0, 0, panelWidth, 100, 12);
     
     // Player info text
     const playerName = new Text({
@@ -208,7 +211,8 @@ export class HomeScene extends BaseScene {
     playerExp.y = 65;
     
     playerPanel.addChild(bg, playerName, playerLevel, playerExp);
-    playerPanel.x = (this.gameWidth - 300) / 2;
+    // Center the panel with standard padding consideration
+    playerPanel.x = (this.gameWidth - panelWidth) / 2;
     playerPanel.y = 200;
     
     this.container.addChild(playerPanel);
@@ -224,20 +228,23 @@ export class HomeScene extends BaseScene {
       { text: 'Formation', screen: FormationScene },
     ];
     
+    // Make buttons wider to utilize more screen space
+    const buttonWidth = Math.min(this.gameWidth - 2 * this.STANDARD_PADDING, 280);
+    
     buttons.forEach((buttonData, index) => {
       const button = this.createButton(
         buttonData.text,
         0,
-        index * 70,
-        250,
+        index * (60 + this.STANDARD_SPACING), // Use standard spacing between buttons
+        buttonWidth,
         60,
         () => navigation.showScreen(buttonData.screen)
       );
       buttonContainer.addChild(button);
     });
     
-    // Center horizontally and position vertically based on screen height
-    buttonContainer.x = (this.gameWidth - 250) / 2;
+    // Center horizontally with standard padding consideration
+    buttonContainer.x = (this.gameWidth - buttonWidth) / 2;
     buttonContainer.y = Math.max(350, this.gameHeight * 0.55);
     
     this.container.addChild(buttonContainer);
