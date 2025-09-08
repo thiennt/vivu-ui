@@ -32,6 +32,8 @@ export abstract class BaseScene extends Container {
     this.gameHeight = app.screen?.height || 600;
   }
 
+
+
   /**
    * Creates a centered container with standard padding
    */

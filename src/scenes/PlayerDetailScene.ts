@@ -9,14 +9,63 @@ import { Colors } from '@/utils/colors';
 import { ScrollBox } from '@pixi/ui';
 
 export class PlayerDetailScene extends BaseScene {
+  // UI containers
+  public container: Container;
+  private backgroundContainer: Container;
+  private headerContainer: Container;
+  private statsContainer: Container;
+  private collectionContainer: Container;
+  private buttonContainer: Container;
+
   constructor() {
     super();
+    
+    // Create containers once
+    this.container = new Container();
+    this.backgroundContainer = new Container();
+    this.headerContainer = new Container();
+    this.statsContainer = new Container();
+    this.collectionContainer = new Container();
+    this.buttonContainer = new Container();
+    
+    this.addChild(this.container);
+    this.container.addChild(
+      this.backgroundContainer,
+      this.headerContainer,
+      this.statsContainer,
+      this.collectionContainer,
+      this.buttonContainer
+    );
+    
+    // Create UI once
+    this.initializeUI();
+  }
+  
+  private initializeUI(): void {
+    this.createBackground();
+    this.createHeader();
+    this.createPlayerStats();
+    this.createCharacterCollection();
+    this.createBackButton();
   }
 
   resize(width: number, height: number): void {
     this.gameWidth = width;
     this.gameHeight = height;
 
+    // Update UI layout without recreating
+    this.updateLayout();
+  }
+  
+  private updateLayout(): void {
+    // Clear and recreate layout - this is more efficient than destroying/recreating all elements
+    this.backgroundContainer.removeChildren();
+    this.headerContainer.removeChildren();
+    this.statsContainer.removeChildren();
+    this.collectionContainer.removeChildren();
+    this.buttonContainer.removeChildren();
+    
+    // Recreate layout with current dimensions
     this.createBackground();
     this.createHeader();
     this.createPlayerStats();
@@ -27,17 +76,15 @@ export class PlayerDetailScene extends BaseScene {
   private createBackground(): void {
     const bg = new Graphics();
     bg.fill(Colors.BACKGROUND_PRIMARY).rect(0, 0, this.gameWidth, this.gameHeight);
-    this.addChildAt(bg, 0);
+    this.backgroundContainer.addChild(bg);
   }
 
   private createHeader(): void {
     const title = this.createTitle('Player Profile', this.gameWidth / 2, 60);
-    this.addChild(title);
+    this.headerContainer.addChild(title);
   }
 
   private createPlayerStats(): void {
-    const statsContainer = new Container();
-    
     // Calculate responsive panel sizes with standard padding
     const availableWidth = this.gameWidth - 2 * this.STANDARD_PADDING;
     const panelWidth = Math.min(280, (availableWidth - this.STANDARD_SPACING) / 2);
@@ -77,8 +124,7 @@ export class PlayerDetailScene extends BaseScene {
     statsPanel.x = startX + panelWidth + this.STANDARD_SPACING;
     statsPanel.y = 120;
     
-    statsContainer.addChild(mainPanel, statsPanel);
-    this.addChild(statsContainer);
+    this.statsContainer.addChild(mainPanel, statsPanel);
   }
 
   private createStatsPanel(title: string, stats: string[], width: number, height: number): Container {
@@ -118,8 +164,6 @@ export class PlayerDetailScene extends BaseScene {
   }
 
   private createCharacterCollection(): void {
-    const collectionContainer = new Container();
-
     // Card layout with standard spacing
     const cardWidth = 120;
     const cardHeight = 140;
@@ -176,8 +220,7 @@ export class PlayerDetailScene extends BaseScene {
       () => navigation.showScreen(CharactersScene)
     );
 
-    collectionContainer.addChild(collectionTitle, scrollBox, viewAllButton);
-    this.addChild(collectionContainer);
+    this.collectionContainer.addChild(collectionTitle, scrollBox, viewAllButton);
   }
 
   private createCharacterPreviewCard(character: any, x: number, y: number): Container {
@@ -200,7 +243,7 @@ export class PlayerDetailScene extends BaseScene {
       50,
       () => navigation.showScreen(HomeScene)
     );
-    this.addChild(backButton);
+    this.buttonContainer.addChild(backButton);
   }
 
   update(time: Ticker): void {

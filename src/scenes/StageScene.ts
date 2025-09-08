@@ -9,10 +9,47 @@ import { DungeonScene } from './DungeonScene';
 export class StageScene extends BaseScene {
   private dungeon: Dungeon | null = null;
   private selectedStage: number = 0;
+  
+  // UI containers
+  public container: Container;
+  private backgroundContainer: Container;
+  private headerContainer: Container;
+  private stageContainer: Container;
+  private buttonContainer: Container;
 
   constructor(params?: { selectedDungeon: Dungeon }) {
     super();
     this.dungeon = params?.selectedDungeon || null;
+    
+    // Create containers once
+    this.container = new Container();
+    this.backgroundContainer = new Container();
+    this.headerContainer = new Container();
+    this.stageContainer = new Container();
+    this.buttonContainer = new Container();
+    
+    this.addChild(this.container);
+    this.container.addChild(
+      this.backgroundContainer,
+      this.headerContainer,
+      this.stageContainer,
+      this.buttonContainer
+    );
+    
+    // Create UI once
+    this.initializeUI();
+  }
+  
+  private initializeUI(): void {
+    if (!this.dungeon) {
+      navigation.showScreen(HomeScene);
+      return;
+    }
+    
+    this.createBackground();
+    this.createHeader();
+    this.createStageList();
+    this.createBackButton();
   }
 
   resize(width: number, height: number): void {
@@ -24,9 +61,20 @@ export class StageScene extends BaseScene {
       return;
     }
 
+    // Update UI layout without recreating
+    this.updateLayout();
+  }
+  
+  private updateLayout(): void {
+    // Clear and recreate layout - this is more efficient than destroying/recreating all elements
+    this.backgroundContainer.removeChildren();
+    this.headerContainer.removeChildren();
+    this.stageContainer.removeChildren();
+    this.buttonContainer.removeChildren();
+    
+    // Recreate layout with current dimensions
     this.createBackground();
     this.createHeader();
-    //this.createStageSelector();
     this.createStageList();
     this.createBackButton();
   }
@@ -34,7 +82,7 @@ export class StageScene extends BaseScene {
   private createBackground(): void {
     const bg = new Graphics();
     bg.rect(0, 0, this.gameWidth, this.gameHeight).fill(0x1a0e0a);
-    this.addChildAt(bg, 0);
+    this.backgroundContainer.addChild(bg);
   }
 
   private createHeader(): void {
@@ -53,7 +101,7 @@ export class StageScene extends BaseScene {
     subtitle.x = this.gameWidth / 2;
     subtitle.y = 100;
     
-    this.addChild(title, subtitle);
+    this.headerContainer.addChild(title, subtitle);
   }
 
   private createStageSelector(): void {
@@ -101,7 +149,7 @@ export class StageScene extends BaseScene {
     selectorContainer.x = (this.gameWidth - selectorWidth) / 2;
     selectorContainer.y = 140;
     
-    this.addChild(selectorContainer);
+    this.stageContainer.addChild(selectorContainer);
   }
 
   private createStageButton(text: string, x: number, y: number, width: number, height: number, stageIndex: number): Container {
@@ -178,7 +226,7 @@ export class StageScene extends BaseScene {
     }
     
     stageContainer.y = 240;
-    this.addChild(stageContainer);
+    this.stageContainer.addChild(stageContainer);
   }
 
   private createStageCard(stage: any, index: number): Container {
@@ -299,6 +347,6 @@ export class StageScene extends BaseScene {
       50,
       () => navigation.showScreen(DungeonScene)
     );
-    this.addChild(backButton);
+    this.buttonContainer.addChild(backButton);
   }
 }

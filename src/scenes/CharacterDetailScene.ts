@@ -10,11 +10,56 @@ export class CharacterDetailScene extends BaseScene {
   /** Assets bundles required by this screen */
   public static assetBundles = [];
   private character: any = null;
+  
+  // UI containers
+  public container: Container;
+  private backgroundContainer: Container;
+  private headerContainer: Container;
+  private infoContainer: Container;
+  private statsContainer: Container;
+  private skillsContainer: Container;
+  private buttonContainer: Container;
 
   constructor(params?: { selectedCharacter: any }) {
     super();
     
     this.character = params?.selectedCharacter || null;
+    
+    // Create containers once
+    this.container = new Container();
+    this.backgroundContainer = new Container();
+    this.headerContainer = new Container();
+    this.infoContainer = new Container();
+    this.statsContainer = new Container();
+    this.skillsContainer = new Container();
+    this.buttonContainer = new Container();
+    
+    this.addChild(this.container);
+    this.container.addChild(
+      this.backgroundContainer,
+      this.headerContainer,
+      this.infoContainer,
+      this.statsContainer,
+      this.skillsContainer,
+      this.buttonContainer
+    );
+    
+    // Create UI once
+    this.initializeUI();
+  }
+  
+  private initializeUI(): void {
+    if (!this.character) {
+      navigation.showScreen(HomeScene);
+      return;
+    }
+    
+    this.createBackground();
+    this.createHeader();
+    this.createCharacterInfo();
+    this.createStatsDisplay();
+    this.createSkillsDisplay();
+    this.createBackButton();
   }
 
   resize(width: number, height: number): void {
@@ -26,6 +71,20 @@ export class CharacterDetailScene extends BaseScene {
       return;
     }
 
+    // Update UI layout without recreating
+    this.updateLayout();
+  }
+  
+  private updateLayout(): void {
+    // Clear and recreate layout - this is more efficient than destroying/recreating all elements
+    this.backgroundContainer.removeChildren();
+    this.headerContainer.removeChildren();
+    this.infoContainer.removeChildren();
+    this.statsContainer.removeChildren();
+    this.skillsContainer.removeChildren();
+    this.buttonContainer.removeChildren();
+    
+    // Recreate layout with current dimensions
     this.createBackground();
     this.createHeader();
     this.createCharacterInfo();
@@ -37,12 +96,12 @@ export class CharacterDetailScene extends BaseScene {
   private createBackground(): void {
     const bg = new Graphics();
     bg.fill(0x2c1810).rect(0, 0, this.gameWidth, this.gameHeight);
-    this.addChildAt(bg, 0);
+    this.backgroundContainer.addChild(bg);
   }
 
   private createHeader(): void {
     const title = this.createTitle(this.character!.name, this.gameWidth / 2, 60);
-    this.addChild(title);
+    this.headerContainer.addChild(title);
   }
 
   private createCharacterInfo(): void {
@@ -135,18 +194,14 @@ export class CharacterDetailScene extends BaseScene {
     elementText.y = 210;
 
     largeCard.addChild(symbolText, levelText, expText, rarityText, elementText);
-    infoContainer.addChild(largeCard);
 
     // Position infoContainer with padding
-    infoContainer.x = panelPadding;
-    infoContainer.y = cardY;
-
-    this.addChild(infoContainer);
+    this.infoContainer.x = panelPadding;
+    this.infoContainer.y = cardY;
+    this.infoContainer.addChild(largeCard);
   }
 
   private createStatsDisplay(): void {
-    const statsContainer = new Container();
-
     // Responsive panel width: 2/3 of screen
     const panelPadding = 10;
     const panelWidth = Math.floor(this.gameWidth * 2 / 3) - panelPadding * 1.5 - this.STANDARD_PADDING;
@@ -158,7 +213,7 @@ export class CharacterDetailScene extends BaseScene {
       .fill({ color: 0x3e2723, alpha: 0.9 })
       .stroke({ width: 3, color: 0x8d6e63 });
 
-    statsContainer.addChild(statsPanelBg);
+    this.statsContainer.addChild(statsPanelBg);
 
     // Title
     const title = new Text({
@@ -172,7 +227,7 @@ export class CharacterDetailScene extends BaseScene {
     });
     title.x = panelPadding;
     title.y = 15;
-    statsContainer.addChild(title);
+    this.statsContainer.addChild(title);
 
     // Stats
     const stats = [
@@ -200,7 +255,7 @@ export class CharacterDetailScene extends BaseScene {
       });
       nameText.x = panelPadding;
       nameText.y = y;
-      statsContainer.addChild(nameText);
+      this.statsContainer.addChild(nameText);
 
       // Stat value
       const valueText = new Text({
@@ -214,29 +269,26 @@ export class CharacterDetailScene extends BaseScene {
       });
       valueText.x = panelWidth - 80;
       valueText.y = y;
-      statsContainer.addChild(valueText);
+      this.statsContainer.addChild(valueText);
 
       // Stat bar background
       const barBg = new Graphics();
       barBg.fill(0x424242).rect(panelPadding, y + 20, panelWidth - 2 * panelPadding, 4);
-      statsContainer.addChild(barBg);
+      this.statsContainer.addChild(barBg);
 
       // Stat bar
       const barWidth = (typeof stat.value === 'number' ? stat.value : 0) / maxValue * (panelWidth - 2 * panelPadding);
       const bar = new Graphics();
       bar.fill(stat.color).rect(panelPadding, y + 20, barWidth, 4);
-      statsContainer.addChild(bar);
+      this.statsContainer.addChild(bar);
     });
 
     // Position statsContainer to the right of character info with padding
-    statsContainer.x = Math.floor(this.gameWidth / 3) + panelPadding * 1.5;
-    statsContainer.y = 120;
-
-    this.addChild(statsContainer);
+    this.statsContainer.x = Math.floor(this.gameWidth / 3) + panelPadding * 1.5;
+    this.statsContainer.y = 120;
   }
 
   private createSkillsDisplay(): void {
-    const skillsContainer = new Container();
     const panelPadding = 15;
     const panelWidth = this.gameWidth - 2 * panelPadding;
     const panelHeight = 150;
@@ -264,7 +316,7 @@ export class CharacterDetailScene extends BaseScene {
     title.x = panelPadding;
     title.y = 15;
 
-    skillsContainer.addChild(skillsPanel, title);
+    this.skillsContainer.addChild(skillsPanel, title);
 
     // Layout skill cards horizontally, wrap if needed
     const skillCardWidth = 280;
@@ -334,15 +386,13 @@ export class CharacterDetailScene extends BaseScene {
       skillCard.x = x;
       skillCard.y = y;
 
-      skillsContainer.addChild(skillCard);
+      this.skillsContainer.addChild(skillCard);
 
       x += skillCardWidth + skillSpacing;
     });
 
-    skillsContainer.x = panelPadding;
-    skillsContainer.y = skillsPanelY;
-
-    this.addChild(skillsContainer);
+    this.skillsContainer.x = panelPadding;
+    this.skillsContainer.y = skillsPanelY;
   }
 
   private getRarityColor(rarity: string): number {
@@ -365,7 +415,7 @@ export class CharacterDetailScene extends BaseScene {
       50,
       () => navigation.showScreen(CharactersScene)
     );
-    this.addChild(backButton);
+    this.buttonContainer.addChild(backButton);
   }
 
   update(time: Ticker): void {
