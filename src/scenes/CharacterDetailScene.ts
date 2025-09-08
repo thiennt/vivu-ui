@@ -514,7 +514,7 @@ export class CharacterDetailScene extends BaseScene {
   private createBackButton(): void {
     const backButton = this.createButton(
       '← Back to Characters',
-      (this.gameWidth - 200) / 2, // Center the button
+      5,
       this.gameHeight - 60, // Adjust for new layout
       200,
       50,
