@@ -1,289 +1,220 @@
-import { 
-  Player, 
-  Character, 
-  Dungeon, 
-  CharacterRarity, 
-  Element, 
-  SkillType, 
-  Difficulty,
-  RewardType 
-} from '@/types';
+// Mock data fully synced to @thiennt/vivu-api schema (Player, Character, Dungeon, Skill, etc.)
+// NOTE: Add/adjust fields as your backend schema evolves.
 
-export const mockPlayer: Player = {
-  id: 'player1',
-  username: 'CryptoWarrior',
-  level: 25,
-  experience: 12750,
-  stats: {
-    stamina: 120,
-    strength: 85,
-    agility: 90,
-    luck: 75,
-    intelligence: 80,
-    vitality: 95
+import { v4 as uuidv4 } from 'uuid';
+
+// ---- Skill Mock ----
+export const mockSkills = [
+  {
+    id: uuidv4(),
+    name: "Shield Bash",
+    description: "Stuns the enemy with a bash!",
+    skill_type: "active_skill",
+    level: 1,
+    actions: [
+      {
+        type: "damage",
+        target_type: "single_enemy",
+        amount_min: 60,
+        amount_max: 80,
+        damage_type: "physical",
+        can_crit: true,
+        cooldown: 2,
+        energy_cost: 30,
+        effect_name: "stun",
+        effect_chance: 25,
+        effect_duration: 1,
+      }
+    ]
   },
-  characters: [],
-  formation: {
-    positions: [null, null, null, null],
-    maxSize: 6
+  {
+    id: uuidv4(),
+    name: "Normal Attack",
+    description: "Basic melee attack.",
+    skill_type: "normal_attack",
+    level: 1,
+    actions: [
+      {
+        type: "damage",
+        target_type: "single_enemy",
+        amount_min: 35,
+        amount_max: 50,
+        damage_type: "physical",
+        can_crit: true,
+      }
+    ]
   },
+];
+
+// ---- Character Mock ----
+export const mockCharacters = [
+  {
+    id: uuidv4(),
+    name: "Aegis",
+    avatar_url: "https://example.com/avatars/aegis.jpg",
+    description: "A shield maiden with unbreakable will.",
+    c_type: "hero",
+    c_class: "warrior",
+    level: 10,
+    exp: 500,
+    points: 0,
+    sta: 15,
+    str: 18,
+    agi: 9,
+    hp: 150,
+    atk: 30,
+    def: 25,
+    crit_rate: 5,
+    crit_dmg: 120,
+    res: 10,
+    damage: 0,
+    mitigation: 5,
+    hit_rate: 98,
+    dodge: 8,
+    farcaster_id: "aegis_fc_001",
+    username: "Aegis",
+    equipped_skills: [mockSkills[0], mockSkills[1]],
+  },
+  {
+    id: uuidv4(),
+    name: "Blaze",
+    avatar_url: "https://example.com/avatars/blaze.jpg",
+    description: "A fire mage who conjures flames at will.",
+    c_type: "hero",
+    c_class: "mage",
+    level: 8,
+    exp: 420,
+    points: 0,
+    sta: 10,
+    str: 8,
+    agi: 12,
+    hp: 105,
+    atk: 36,
+    def: 12,
+    crit_rate: 12,
+    crit_dmg: 130,
+    res: 7,
+    damage: 5,
+    mitigation: 2,
+    hit_rate: 96,
+    dodge: 10,
+    farcaster_id: "blaze_fc_002",
+    username: "Blaze",
+    equipped_skills: [mockSkills[1]],
+  },
+  {
+    id: uuidv4(),
+    name: "Seraph",
+    avatar_url: "https://example.com/avatars/seraph.jpg",
+    description: "A healer with divine powers.",
+    c_type: "hero",
+    c_class: "support",
+    level: 7,
+    exp: 350,
+    points: 0,
+    sta: 12,
+    str: 5,
+    agi: 10,
+    hp: 120,
+    atk: 15,
+    def: 20,
+    crit_rate: 6,
+    crit_dmg: 110,
+    res: 15,
+    damage: 0,
+    mitigation: 8,
+    hit_rate: 97,
+    dodge: 9,
+    farcaster_id: "seraph_fc_004",
+    username: "SeraphHealer",
+    equipped_skills: [],
+  }
+];
+
+// ---- Player Mock ----
+export const mockPlayer = {
+  id: uuidv4(),
+  farcaster_id: "player_fc_001",
+  username: "PlayerOne",
+  sta: 5,
+  str: 5,
+  agi: 5,
+  luck: 5,
+  level: 1,
+  exp: 0,
+  awaking: 1,
+  star: 1,
+  points: 0,
+  created_at: new Date(),
+  updated_at: new Date(),
+  characters: mockCharacters,
+  // Typical game progress
   progress: {
-    currentChapter: 2,
-    currentStage: 3,
-    completedStages: ['1-1', '1-2', '1-3', '2-1', '2-2'],
-    unlockedDungeons: ['crypto-caves', 'blockchain-forest']
+    currentChapter: 1,
+    currentStage: 1,
+    completedStages: [],
+    unlockedDungeons: ["crypto-caves"]
+  },
+  // Add formation if your UI expects it:
+  formation: {
+    positions: [mockCharacters[0], mockCharacters[1], null, mockCharacters[2], null, null],
+    maxSize: 6
   }
 };
 
-export const mockCharacters: Character[] = [
+// ---- Dungeon/Stage/Chapter Mock ----
+export const mockDungeons = [
   {
-    id: 'char1',
-    name: 'Bitcoin Paladin',
-    tokenSymbol: 'BTC',
-    rarity: CharacterRarity.LEGENDARY,
-    level: 20,
-    experience: 8500,
-    stats: {
-      health: 1200,
-      attack: 180,
-      defense: 150,
-      speed: 85,
-      criticalRate: 15,
-      criticalDamage: 200
-    },
-    skills: [
-      {
-        id: 'skill1',
-        name: 'Golden Strike',
-        description: 'A powerful attack that deals massive damage',
-        damage: 250,
-        cooldown: 3,
-        manaCost: 40,
-        type: SkillType.ATTACK
-      },
-      {
-        id: 'skill2',
-        name: 'Diamond Hands',
-        description: 'Increases defense and resistance',
-        damage: 0,
-        cooldown: 5,
-        manaCost: 30,
-        type: SkillType.BUFF
-      }
-    ],
-    element: Element.LIGHT
-  },
-  {
-    id: 'char2',
-    name: 'Ethereum Mage',
-    tokenSymbol: 'ETH',
-    rarity: CharacterRarity.EPIC,
-    level: 18,
-    experience: 6200,
-    stats: {
-      health: 900,
-      attack: 200,
-      defense: 100,
-      speed: 120,
-      criticalRate: 20,
-      criticalDamage: 180
-    },
-    skills: [
-      {
-        id: 'skill3',
-        name: 'Smart Contract',
-        description: 'Casts a magical spell that damages all enemies',
-        damage: 180,
-        cooldown: 4,
-        manaCost: 50,
-        type: SkillType.ATTACK
-      }
-    ],
-    element: Element.FIRE
-  },
-  {
-    id: 'char3',
-    name: 'Cardano Guardian',
-    tokenSymbol: 'ADA',
-    rarity: CharacterRarity.RARE,
-    level: 15,
-    experience: 4800,
-    stats: {
-      health: 1000,
-      attack: 140,
-      defense: 180,
-      speed: 95,
-      criticalRate: 10,
-      criticalDamage: 150
-    },
-    skills: [
-      {
-        id: 'skill4',
-        name: 'Proof of Stake',
-        description: 'Provides protection and healing to allies',
-        damage: 0,
-        cooldown: 2,
-        manaCost: 25,
-        type: SkillType.HEAL
-      }
-    ],
-    element: Element.EARTH
-  },
-  {
-    id: 'char4',
-    name: 'Solana Archer',
-    tokenSymbol: 'SOL',
-    rarity: CharacterRarity.UNCOMMON,
-    level: 12,
-    experience: 3200,
-    stats: {
-      health: 800,
-      attack: 160,
-      defense: 90,
-      speed: 140,
-      criticalRate: 25,
-      criticalDamage: 170
-    },
-    skills: [
-      {
-        id: 'skill5',
-        name: 'Lightning Arrow',
-        description: 'Fast attack with high critical chance',
-        damage: 120,
-        cooldown: 1,
-        manaCost: 20,
-        type: SkillType.ATTACK
-      }
-    ],
-    element: Element.AIR
-  },
-  {
-    id: 'char5',
-    name: 'Dogecoin Warrior',
-    tokenSymbol: 'DOGE',
-    rarity: CharacterRarity.COMMON,
-    level: 10,
-    experience: 2100,
-    stats: {
-      health: 750,
-      attack: 110,
-      defense: 80,
-      speed: 100,
-      criticalRate: 12,
-      criticalDamage: 140
-    },
-    skills: [
-      {
-        id: 'skill6',
-        name: 'Much Wow',
-        description: 'A cheerful attack that boosts team morale',
-        damage: 90,
-        cooldown: 2,
-        manaCost: 15,
-        type: SkillType.ATTACK
-      }
-    ],
-    element: Element.LIGHT
-  }
-];
-
-export const mockDungeons: Dungeon[] = [
-  {
-    id: 'crypto-caves',
-    name: 'Crypto Caves',
-    description: 'Deep underground caverns filled with digital treasures',
+    id: "crypto-caves",
+    name: "Crypto Caves",
+    description: "Deep mysterious caves with hidden treasures.",
     requiredLevel: 1,
     rewards: [
-      { type: RewardType.EXPERIENCE, amount: 100 },
-      { type: RewardType.GOLD, amount: 50 }
+      { type: "EXPERIENCE", amount: 150 },
+      { type: "GOLD", amount: 75 }
     ],
     chapters: [
       {
-        id: 'chapter1',
-        name: 'The Mining Tunnels',
-        description: 'Explore the abandoned mining tunnels',
+        id: "chapter1",
+        name: "Entrance",
+        description: "The cave's mysterious entrance.",
         chapterNumber: 1,
         stages: [
           {
-            id: 'stage1-1',
-            name: 'Entrance',
-            description: 'The cave entrance guarded by weak creatures',
+            id: "stage1-1",
+            name: "Bats Attack",
+            description: "Survive a swarm of bats.",
             stageNumber: 1,
-            difficulty: Difficulty.EASY,
+            difficulty: "EASY",
             enemies: [],
             rewards: [
-              { type: RewardType.EXPERIENCE, amount: 50 },
-              { type: RewardType.GOLD, amount: 25 }
+              { type: "EXPERIENCE", amount: 50 },
+              { type: "GOLD", amount: 25 }
             ]
           },
           {
-            id: 'stage1-2',
-            name: 'Deep Tunnel',
-            description: 'Venture deeper into the mysterious tunnels',
+            id: "stage1-2",
+            name: "Tunnel Ambush",
+            description: "Venture deeper into the mysterious tunnels.",
             stageNumber: 2,
-            difficulty: Difficulty.EASY,
+            difficulty: "EASY",
             enemies: [],
             rewards: [
-              { type: RewardType.EXPERIENCE, amount: 75 },
-              { type: RewardType.GOLD, amount: 35 }
+              { type: "EXPERIENCE", amount: 75 },
+              { type: "GOLD", amount: 35 }
             ]
           },
           {
-            id: 'stage1-3',
-            name: 'Boss Chamber',
-            description: 'Face the guardian of the first level',
+            id: "stage1-3",
+            name: "Boss Chamber",
+            description: "Face the guardian of the first level.",
             stageNumber: 3,
-            difficulty: Difficulty.NORMAL,
+            difficulty: "NORMAL",
             enemies: [],
             rewards: [
-              { type: RewardType.EXPERIENCE, amount: 150 },
-              { type: RewardType.GOLD, amount: 100 },
-              { type: RewardType.CHARACTER, amount: 1, rarity: CharacterRarity.COMMON }
-            ]
-          }
-        ]
-      },
-      {
-        id: 'chapter2',
-        name: 'The Crystal Chamber',
-        description: 'A beautiful chamber filled with glowing crystals',
-        chapterNumber: 2,
-        stages: [
-          {
-            id: 'stage2-1',
-            name: 'Crystal Garden',
-            description: 'Navigate through the crystal formations',
-            stageNumber: 1,
-            difficulty: Difficulty.NORMAL,
-            enemies: [],
-            rewards: [
-              { type: RewardType.EXPERIENCE, amount: 100 },
-              { type: RewardType.GOLD, amount: 60 }
-            ]
-          },
-          {
-            id: 'stage2-2',
-            name: 'Prism Maze',
-            description: 'Solve the light puzzles to proceed',
-            stageNumber: 2,
-            difficulty: Difficulty.NORMAL,
-            enemies: [],
-            rewards: [
-              { type: RewardType.EXPERIENCE, amount: 125 },
-              { type: RewardType.GOLD, amount: 75 }
-            ]
-          },
-          {
-            id: 'stage2-3',
-            name: 'Crystal Guardian',
-            description: 'Defeat the powerful crystal entity',
-            stageNumber: 3,
-            difficulty: Difficulty.HARD,
-            enemies: [],
-            rewards: [
-              { type: RewardType.EXPERIENCE, amount: 250 },
-              { type: RewardType.GOLD, amount: 150 },
-              { type: RewardType.CHARACTER, amount: 1, rarity: CharacterRarity.UNCOMMON }
+              { type: "EXPERIENCE", amount: 150 },
+              { type: "GOLD", amount: 100 },
+              { type: "CHARACTER", amount: 1, rarity: "common" }
             ]
           }
         ]
@@ -291,31 +222,31 @@ export const mockDungeons: Dungeon[] = [
     ]
   },
   {
-    id: 'blockchain-forest',
-    name: 'Blockchain Forest',
-    description: 'A mystical forest where digital nature thrives',
+    id: "blockchain-forest",
+    name: "Blockchain Forest",
+    description: "A mystical forest where digital nature thrives.",
     requiredLevel: 10,
     rewards: [
-      { type: RewardType.EXPERIENCE, amount: 200 },
-      { type: RewardType.GOLD, amount: 100 }
+      { type: "EXPERIENCE", amount: 200 },
+      { type: "GOLD", amount: 100 }
     ],
     chapters: [
       {
-        id: 'chapter3',
-        name: 'The Sacred Grove',
-        description: 'Ancient trees hold the secrets of the blockchain',
+        id: "chapter2",
+        name: "The Sacred Grove",
+        description: "Ancient trees hold the secrets of the blockchain.",
         chapterNumber: 1,
         stages: [
           {
-            id: 'stage3-1',
-            name: 'Forest Path',
-            description: 'Follow the winding path through the forest',
+            id: "stage2-1",
+            name: "Forest Path",
+            description: "Follow the winding path through the forest.",
             stageNumber: 1,
-            difficulty: Difficulty.NORMAL,
+            difficulty: "NORMAL",
             enemies: [],
             rewards: [
-              { type: RewardType.EXPERIENCE, amount: 150 },
-              { type: RewardType.GOLD, amount: 80 }
+              { type: "EXPERIENCE", amount: 150 },
+              { type: "GOLD", amount: 80 }
             ]
           }
         ]
@@ -323,9 +254,3 @@ export const mockDungeons: Dungeon[] = [
     ]
   }
 ];
-
-// Assign characters to player
-mockPlayer.characters = mockCharacters;
-mockPlayer.formation.positions[0] = mockCharacters[0];
-mockPlayer.formation.positions[1] = mockCharacters[1];
-mockPlayer.formation.positions[3] = mockCharacters[2];
