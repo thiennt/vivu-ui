@@ -2,6 +2,7 @@
 // NOTE: Add/adjust fields as your backend schema evolves.
 
 import { v4 as uuidv4 } from 'uuid';
+import { CharacterRarity, Element, SkillType } from '../types';
 
 // ---- Skill Mock ----
 export const mockSkills = [
@@ -9,41 +10,29 @@ export const mockSkills = [
     id: uuidv4(),
     name: "Shield Bash",
     description: "Stuns the enemy with a bash!",
-    skill_type: "active_skill",
-    level: 1,
-    actions: [
-      {
-        type: "damage",
-        target_type: "single_enemy",
-        amount_min: 60,
-        amount_max: 80,
-        damage_type: "physical",
-        can_crit: true,
-        cooldown: 2,
-        energy_cost: 30,
-        effect_name: "stun",
-        effect_chance: 25,
-        effect_duration: 1,
-      }
-    ]
+    damage: 70,
+    cooldown: 2,
+    manaCost: 30,
+    type: SkillType.ATTACK
   },
   {
     id: uuidv4(),
-    name: "Normal Attack",
+    name: "Normal Attack", 
     description: "Basic melee attack.",
-    skill_type: "normal_attack",
-    level: 1,
-    actions: [
-      {
-        type: "damage",
-        target_type: "single_enemy",
-        amount_min: 35,
-        amount_max: 50,
-        damage_type: "physical",
-        can_crit: true,
-      }
-    ]
+    damage: 42,
+    cooldown: 0,
+    manaCost: 0,
+    type: SkillType.ATTACK
   },
+  {
+    id: uuidv4(),
+    name: "Heal",
+    description: "Restore health to an ally.",
+    damage: 0,
+    cooldown: 3,
+    manaCost: 25,
+    type: SkillType.HEAL
+  }
 ];
 
 // ---- Character Mock ----
@@ -51,111 +40,80 @@ export const mockCharacters = [
   {
     id: uuidv4(),
     name: "Aegis",
-    avatar_url: "https://example.com/avatars/aegis.jpg",
-    description: "A shield maiden with unbreakable will.",
-    c_type: "hero",
-    c_class: "warrior",
+    tokenSymbol: "BTC",
+    rarity: CharacterRarity.RARE,
     level: 10,
-    exp: 500,
-    points: 0,
-    sta: 15,
-    str: 18,
-    agi: 9,
-    hp: 150,
-    atk: 30,
-    def: 25,
-    crit_rate: 5,
-    crit_dmg: 120,
-    res: 10,
-    damage: 0,
-    mitigation: 5,
-    hit_rate: 98,
-    dodge: 8,
-    farcaster_id: "aegis_fc_001",
-    username: "Aegis",
-    equipped_skills: [mockSkills[0], mockSkills[1]],
+    experience: 500,
+    stats: {
+      health: 150,
+      attack: 30,
+      defense: 25,
+      speed: 8,
+      criticalRate: 5,
+      criticalDamage: 120
+    },
+    skills: [mockSkills[0], mockSkills[1]],
+    element: Element.EARTH
   },
   {
     id: uuidv4(),
     name: "Blaze",
-    avatar_url: "https://example.com/avatars/blaze.jpg",
-    description: "A fire mage who conjures flames at will.",
-    c_type: "hero",
-    c_class: "mage",
+    tokenSymbol: "ETH", 
+    rarity: CharacterRarity.EPIC,
     level: 8,
-    exp: 420,
-    points: 0,
-    sta: 10,
-    str: 8,
-    agi: 12,
-    hp: 105,
-    atk: 36,
-    def: 12,
-    crit_rate: 12,
-    crit_dmg: 130,
-    res: 7,
-    damage: 5,
-    mitigation: 2,
-    hit_rate: 96,
-    dodge: 10,
-    farcaster_id: "blaze_fc_002",
-    username: "Blaze",
-    equipped_skills: [mockSkills[1]],
+    experience: 420,
+    stats: {
+      health: 105,
+      attack: 36,
+      defense: 12,
+      speed: 10,
+      criticalRate: 12,
+      criticalDamage: 130
+    },
+    skills: [mockSkills[1]],
+    element: Element.FIRE
   },
   {
     id: uuidv4(),
     name: "Seraph",
-    avatar_url: "https://example.com/avatars/seraph.jpg",
-    description: "A healer with divine powers.",
-    c_type: "hero",
-    c_class: "support",
+    tokenSymbol: "SOL",
+    rarity: CharacterRarity.LEGENDARY,
     level: 7,
-    exp: 350,
-    points: 0,
-    sta: 12,
-    str: 5,
-    agi: 10,
-    hp: 120,
-    atk: 15,
-    def: 20,
-    crit_rate: 6,
-    crit_dmg: 110,
-    res: 15,
-    damage: 0,
-    mitigation: 8,
-    hit_rate: 97,
-    dodge: 9,
-    farcaster_id: "seraph_fc_004",
-    username: "SeraphHealer",
-    equipped_skills: [],
+    experience: 350,
+    stats: {
+      health: 120,
+      attack: 15,
+      defense: 20,
+      speed: 9,
+      criticalRate: 6,
+      criticalDamage: 110
+    },
+    skills: [mockSkills[2]],
+    element: Element.LIGHT
   }
 ];
 
 // ---- Player Mock ----
 export const mockPlayer = {
   id: uuidv4(),
-  farcaster_id: "player_fc_001",
   username: "PlayerOne",
-  sta: 5,
-  str: 5,
-  agi: 5,
-  luck: 5,
   level: 1,
-  exp: 0,
-  awaking: 1,
-  star: 1,
-  points: 0,
-  created_at: new Date(),
-  updated_at: new Date(),
+  experience: 0,
+  stats: {
+    stamina: 5,
+    strength: 5,
+    agility: 5,
+    luck: 5,
+    intelligence: 5,
+    vitality: 5
+  },
   characters: mockCharacters,
-  // Typical game progress
   progress: {
     currentChapter: 1,
     currentStage: 1,
     completedStages: [],
     unlockedDungeons: ["crypto-caves"]
   },
-  // Add formation if your UI expects it:
   formation: {
     positions: [mockCharacters[0], mockCharacters[1], null, mockCharacters[2], null, null],
     maxSize: 6
