@@ -8,7 +8,7 @@ import { DungeonScene } from './DungeonScene';
 
 export class StageScene extends BaseScene {
   private dungeon: Dungeon | null = null;
-  private selectedChapter: number = 0;
+  private selectedStage: number = 0;
 
   constructor(params?: { selectedDungeon: Dungeon }) {
     super();
@@ -26,7 +26,7 @@ export class StageScene extends BaseScene {
 
     this.createBackground();
     this.createHeader();
-    this.createChapterSelector();
+    //this.createStageSelector();
     this.createStageList();
     this.createBackButton();
   }
@@ -56,20 +56,20 @@ export class StageScene extends BaseScene {
     this.addChild(title, subtitle);
   }
 
-  private createChapterSelector(): void {
+  private createStageSelector(): void {
     const selectorContainer = new Container();
     
     // Calculate responsive sizing
     const selectorWidth = Math.min(this.gameWidth - 100, 800);
-    const buttonWidth = Math.min(160, (selectorWidth - 140) / this.dungeon!.chapters.length);
+    const buttonWidth = Math.min(160, (selectorWidth - 140) / this.dungeon!.stages.length);
     
     const selectorBg = new Graphics();
     selectorBg.roundRect(0, 0, selectorWidth, 60, 10)
       .fill({ color: Colors.BACKGROUND_SECONDARY, alpha: 0.9 })
       .stroke({ width: 2, color: Colors.BUTTON_PRIMARY });
     
-    const chapterTitle = new Text({
-      text: 'Chapters:',
+    const stageTitle = new Text({
+      text: 'Stages:',
       style: {
         fontFamily: 'Kalam',
         fontSize: 18,
@@ -77,23 +77,23 @@ export class StageScene extends BaseScene {
         fill: Colors.TEXT_PRIMARY
       }
     });
-    chapterTitle.x = 20;
-    chapterTitle.y = 20;
+    stageTitle.x = 20;
+    stageTitle.y = 20;
     
-    selectorContainer.addChild(selectorBg, chapterTitle);
+    selectorContainer.addChild(selectorBg, stageTitle);
     
-    // Chapter buttons - responsive positioning
+    // Stage buttons - responsive positioning
     let currentX = 120;
-    this.dungeon!.chapters.forEach((chapter, index) => {
-      const chapterButton = this.createChapterButton(
-        chapter.name,
+    this.dungeon!.stages.forEach((stage, index) => {
+      const stageButton = this.createStageButton(
+        stage.name,
         currentX,
         10,
         buttonWidth,
         40,
         index
       );
-      selectorContainer.addChild(chapterButton);
+      selectorContainer.addChild(stageButton);
       currentX += buttonWidth + 10;
     });
     
@@ -104,10 +104,10 @@ export class StageScene extends BaseScene {
     this.addChild(selectorContainer);
   }
 
-  private createChapterButton(text: string, x: number, y: number, width: number, height: number, chapterIndex: number): Container {
+  private createStageButton(text: string, x: number, y: number, width: number, height: number, stageIndex: number): Container {
     const button = new Container();
-    
-    const isSelected = chapterIndex === this.selectedChapter;
+
+    const isSelected = stageIndex === this.selectedStage;
     const bgColor = isSelected ? Colors.BUTTON_PRIMARY : Colors.BUTTON_BORDER;
     const textColor = isSelected ? Colors.TEXT_PRIMARY : Colors.TEXT_SECONDARY;
     
@@ -139,9 +139,9 @@ export class StageScene extends BaseScene {
     button.cursor = 'pointer';
     
     button.on('pointerdown', () => {
-      this.selectedChapter = chapterIndex;
+      this.selectedStage = stageIndex;
       this.refreshStageList();
-      this.refreshChapterSelector();
+      this.refreshStageSelector();
     });
     
     return button;
@@ -151,8 +151,8 @@ export class StageScene extends BaseScene {
     const stageContainer = new Container();
     stageContainer.label = 'stageContainer';
     
-    const chapter = this.dungeon!.chapters[this.selectedChapter];
-    if (chapter) {
+    const stages = this.dungeon!.stages;
+    if (stages.length > 0) {
       // Calculate responsive grid layout
       const cardWidth = 180;
       const cardHeight = 130;
@@ -161,7 +161,7 @@ export class StageScene extends BaseScene {
       const columns = Math.min(3, maxColumns);
       const gridWidth = (cardWidth * columns) + (cardSpacing * (columns - 1));
       
-      chapter.stages.forEach((stage, index) => {
+      stages.forEach((stage, index) => {
         const stageCard = this.createStageCard(stage, index);
         const col = index % columns;
         const row = Math.floor(index / columns);
@@ -219,15 +219,15 @@ export class StageScene extends BaseScene {
     stageName.y = 35;
     
     // Difficulty
-    const difficultyColors: { [key: string]: number } = {
-      easy: Colors.ELEMENT_EARTH,
-      normal: Colors.RARITY_LEGENDARY,
-      hard: Colors.ELEMENT_FIRE,
-      nightmare: Colors.ELEMENT_DARK
+    const difficultyColors: { [key: number]: number } = {
+      1: Colors.ELEMENT_EARTH,
+      2: Colors.RARITY_LEGENDARY,
+      3: Colors.ELEMENT_FIRE,
+      4: Colors.ELEMENT_DARK
     };
 
     const difficulty = new Text({
-      text: stage.difficulty.toUpperCase(),
+      text: stage.difficulty.toString(),
       style: {
         fontFamily: 'Kalam',
         fontSize: 12,
@@ -285,7 +285,7 @@ export class StageScene extends BaseScene {
     this.createStageList();
   }
 
-  private refreshChapterSelector(): void {
+  private refreshStageSelector(): void {
     // This is a simplified refresh - in a real app you'd update the existing buttons
     this.removeChildren();
   }

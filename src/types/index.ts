@@ -72,27 +72,29 @@ export interface Dungeon {
   id: string;
   name: string;
   description: string;
-  chapters: Chapter[];
+  stages: Stage[];
   requiredLevel: number;
   rewards: Reward[];
 }
 
-export interface Chapter {
-  id: string;
-  name: string;
-  description: string;
-  stages: Stage[];
-  chapterNumber: number;
-}
 
 export interface Stage {
   id: string;
   name: string;
   description: string;
-  enemies: Enemy[];
+  thumbnail_url: string,
+  background_url: string,
+  music_url: string | null,
+  created_at: string,
+  updated_at: string,
+  parent_stage_id: string,
+  energy_cost: number,
+  max_attempts: number,
+  is_boss_stage: false,
+  enemies: Enemy[],
   rewards: Reward[];
   stageNumber: number;
-  difficulty: Difficulty;
+  difficulty: number;
 }
 
 export interface Enemy {

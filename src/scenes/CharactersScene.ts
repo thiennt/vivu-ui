@@ -5,6 +5,7 @@ import { HomeScene } from './HomeScene';
 import { BaseScene } from '@/utils/BaseScene';
 import { Colors } from '@/utils/colors';
 import { CharacterDetailScene } from './CharacterDetailScene';
+import { ScrollBox } from '@pixi/ui';
 
 export class CharactersScene extends BaseScene {
   /** Assets bundles required by this screen */
@@ -28,7 +29,7 @@ export class CharactersScene extends BaseScene {
     this.createHeader();
     this.createCharacterGrid();
     this.createBackButton();
-    this.setupScrolling();
+    //this.setupScrolling();
   }
 
   /** Show the screen with animation */
@@ -81,7 +82,7 @@ export class CharactersScene extends BaseScene {
 
   private createBackground(): void {
     const bg = new Graphics();
-    bg.fill(Colors.BACKGROUND_PRIMARY).rect(0, 0, this.gameWidth, this.gameHeight);
+    bg.rect(0, 0, this.gameWidth, this.gameHeight).fill(Colors.BACKGROUND_PRIMARY);
     this.addChildAt(bg, 0);
   }
 
@@ -105,33 +106,34 @@ export class CharactersScene extends BaseScene {
   }
 
   private createCharacterGrid(): void {
-    const gridContainer = new Container();
-    
-    // Use standard padding and improved layout calculations
+    // Calculate area for grid (leave space for back button)
+    const gridTop = 140;
+    const backButtonHeight = 50;
+    const backButtonMargin = 30;
+    const gridHeight = this.gameHeight - gridTop - backButtonHeight - backButtonMargin - this.STANDARD_PADDING;
+
+    // Card layout
     const availableWidth = this.gameWidth - 2 * this.STANDARD_PADDING;
     const minCardWidth = 120;
     const maxCardWidth = 180;
-    
-    const layout = this.calculateGridLayout(
-      availableWidth, 
-      minCardWidth, 
-      maxCardWidth, 
-      this.STANDARD_SPACING
-    );
-    
     const cardHeight = 180;
 
-    // Center the grid container horizontally
-    const gridStartX = (this.gameWidth - layout.totalWidth) / 2;
-    gridContainer.x = gridStartX;
+    const layout = this.calculateGridLayout(
+      availableWidth,
+      minCardWidth,
+      maxCardWidth,
+      this.STANDARD_SPACING
+    );
 
-    // Layout cards
+    // Create a container for all cards
+    const gridContent = new Container();
+
     mockCharacters.forEach((character, index) => {
       const row = Math.floor(index / layout.itemsPerRow);
       const col = index % layout.itemsPerRow;
 
       const x = col * (layout.itemWidth + this.STANDARD_SPACING);
-      const y = 140 + row * (cardHeight + this.STANDARD_SPACING);
+      const y = row * (cardHeight + this.STANDARD_SPACING);
 
       const characterCard = this.createHeroCard(character, x, y, 'detailed');
       characterCard.width = layout.itemWidth;
@@ -141,14 +143,27 @@ export class CharactersScene extends BaseScene {
         navigation.showScreen(CharacterDetailScene, { selectedCharacter: character });
       });
 
-      gridContainer.addChild(characterCard);
+      gridContent.addChild(characterCard);
     });
 
+    // Set content height for scrolling
     const totalRows = Math.ceil(mockCharacters.length / layout.itemsPerRow);
-    this.maxScroll = Math.max(0, (totalRows * (cardHeight + this.STANDARD_SPACING)) - (this.gameHeight - 200));
+    const contentHeight = totalRows * (cardHeight + this.STANDARD_SPACING);
 
-    this.addChild(gridContainer);
-    gridContainer.label = 'gridContainer';
+    // Create ScrollBox for vertical scrolling
+    const scrollBox = new ScrollBox({
+      width: availableWidth,
+      height: gridHeight,
+    });
+    scrollBox.x = this.STANDARD_PADDING;
+    scrollBox.y = gridTop;
+    scrollBox.addItem(gridContent);
+
+    // Set gridContent height for proper scrolling
+    gridContent.height = contentHeight;
+
+    this.addChild(scrollBox);
+    scrollBox.label = 'gridContainer';
   }
 
   private createDetailedCharacterCard(character: any, x: number, y: number): Container {

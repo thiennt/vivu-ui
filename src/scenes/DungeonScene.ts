@@ -151,7 +151,7 @@ export class DungeonScene extends BaseScene {
     requiredLevel.y = 90;
     
     const chapters = new Text({
-      text: `Chapters: ${dungeon.chapters.length}`,
+      text: `Chapters: ${dungeon.stages.length}`,
       style: {
         fontFamily: 'Kalam',
         fontSize: 14,

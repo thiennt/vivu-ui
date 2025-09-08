@@ -257,7 +257,7 @@ export const mockDungeons = [
     ],
     is_boss_stage: false,
     battles: [],
-    chapters: [
+    stages: [
       {
         id: "stage-1-1",
         name: "Genesis 1",
@@ -379,7 +379,7 @@ export const mockDungeons = [
     ],
     is_boss_stage: false,
     battles: [],
-    chapters: [
+    stages: [
       {
         id: "stage-2-1",
         name: "Island 1",

@@ -1,4 +1,5 @@
 import { Graphics, Text, Container, Ticker } from 'pixi.js';
+import { ScrollBox } from '@pixi/ui';
 import { BaseScene } from '@/utils/BaseScene';
 import { Character } from '@/types';
 import { mockPlayer, mockCharacters } from '@/utils/mockData';
@@ -17,16 +18,6 @@ export class FormationScene extends BaseScene {
   private isDragging: boolean = false;
   
   private slotHitBoxes: {index: number, x: number, y: number, size: number}[] = [];
-
-  // Pool scroll
-  private poolScrollContainer: Container | null = null;
-  private poolScrollOffset: number = 0;
-  private poolScrollBar: Graphics | null = null;
-  private poolMaxScroll: number = 0;
-  private poolScrolling: boolean = false;
-  private poolScrollStartY: number = 0;
-  private poolScrollStartOffset: number = 0;
-
 
   constructor() {
     super();
@@ -232,15 +223,35 @@ export class FormationScene extends BaseScene {
     const poolContainer = new Container();
     poolContainer.label = 'characterPool';
 
-    // Make pool wider to use more screen space with standard padding
-    const poolWidth = Math.min(this.gameWidth - 2 * this.STANDARD_PADDING, 450);
-    const poolHeight = 180;
+    // Calculate available area
+    const poolTop = 150 + 2 * 100 + 2 * this.STANDARD_SPACING; // formation grid bottom
+    const actionButtonHeight = 50;
+    const actionButtonY = this.gameHeight - 80;
+    const poolBottom = actionButtonY - this.STANDARD_SPACING * 2;
+    const poolHeight = poolBottom - poolTop;
+    const poolWidth = this.gameWidth - 2 * this.STANDARD_PADDING;
 
+    const minCardWidth = 90;
+    const cardHeight = 80;
+    const spacing = this.STANDARD_SPACING;
+    const padding = this.STANDARD_PADDING; // Use for left/right padding
+    const marginTop = 45;
+
+    // Calculate cards per row to fit width, including left/right padding
+    const maxCardsPerRow = Math.floor((poolWidth - 2 * padding + spacing) / (minCardWidth + spacing));
+    const cardsPerRow = Math.min(maxCardsPerRow, this.availableCharacters.length || 1);
+
+    // Dynamically calculate card width to fill the row (with left/right padding)
+    const totalSpacing = spacing * (cardsPerRow - 1);
+    const cardWidth = (poolWidth - 2 * padding - totalSpacing) / cardsPerRow;
+
+    // Background
     const poolBg = new Graphics();
     poolBg.roundRect(0, 0, poolWidth, poolHeight, 12)
       .fill({ color: 0x3e2723, alpha: 0.8 })
       .stroke({ width: 2, color: 0x8d6e63 });
 
+    // Title
     const poolTitle = new Text({
       text: 'Available Characters',
       style: {
@@ -250,104 +261,48 @@ export class FormationScene extends BaseScene {
         fill: 0xffecb3
       }
     });
-    poolTitle.x = this.STANDARD_PADDING + 10;
+    poolTitle.x = padding;
     poolTitle.y = 15;
 
-    const cardWidth = 90;
-    const cardHeight = 80;
-    const colCount = Math.floor((poolWidth - 2 * this.STANDARD_PADDING) / (cardWidth + this.STANDARD_SPACING));
-    const marginTop = 45;
-    const lineHeight = cardHeight + this.STANDARD_SPACING;
-    const cardsPerRow = Math.max(1, colCount);
-    const totalRowWidth = cardsPerRow * cardWidth + (cardsPerRow - 1) * this.STANDARD_SPACING;
-    let marginLeft = (poolWidth - totalRowWidth) / 2;
+    // ScrollBox for vertical scrolling
+    const scrollBox = new ScrollBox({
+      width: poolWidth,
+      height: poolHeight - marginTop,
+    });
+    scrollBox.x = 0;
+    scrollBox.y = marginTop;
 
-    if (this.poolScrollContainer) {
-      this.poolScrollContainer.destroy({children: true});
-    }
-    const scrollContainer = new Container();
-    this.poolScrollContainer = scrollContainer;
+    // Content container for cards
+    const content = new Container();
 
     this.availableCharacters.forEach((character, index) => {
       const col = index % cardsPerRow;
       const row = Math.floor(index / cardsPerRow);
 
-      const x = marginLeft + col * (cardWidth + this.STANDARD_SPACING);
-      const y = marginTop + row * lineHeight;
+      // Start from left padding
+      const x = padding + col * (cardWidth + spacing);
+      const y = row * (cardHeight + spacing);
+
       const characterCard = this.createPoolCharacterCard(character, x, y);
-      scrollContainer.addChild(characterCard);
+      characterCard.width = cardWidth;
+      characterCard.height = cardHeight;
+      content.addChild(characterCard);
     });
 
-    // Mask for scroll area
-    const mask = new Graphics();
-    mask.rect(0, 0, poolWidth, poolHeight).fill(0xffffff);
+    // Set content height for scrolling
+    const totalRows = Math.ceil(this.availableCharacters.length / cardsPerRow);
+    content.height = totalRows * (cardHeight + spacing);
 
-    poolContainer.addChild(mask, scrollContainer);
-    scrollContainer.mask = mask;
+    scrollBox.addItem(content);
 
-    poolContainer.addChild(poolBg, poolTitle, scrollContainer);
+    poolContainer.addChild(poolBg, poolTitle, scrollBox);
 
-    // Center horizontally with standard padding consideration
-    poolContainer.x = (this.gameWidth - poolWidth) / 2;
-    // Place below formation grid
-    const startY = 150;
-    const slotSize = 100;
-    const backRowY = startY + slotSize + this.STANDARD_SPACING;
-    const backRowBottom = backRowY + slotSize;
-    poolContainer.y = backRowBottom + this.STANDARD_SPACING * 2;
+    // Align pool to fit screen
+    poolContainer.x = this.STANDARD_PADDING;
+    poolContainer.y = poolTop;
 
     this.addChild(poolContainer);
   }
-
-  private updatePoolScrollBar() {
-    if (!this.poolScrollBar || this.poolMaxScroll === 0) {
-      if (this.poolScrollBar) this.poolScrollBar.visible = false;
-      return;
-    }
-    this.poolScrollBar.visible = true;
-    const visibleHeight = 140;
-    const contentHeight = this.poolScrollContainer
-      ? this.poolScrollContainer.height
-      : visibleHeight;
-    const scrollBarAreaHeight = visibleHeight - 20;
-    const barHeight = Math.max(30, scrollBarAreaHeight * (visibleHeight / contentHeight));
-    const barY = 10 + Math.abs(this.poolScrollOffset) * (scrollBarAreaHeight - barHeight) / (this.poolMaxScroll || 1);
-
-    this.poolScrollBar.clear();
-    this.poolScrollBar.fill({ color: 0xffffff, alpha: 0.5 })
-      .roundRect(0, barY, 6, barHeight, 3);
-    this.poolScrollBar.stroke({ width: 1, color: 0x8d6e63 });
-  }
-
-  private onPoolBarPointerMove = (event: any) => {
-    if (!this.poolScrolling || !this.poolScrollBar) return;
-    const visibleHeight = 140;
-    const contentHeight = this.poolScrollContainer
-      ? this.poolScrollContainer.height
-      : visibleHeight;
-    const scrollBarAreaHeight = visibleHeight - 20;
-    const barHeight = Math.max(30, scrollBarAreaHeight * (visibleHeight / contentHeight));
-    const deltaY = event.global.y - this.poolScrollStartY;
-    const scrollRange = scrollBarAreaHeight - barHeight;
-    let scrollRatio = 0;
-    if (scrollRange > 0) {
-      scrollRatio = deltaY / scrollRange;
-    }
-    let newOffset = this.poolScrollStartOffset - scrollRatio * this.poolMaxScroll;
-    newOffset = Math.max(Math.min(newOffset, 0), -this.poolMaxScroll);
-    this.poolScrollOffset = newOffset;
-    if (this.poolScrollContainer) {
-      this.poolScrollContainer.y = this.poolScrollOffset;
-    }
-    this.updatePoolScrollBar();
-  };
-
-  private onPoolBarPointerUp = () => {
-    this.poolScrolling = false;
-    this.off('pointermove', this.onPoolBarPointerMove);
-    this.off('pointerup', this.onPoolBarPointerUp);
-    this.off('pointerupoutside', this.onPoolBarPointerUp);
-  };
 
   private createPoolCharacterCard(character: any, x: number, y: number): Container {
     const card = this.createHeroCard(character, x, y, 'pool');
