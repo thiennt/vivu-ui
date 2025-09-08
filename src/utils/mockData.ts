@@ -225,7 +225,7 @@ export const mockPlayer = {
   exp: 3500,
   awaking: 2,
   star: 2,
-  points: 3,
+  points: 5,
   created_at: "2025-09-01T00:00:00.000Z",
   updated_at: "2025-09-08T06:00:00.000Z",
   sta: 12,
