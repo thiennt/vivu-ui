@@ -241,14 +241,12 @@ export class DungeonScene extends BaseScene {
 
   update(time: Ticker): void {
     // Animate background orbs
-    if (this.children[0] && this.children[0].children) {
-      this.children[0].children.forEach((child: any, index) => {
+    this.backgroundContainer.children.forEach((child: any, index) => {
       if (child instanceof Graphics) {
         child.alpha = 0.2 + Math.sin(Date.now() * 0.001 + index) * 0.1;
         child.x += Math.sin(Date.now() * 0.0005 + index) * 0.2;
         child.y += Math.cos(Date.now() * 0.0007 + index) * 0.15;
       }
-      });
-    }
+    });
   }
 }

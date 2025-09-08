@@ -76,7 +76,8 @@ export const mockCharacters = [
     damage: 0, mitigation: 8, hit_rate: 99, dodge: 7,
     equipped_skills: ["S1", "S2", "S3"], activeEffects: [],
     shields: {}, immunities: ["stun"],
-    level: 12, exp: 1800, points: 0, farcaster_id: "btc_fc", username: "BTC Paladin"
+    level: 12, exp: 1800, points: 0, farcaster_id: "btc_fc", username: "BTC Paladin",
+    rarity: "legendary"
   },
   {
     id: "2",
@@ -90,7 +91,8 @@ export const mockCharacters = [
     damage: 8, mitigation: 2, hit_rate: 97, dodge: 13,
     equipped_skills: ["S1", "S2"], activeEffects: [],
     shields: {}, immunities: [],
-    level: 10, exp: 1500, points: 0, farcaster_id: "eth_fc", username: "ETH Mage"
+    level: 10, exp: 1500, points: 0, farcaster_id: "eth_fc", username: "ETH Mage",
+    rarity: "epic"
   },
   {
     id: "3",
@@ -104,7 +106,8 @@ export const mockCharacters = [
     damage: 0, mitigation: 10, hit_rate: 98, dodge: 9,
     equipped_skills: ["S1", "S3"], activeEffects: [],
     shields: {}, immunities: ["poison"],
-    level: 11, exp: 1400, points: 0, farcaster_id: "ada_fc", username: "ADA Guardian"
+    level: 11, exp: 1400, points: 0, farcaster_id: "ada_fc", username: "ADA Guardian",
+    rarity: "rare"
   },
   {
     id: "4",
@@ -118,7 +121,8 @@ export const mockCharacters = [
     damage: 12, mitigation: 3, hit_rate: 99, dodge: 18,
     equipped_skills: ["S1", "S2"], activeEffects: [],
     shields: {}, immunities: [],
-    level: 9, exp: 1100, points: 0, farcaster_id: "sol_fc", username: "SOL Archer"
+    level: 9, exp: 1100, points: 0, farcaster_id: "sol_fc", username: "SOL Archer",
+    rarity: "rare"
   },
   {
     id: "5",
@@ -132,7 +136,8 @@ export const mockCharacters = [
     damage: 6, mitigation: 4, hit_rate: 97, dodge: 12,
     equipped_skills: ["S1", "S3"], activeEffects: [],
     shields: {}, immunities: [],
-    level: 8, exp: 900, points: 0, farcaster_id: "doge_fc", username: "DOGE Warrior"
+    level: 8, exp: 900, points: 0, farcaster_id: "doge_fc", username: "DOGE Warrior",
+    rarity: "common"
   },
   {
     id: "6",
@@ -146,7 +151,8 @@ export const mockCharacters = [
     damage: 4, mitigation: 5, hit_rate: 96, dodge: 13,
     equipped_skills: ["S1"], activeEffects: [],
     shields: {}, immunities: [],
-    level: 7, exp: 750, points: 0, farcaster_id: "bnb_fc", username: "BNB Monk"
+    level: 7, exp: 750, points: 0, farcaster_id: "bnb_fc", username: "BNB Monk",
+    rarity: "common"
   },
   {
     id: "7",
@@ -160,7 +166,8 @@ export const mockCharacters = [
     damage: 14, mitigation: 1, hit_rate: 99, dodge: 22,
     equipped_skills: ["S1", "S2"], activeEffects: [],
     shields: {}, immunities: [],
-    level: 8, exp: 840, points: 0, farcaster_id: "xrp_fc", username: "XRP Assassin"
+    level: 8, exp: 840, points: 0, farcaster_id: "xrp_fc", username: "XRP Assassin",
+    rarity: "epic"
   },
   {
     id: "8",
@@ -174,7 +181,8 @@ export const mockCharacters = [
     damage: 8, mitigation: 2, hit_rate: 98, dodge: 15,
     equipped_skills: ["S2"], activeEffects: [],
     shields: {}, immunities: [],
-    level: 7, exp: 700, points: 0, farcaster_id: "avax_fc", username: "AVAX Sorceress"
+    level: 7, exp: 700, points: 0, farcaster_id: "avax_fc", username: "AVAX Sorceress",
+    rarity: "rare"
   },
   {
     id: "9",
@@ -188,7 +196,8 @@ export const mockCharacters = [
     damage: 6, mitigation: 4, hit_rate: 97, dodge: 14,
     equipped_skills: ["S1"], activeEffects: [],
     shields: {}, immunities: [],
-    level: 6, exp: 600, points: 0, farcaster_id: "matic_fc", username: "MATIC Ranger"
+    level: 6, exp: 600, points: 0, farcaster_id: "matic_fc", username: "MATIC Ranger",
+    rarity: "common"
   },
   {
     id: "10",
@@ -202,7 +211,8 @@ export const mockCharacters = [
     damage: 10, mitigation: 3, hit_rate: 97, dodge: 10,
     equipped_skills: ["S1", "S3"], activeEffects: [],
     shields: {}, immunities: [],
-    level: 7, exp: 690, points: 0, farcaster_id: "ltc_fc", username: "LTC Berserker"
+    level: 7, exp: 690, points: 0, farcaster_id: "ltc_fc", username: "LTC Berserker",
+    rarity: "common"
   }
 ];
 

@@ -383,6 +383,16 @@ export class FormationScene extends BaseScene {
       y: event.global.y - (globalCardPos?.y || 0)
     };
 
+    // Move card to top layer (app.stage) for dragging above all
+    const globalPos = card.parent?.toGlobal({ x: card.x, y: card.y });
+    if (card.parent) {
+      card.parent.removeChild(card);
+    }
+    app.stage.addChild(card);
+    if (globalPos) {
+      card.position.set(globalPos.x, globalPos.y);
+    }
+
     // Attach pointermove to stage
     app.stage.on('pointermove', this.onDragMove, this);
   }
@@ -461,6 +471,11 @@ export class FormationScene extends BaseScene {
         this.availableCharacters.push((this.dragTarget as any).character);
       }
       this.refreshFormation();
+    }
+
+    // Remove dragTarget from stage (refreshFormation will re-create all cards in correct containers)
+    if (this.dragTarget.parent) {
+      this.dragTarget.parent.removeChild(this.dragTarget);
     }
 
     this.isDragging = false;

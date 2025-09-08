@@ -105,8 +105,6 @@ export class CharacterDetailScene extends BaseScene {
   }
 
   private createCharacterInfo(): void {
-    const infoContainer = new Container();
-
     // Responsive card width: 1/3 of screen
     const panelPadding = 10;
     const panelWidth = Math.floor(this.gameWidth / 3) - panelPadding * 1.5;
@@ -179,21 +177,7 @@ export class CharacterDetailScene extends BaseScene {
     rarityText.x = centerX;
     rarityText.y = 180;
 
-    // Element
-    const elementText = new Text({
-      text: `Element: ${this.character!.element.toUpperCase()}`,
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 12,
-        fill: 0xd7ccc8,
-        align: 'center'
-      }
-    });
-    elementText.anchor.set(0.5);
-    elementText.x = centerX;
-    elementText.y = 210;
-
-    largeCard.addChild(symbolText, levelText, expText, rarityText, elementText);
+    largeCard.addChild(symbolText, levelText, expText, rarityText);
 
     // Position infoContainer with padding
     this.infoContainer.x = panelPadding;
