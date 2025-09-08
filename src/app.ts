@@ -54,51 +54,49 @@ async function init() {
     return;
   }
   
-  // Initialize the PixiJS application
-  await app.init({
-    canvas: canvas,
-    backgroundColor: Colors.BACKGROUND_PRIMARY,
-    antialias: true,
-    resolution: Math.max(window.devicePixelRatio, 2),
-    autoDensity: true
-  });
+  try {
+    // Initialize the PixiJS application
+    await app.init({
+      canvas: canvas,
+      backgroundColor: Colors.BACKGROUND_PRIMARY,
+      antialias: true,
+      resolution: Math.max(window.devicePixelRatio, 2),
+      autoDensity: true
+    });
 
-  // Center the canvas in the page
-  canvas.style.display = 'block';
-  canvas.style.margin = 'auto';
+    // Center the canvas in the page
+    canvas.style.display = 'block';
+    canvas.style.margin = 'auto';
 
-  // Canvas is already in the HTML, no need to append it again
-  // Add pixi canvas element to the document's body
-  // const gameContainer = document.getElementById('game-container');
-  // if (gameContainer) {
-  //   gameContainer.appendChild(canvas);
-  // } else {
-  //   document.body.appendChild(canvas);
-  // }
+    // Whenever the window resizes, call the 'resize' function
+    window.addEventListener("resize", resize);
 
-  // Whenever the window resizes, call the 'resize' function
-  window.addEventListener("resize", resize);
+    // Trigger the first resize
+    resize();
 
-  // Trigger the first resize
-  resize();
+    // Add a visibility listener, so the app can pause sounds and screens
+    document.addEventListener("visibilitychange", visibilityChange);
 
-  // Add a visibility listener, so the app can pause sounds and screens
-  document.addEventListener("visibilitychange", visibilityChange);
+    // Setup assets bundles (see assets.ts) and start up loading everything in background
+    await initAssets();
 
-  // Setup assets bundles (see assets.ts) and start up loading everything in background
-  await initAssets();
+    // Add a persisting background shared by all screens
+    //navigation.setBackground(TiledBackground);
 
-  // Add a persisting background shared by all screens
-  //navigation.setBackground(TiledBackground);
+    // Show initial loading screen
+    //await navigation.showScreen(HomeScene);
 
-  // Show initial loading screen
-  //await navigation.showScreen(HomeScene);
-
-  //Go to one of the screens if a shortcut is present in url params, otherwise go to home screen
-  if (getUrlParam("combat") !== null) {
-    //await navigation.showScreen(CombatScreen);
-  } else {
-    await navigation.showScreen(HomeScene);
+    //Go to one of the screens if a shortcut is present in url params, otherwise go to home screen
+    if (getUrlParam("combat") !== null) {
+      //await navigation.showScreen(CombatScreen);
+    } else {
+      await navigation.showScreen(HomeScene);
+    }
+    
+    // Make app available globally for debugging
+    (window as any).app = app;
+  } catch (error) {
+    console.error('Error during app initialization:', error);
   }
 }
 
