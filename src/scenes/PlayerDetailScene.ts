@@ -50,7 +50,7 @@ export class PlayerDetailScene extends BaseScene {
       [
         `Username: ${mockPlayer.username}`,
         `Level: ${mockPlayer.level}`,
-        `Experience: ${mockPlayer.experience}`,
+        `Experience: ${mockPlayer.exp}`,
         `Characters: ${mockPlayer.characters.length}`
       ],
       panelWidth, 160
@@ -60,12 +60,12 @@ export class PlayerDetailScene extends BaseScene {
     const statsPanel = this.createStatsPanel(
       'Statistics',
       [
-        `Stamina: ${mockPlayer.stats.stamina}`,
-        `Strength: ${mockPlayer.stats.strength}`,
-        `Agility: ${mockPlayer.stats.agility}`,
-        `Luck: ${mockPlayer.stats.luck}`,
-        `Intelligence: ${mockPlayer.stats.intelligence}`,
-        `Vitality: ${mockPlayer.stats.vitality}`
+        `Stamina: ${mockPlayer.sta}`,
+        `Strength: ${mockPlayer.str}`,
+        `Agility: ${mockPlayer.agi}`,
+        `Luck: ${mockPlayer.luck}`,
+        `Intelligence: N/A`,
+        `Vitality: N/A`
       ],
       panelWidth, 200
     );

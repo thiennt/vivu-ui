@@ -30,10 +30,10 @@ export class FormationScene extends BaseScene {
 
   constructor() {
     super();
-    this.formationPositions = [...mockPlayer.formation.positions];
+    this.formationPositions = [...mockPlayer.formation.positions] as any[];
     this.availableCharacters = mockPlayer.characters.filter(
-      char => !this.formationPositions.includes(char)
-    );
+      char => !this.formationPositions.includes(char as any)
+    ) as any[];
   }
 
   // Utility: Clean up any floating/dragged card and any card that is a direct child of the scene
@@ -502,7 +502,7 @@ export class FormationScene extends BaseScene {
       buttonWidth,
       buttonHeight,
       () => {
-        mockPlayer.formation.positions = [...this.formationPositions];
+        mockPlayer.formation.positions = [...this.formationPositions] as any;
         alert('Formation saved successfully!');
       }
     );
@@ -523,8 +523,8 @@ export class FormationScene extends BaseScene {
         });
         // Remove filled characters from pool
         this.availableCharacters = mockPlayer.characters.filter(
-          char => !this.formationPositions.includes(char)
-        );
+          char => !this.formationPositions.includes(char as any)
+        ) as any;
         this.refreshFormation();
       }
     );

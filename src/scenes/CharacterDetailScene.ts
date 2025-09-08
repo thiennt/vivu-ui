@@ -175,12 +175,12 @@ export class CharacterDetailScene extends BaseScene {
 
     // Stats
     const stats = [
-      { name: 'Health', value: this.character!.stats.health, color: 0x4caf50 },
-      { name: 'Attack', value: this.character!.stats.attack, color: 0xf44336 },
-      { name: 'Defense', value: this.character!.stats.defense, color: 0x2196f3 },
-      { name: 'Speed', value: this.character!.stats.speed, color: 0xffeb3b },
-      { name: 'Crit Rate', value: this.character!.stats.criticalRate + '%', color: 0xff9800 },
-      { name: 'Crit Damage', value: this.character!.stats.criticalDamage + '%', color: 0x9c27b0 }
+      { name: 'Health', value: (this.character as any)!.hp, color: 0x4caf50 },
+      { name: 'Attack', value: (this.character as any)!.atk, color: 0xf44336 },
+      { name: 'Defense', value: (this.character as any)!.def, color: 0x2196f3 },
+      { name: 'Speed', value: (this.character as any)!.agi, color: 0xffeb3b },
+      { name: 'Crit Rate', value: (this.character as any)!.crit_rate + '%', color: 0xff9800 },
+      { name: 'Crit Damage', value: (this.character as any)!.crit_dmg + '%', color: 0x9c27b0 }
     ];
 
     const maxValue = Math.max(...stats.filter(s => typeof s.value === 'number').map(s => s.value as number));
