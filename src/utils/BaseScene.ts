@@ -33,6 +33,20 @@ export abstract class BaseScene extends Container {
   }
 
   /**
+   * Clean up all children to prevent duplicates on resize
+   * This should be called before recreating UI elements
+   */
+  protected cleanupBeforeResize(): void {
+    // Remove all children and destroy them properly
+    this.children.forEach(child => {
+      if (child && typeof (child as any).destroy === 'function') {
+        (child as any).destroy({ children: true });
+      }
+    });
+    this.removeChildren();
+  }
+
+  /**
    * Creates a centered container with standard padding
    */
   protected createCenteredContainer(

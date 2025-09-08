@@ -24,6 +24,7 @@ export class StageScene extends BaseScene {
       return;
     }
 
+    this.cleanupBeforeResize();
     this.createBackground();
     this.createHeader();
     //this.createStageSelector();

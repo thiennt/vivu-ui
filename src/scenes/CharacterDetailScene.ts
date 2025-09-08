@@ -26,6 +26,7 @@ export class CharacterDetailScene extends BaseScene {
       return;
     }
 
+    this.cleanupBeforeResize();
     this.createBackground();
     this.createHeader();
     this.createCharacterInfo();

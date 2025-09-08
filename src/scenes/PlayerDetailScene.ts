@@ -17,6 +17,7 @@ export class PlayerDetailScene extends BaseScene {
     this.gameWidth = width;
     this.gameHeight = height;
 
+    this.cleanupBeforeResize();
     this.createBackground();
     this.createHeader();
     this.createPlayerStats();

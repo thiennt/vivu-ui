@@ -55,6 +55,7 @@ export class FormationScene extends BaseScene {
   resize(width: number, height: number): void {
     this.gameWidth = width;
     this.gameHeight = height;
+    this.cleanupBeforeResize();
     this.createBackground();
     this.createHeader();
     this.createFormationGrid();
