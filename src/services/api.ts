@@ -4,7 +4,7 @@
  */
 
 // Base API configuration
-const API_BASE_URL = process.env.VITE_API_BASE_URL || 'https://api.vivu.game';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.vivu.game';
 
 // API Response wrapper interface
 interface ApiResponse<T> {
