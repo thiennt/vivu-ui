@@ -2,6 +2,7 @@ import { Application } from 'pixi.js';
 import { initDevtools } from '@pixi/devtools';
 import { navigation } from './utils/navigation';
 import { HomeScene } from './scenes/HomeScene';
+import { PlayerDetailScene } from './scenes/PlayerDetailScene';
 import { initAssets } from "./utils/assets";
 import { getUrlParam } from './utils/getUrlParams';
 import { Colors } from './utils/colors';
@@ -94,11 +95,14 @@ async function init() {
   // Show initial loading screen
   //await navigation.showScreen(HomeScene);
 
-  //Go to one of the screens if a shortcut is present in url params, otherwise go to home screen
+  //Go to one of the screens if a shortcut is present in url params, otherwise go to player detail screen for testing
   if (getUrlParam("combat") !== null) {
     //await navigation.showScreen(CombatScreen);
-  } else {
+  } else if (getUrlParam("home") !== null) {
     await navigation.showScreen(HomeScene);
+  } else {
+    // Temporarily show PlayerDetailScene directly for testing
+    await navigation.showScreen(PlayerDetailScene);
   }
 }
 
