@@ -196,8 +196,7 @@ export class StageScene extends BaseScene {
   }
 
   private createStageList(): void {
-    const stageContainer = new Container();
-    stageContainer.label = 'stageContainer';
+    this.stageContainer.label = 'stageContainer';
     
     const stages = this.dungeon!.stages;
     if (stages.length > 0) {
@@ -216,17 +215,17 @@ export class StageScene extends BaseScene {
         
         stageCard.x = col * (cardWidth + cardSpacing);
         stageCard.y = row * (cardHeight + cardSpacing);
-        stageContainer.addChild(stageCard);
+        this.stageContainer.addChild(stageCard);
       });
       
       // Center the stage grid
-      stageContainer.x = (this.gameWidth - gridWidth) / 2;
+      this.stageContainer.x = (this.gameWidth - gridWidth) / 2;
     } else {
-      stageContainer.x = (this.gameWidth - 600) / 2;
+      this.stageContainer.x = (this.gameWidth - 600) / 2;
     }
-    
-    stageContainer.y = 240;
-    this.stageContainer.addChild(stageContainer);
+
+    this.stageContainer.y = 120;
+    this.addChild(this.stageContainer);
   }
 
   private createStageCard(stage: any, index: number): Container {
