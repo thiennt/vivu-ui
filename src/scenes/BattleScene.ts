@@ -96,7 +96,7 @@ export class BattleScene extends BaseScene {
 
   private createBackground(): void {
     const bg = new Graphics();
-    bg.fill(Colors.BACKGROUND_PRIMARY).rect(0, 0, this.gameWidth, this.gameHeight);
+  bg.rect(0, 0, this.gameWidth, this.gameHeight).fill(Colors.BACKGROUND_PRIMARY);
     this.container.addChild(bg);
     
     // Add title
@@ -126,42 +126,60 @@ export class BattleScene extends BaseScene {
     // Create containers for each team
     this.team1Container = new Container();
     this.team2Container = new Container();
-    
+
     const cardWidth = 100;
     const spacing = 15;
-    const teamWidth = (cardWidth + spacing) * 4 - spacing; // 4 characters in a row
-    
-    // Position enemies (team 1) at the top
+    const rowSpacing = 20;
+    const cardsPerRow = 2;
+    const teamWidth = (cardWidth + spacing) * cardsPerRow - spacing;
+
+    // Team 1 (enemies) at the top
     const team1X = this.gameWidth / 2 - teamWidth / 2;
-    const team1Y = 80; // Top area
-    
-    // Position allies (team 2) at the bottom
+    const team1Y = 100;
+
+    // Team 2 (allies) at the bottom
     const team2X = this.gameWidth / 2 - teamWidth / 2;
-    const team2Y = this.gameHeight - 200; // Bottom area
-    
-    // Create team 1 cards (enemies) - 4 in a row at top
-    this.team1.forEach((character, index) => {
+    const team2Y = this.gameHeight - 300;
+
+    // Split into front and back rows
+    const team1Front = this.team1.slice(0, 2);
+    const team1Back = this.team1.slice(2, 4);
+    const team2Front = this.team2.slice(0, 2);
+    const team2Back = this.team2.slice(2, 4);
+
+    // Team 1: back row (top), then front row (closer to center)
+    team1Back.forEach((character, index) => {
       const x = index * (cardWidth + spacing);
       const y = 0;
-      
       const card = this.createBattleCard(character, x, y);
       this.team1Container.addChild(card);
     });
-    
-    // Create team 2 cards (allies) - 4 in a row at bottom
-    this.team2.forEach((character, index) => {
+    team1Front.forEach((character, index) => {
+      const x = index * (cardWidth + spacing);
+      const y = cardWidth + rowSpacing;
+      const card = this.createBattleCard(character, x, y);
+      this.team1Container.addChild(card);
+    });
+
+    // Team 2: front row (closer to center), then back row (bottom)
+    team2Front.forEach((character, index) => {
       const x = index * (cardWidth + spacing);
       const y = 0;
-      
       const card = this.createBattleCard(character, x, y);
       this.team2Container.addChild(card);
     });
-    
+    team2Back.forEach((character, index) => {
+      const x = index * (cardWidth + spacing);
+      const y = cardWidth + rowSpacing;
+      const card = this.createBattleCard(character, x, y);
+      this.team2Container.addChild(card);
+    });
+
     this.team1Container.x = team1X;
     this.team1Container.y = team1Y;
     this.team2Container.x = team2X;
     this.team2Container.y = team2Y;
-    
+
     // Add team labels
     const team1Label = new Text({
       text: 'Enemies',
@@ -175,7 +193,7 @@ export class BattleScene extends BaseScene {
     team1Label.anchor.set(0.5);
     team1Label.x = this.gameWidth / 2;
     team1Label.y = team1Y - 30;
-    
+
     const team2Label = new Text({
       text: 'Allies',
       style: {
@@ -188,7 +206,7 @@ export class BattleScene extends BaseScene {
     team2Label.anchor.set(0.5);
     team2Label.x = this.gameWidth / 2;
     team2Label.y = team2Y - 30;
-    
+
     this.container.addChild(this.team1Container, this.team2Container, team1Label, team2Label);
   }
 
@@ -342,7 +360,7 @@ export class BattleScene extends BaseScene {
     
     this.logContainer.addChild(logBg, logTitle);
     this.logContainer.x = 20;
-    this.logContainer.y = this.gameHeight - 120;
+    this.logContainer.y = this.gameHeight - 400;
     
     this.container.addChild(this.logContainer);
   }
@@ -433,13 +451,23 @@ export class BattleScene extends BaseScene {
         break;
       case 'fire':
         // Glow and shake effect
+        await gsap.to(card.scale, { 
+          x: 1.1, 
+          y: 1.1, 
+          duration: 0.15, 
+          ease: 'power2.inOut' 
+        });
         await gsap.to(card, { 
-          scaleX: 1.1, 
-          scaleY: 1.1, 
           rotation: 0.1, 
-          duration: 0.3, 
+          duration: 0.15, 
           yoyo: true, 
           repeat: 1,
+          ease: 'power2.inOut' 
+        });
+        await gsap.to(card.scale, { 
+          x: 1, 
+          y: 1, 
+          duration: 0.15, 
           ease: 'power2.inOut' 
         });
         break;
@@ -455,10 +483,10 @@ export class BattleScene extends BaseScene {
         break;
       default:
         // Default punch animation
-        await gsap.to(card, { 
-          scaleX: 1.05, 
-          scaleY: 1.05, 
-          duration: 0.15, 
+        await gsap.to(card.scale, { 
+          x: 1.05, 
+          y: 1.05, 
+          duration: 0.075, 
           yoyo: true, 
           repeat: 1,
           ease: 'power2.inOut' 
@@ -472,39 +500,35 @@ export class BattleScene extends BaseScene {
     const targetY = targetCard.y + (targetCard.parent?.y || 0) + 60;
     
     switch (actionType) {
-      case 'slash':
+      case 'slash': {
         // Slash effect - diagonal line
-        effect.fill(0xFFFFFF)
-          .rect(-2, -20, 4, 40)
-          .fill(0xFFAA00)
-          .rect(-1, -20, 2, 40);
+        effect.rect(-2, -20, 4, 40).fill(0xFFFFFF);
+        effect.rect(-1, -20, 2, 40).fill(0xFFAA00);
         effect.rotation = Math.PI / 4;
         break;
-      case 'fire':
+      }
+      case 'fire': {
         // Fire burst effect
-        effect.fill(0xFF4444)
-          .circle(0, 0, 25)
-          .fill(0xFF8800)
-          .circle(0, 0, 15)
-          .fill(0xFFDD00)
-          .circle(0, 0, 8);
+        effect.circle(0, 0, 25).fill(0xFF4444);
+        effect.circle(0, 0, 15).fill(0xFF8800);
+        effect.circle(0, 0, 8).fill(0xFFDD00);
         break;
-      case 'ice':
+      }
+      case 'ice': {
         // Ice shard effect
-        effect.fill(0x88DDFF)
-          .moveTo(0, -15)
+        effect.moveTo(0, -15)
           .lineTo(10, 15)
           .lineTo(-10, 15)
           .closePath()
-          .fill(0xAAEEFF)
-          .circle(0, 0, 8);
+          .fill(0x88DDFF);
+        effect.circle(0, 0, 8).fill(0xAAEEFF);
         break;
-      default:
+      }
+      default: {
         // Default impact effect
-        effect.fill(0xFFFFFF)
-          .circle(0, 0, 20)
-          .fill(0xFFDD00)
-          .circle(0, 0, 12);
+        effect.circle(0, 0, 20).fill(0xFFFFFF);
+        effect.circle(0, 0, 12).fill(0xFFDD00);
+      }
     }
     
     effect.x = targetX;
@@ -513,7 +537,9 @@ export class BattleScene extends BaseScene {
     effect.scale.set(0.5);
     
     this.effectsContainer.addChild(effect);
-    
+
+    console.log('Animating effect', effect);
+
     // Animate effect
     await gsap.to(effect, { 
       alpha: 1, 
