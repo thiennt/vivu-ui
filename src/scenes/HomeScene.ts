@@ -6,6 +6,7 @@ import { CharactersScene } from './CharactersScene';
 import { DungeonScene } from './DungeonScene';
 import { PlayerDetailScene } from './PlayerDetailScene';
 import { FormationScene } from './FormationScene';
+import { BattleScene } from './BattleScene';
 import { app } from '@/app';
 import { Colors } from '@/utils/colors';
 
@@ -224,6 +225,7 @@ export class HomeScene extends BaseScene {
     const buttons = [
       { text: 'Adventure', screen: DungeonScene },
       { text: 'Characters', screen: CharactersScene },
+      { text: 'Battle Arena', screen: BattleScene },
       { text: 'Player Profile', screen: PlayerDetailScene },
       { text: 'Formation', screen: FormationScene },
     ];

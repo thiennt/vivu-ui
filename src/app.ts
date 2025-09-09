@@ -95,14 +95,17 @@ async function init() {
   // Show initial loading screen
   //await navigation.showScreen(HomeScene);
 
-  //Go to one of the screens if a shortcut is present in url params, otherwise go to player detail screen for testing
+  //Go to one of the screens if a shortcut is present in url params, otherwise go to home screen
   if (getUrlParam("combat") !== null) {
     //await navigation.showScreen(CombatScreen);
+  } else if (getUrlParam("battle") !== null) {
+    const { BattleScene } = await import('./scenes/BattleScene');
+    await navigation.showScreen(BattleScene);
   } else if (getUrlParam("home") !== null) {
     await navigation.showScreen(HomeScene);
   } else {
-    // Temporarily show PlayerDetailScene directly for testing
-    await navigation.showScreen(PlayerDetailScene);
+    // Show HomeScene by default for easier navigation
+    await navigation.showScreen(HomeScene);
   }
 }
 
