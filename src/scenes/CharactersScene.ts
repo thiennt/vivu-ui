@@ -1,11 +1,12 @@
 import { Container, Graphics, Text, Ticker } from 'pixi.js';
 import { navigation } from '@/utils/navigation';
-import { mockCharacters } from '@/utils/mockData';
 import { HomeScene } from './HomeScene';
 import { BaseScene } from '@/utils/BaseScene';
 import { Colors } from '@/utils/colors';
 import { CharacterDetailScene } from './CharacterDetailScene';
 import { ScrollBox } from '@pixi/ui';
+import { charactersApi, ApiError, isLikelyUsingMockData } from '@/services/api';
+import { LoadingStateManager } from '@/utils/loadingStateManager';
 
 export class CharactersScene extends BaseScene {
   /** Assets bundles required by this screen */
@@ -13,6 +14,8 @@ export class CharactersScene extends BaseScene {
   
   private scrollOffset: number = 0;
   private maxScroll: number = 0;
+  private characters: any[] = [];
+  private loadingManager: LoadingStateManager;
   
   // UI containers
   public container: Container;
@@ -41,11 +44,31 @@ export class CharactersScene extends BaseScene {
       this.buttonContainer
     );
     
-    // Create UI once
+    // Initialize loading manager
+    this.loadingManager = new LoadingStateManager(this.container, this.gameWidth, this.gameHeight);
+    
+    // Load data and create UI
+    this.loadCharactersData();
+  }
+  
+  private async loadCharactersData(): Promise<void> {
+    this.loadingManager.showLoading();
+    
+    this.characters = await charactersApi.getAllCharacters();
+    
+    this.loadingManager.hideLoading();
+    
+    // Show mock data indicator if we're likely using mock data
+    if (isLikelyUsingMockData()) {
+      this.loadingManager.showMockDataIndicator();
+    }
+    
     this.initializeUI();
   }
   
   private initializeUI(): void {
+    if (!this.characters.length) return;
+    
     this.createBackground();
     this.createHeader();
     this.createCharacterGrid();
@@ -57,8 +80,13 @@ export class CharactersScene extends BaseScene {
     this.gameWidth = width;
     this.gameHeight = height;
     
-    // Update UI layout without recreating
-    this.updateLayout();
+    // Update loading manager dimensions
+    this.loadingManager.updateDimensions(width, height);
+    
+    // Only update layout if we have loaded data
+    if (this.characters.length > 0) {
+      this.updateLayout();
+    }
   }
   
   private updateLayout(): void {
@@ -133,7 +161,7 @@ export class CharactersScene extends BaseScene {
     const title = this.createTitle('Character Collection', this.gameWidth / 2, 60);
 
     const subtitle = new Text({
-      text: `${mockCharacters.length} Characters`,
+      text: `${this.characters.length} Characters`,
       style: {
         fontFamily: 'Kalam',
         fontSize: 18,
@@ -171,7 +199,7 @@ export class CharactersScene extends BaseScene {
     // Create a container for all cards
     const gridContent = new Container();
 
-    mockCharacters.forEach((character, index) => {
+    this.characters.forEach((character, index) => {
       const row = Math.floor(index / layout.itemsPerRow);
       const col = index % layout.itemsPerRow;
 
@@ -190,7 +218,7 @@ export class CharactersScene extends BaseScene {
     });
 
     // Set content height for scrolling
-    const totalRows = Math.ceil(mockCharacters.length / layout.itemsPerRow);
+    const totalRows = Math.ceil(this.characters.length / layout.itemsPerRow);
     const contentHeight = totalRows * (cardHeight + this.STANDARD_SPACING);
 
     // Create ScrollBox for vertical scrolling

@@ -1,10 +1,11 @@
 import { Graphics, Text, Container, Ticker } from 'pixi.js';
 import { BaseScene } from '@/utils/BaseScene';
-import { mockDungeons } from '@/utils/mockData';
 import { navigation } from '@/utils/navigation';
 import { HomeScene } from './HomeScene';
 import { StageScene } from './StageScene';
 import { Colors } from '@/utils/colors';
+import { dungeonsApi, ApiError, isLikelyUsingMockData } from '@/services/api';
+import { LoadingStateManager } from '@/utils/loadingStateManager';
 
 export class DungeonScene extends BaseScene {
   // UI containers
@@ -13,6 +14,10 @@ export class DungeonScene extends BaseScene {
   private headerContainer: Container;
   private listContainer: Container;
   private buttonContainer: Container;
+  
+  // Data state
+  private dungeons: any[] = [];
+  private loadingManager: LoadingStateManager;
 
   constructor() {
     super();
@@ -32,11 +37,31 @@ export class DungeonScene extends BaseScene {
       this.buttonContainer
     );
     
-    // Create UI once
+    // Initialize loading manager
+    this.loadingManager = new LoadingStateManager(this.container, this.gameWidth, this.gameHeight);
+    
+    // Load data and create UI
+    this.loadDungeonsData();
+  }
+  
+  private async loadDungeonsData(): Promise<void> {
+    this.loadingManager.showLoading();
+    
+    this.dungeons = await dungeonsApi.getAllDungeons();
+    
+    this.loadingManager.hideLoading();
+    
+    // Show mock data indicator if we're likely using mock data
+    if (isLikelyUsingMockData()) {
+      this.loadingManager.showMockDataIndicator();
+    }
+    
     this.initializeUI();
   }
   
   private initializeUI(): void {
+    if (!this.dungeons.length) return;
+    
     this.createBackground();
     this.createHeader();
     this.createDungeonList();
@@ -48,8 +73,13 @@ export class DungeonScene extends BaseScene {
     this.gameWidth = width;
     this.gameHeight = height;
 
-    // Update UI layout without recreating
-    this.updateLayout();
+    // Update loading manager dimensions
+    this.loadingManager.updateDimensions(width, height);
+
+    // Only update layout if we have loaded data
+    if (this.dungeons.length > 0) {
+      this.updateLayout();
+    }
   }
   
   private updateLayout(): void {
@@ -110,7 +140,7 @@ export class DungeonScene extends BaseScene {
     const cardHeight = 160;
     const startY = 150;
     
-    mockDungeons.forEach((dungeon, index) => {
+    this.dungeons.forEach((dungeon, index) => {
       const dungeonCard = this.createDungeonCard(dungeon, index, cardWidth, cardHeight);
       dungeonCard.x = (this.gameWidth - cardWidth) / 2; // Center each card
       dungeonCard.y = startY + (index * (cardHeight + this.STANDARD_SPACING));

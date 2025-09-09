@@ -1,15 +1,17 @@
 import { Container, Graphics, Text, Ticker } from 'pixi.js';
-import { Character } from '@/types';
 import { navigation } from '@/utils/navigation';
 import { HomeScene } from './HomeScene';
 import { BaseScene } from '@/utils/BaseScene';
 import { CharactersScene } from './CharactersScene';
-import { mockSkills } from '@/utils/mockData';
+import { charactersApi, ApiError, isLikelyUsingMockData } from '@/services/api';
+import { LoadingStateManager } from '@/utils/loadingStateManager';
 
 export class CharacterDetailScene extends BaseScene {
   /** Assets bundles required by this screen */
   public static assetBundles = [];
   private character: any = null;
+  private characterSkills: any[] = [];
+  private loadingManager: LoadingStateManager;
   
   // UI containers
   public container: Container;
@@ -47,7 +49,31 @@ export class CharacterDetailScene extends BaseScene {
       this.buttonContainer
     );
     
-    // Create UI once
+    // Initialize loading manager
+    this.loadingManager = new LoadingStateManager(this.container, this.gameWidth, this.gameHeight);
+    
+    // Load character data and create UI
+    this.loadCharacterData();
+  }
+  
+  private async loadCharacterData(): Promise<void> {
+    if (!this.character || !this.character.id) {
+      navigation.showScreen(HomeScene);
+      return;
+    }
+
+    this.loadingManager.showLoading();
+    
+    // Load character skills
+    this.characterSkills = await charactersApi.getCharacterSkills(this.character.id);
+    
+    this.loadingManager.hideLoading();
+    
+    // Show mock data indicator if we're likely using mock data
+    if (isLikelyUsingMockData()) {
+      this.loadingManager.showMockDataIndicator();
+    }
+    
     this.initializeUI();
   }
   
@@ -69,6 +95,9 @@ export class CharacterDetailScene extends BaseScene {
   resize(width: number, height: number): void {
     this.gameWidth = width;
     this.gameHeight = height;
+    
+    // Update loading manager dimensions
+    this.loadingManager.updateDimensions(width, height);
     
     if (!this.character) {
       navigation.showScreen(HomeScene);
@@ -344,8 +373,7 @@ export class CharacterDetailScene extends BaseScene {
     // Skills layout - one per row
     let y = 45;
     
-    this.character!.equipped_skills.forEach((skillId: string, index: number) => {
-      const skill = mockSkills.find(s => s.id === skillId);
+    this.characterSkills.forEach((skill, index: number) => {
       if (!skill) return;
       
       // Skill type badge
