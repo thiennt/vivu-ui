@@ -5,7 +5,7 @@ export interface Player {
   experience: number;
   stats: PlayerStats;
   characters: Character[];
-  formation: Formation;
+  lineup: Lineup;
   progress: GameProgress;
 }
 
@@ -28,7 +28,7 @@ export interface Character {
   stats: CharacterStats;
   skills: Skill[];
   element: Element;
-  position?: FormationPosition;
+  position?: LineupPosition;
 }
 
 export interface CharacterStats {
@@ -50,12 +50,12 @@ export interface Skill {
   type: SkillType;
 }
 
-export interface Formation {
+export interface Lineup {
   positions: (Character | null)[];
   maxSize: number;
 }
 
-export interface FormationPosition {
+export interface LineupPosition {
   x: number;
   y: number;
   row: number; // front, middle, back

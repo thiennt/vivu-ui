@@ -233,7 +233,7 @@ export const mockPlayer = {
   agi: 14,
   luck: 9,
   characters: ["1","2","3","4","5","6","7","8","9","10"],
-  formation: {
+  lineup: {
     positions: ["1", "2", null, null]
   },
   inventory: [

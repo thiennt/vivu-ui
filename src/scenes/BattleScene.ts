@@ -96,24 +96,24 @@ export class BattleScene extends BaseScene {
 
   private createBackground(): void {
     const bg = new Graphics();
-  bg.rect(0, 0, this.gameWidth, this.gameHeight).fill(Colors.BACKGROUND_PRIMARY);
+    bg.rect(0, 0, this.gameWidth, this.gameHeight).fill(Colors.BACKGROUND_PRIMARY);
     this.container.addChild(bg);
     
-    // Add title
-    const title = new Text({
-      text: '4v4 Battle Arena',
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 32,
-        fontWeight: 'bold',
-        fill: Colors.TEXT_PRIMARY,
-        align: 'center'
-      }
-    });
-    title.anchor.set(0.5);
-    title.x = this.gameWidth / 2;
-    title.y = 30;
-    this.container.addChild(title);
+    // // Add title
+    // const title = new Text({
+    //   text: '4v4 Battle Arena',
+    //   style: {
+    //     fontFamily: 'Kalam',
+    //     fontSize: 32,
+    //     fontWeight: 'bold',
+    //     fill: Colors.TEXT_PRIMARY,
+    //     align: 'center'
+    //   }
+    // });
+    // title.anchor.set(0.5);
+    // title.x = this.gameWidth / 2;
+    // title.y = 30;
+    // this.container.addChild(title);
   }
 
   private createEffectsContainer(): void {
@@ -141,7 +141,7 @@ export class BattleScene extends BaseScene {
     const logMargin = 30;
 
     // Calculate vertical positions
-    const totalUsedHeight = teamBlockHeight * 2 + logHeight + logMargin * 2;
+    const totalUsedHeight = teamBlockHeight * 2 + logHeight + logMargin * 2 + 5;
     const verticalPadding = Math.max(0, (this.gameHeight - totalUsedHeight) / 2);
 
     // Team 1 (enemies) at the top

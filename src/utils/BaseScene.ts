@@ -187,14 +187,14 @@ export abstract class BaseScene extends Container {
     character: any,
     x: number,
     y: number,
-    cardType: 'preview' | 'detailed' | 'formation' | 'pool' = 'detailed',
+    cardType: 'preview' | 'detailed' | 'lineup' | 'pool' = 'detailed',
     positionIndex?: number
   ): Container {
     // Define card dimensions based on type
     const cardSizes = {
       preview: { width: 120, height: 140 },
       detailed: { width: 140, height: 180 },
-      formation: { width: 100, height: 100 },
+      lineup: { width: 100, height: 100 },
       pool: { width: 90, height: 90 }
     };
     
@@ -216,7 +216,7 @@ export abstract class BaseScene extends Container {
     });
     symbolText.anchor.set(0.5);
     symbolText.x = width / 2;
-    symbolText.y = cardType === 'formation' || cardType === 'pool' ? height / 2 - 15 : 25;
+    symbolText.y = cardType === 'lineup' || cardType === 'pool' ? height / 2 - 15 : 25;
     
     // Level text - positioned below symbol
     const levelSize = cardType === 'detailed' ? 14 : (cardType === 'preview' ? 12 : 10);
@@ -231,8 +231,8 @@ export abstract class BaseScene extends Container {
     });
     levelText.anchor.set(0.5);
     levelText.x = width / 2;
-    levelText.y = cardType === 'formation' || cardType === 'pool' ? height / 2 + 10 : 50;
-    
+    levelText.y = cardType === 'lineup' || cardType === 'pool' ? height / 2 + 10 : 50;
+
     card.addChild(symbolText, levelText);
     
     // Add additional elements based on card type
@@ -241,9 +241,9 @@ export abstract class BaseScene extends Container {
     } else if (cardType === 'preview') {
       this.addPreviewCardElements(card, character, width, height);
     }
-    
-    // Add element indicator for all types except formation/pool
-    if (cardType !== 'formation' && cardType !== 'pool') {
+
+    // Add element indicator for all types except lineup/pool
+    if (cardType !== 'lineup' && cardType !== 'pool') {
       this.addElementIndicator(card, character, width);
     }
     

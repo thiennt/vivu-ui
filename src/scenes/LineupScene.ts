@@ -8,8 +8,8 @@ import { HomeScene } from './HomeScene';
 import { Colors } from '@/utils/colors';
 import { app } from '../app';
 
-export class FormationScene extends BaseScene {
-  private formationPositions: (any | null)[] = [];
+export class LineupScene extends BaseScene {
+  private lineupPositions: (any | null)[] = [];
   private availableCharacters: any[] = [];
 
   // Drag state
@@ -17,13 +17,13 @@ export class FormationScene extends BaseScene {
   private dragTarget: Container | null = null;
   private isDragging: boolean = false;
   
-  private slotHitBoxes: {index: number, x: number, y: number, size: number}[] = [];
+  private lineupSlotHitBoxes: {index: number, x: number, y: number, size: number}[] = [];
   
   // UI containers
   public container: Container;
   private backgroundContainer: Container;
   private headerContainer: Container;
-  private formationContainer: Container;
+  private lineupContainer: Container;
   private poolContainer: Container;
   private buttonContainer: Container;
 
@@ -31,21 +31,21 @@ export class FormationScene extends BaseScene {
     super();
     
     // Convert string IDs to Character objects
-    this.formationPositions = mockPlayer.formation.positions.map(id => 
+    this.lineupPositions = mockPlayer.lineup.positions.map(id => 
       id ? mockCharacters.find(c => c.id === id) || null : null
     );
-    
-    // Get available characters (all characters not in formation)
-    const formationCharacterIds = mockPlayer.formation.positions.filter(id => id !== null);
+
+    // Get available characters (all characters not in lineup)
+    const lineupCharacterIds = mockPlayer.lineup.positions.filter(id => id !== null);
     this.availableCharacters = mockCharacters.filter(
-      char => !formationCharacterIds.includes(char.id)
+      char => !lineupCharacterIds.includes(char.id)
     );
     
     // Create containers once
     this.container = new Container();
     this.backgroundContainer = new Container();
     this.headerContainer = new Container();
-    this.formationContainer = new Container();
+    this.lineupContainer = new Container();
     this.poolContainer = new Container();
     this.buttonContainer = new Container();
     
@@ -53,7 +53,7 @@ export class FormationScene extends BaseScene {
     this.container.addChild(
       this.backgroundContainer,
       this.headerContainer,
-      this.formationContainer,
+      this.lineupContainer,
       this.poolContainer,
       this.buttonContainer
     );
@@ -84,7 +84,7 @@ export class FormationScene extends BaseScene {
   private initializeUI(): void {
     this.createBackground();
     this.createHeader();
-    this.createFormationGrid();
+    this.createLineupGrid();
     this.createCharacterPool();
     this.createActionButtons();
   }
@@ -101,14 +101,14 @@ export class FormationScene extends BaseScene {
     // Clear and recreate layout - this is more efficient than destroying/recreating all elements
     this.backgroundContainer.removeChildren();
     this.headerContainer.removeChildren();
-    this.formationContainer.removeChildren();
+    this.lineupContainer.removeChildren();
     this.poolContainer.removeChildren();
     this.buttonContainer.removeChildren();
     
     // Recreate layout with current dimensions
     this.createBackground();
     this.createHeader();
-    this.createFormationGrid();
+    this.createLineupGrid();
     this.createCharacterPool();
     this.createActionButtons();
   }
@@ -135,13 +135,13 @@ export class FormationScene extends BaseScene {
   }
 
   private createHeader(): void {
-    const title = this.createTitle('Battle Formation', this.gameWidth / 2, 60);
+    const title = this.createTitle('Battle Lineup', this.gameWidth / 2, 60);
     title.anchor.set(0.5, 0.5);
     title.x = this.gameWidth / 2;
     title.y = 60;
 
     const subtitle = new Text({
-      text: 'Drag to swap positions in formation. Click to move between formation and pool.',
+      text: 'Drag to swap positions in lineup. Click to move between lineup and pool.',
       style: {
         fontFamily: 'Kalam',
         fontSize: 16,
@@ -158,10 +158,10 @@ export class FormationScene extends BaseScene {
     this.headerContainer.addChild(title, subtitle);
   }
 
-  private createFormationGrid(): void {
-    this.formationContainer.label = 'formationContainer';
+  private createLineupGrid(): void {
+    this.lineupContainer.label = 'lineupContainer';
 
-    // Formation positions (2x2 grid) with standard spacing
+    // Lineup positions (2x2 grid) with standard spacing
     const rows = 2;
     const cols = 2;
     const slotSize = 100;
@@ -169,23 +169,23 @@ export class FormationScene extends BaseScene {
     const startX = (this.gameWidth - gridWidth) / 2;
     const startY = 150;
 
-    this.slotHitBoxes = [];
+    this.lineupSlotHitBoxes = [];
     for (let row = 0; row < rows; row++) {
       for (let col = 0; col < cols; col++) {
         const positionIndex = row * cols + col;
         const x = col * (slotSize + this.STANDARD_SPACING);
         const y = row * (slotSize + this.STANDARD_SPACING);
 
-        this.slotHitBoxes.push({index: positionIndex, x: startX + x, y: startY + y, size: slotSize});
+        this.lineupSlotHitBoxes.push({index: positionIndex, x: startX + x, y: startY + y, size: slotSize});
 
-        const slot = this.createFormationSlot(x, y, slotSize, positionIndex);
-        this.formationContainer.addChild(slot);
+        const slot = this.createLineupSlot(x, y, slotSize, positionIndex);
+        this.lineupContainer.addChild(slot);
 
         // Add character if present
-        const character = this.formationPositions[positionIndex];
+        const character = this.lineupPositions[positionIndex];
         if (character) {
-          const characterCard = this.createFormationCharacterCard(character, x, y, slotSize, positionIndex);
-          this.formationContainer.addChild(characterCard);
+          const characterCard = this.createLineupCharacterCard(character, x, y, slotSize, positionIndex);
+          this.lineupContainer.addChild(characterCard);
         }
       }
     }
@@ -197,7 +197,7 @@ export class FormationScene extends BaseScene {
         fontFamily: 'Kalam',
         fontSize: 14,
         fontWeight: 'bold',
-        fill: Colors.FORMATION_FRONT
+        fill: Colors.LINEUP_FRONT
       }
     });
     frontLabel.anchor.set(0.5);
@@ -210,18 +210,18 @@ export class FormationScene extends BaseScene {
         fontFamily: 'Kalam',
         fontSize: 14,
         fontWeight: 'bold',
-        fill: Colors.FORMATION_BACK
+        fill: Colors.LINEUP_BACK
       }
     });
     backLabel.anchor.set(0.5);
     backLabel.x = -50;
     backLabel.y = slotSize + this.STANDARD_SPACING + slotSize / 2;
 
-    this.formationContainer.addChild(frontLabel, backLabel);
+    this.lineupContainer.addChild(frontLabel, backLabel);
 
     // Center the grid container horizontally
-    this.formationContainer.x = startX;
-    this.formationContainer.y = startY;
+    this.lineupContainer.x = startX;
+    this.lineupContainer.y = startY;
 
     app.stage.eventMode = 'static';
     app.stage.on('pointerup', this.onDragEnd, this);
@@ -229,7 +229,7 @@ export class FormationScene extends BaseScene {
     app.stage.hitArea = app.screen;
   }
 
-  private createFormationSlot(x: number, y: number, size: number, positionIndex: number): Container {
+  private createLineupSlot(x: number, y: number, size: number, positionIndex: number): Container {
     const slot = new Container();
     const bg = new Graphics();
     bg.roundRect(0, 0, 100, size, 8)
@@ -258,9 +258,9 @@ export class FormationScene extends BaseScene {
     return slot;
   }
 
-  private createFormationCharacterCard(character: any, x: number, y: number, size: number, positionIndex: number): Container {
-    const card = this.createHeroCard(character, x, y, 'formation', positionIndex);
-    this.makeFormationCardInteractive(card, character, positionIndex);
+  private createLineupCharacterCard(character: any, x: number, y: number, size: number, positionIndex: number): Container {
+    const card = this.createHeroCard(character, x, y, 'lineup', positionIndex);
+    this.makeLineupCardInteractive(card, character, positionIndex);
     card.zIndex = 1;
     return card;
   }
@@ -269,7 +269,7 @@ export class FormationScene extends BaseScene {
     this.poolContainer.label = 'characterPool';
 
     // Calculate available area
-    const poolTop = 150 + 2 * 100 + 2 * this.STANDARD_SPACING; // formation grid bottom
+    const poolTop = 150 + 2 * 100 + 2 * this.STANDARD_SPACING; // lineup grid bottom
     const actionButtonHeight = 50;
     const actionButtonY = this.gameHeight - 80;
     const poolBottom = actionButtonY - this.STANDARD_SPACING * 2;
@@ -353,19 +353,19 @@ export class FormationScene extends BaseScene {
     card.cursor = 'pointer';
     card.on('pointertap', () => {
       this.cleanUpFloatingCards();
-      const emptyIndex = this.formationPositions.findIndex(pos => pos === null);
+      const emptyIndex = this.lineupPositions.findIndex(pos => pos === null);
       if (emptyIndex !== -1) {
-        this.formationPositions[emptyIndex] = character;
+        this.lineupPositions[emptyIndex] = character;
         this.availableCharacters = this.availableCharacters.filter(c => c !== character);
-        this.refreshFormation();
+        this.refreshLineup();
       } else {
-        alert('No available slot in formation!');
+        alert('No available slot in lineup!');
       }
     });
     return card;
   }
 
-  private makeFormationCardInteractive(card: Container, character: any, currentPosition: number): void {
+  private makeLineupCardInteractive(card: Container, character: any, currentPosition: number): void {
     card.interactive = true;
     card.cursor = 'pointer';
 
@@ -423,7 +423,7 @@ export class FormationScene extends BaseScene {
 
     // Find which slot (if any) the pointer is over
     let targetSlotIndex: number | null = null;
-    for (const slot of this.slotHitBoxes) {
+    for (const slot of this.lineupSlotHitBoxes) {
       if (
         pointer.x >= slot.x && pointer.x <= slot.x + slot.size &&
         pointer.y >= slot.y && pointer.y <= slot.y + slot.size
@@ -435,8 +435,8 @@ export class FormationScene extends BaseScene {
 
     // Find the original slot index of the dragged card
     let originalSlotIndex: number | null = null;
-    for (let i = 0; i < this.formationPositions.length; i++) {
-      const slotChar = this.formationPositions[i];
+    for (let i = 0; i < this.lineupPositions.length; i++) {
+      const slotChar = this.lineupPositions[i];
       if (
         slotChar &&
         this.dragTarget &&
@@ -454,28 +454,23 @@ export class FormationScene extends BaseScene {
         originalSlotIndex !== null &&
         targetSlotIndex !== originalSlotIndex
       ) {
-        const temp = this.formationPositions[originalSlotIndex];
-        this.formationPositions[originalSlotIndex] = this.formationPositions[targetSlotIndex];
-        this.formationPositions[targetSlotIndex] = temp;
-        this.refreshFormation();
+        const temp = this.lineupPositions[originalSlotIndex];
+        this.lineupPositions[originalSlotIndex] = this.lineupPositions[targetSlotIndex];
+        this.lineupPositions[targetSlotIndex] = temp;
+        this.refreshLineup();
       } else {
         // Snap back to original position if not swapped
         if (this.dragTarget.parent) {
-          this.refreshFormation();
+          this.refreshLineup();
         }
       }
     } else if (originalSlotIndex !== null) {
       // Not a drag: treat as click, move to Character pool
-      this.formationPositions[originalSlotIndex] = null;
+      this.lineupPositions[originalSlotIndex] = null;
       if (!this.availableCharacters.find(c => c.id === (this.dragTarget as any).character?.id)) {
         this.availableCharacters.push((this.dragTarget as any).character);
       }
-      this.refreshFormation();
-    }
-
-    // Remove dragTarget from stage (refreshFormation will re-create all cards in correct containers)
-    if (this.dragTarget.parent) {
-      this.dragTarget.parent.removeChild(this.dragTarget);
+      this.refreshLineup();
     }
 
     this.isDragging = false;
@@ -483,12 +478,12 @@ export class FormationScene extends BaseScene {
     this.dragTarget = null;
   }
 
-  private refreshFormation(): void {
+  private refreshLineup(): void {
     this.cleanUpFloatingCards();
-    // Clear and recreate only formation and pool containers
-    this.formationContainer.removeChildren();
+    // Clear and recreate only lineup and pool containers
+    this.lineupContainer.removeChildren();
     this.poolContainer.removeChildren();
-    this.createFormationGrid();
+    this.createLineupGrid();
     this.createCharacterPool();
   }
 
@@ -514,15 +509,15 @@ export class FormationScene extends BaseScene {
 
     // Save button - centered
     const saveButton = this.createButton(
-      'Save Formation',
+      'Save Lineup',
       startX + buttonWidth + this.STANDARD_SPACING,
       y,
       buttonWidth,
       buttonHeight,
       () => {
         // Convert Character objects back to string IDs for saving
-        mockPlayer.formation.positions = this.formationPositions.map(char => char ? char.id : null);
-        alert('Formation saved successfully!');
+        mockPlayer.lineup.positions = this.lineupPositions.map(char => char ? char.id : null);
+        alert('Lineup saved successfully!');
       }
     );
 
@@ -534,17 +529,17 @@ export class FormationScene extends BaseScene {
       buttonWidth,
       buttonHeight,
       () => {
-        // Fill empty slots in formation with available characters
+        // Fill empty slots in lineup with available characters
         const available = [...this.availableCharacters];
-        this.formationPositions = this.formationPositions.map(pos => {
+        this.lineupPositions = this.lineupPositions.map(pos => {
           if (pos) return pos;
           return available.shift() || null;
         });
         // Remove filled characters from pool
         this.availableCharacters = mockCharacters.filter(
-          char => !this.formationPositions.some(pos => pos && pos.id === char.id)
+          char => !this.lineupPositions.some(pos => pos && pos.id === char.id)
         );
-        this.refreshFormation();
+        this.refreshLineup();
       }
     );
 

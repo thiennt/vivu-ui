@@ -36,9 +36,9 @@ export const Colors = {
   ELEMENT_DARK: 0x9c27b0,
   ELEMENT_DEFAULT: 0x888888,
 
-  // Formation labels
-  FORMATION_FRONT: 0xf44336,
-  FORMATION_BACK: 0x2196f3,
+  // Lineup labels
+  LINEUP_FRONT: 0xf44336,
+  LINEUP_BACK: 0x2196f3,
 
   // Card borders
   CARD_BORDER: 0x3e2723,
