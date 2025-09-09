@@ -4,6 +4,7 @@ import { mockCharacters } from '@/utils/mockData';
 import { BaseScene } from '@/utils/BaseScene';
 import { HomeScene } from './HomeScene';
 import { Colors } from '@/utils/colors';
+import { gsap } from 'gsap';
 
 export class BattleScene extends BaseScene {
   /** Assets bundles required by this screen */
@@ -18,6 +19,7 @@ export class BattleScene extends BaseScene {
   private logContainer!: Container;
   private team1Container!: Container;
   private team2Container!: Container;
+  private effectsContainer!: Container;
 
   constructor() {
     super();
@@ -66,6 +68,7 @@ export class BattleScene extends BaseScene {
     // Clear and recreate layout
     this.container.removeChildren();
     this.createBackground();
+    this.createEffectsContainer();
     this.createBattleLayout();
     this.createBattleLog();
     this.createActionButtons();
@@ -113,6 +116,12 @@ export class BattleScene extends BaseScene {
     this.container.addChild(title);
   }
 
+  private createEffectsContainer(): void {
+    // Container for visual effects and animations
+    this.effectsContainer = new Container();
+    this.container.addChild(this.effectsContainer);
+  }
+
   private createBattleLayout(): void {
     // Create containers for each team
     this.team1Container = new Container();
@@ -120,35 +129,30 @@ export class BattleScene extends BaseScene {
     
     const cardWidth = 100;
     const cardHeight = 120;
-    const spacing = 10;
-    const teamWidth = (cardWidth + spacing) * 2; // 2x2 grid
-    const teamHeight = (cardHeight + spacing) * 2;
+    const spacing = 15;
+    const teamWidth = (cardWidth + spacing) * 4 - spacing; // 4 characters in a row
     
-    // Position team 1 on the left
-    const team1X = this.gameWidth / 4 - teamWidth / 2;
-    const team1Y = this.gameHeight / 2 - teamHeight / 2;
+    // Position enemies (team 1) at the top
+    const team1X = this.gameWidth / 2 - teamWidth / 2;
+    const team1Y = 80; // Top area
     
-    // Position team 2 on the right
-    const team2X = (3 * this.gameWidth) / 4 - teamWidth / 2;
-    const team2Y = this.gameHeight / 2 - teamHeight / 2;
+    // Position allies (team 2) at the bottom
+    const team2X = this.gameWidth / 2 - teamWidth / 2;
+    const team2Y = this.gameHeight - 200; // Bottom area
     
-    // Create team 1 cards (2x2 grid)
+    // Create team 1 cards (enemies) - 4 in a row at top
     this.team1.forEach((character, index) => {
-      const row = Math.floor(index / 2);
-      const col = index % 2;
-      const x = col * (cardWidth + spacing);
-      const y = row * (cardHeight + spacing);
+      const x = index * (cardWidth + spacing);
+      const y = 0;
       
       const card = this.createBattleCard(character, x, y);
       this.team1Container.addChild(card);
     });
     
-    // Create team 2 cards (2x2 grid)
+    // Create team 2 cards (allies) - 4 in a row at bottom
     this.team2.forEach((character, index) => {
-      const row = Math.floor(index / 2);
-      const col = index % 2;
-      const x = col * (cardWidth + spacing);
-      const y = row * (cardHeight + spacing);
+      const x = index * (cardWidth + spacing);
+      const y = 0;
       
       const card = this.createBattleCard(character, x, y);
       this.team2Container.addChild(card);
@@ -161,7 +165,7 @@ export class BattleScene extends BaseScene {
     
     // Add team labels
     const team1Label = new Text({
-      text: 'Team 1',
+      text: 'Enemies',
       style: {
         fontFamily: 'Kalam',
         fontSize: 18,
@@ -170,11 +174,11 @@ export class BattleScene extends BaseScene {
       }
     });
     team1Label.anchor.set(0.5);
-    team1Label.x = team1X + teamWidth / 2;
+    team1Label.x = this.gameWidth / 2;
     team1Label.y = team1Y - 30;
     
     const team2Label = new Text({
-      text: 'Team 2',
+      text: 'Allies',
       style: {
         fontFamily: 'Kalam',
         fontSize: 18,
@@ -183,7 +187,7 @@ export class BattleScene extends BaseScene {
       }
     });
     team2Label.anchor.set(0.5);
-    team2Label.x = team2X + teamWidth / 2;
+    team2Label.x = this.gameWidth / 2;
     team2Label.y = team2Y - 30;
     
     this.container.addChild(this.team1Container, this.team2Container, team1Label, team2Label);
@@ -384,13 +388,207 @@ export class BattleScene extends BaseScene {
     this.container.addChild(buttonContainer);
   }
 
+  private async animateAction(attacker: any, target: any, actionType: string, damage: number): Promise<void> {
+    const attackerCard = this.findCharacterCard(attacker);
+    const targetCard = this.findCharacterCard(target);
+    
+    if (!attackerCard || !targetCard) return;
+
+    // Attacker animation
+    await this.animateAttackerCard(attackerCard, actionType);
+    
+    // Action effect animation
+    await this.animateActionEffect(targetCard, actionType);
+    
+    // Target hit animation
+    await this.animateTargetHit(targetCard, damage);
+  }
+
+  private findCharacterCard(character: any): Container | null {
+    const isTeam1 = character.team === 1;
+    const teamContainer = isTeam1 ? this.team1Container : this.team2Container;
+    const team = isTeam1 ? this.team1 : this.team2;
+    
+    const index = team.findIndex(char => char.id === character.id);
+    if (index >= 0 && index < teamContainer.children.length) {
+      return teamContainer.children[index] as Container;
+    }
+    return null;
+  }
+
+  private async animateAttackerCard(card: Container, actionType: string): Promise<void> {
+    // Different animations based on action type
+    switch (actionType) {
+      case 'slash':
+        // Quick forward dash and back
+        await gsap.to(card, { 
+          x: card.x + 20, 
+          duration: 0.1, 
+          ease: 'power2.out' 
+        });
+        await gsap.to(card, { 
+          x: card.x, 
+          duration: 0.2, 
+          ease: 'power2.inOut' 
+        });
+        break;
+      case 'fire':
+        // Glow and shake effect
+        await gsap.to(card, { 
+          scaleX: 1.1, 
+          scaleY: 1.1, 
+          rotation: 0.1, 
+          duration: 0.3, 
+          yoyo: true, 
+          repeat: 1,
+          ease: 'power2.inOut' 
+        });
+        break;
+      case 'ice':
+        // Vertical bob effect
+        await gsap.to(card, { 
+          y: card.y - 10, 
+          duration: 0.2, 
+          yoyo: true, 
+          repeat: 1,
+          ease: 'power2.inOut' 
+        });
+        break;
+      default:
+        // Default punch animation
+        await gsap.to(card, { 
+          scaleX: 1.05, 
+          scaleY: 1.05, 
+          duration: 0.15, 
+          yoyo: true, 
+          repeat: 1,
+          ease: 'power2.inOut' 
+        });
+    }
+  }
+
+  private async animateActionEffect(targetCard: Container, actionType: string): Promise<void> {
+    const effect = new Graphics();
+    const targetX = targetCard.x + (targetCard.parent?.x || 0) + 50;
+    const targetY = targetCard.y + (targetCard.parent?.y || 0) + 60;
+    
+    switch (actionType) {
+      case 'slash':
+        // Slash effect - diagonal line
+        effect.fill(0xFFFFFF)
+          .rect(-2, -20, 4, 40)
+          .fill(0xFFAA00)
+          .rect(-1, -20, 2, 40);
+        effect.rotation = Math.PI / 4;
+        break;
+      case 'fire':
+        // Fire burst effect
+        effect.fill(0xFF4444)
+          .circle(0, 0, 25)
+          .fill(0xFF8800)
+          .circle(0, 0, 15)
+          .fill(0xFFDD00)
+          .circle(0, 0, 8);
+        break;
+      case 'ice':
+        // Ice shard effect
+        effect.fill(0x88DDFF)
+          .moveTo(0, -15)
+          .lineTo(10, 15)
+          .lineTo(-10, 15)
+          .closePath()
+          .fill(0xAAEEFF)
+          .circle(0, 0, 8);
+        break;
+      default:
+        // Default impact effect
+        effect.fill(0xFFFFFF)
+          .circle(0, 0, 20)
+          .fill(0xFFDD00)
+          .circle(0, 0, 12);
+    }
+    
+    effect.x = targetX;
+    effect.y = targetY;
+    effect.alpha = 0;
+    effect.scale.set(0.5);
+    
+    this.effectsContainer.addChild(effect);
+    
+    // Animate effect
+    await gsap.to(effect, { 
+      alpha: 1, 
+      scale: 1.2, 
+      duration: 0.2, 
+      ease: 'power2.out' 
+    });
+    await gsap.to(effect, { 
+      alpha: 0, 
+      scale: 0.8, 
+      duration: 0.3, 
+      ease: 'power2.in' 
+    });
+    
+    this.effectsContainer.removeChild(effect);
+  }
+
+  private async animateTargetHit(targetCard: Container, damage: number): Promise<void> {
+    // Shake effect for target
+    const originalX = targetCard.x;
+    await gsap.to(targetCard, { 
+      x: originalX - 5, 
+      duration: 0.05 
+    });
+    await gsap.to(targetCard, { 
+      x: originalX + 5, 
+      duration: 0.05 
+    });
+    await gsap.to(targetCard, { 
+      x: originalX, 
+      duration: 0.05 
+    });
+    
+    // Damage number animation
+    await this.showDamageNumber(targetCard, damage);
+  }
+
+  private async showDamageNumber(targetCard: Container, damage: number): Promise<void> {
+    const damageText = new Text({
+      text: `-${damage}`,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 20,
+        fontWeight: 'bold',
+        fill: 0xFF4444,
+        stroke: { color: 0xFFFFFF, width: 2 }
+      }
+    });
+    
+    damageText.anchor.set(0.5);
+    damageText.x = targetCard.x + (targetCard.parent?.x || 0) + 50;
+    damageText.y = targetCard.y + (targetCard.parent?.y || 0) + 30;
+    
+    this.effectsContainer.addChild(damageText);
+    
+    // Animate damage number floating up and fading
+    await gsap.to(damageText, { 
+      y: damageText.y - 50, 
+      alpha: 0, 
+      scale: 1.5,
+      duration: 1, 
+      ease: 'power2.out' 
+    });
+    
+    this.effectsContainer.removeChild(damageText);
+  }
+
   private startBattle(): void {
     this.battleLog = ['Battle Started!'];
     this.currentTurn = 1;
     this.updateBattleLog();
   }
 
-  private processTurn(): void {
+  private async processTurn(): Promise<void> {
     if (this.isAnimating) return;
     
     this.isAnimating = true;
@@ -401,14 +599,14 @@ export class BattleScene extends BaseScene {
     
     // Check for battle end conditions
     if (team1Alive.length === 0) {
-      this.battleLog.push('Team 2 Wins!');
+      this.battleLog.push('Allies Win!');
       this.updateBattleLog();
       this.isAnimating = false;
       return;
     }
     
     if (team2Alive.length === 0) {
-      this.battleLog.push('Team 1 Wins!');
+      this.battleLog.push('Enemies Win!');
       this.updateBattleLog();
       this.isAnimating = false;
       return;
@@ -418,7 +616,7 @@ export class BattleScene extends BaseScene {
     const allAlive = [...team1Alive.map(c => ({...c, team: 1})), ...team2Alive.map(c => ({...c, team: 2}))];
     allAlive.sort((a, b) => b.agi - a.agi);
     
-    // Process each character's turn in order
+    // Process each character's turn in order with animations
     for (const attacker of allAlive) {
       if (attacker.current_hp <= 0) continue; // Skip if character died this turn
       
@@ -432,6 +630,9 @@ export class BattleScene extends BaseScene {
       // Select target (for now, random - could be improved with AI)
       const target = targets[Math.floor(Math.random() * targets.length)];
       
+      // Choose action type based on character stats and random chance
+      const actionType = this.chooseActionType(attacker);
+      
       // Calculate damage with some strategy
       const baseDamage = attacker.atk;
       const defense = target.def;
@@ -439,6 +640,24 @@ export class BattleScene extends BaseScene {
       const isCrit = Math.random() < critChance;
       
       let damage = Math.max(1, baseDamage - defense + Math.floor(Math.random() * 5) - 2);
+      
+      // Apply action type modifiers
+      switch (actionType) {
+        case 'fire':
+          damage = Math.floor(damage * 1.2); // Fire does more damage
+          break;
+        case 'ice':
+          damage = Math.floor(damage * 0.9); // Ice does less damage but could have other effects
+          break;
+        case 'slash':
+          // Slash has higher crit chance
+          if (!isCrit && Math.random() < 0.2) {
+            damage = Math.floor(damage * (attacker.crit_dmg / 100));
+            this.battleLog.push(`💥 Slash Critical Hit!`);
+          }
+          break;
+      }
+      
       if (isCrit) {
         damage = Math.floor(damage * (attacker.crit_dmg / 100));
         this.battleLog.push(`💥 Critical Hit!`);
@@ -450,21 +669,55 @@ export class BattleScene extends BaseScene {
       // Gain energy for attacking
       attacker.current_energy = Math.min(100, attacker.current_energy + 15);
       
-      // Log the attack
+      // Animate the action
+      await this.animateAction(attacker, target, actionType, damage);
+      
+      // Log the attack with action type
+      const actionEmoji = this.getActionEmoji(actionType);
       const critText = isCrit ? ' (CRIT)' : '';
-      this.battleLog.push(`${attacker.ticker} attacks ${target.ticker} for ${damage} damage${critText}`);
+      this.battleLog.push(`${attacker.ticker} ${actionEmoji} ${actionType}s ${target.ticker} for ${damage} damage${critText}`);
       
       if (target.current_hp === 0) {
         this.battleLog.push(`${target.ticker} is defeated!`);
         // Attacker gains bonus energy for defeating enemy
         attacker.current_energy = Math.min(100, attacker.current_energy + 25);
       }
+      
+      // Update UI after each action
+      this.updateBattleCards();
+      this.updateBattleLog();
+      
+      // Small delay between actions for better visual flow
+      await new Promise(resolve => setTimeout(resolve, 500));
     }
     
     this.currentTurn++;
-    this.updateBattleCards();
-    this.updateBattleLog();
     this.isAnimating = false;
+  }
+
+  private chooseActionType(character: any): string {
+    const actions = ['slash', 'fire', 'ice', 'punch'];
+    
+    // Simple logic based on character stats or random
+    if (character.atk > 80) {
+      // High attack characters prefer slash
+      return Math.random() < 0.4 ? 'slash' : actions[Math.floor(Math.random() * actions.length)];
+    } else if (character.agi > 70) {
+      // Fast characters prefer ice
+      return Math.random() < 0.4 ? 'ice' : actions[Math.floor(Math.random() * actions.length)];
+    } else {
+      // Others prefer fire or random
+      return Math.random() < 0.3 ? 'fire' : actions[Math.floor(Math.random() * actions.length)];
+    }
+  }
+
+  private getActionEmoji(actionType: string): string {
+    switch (actionType) {
+      case 'slash': return '⚔️';
+      case 'fire': return '🔥';
+      case 'ice': return '❄️';
+      default: return '👊';
+    }
   }
 
   private updateBattleCards(): void {
