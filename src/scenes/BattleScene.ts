@@ -68,8 +68,8 @@ export class BattleScene extends BaseScene {
     // Clear and recreate layout
     this.container.removeChildren();
     this.createBackground();
-    this.createEffectsContainer();
     this.createBattleLayout();
+    this.createEffectsContainer();
     this.createBattleLog();
     this.createActionButtons();
   }
@@ -132,14 +132,28 @@ export class BattleScene extends BaseScene {
     const rowSpacing = 20;
     const cardsPerRow = 2;
     const teamWidth = (cardWidth + spacing) * cardsPerRow - spacing;
+    const cardHeight = 120;
+    const teamRows = 2;
+    const teamBlockHeight = cardHeight * teamRows + rowSpacing;
+
+    // Battle log height (should match createBattleLog)
+    const logHeight = 80;
+    const logMargin = 30;
+
+    // Calculate vertical positions
+    const totalUsedHeight = teamBlockHeight * 2 + logHeight + logMargin * 2;
+    const verticalPadding = Math.max(0, (this.gameHeight - totalUsedHeight) / 2);
 
     // Team 1 (enemies) at the top
     const team1X = this.gameWidth / 2 - teamWidth / 2;
-    const team1Y = 100;
+    const team1Y = verticalPadding;
+
+    // Battle log in the center
+    const logY = team1Y + teamBlockHeight + logMargin;
 
     // Team 2 (allies) at the bottom
     const team2X = this.gameWidth / 2 - teamWidth / 2;
-    const team2Y = this.gameHeight - 300;
+    const team2Y = logY + logHeight + logMargin;
 
     // Split into front and back rows
     const team1Front = this.team1.slice(0, 2);
@@ -156,7 +170,7 @@ export class BattleScene extends BaseScene {
     });
     team1Front.forEach((character, index) => {
       const x = index * (cardWidth + spacing);
-      const y = cardWidth + rowSpacing;
+      const y = cardHeight + rowSpacing;
       const card = this.createBattleCard(character, x, y);
       this.team1Container.addChild(card);
     });
@@ -170,7 +184,7 @@ export class BattleScene extends BaseScene {
     });
     team2Back.forEach((character, index) => {
       const x = index * (cardWidth + spacing);
-      const y = cardWidth + rowSpacing;
+      const y = cardHeight + rowSpacing;
       const card = this.createBattleCard(character, x, y);
       this.team2Container.addChild(card);
     });
@@ -208,6 +222,9 @@ export class BattleScene extends BaseScene {
     team2Label.y = team2Y - 30;
 
     this.container.addChild(this.team1Container, this.team2Container, team1Label, team2Label);
+
+    // Store for use in createBattleLog
+    (this as any)._battleLogY = logY;
   }
 
   private createBattleCard(character: any, x: number, y: number): Container {
@@ -336,7 +353,7 @@ export class BattleScene extends BaseScene {
 
   private createBattleLog(): void {
     this.logContainer = new Container();
-    
+
     // Log background
     const logBg = new Graphics();
     const logWidth = this.gameWidth - 40;
@@ -344,7 +361,7 @@ export class BattleScene extends BaseScene {
     logBg.roundRect(0, 0, logWidth, logHeight, 8)
       .fill({ color: Colors.BACKGROUND_SECONDARY, alpha: 0.8 })
       .stroke({ width: 2, color: Colors.CARD_BORDER });
-    
+
     // Log title
     const logTitle = new Text({
       text: 'Battle Log',
@@ -357,11 +374,12 @@ export class BattleScene extends BaseScene {
     });
     logTitle.x = 10;
     logTitle.y = 5;
-    
+
     this.logContainer.addChild(logBg, logTitle);
     this.logContainer.x = 20;
-    this.logContainer.y = this.gameHeight - 400;
-    
+    // Use the calculated Y from createBattleLayout
+    this.logContainer.y = (this as any)._battleLogY ?? (this.gameHeight / 2 - logHeight / 2);
+
     this.container.addChild(this.logContainer);
   }
 
@@ -371,34 +389,24 @@ export class BattleScene extends BaseScene {
     // Start Battle button
     const startButton = this.createButton(
       'Start Battle',
-      0,
+      (this.width - 120) / 2,
       0,
       120,
       40,
       () => this.startBattle()
     );
     
-    // Next Turn button
-    const nextTurnButton = this.createButton(
-      'Next Turn',
-      130,
-      0,
-      120,
-      40,
-      () => this.processTurn()
-    );
-    
     // Back button
     const backButton = this.createButton(
       '← Back to Home',
-      260,
+      15,
       0,
       140,
       40,
       () => navigation.showScreen(HomeScene)
     );
-    
-    buttonContainer.addChild(startButton, nextTurnButton, backButton);
+
+    buttonContainer.addChild(backButton, startButton);
     buttonContainer.x = (this.gameWidth - 520) / 2;
     buttonContainer.y = this.gameHeight - 60;
     
@@ -434,6 +442,8 @@ export class BattleScene extends BaseScene {
   }
 
   private async animateAttackerCard(card: Container, actionType: string): Promise<void> {
+    const originalX = card.x;
+    const originalY = card.y;
     // Different animations based on action type
     switch (actionType) {
       case 'slash':
@@ -492,10 +502,14 @@ export class BattleScene extends BaseScene {
           ease: 'power2.inOut' 
         });
     }
+
+    card.x = originalX;
+    card.y = originalY;
   }
 
   private async animateActionEffect(targetCard: Container, actionType: string): Promise<void> {
     const effect = new Graphics();
+    effect.zIndex = 1000; // Ensure effect is on top
     const targetX = targetCard.x + (targetCard.parent?.x || 0) + 50;
     const targetY = targetCard.y + (targetCard.parent?.y || 0) + 60;
     
@@ -537,8 +551,6 @@ export class BattleScene extends BaseScene {
     effect.scale.set(0.5);
     
     this.effectsContainer.addChild(effect);
-
-    console.log('Animating effect', effect);
 
     // Animate effect
     await gsap.to(effect, { 
@@ -611,6 +623,7 @@ export class BattleScene extends BaseScene {
     this.battleLog = ['Battle Started!'];
     this.currentTurn = 1;
     this.updateBattleLog();
+    this.processTurn();
   }
 
   private async processTurn(): Promise<void> {
