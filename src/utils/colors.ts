@@ -5,15 +5,15 @@
 
 export const Colors = {
   // Background colors
-  BACKGROUND_PRIMARY: 0x2c1810,
-  BACKGROUND_SECONDARY: 0x3e2723,
+  BACKGROUND_PRIMARY: 0x0d3011,    // Very dark green background (updated from brown)
+  BACKGROUND_SECONDARY: 0x1b5e20,  // Dark green secondary background (updated from brown)
 
   // Text colors
-  TEXT_PRIMARY: 0xffecb3,      // Primary text (titles)
-  TEXT_SECONDARY: 0xd7ccc8,    // Secondary text (subtitles, stats)
-  TEXT_TERTIARY: 0xa1887f,     // Tertiary text (skill stats)
+  TEXT_PRIMARY: 0xe8f5e8,      // Light green-tinted text (updated for green theme)
+  TEXT_SECONDARY: 0xc8e6c9,    // Light green secondary text (updated for green theme)
+  TEXT_TERTIARY: 0xa5d6a7,     // Green-tinted tertiary text (updated for green theme)
   TEXT_WHITE: 0xffffff,        // White text
-  TEXT_BUTTON: 0xfff8e1,       // Button text
+  TEXT_BUTTON: 0xf1f8e9,       // Light green button text (updated for green theme)
 
   // Button colors
   BUTTON_PRIMARY: 0x43a047,    // Primary button background (green)
@@ -41,7 +41,11 @@ export const Colors = {
   LINEUP_BACK: 0x2196f3,
 
   // Card borders
-  CARD_BORDER: 0x3e2723,
+  CARD_BORDER: 0x2e7d32,       // Updated to dark green to match theme
+
+  // Panel and container backgrounds
+  PANEL_BACKGROUND: 0x1b5e20,  // Dark green panel background (replaces hardcoded brown)
+  CONTAINER_BACKGROUND: 0x263238, // Dark blue-grey for containers that shouldn't be green
 
   // Decorative elements
   DECORATION_MAGIC: 0x4fc3f7,

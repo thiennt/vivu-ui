@@ -109,10 +109,12 @@ game.getCurrentScene()
 ## 🎨 Design System
 
 ### Color Palette
-- **Primary Background**: Deep brown tones (#2c1810, #1a0e0a)
-- **UI Elements**: Green accents (#43a047, #2e7d32, #66bb6a)
-- **Text**: Light cream (#ffecb3, #d7ccc8)
+- **Primary Background**: Dark green tones (#0d3011, #1b5e20)  
+- **UI Elements**: Green theme (#43a047, #2e7d32, #66bb6a)
+- **Text**: Light green-tinted (#e8f5e8, #c8e6c9, #a5d6a7)
 - **Accents**: Mystical blues and purples for magical elements
+
+The entire UI now uses a cohesive green color scheme, replacing previous brown elements for a more consistent and modern appearance.
 
 ### Character Rarities
 - **Common**: Green (#4caf50)

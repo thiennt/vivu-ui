@@ -293,7 +293,7 @@ export class LineupScene extends BaseScene {
     // Background
     const poolBg = new Graphics();
     poolBg.roundRect(0, 0, poolWidth, poolHeight, 12)
-      .fill({ color: 0x3e2723, alpha: 0.8 })
+      .fill({ color: Colors.PANEL_BACKGROUND, alpha: 0.8 })
       .stroke({ width: 2, color: Colors.BUTTON_PRIMARY });
 
     // Title
@@ -303,7 +303,7 @@ export class LineupScene extends BaseScene {
         fontFamily: 'Kalam',
         fontSize: 18,
         fontWeight: 'bold',
-        fill: 0xffecb3
+        fill: Colors.TEXT_PRIMARY
       }
     });
     poolTitle.x = padding;

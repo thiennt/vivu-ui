@@ -81,7 +81,7 @@ export class StageScene extends BaseScene {
 
   private createBackground(): void {
     const bg = new Graphics();
-    bg.rect(0, 0, this.gameWidth, this.gameHeight).fill(0x1a0e0a);
+    bg.rect(0, 0, this.gameWidth, this.gameHeight).fill(Colors.BACKGROUND_PRIMARY);
     this.backgroundContainer.addChild(bg);
   }
 
