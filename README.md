@@ -110,13 +110,13 @@ game.getCurrentScene()
 
 ### Color Palette
 - **Primary Background**: Deep brown tones (#2c1810, #1a0e0a)
-- **UI Elements**: Warm browns (#3e2723, #5d4037, #8d6e63)
+- **UI Elements**: Green accents (#43a047, #2e7d32, #66bb6a)
 - **Text**: Light cream (#ffecb3, #d7ccc8)
 - **Accents**: Mystical blues and purples for magical elements
 
 ### Character Rarities
-- **Common**: Brown (#8d6e63)
-- **Uncommon**: Green (#66bb6a)
+- **Common**: Green (#4caf50)
+- **Uncommon**: Light Green (#66bb6a)
 - **Rare**: Blue (#42a5f5)
 - **Epic**: Purple (#ab47bc)
 - **Legendary**: Orange (#ff9800)

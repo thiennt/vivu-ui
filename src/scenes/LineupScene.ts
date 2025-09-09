@@ -241,7 +241,7 @@ export class LineupScene extends BaseScene {
       style: {
         fontFamily: 'Kalam',
         fontSize: 24,
-        fill: 0x8d6e63,
+        fill: Colors.BUTTON_PRIMARY,
         align: 'center'
       }
     });
@@ -294,7 +294,7 @@ export class LineupScene extends BaseScene {
     const poolBg = new Graphics();
     poolBg.roundRect(0, 0, poolWidth, poolHeight, 12)
       .fill({ color: 0x3e2723, alpha: 0.8 })
-      .stroke({ width: 2, color: 0x8d6e63 });
+      .stroke({ width: 2, color: Colors.BUTTON_PRIMARY });
 
     // Title
     const poolTitle = new Text({

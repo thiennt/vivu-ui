@@ -16,12 +16,12 @@ export const Colors = {
   TEXT_BUTTON: 0xfff8e1,       // Button text
 
   // Button colors
-  BUTTON_PRIMARY: 0x8d6e63,    // Primary button background
-  BUTTON_BORDER: 0x5d4037,     // Button border
-  BUTTON_HOVER: 0xa1887f,      // Button hover state
+  BUTTON_PRIMARY: 0x43a047,    // Primary button background (green)
+  BUTTON_BORDER: 0x2e7d32,     // Button border (dark green)
+  BUTTON_HOVER: 0x66bb6a,      // Button hover state (light green)
 
   // Card rarity colors
-  RARITY_COMMON: 0x8d6e63,
+  RARITY_COMMON: 0x4caf50,
   RARITY_UNCOMMON: 0x66bb6a,
   RARITY_RARE: 0x42a5f5,
   RARITY_EPIC: 0xab47bc,
