@@ -128,7 +128,6 @@ export class BattleScene extends BaseScene {
     this.team2Container = new Container();
     
     const cardWidth = 100;
-    const cardHeight = 120;
     const spacing = 15;
     const teamWidth = (cardWidth + spacing) * 4 - spacing; // 4 characters in a row
     
@@ -817,7 +816,7 @@ export class BattleScene extends BaseScene {
     });
   }
 
-  public update(time: Ticker): void {
+  public update(_time: Ticker): void {
     // Animation updates can be added here
   }
 }
