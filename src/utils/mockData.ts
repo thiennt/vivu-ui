@@ -1,4 +1,6 @@
 // ---- Skills ----
+// NOTE: mockSkills usage has been replaced with API calls for CharacterDetail component
+// This data is kept for other components that haven't been migrated yet
 export const mockSkills = [
   {
     id: "S1",
@@ -60,6 +62,8 @@ export const mockSkills = [
 ];
 
 // ---- Characters (Crypto Inspired) ----
+// NOTE: mockCharacters usage has been replaced with API calls for Characters and CharacterDetail components
+// This data is kept for other components that haven't been migrated yet
 export const mockCharacters = [
   {
     id: "1",
@@ -217,6 +221,8 @@ export const mockCharacters = [
 ];
 
 // ---- Player ----
+// NOTE: mockPlayer usage has been replaced with API calls for PlayerDetail component
+// This data is kept for other components that haven't been migrated yet
 export const mockPlayer = {
   id: "P1",
   username: "Satoshi",
@@ -243,6 +249,8 @@ export const mockPlayer = {
 };
 
 // ---- Stages ----
+// NOTE: mockDungeons usage has been replaced with API calls for Dungeon and Stage components
+// This data is kept for other components that haven't been migrated yet
 export const mockDungeons = [
   {
     id: "stage-1",

@@ -3,7 +3,7 @@ import { navigation } from '@/utils/navigation';
 import { HomeScene } from './HomeScene';
 import { BaseScene } from '@/utils/BaseScene';
 import { CharactersScene } from './CharactersScene';
-import { charactersApi, skillsApi, ApiError } from '@/services/api';
+import { charactersApi, ApiError } from '@/services/api';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
 
 export class CharacterDetailScene extends BaseScene {

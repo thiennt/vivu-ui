@@ -1,14 +1,14 @@
 import { Container, Graphics, Text, Ticker } from 'pixi.js';
 import { navigation } from '@/utils/navigation';
-import { mockPlayer } from '@/utils/mockData';
 import { BaseScene } from '@/utils/BaseScene';
 import { CharactersScene } from './CharactersScene';
 import { DungeonScene } from './DungeonScene';
 import { PlayerDetailScene } from './PlayerDetailScene';
 import { LineupScene } from './LineupScene';
 import { BattleScene } from './BattleScene';
-import { app } from '@/app';
 import { Colors } from '@/utils/colors';
+import { playerApi, ApiError } from '@/services/api';
+import { LoadingStateManager } from '@/utils/loadingStateManager';
 
 
 export class HomeScene extends BaseScene {
@@ -17,19 +17,45 @@ export class HomeScene extends BaseScene {
   
   public container: Container;
   private decorativeElements: Container[] = [];
+  private player: any = null;
+  private loadingManager: LoadingStateManager;
 
   constructor() {
     super();
 
     this.container = new Container();
     this.addChild(this.container);
+    
+    // Initialize loading manager
+    this.loadingManager = new LoadingStateManager(this.container, this.gameWidth, this.gameHeight);
+    
+    // Load player data
+    this.loadPlayerData();
   }
 
-  resize(width: number, height: number): void {
-    this.gameWidth = width
-    this.gameHeight = height;
+  private async loadPlayerData(): Promise<void> {
+    try {
+      this.loadingManager.showLoading();
+      
+      // For now, using a default player ID - this should come from authentication/context
+      const playerId = 'P1';
+      this.player = await playerApi.getPlayer(playerId);
+      
+      this.loadingManager.hideLoading();
+      this.createUI();
+    } catch (error) {
+      console.error('Failed to load player data:', error);
+      const errorMessage = error instanceof ApiError 
+        ? error.message 
+        : 'Failed to load player data. Please try again.';
+      
+      this.loadingManager.showError(errorMessage, () => this.loadPlayerData());
+    }
+  }
 
-    // Update the container to match the new dimensions
+  private createUI(): void {
+    if (!this.player) return;
+    
     this.container.removeChildren();
     this.createBackground();
     this.createHomeTitle();
@@ -37,19 +63,34 @@ export class HomeScene extends BaseScene {
     this.createMenuButtons();
     this.createDecorations();
     
-
     // Animate decorative elements
     this.decorativeElements.forEach((element, index) => {
-      element.y += Math.sin(Date.now() * 0.001 + index) * 0.5;
-      element.x += Math.cos(Date.now() * 0.0008 + index) * 0.3;
-      element.alpha = 0.3 + Math.sin(Date.now() * 0.002 + index) * 0.3;
-
-      // Wrap around screen
-      if (element.x > this.gameWidth + 20) element.x = -20;
-      if (element.x < -20) element.x = this.gameWidth + 20;
-      if (element.y > this.gameHeight + 20) element.y = -20;
-      if (element.y < -20) element.y = this.gameHeight + 20;
+      element.alpha = 0;
+      const delay = index * 0.2;
+      
+      setTimeout(() => {
+        const animate = () => {
+          element.alpha += 0.02;
+          if (element.alpha < 1) {
+            requestAnimationFrame(animate);
+          }
+        };
+        animate();
+      }, delay * 1000);
     });
+  }
+
+  resize(width: number, height: number): void {
+    this.gameWidth = width
+    this.gameHeight = height;
+
+    // Update loading manager dimensions
+    this.loadingManager.updateDimensions(width, height);
+    
+    // Only update layout if we have loaded data
+    if (this.player) {
+      this.createUI();
+    }
   }
 
   /** Show the screen with animation */
@@ -178,7 +219,7 @@ export class HomeScene extends BaseScene {
     
     // Player info text
     const playerName = new Text({
-      text: `Welcome, ${mockPlayer.username}!`,
+      text: `Welcome, ${this.player.username}!`,
       style: {
         fontFamily: 'Kalam',
         fontSize: 20,
@@ -190,7 +231,7 @@ export class HomeScene extends BaseScene {
     playerName.y = 15;
     
     const playerLevel = new Text({
-      text: `Level: ${mockPlayer.level}`,
+      text: `Level: ${this.player.level}`,
       style: {
         fontFamily: 'Kalam',
         fontSize: 16,
@@ -201,7 +242,7 @@ export class HomeScene extends BaseScene {
     playerLevel.y = 45;
     
     const playerExp = new Text({
-      text: `EXP: ${mockPlayer.exp}`,
+      text: `EXP: ${this.player.exp}`,
       style: {
         fontFamily: 'Kalam',
         fontSize: 16,
@@ -268,6 +309,18 @@ export class HomeScene extends BaseScene {
   }
 
   public update(time: Ticker): void {
+    // Animate decorative elements
+    this.decorativeElements.forEach((element, index) => {
+      element.y += Math.sin(Date.now() * 0.001 + index) * 0.5;
+      element.x += Math.cos(Date.now() * 0.0008 + index) * 0.3;
+      element.alpha = 0.3 + Math.sin(Date.now() * 0.002 + index) * 0.3;
+
+      // Wrap around screen
+      if (element.x > this.gameWidth + 20) element.x = -20;
+      if (element.x < -20) element.x = this.gameWidth + 20;
+      if (element.y > this.gameHeight + 20) element.y = -20;
+      if (element.y < -20) element.y = this.gameHeight + 20;
+    });
   }
 
 }

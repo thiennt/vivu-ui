@@ -6,7 +6,7 @@ import { CharacterDetailScene } from './CharacterDetailScene';
 import { HomeScene } from './HomeScene';
 import { Colors } from '@/utils/colors';
 import { ScrollBox } from '@pixi/ui';
-import { playerApi, charactersApi, ApiError } from '@/services/api';
+import { playerApi, ApiError } from '@/services/api';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
 
 export class PlayerDetailScene extends BaseScene {
