@@ -6,7 +6,7 @@ import { CharacterDetailScene } from './CharacterDetailScene';
 import { HomeScene } from './HomeScene';
 import { Colors } from '@/utils/colors';
 import { ScrollBox } from '@pixi/ui';
-import { playerApi, ApiError } from '@/services/api';
+import { playerApi, ApiError, isLikelyUsingMockData } from '@/services/api';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
 
 export class PlayerDetailScene extends BaseScene {
@@ -58,33 +58,30 @@ export class PlayerDetailScene extends BaseScene {
   }
   
   private async loadPlayerData(): Promise<void> {
-    try {
-      this.loadingManager.showLoading();
-      
-      // For now, using a default player ID - this should come from authentication/context
-      const playerId = 'P1';
-      
-      // Load player data and characters in parallel
-      const [playerData, charactersData] = await Promise.all([
-        playerApi.getPlayer(playerId),
-        playerApi.getPlayerCharacters(playerId)
-      ]);
+    this.loadingManager.showLoading();
+    
+    // For now, using a default player ID - this should come from authentication/context
+    const playerId = 'P1';
+    
+    // Load player data and characters in parallel
+    const [playerData, charactersData] = await Promise.all([
+      playerApi.getPlayer(playerId),
+      playerApi.getPlayerCharacters(playerId)
+    ]);
 
-      this.player = playerData;
-      this.characters = charactersData;
-      this.remainingPoints = this.player.points || 0;
-      this.tempStatChanges = { sta: 0, str: 0, agi: 0 };
+    this.player = playerData;
+    this.characters = charactersData;
+    this.remainingPoints = this.player.points || 0;
+    this.tempStatChanges = { sta: 0, str: 0, agi: 0 };
 
-      this.loadingManager.hideLoading();
-      this.initializeUI();
-    } catch (error) {
-      console.error('Failed to load player data:', error);
-      const errorMessage = error instanceof ApiError 
-        ? error.message 
-        : 'Failed to load player data. Please try again.';
-      
-      this.loadingManager.showError(errorMessage, () => this.loadPlayerData());
+    this.loadingManager.hideLoading();
+    
+    // Show mock data indicator if we're likely using mock data
+    if (isLikelyUsingMockData()) {
+      this.loadingManager.showMockDataIndicator();
     }
+    
+    this.initializeUI();
   }
 
   private initializeUI(): void {

@@ -3,7 +3,7 @@ import { navigation } from '@/utils/navigation';
 import { HomeScene } from './HomeScene';
 import { BaseScene } from '@/utils/BaseScene';
 import { CharactersScene } from './CharactersScene';
-import { charactersApi, ApiError } from '@/services/api';
+import { charactersApi, ApiError, isLikelyUsingMockData } from '@/services/api';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
 
 export class CharacterDetailScene extends BaseScene {
@@ -57,27 +57,24 @@ export class CharacterDetailScene extends BaseScene {
   }
   
   private async loadCharacterData(): Promise<void> {
-    try {
-      if (!this.character || !this.character.id) {
-        navigation.showScreen(HomeScene);
-        return;
-      }
-
-      this.loadingManager.showLoading();
-      
-      // Load character skills
-      this.characterSkills = await charactersApi.getCharacterSkills(this.character.id);
-      
-      this.loadingManager.hideLoading();
-      this.initializeUI();
-    } catch (error) {
-      console.error('Failed to load character data:', error);
-      const errorMessage = error instanceof ApiError 
-        ? error.message 
-        : 'Failed to load character data. Please try again.';
-      
-      this.loadingManager.showError(errorMessage, () => this.loadCharacterData());
+    if (!this.character || !this.character.id) {
+      navigation.showScreen(HomeScene);
+      return;
     }
+
+    this.loadingManager.showLoading();
+    
+    // Load character skills
+    this.characterSkills = await charactersApi.getCharacterSkills(this.character.id);
+    
+    this.loadingManager.hideLoading();
+    
+    // Show mock data indicator if we're likely using mock data
+    if (isLikelyUsingMockData()) {
+      this.loadingManager.showMockDataIndicator();
+    }
+    
+    this.initializeUI();
   }
   
   private initializeUI(): void {

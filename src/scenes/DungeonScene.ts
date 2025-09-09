@@ -4,7 +4,7 @@ import { navigation } from '@/utils/navigation';
 import { HomeScene } from './HomeScene';
 import { StageScene } from './StageScene';
 import { Colors } from '@/utils/colors';
-import { dungeonsApi, ApiError } from '@/services/api';
+import { dungeonsApi, ApiError, isLikelyUsingMockData } from '@/services/api';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
 
 export class DungeonScene extends BaseScene {
@@ -45,21 +45,18 @@ export class DungeonScene extends BaseScene {
   }
   
   private async loadDungeonsData(): Promise<void> {
-    try {
-      this.loadingManager.showLoading();
-      
-      this.dungeons = await dungeonsApi.getAllDungeons();
-      
-      this.loadingManager.hideLoading();
-      this.initializeUI();
-    } catch (error) {
-      console.error('Failed to load dungeons:', error);
-      const errorMessage = error instanceof ApiError 
-        ? error.message 
-        : 'Failed to load dungeons. Please try again.';
-      
-      this.loadingManager.showError(errorMessage, () => this.loadDungeonsData());
+    this.loadingManager.showLoading();
+    
+    this.dungeons = await dungeonsApi.getAllDungeons();
+    
+    this.loadingManager.hideLoading();
+    
+    // Show mock data indicator if we're likely using mock data
+    if (isLikelyUsingMockData()) {
+      this.loadingManager.showMockDataIndicator();
     }
+    
+    this.initializeUI();
   }
   
   private initializeUI(): void {

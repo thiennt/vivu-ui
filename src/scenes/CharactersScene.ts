@@ -5,7 +5,7 @@ import { BaseScene } from '@/utils/BaseScene';
 import { Colors } from '@/utils/colors';
 import { CharacterDetailScene } from './CharacterDetailScene';
 import { ScrollBox } from '@pixi/ui';
-import { charactersApi, ApiError } from '@/services/api';
+import { charactersApi, ApiError, isLikelyUsingMockData } from '@/services/api';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
 
 export class CharactersScene extends BaseScene {
@@ -52,21 +52,18 @@ export class CharactersScene extends BaseScene {
   }
   
   private async loadCharactersData(): Promise<void> {
-    try {
-      this.loadingManager.showLoading();
-      
-      this.characters = await charactersApi.getAllCharacters();
-      
-      this.loadingManager.hideLoading();
-      this.initializeUI();
-    } catch (error) {
-      console.error('Failed to load characters:', error);
-      const errorMessage = error instanceof ApiError 
-        ? error.message 
-        : 'Failed to load characters. Please try again.';
-      
-      this.loadingManager.showError(errorMessage, () => this.loadCharactersData());
+    this.loadingManager.showLoading();
+    
+    this.characters = await charactersApi.getAllCharacters();
+    
+    this.loadingManager.hideLoading();
+    
+    // Show mock data indicator if we're likely using mock data
+    if (isLikelyUsingMockData()) {
+      this.loadingManager.showMockDataIndicator();
     }
+    
+    this.initializeUI();
   }
   
   private initializeUI(): void {

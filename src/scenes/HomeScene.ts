@@ -7,7 +7,7 @@ import { PlayerDetailScene } from './PlayerDetailScene';
 import { LineupScene } from './LineupScene';
 import { BattleScene } from './BattleScene';
 import { Colors } from '@/utils/colors';
-import { playerApi, ApiError } from '@/services/api';
+import { playerApi, ApiError, isLikelyUsingMockData } from '@/services/api';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
 
 
@@ -34,23 +34,20 @@ export class HomeScene extends BaseScene {
   }
 
   private async loadPlayerData(): Promise<void> {
-    try {
-      this.loadingManager.showLoading();
-      
-      // For now, using a default player ID - this should come from authentication/context
-      const playerId = 'P1';
-      this.player = await playerApi.getPlayer(playerId);
-      
-      this.loadingManager.hideLoading();
-      this.createUI();
-    } catch (error) {
-      console.error('Failed to load player data:', error);
-      const errorMessage = error instanceof ApiError 
-        ? error.message 
-        : 'Failed to load player data. Please try again.';
-      
-      this.loadingManager.showError(errorMessage, () => this.loadPlayerData());
+    this.loadingManager.showLoading();
+    
+    // For now, using a default player ID - this should come from authentication/context
+    const playerId = 'P1';
+    this.player = await playerApi.getPlayer(playerId);
+    
+    this.loadingManager.hideLoading();
+    
+    // Show mock data indicator if we're likely using mock data
+    if (isLikelyUsingMockData()) {
+      this.loadingManager.showMockDataIndicator();
     }
+    
+    this.createUI();
   }
 
   private createUI(): void {
