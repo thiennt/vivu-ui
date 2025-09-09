@@ -1,12 +1,13 @@
 import { Graphics, Container, Text, Ticker } from 'pixi.js';
 import { BaseScene } from '@/utils/BaseScene';
-import { mockPlayer, mockCharacters } from '@/utils/mockData';
 import { navigation } from '@/utils/navigation';
 import { CharactersScene } from './CharactersScene';
 import { CharacterDetailScene } from './CharacterDetailScene';
 import { HomeScene } from './HomeScene';
 import { Colors } from '@/utils/colors';
 import { ScrollBox } from '@pixi/ui';
+import { playerApi, charactersApi, ApiError } from '@/services/api';
+import { LoadingStateManager } from '@/utils/loadingStateManager';
 
 export class PlayerDetailScene extends BaseScene {
   // UI containers
@@ -18,16 +19,17 @@ export class PlayerDetailScene extends BaseScene {
   private buttonContainer: Container;
   private pointDistributionContainer: Container;
 
+  // Data state
+  private player: any = null;
+  private characters: any[] = [];
+  private loadingManager: LoadingStateManager;
+
   // Point distribution state
   private tempStatChanges = { sta: 0, str: 0, agi: 0 };
-  private remainingPoints: number;
+  private remainingPoints: number = 0;
 
   constructor() {
     super();
-    
-    // Initialize point distribution state
-    this.remainingPoints = mockPlayer.points;
-    this.tempStatChanges = { sta: 0, str: 0, agi: 0 };
     
     // Create containers once
     this.container = new Container();
@@ -48,11 +50,46 @@ export class PlayerDetailScene extends BaseScene {
       this.buttonContainer
     );
     
-    // Create UI once
-    this.initializeUI();
+    // Initialize loading manager
+    this.loadingManager = new LoadingStateManager(this.container, this.gameWidth, this.gameHeight);
+    
+    // Load data and create UI
+    this.loadPlayerData();
   }
   
+  private async loadPlayerData(): Promise<void> {
+    try {
+      this.loadingManager.showLoading();
+      
+      // For now, using a default player ID - this should come from authentication/context
+      const playerId = 'P1';
+      
+      // Load player data and characters in parallel
+      const [playerData, charactersData] = await Promise.all([
+        playerApi.getPlayer(playerId),
+        playerApi.getPlayerCharacters(playerId)
+      ]);
+
+      this.player = playerData;
+      this.characters = charactersData;
+      this.remainingPoints = this.player.points || 0;
+      this.tempStatChanges = { sta: 0, str: 0, agi: 0 };
+
+      this.loadingManager.hideLoading();
+      this.initializeUI();
+    } catch (error) {
+      console.error('Failed to load player data:', error);
+      const errorMessage = error instanceof ApiError 
+        ? error.message 
+        : 'Failed to load player data. Please try again.';
+      
+      this.loadingManager.showError(errorMessage, () => this.loadPlayerData());
+    }
+  }
+
   private initializeUI(): void {
+    if (!this.player) return;
+    
     this.createBackground();
     this.createHeader();
     this.createPlayerStats();
@@ -64,9 +101,14 @@ export class PlayerDetailScene extends BaseScene {
   resize(width: number, height: number): void {
     this.gameWidth = width;
     this.gameHeight = height;
+    
+    // Update loading manager dimensions
+    this.loadingManager.updateDimensions(width, height);
 
-    // Update UI layout without recreating
-    this.updateLayout();
+    // Only update layout if we have loaded data
+    if (this.player) {
+      this.updateLayout();
+    }
   }
   
   private updateLayout(): void {
@@ -99,6 +141,8 @@ export class PlayerDetailScene extends BaseScene {
   }
 
   private createPlayerStats(): void {
+    if (!this.player) return;
+    
     // Calculate responsive panel sizes with standard padding
     const availableWidth = this.gameWidth - 2 * this.STANDARD_PADDING;
     const panelWidth = Math.min(280, (availableWidth - this.STANDARD_SPACING) / 2);
@@ -109,24 +153,24 @@ export class PlayerDetailScene extends BaseScene {
     const mainPanel = this.createStatsPanel(
       'Player Information',
       [
-        `Username: ${mockPlayer.username}`,
-        `Level: ${mockPlayer.level}`,
-        `Experience: ${mockPlayer.exp}`,
-        `Characters: ${mockPlayer.characters.length}`
+        `Username: ${this.player.username}`,
+        `Level: ${this.player.level}`,
+        `Experience: ${this.player.exp}`,
+        `Characters: ${this.characters.length}`
       ],
       panelWidth, 160
     );
     
     // Stats panel with temporary changes applied
-    const currentSta = mockPlayer.sta + this.tempStatChanges.sta;
-    const currentStr = mockPlayer.str + this.tempStatChanges.str;
-    const currentAgi = mockPlayer.agi + this.tempStatChanges.agi;
+    const currentSta = this.player.sta + this.tempStatChanges.sta;
+    const currentStr = this.player.str + this.tempStatChanges.str;
+    const currentAgi = this.player.agi + this.tempStatChanges.agi;
     
     const statsText = [
       `Stamina: ${currentSta}${this.tempStatChanges.sta !== 0 ? ` (${this.tempStatChanges.sta > 0 ? '+' : ''}${this.tempStatChanges.sta})` : ''}`,
       `Strength: ${currentStr}${this.tempStatChanges.str !== 0 ? ` (${this.tempStatChanges.str > 0 ? '+' : ''}${this.tempStatChanges.str})` : ''}`,
       `Agility: ${currentAgi}${this.tempStatChanges.agi !== 0 ? ` (${this.tempStatChanges.agi > 0 ? '+' : ''}${this.tempStatChanges.agi})` : ''}`,
-      `Luck: ${mockPlayer.luck}`
+      `Luck: ${this.player.luck}`
     ];
     
     const statsPanel = this.createStatsPanel(
@@ -182,8 +226,10 @@ export class PlayerDetailScene extends BaseScene {
   }
 
   private createPointDistributionPanel(): void {
+    if (!this.player) return;
+    
     // Only show the panel if the player has points to distribute
-    if (mockPlayer.points <= 0) {
+    if (this.player.points <= 0) {
       return;
     }
 
@@ -223,9 +269,9 @@ export class PlayerDetailScene extends BaseScene {
     
     // Stat controls
     const stats = [
-      { name: 'Stamina', key: 'sta' as keyof typeof this.tempStatChanges, current: mockPlayer.sta },
-      { name: 'Strength', key: 'str' as keyof typeof this.tempStatChanges, current: mockPlayer.str },
-      { name: 'Agility', key: 'agi' as keyof typeof this.tempStatChanges, current: mockPlayer.agi }
+      { name: 'Stamina', key: 'sta' as keyof typeof this.tempStatChanges, current: this.player.sta },
+      { name: 'Strength', key: 'str' as keyof typeof this.tempStatChanges, current: this.player.str },
+      { name: 'Agility', key: 'agi' as keyof typeof this.tempStatChanges, current: this.player.agi }
     ];
     
     stats.forEach((stat, index) => {
@@ -281,7 +327,7 @@ export class PlayerDetailScene extends BaseScene {
       40,
       () => {
         this.tempStatChanges = { sta: 0, str: 0, agi: 0 };
-        this.remainingPoints = mockPlayer.points;
+        this.remainingPoints = this.player.points;
         this.refreshPointDistributionPanel();
       }
     );
@@ -292,18 +338,38 @@ export class PlayerDetailScene extends BaseScene {
       panelHeight - 50,
       100,
       40,
-      () => {
-        // Apply changes to mock player data
-        mockPlayer.sta += this.tempStatChanges.sta;
-        mockPlayer.str += this.tempStatChanges.str;
-        mockPlayer.agi += this.tempStatChanges.agi;
-        mockPlayer.points = this.remainingPoints;
-        
-        // Reset temporary changes
-        this.tempStatChanges = { sta: 0, str: 0, agi: 0 };
-        
-        // Refresh the entire UI
-        this.updateLayout();
+      async () => {
+        try {
+          // Apply changes to player data via API
+          const updatedStats = {
+            sta: this.player.sta + this.tempStatChanges.sta,
+            str: this.player.str + this.tempStatChanges.str,
+            agi: this.player.agi + this.tempStatChanges.agi,
+            points: this.remainingPoints
+          };
+          
+          this.loadingManager.showLoading();
+          await playerApi.updatePlayerStats(this.player.id, updatedStats);
+          
+          // Update local player data
+          this.player.sta = updatedStats.sta;
+          this.player.str = updatedStats.str;
+          this.player.agi = updatedStats.agi;
+          this.player.points = updatedStats.points;
+          
+          // Reset temporary changes
+          this.tempStatChanges = { sta: 0, str: 0, agi: 0 };
+          
+          this.loadingManager.hideLoading();
+          // Refresh the entire UI
+          this.updateLayout();
+        } catch (error) {
+          console.error('Failed to update player stats:', error);
+          const errorMessage = error instanceof ApiError 
+            ? error.message 
+            : 'Failed to update stats. Please try again.';
+          this.loadingManager.showError(errorMessage);
+        }
       }
     );
     
@@ -367,13 +433,15 @@ export class PlayerDetailScene extends BaseScene {
   }
 
   private createCharacterCollection(): void {
+    if (!this.player) return;
+    
     // Card layout with standard spacing
     const cardWidth = 120;
     const cardHeight = 140;
-    const totalCards = mockPlayer.characters.length;
+    const totalCards = this.characters.length;
 
     // Calculate Y position based on whether point distribution panel is shown
-    const baseY = mockPlayer.points > 0 ? 560 : 360; // Add 200px offset if point panel is shown
+    const baseY = this.player.points > 0 ? 560 : 360; // Add 200px offset if point panel is shown
 
     // Title - centered
     const collectionTitle = new Text({ text: 'Character Collection', style: {
@@ -397,15 +465,12 @@ export class PlayerDetailScene extends BaseScene {
     });
 
     // Add cards to ScrollBox viewport, always from left (no marginLeft)
-    mockPlayer.characters.forEach((characterId, index) => {
-      const character = mockCharacters.find(c => c.id === characterId);
-      if (character) {
-        const card = this.createCharacterPreviewCard(character, this.STANDARD_PADDING + index * (cardWidth + this.STANDARD_SPACING), 0);
-        // Position cards horizontally with spacing, always from left
-        card.x = index * (cardWidth + this.STANDARD_SPACING);
-        card.y = 0;
-        scrollBox.addItem(card);
-      }
+    this.characters.forEach((character, index) => {
+      const card = this.createCharacterPreviewCard(character, this.STANDARD_PADDING + index * (cardWidth + this.STANDARD_SPACING), 0);
+      // Position cards horizontally with spacing, always from left
+      card.x = index * (cardWidth + this.STANDARD_SPACING);
+      card.y = 0;
+      scrollBox.addItem(card);
     });
 
     // Set viewport width for scrolling (include padding)
