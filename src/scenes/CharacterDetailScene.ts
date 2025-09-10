@@ -358,6 +358,9 @@ export class CharacterDetailScene extends BaseScene {
         // Skill exists - show skill details
         const skill = charSkill.skill;
         
+        // Create a container for the skill to make it clickable
+        const skillContainer = new Container();
+        
         // Skill name
         const skillName = new Text({
           text: skill.name,
@@ -386,7 +389,42 @@ export class CharacterDetailScene extends BaseScene {
         skillDesc.x = padding + 80 + skillName.width + 10;
         skillDesc.y = y;
 
-        this.skillsContainer.addChild(badge, badgeText, skillName, skillDesc);
+        // Add change skill button for active and passive skills
+        if (skillType.type === 'active_skill' || skillType.type === 'passive_skill') {
+          const changeButton = new Container();
+          const buttonBg = new Graphics();
+          buttonBg.roundRect(0, 0, 70, 20, 4)
+            .fill({ color: Colors.BUTTON_HOVER, alpha: 0.7 })
+            .stroke({ width: 1, color: Colors.BUTTON_BORDER });
+          
+          const buttonText = new Text({
+            text: 'Change',
+            style: {
+              fontFamily: 'Kalam',
+              fontSize: 10,
+              fill: Colors.TEXT_BUTTON
+            }
+          });
+          buttonText.anchor.set(0.5);
+          buttonText.x = 35;
+          buttonText.y = 10;
+
+          changeButton.addChild(buttonBg, buttonText);
+          changeButton.x = panelWidth - padding - 80;
+          changeButton.y = y - 2;
+          
+          // Make change button interactive
+          changeButton.interactive = true;
+          changeButton.cursor = 'pointer';
+          changeButton.on('pointerdown', () => {
+            this.showSkillChangeDialog(skillType.type, skill);
+          });
+
+          skillContainer.addChild(changeButton);
+        }
+
+        skillContainer.addChild(skillName, skillDesc);
+        this.skillsContainer.addChild(badge, badgeText, skillContainer);
       } else {
         // Skill slot is empty - show learn option
         const emptyText = new Text({
@@ -442,14 +480,14 @@ export class CharacterDetailScene extends BaseScene {
   }
 
   private showLearnSkillDialog(skillType: string): void {
-    // Create a simple dialog for now - this could be expanded later
+    // Create skill learning dialog with actual skill options
     const dialogBg = new Graphics();
     dialogBg.rect(0, 0, this.gameWidth, this.gameHeight)
       .fill({ color: 0x000000, alpha: 0.7 });
     
     const dialogPanel = new Graphics();
-    const dialogWidth = Math.min(400, this.gameWidth - 40);
-    const dialogHeight = 200;
+    const dialogWidth = Math.min(500, this.gameWidth - 40);
+    const dialogHeight = 450;
     const dialogX = (this.gameWidth - dialogWidth) / 2;
     const dialogY = (this.gameHeight - dialogHeight) / 2;
     
@@ -471,20 +509,81 @@ export class CharacterDetailScene extends BaseScene {
     dialogTitle.x = this.gameWidth / 2;
     dialogTitle.y = dialogY + 20;
 
-    const dialogText = new Text({
-      text: 'Skill learning feature coming soon!\nThis will allow you to choose from available skills.',
+    const instructionText = new Text({
+      text: 'Choose a skill to learn:',
       style: {
         fontFamily: 'Kalam',
         fontSize: 14,
         fill: Colors.TEXT_SECONDARY,
-        align: 'center',
-        wordWrap: true,
-        wordWrapWidth: dialogWidth - 40
+        align: 'center'
       }
     });
-    dialogText.anchor.set(0.5);
-    dialogText.x = this.gameWidth / 2;
-    dialogText.y = dialogY + dialogHeight / 2;
+    instructionText.anchor.set(0.5, 0);
+    instructionText.x = this.gameWidth / 2;
+    instructionText.y = dialogY + 55;
+
+    // Available skills for learning
+    const availableSkills = this.getAvailableSkills(skillType);
+    let optionY = dialogY + 90;
+
+    const skillOptions: Container[] = [];
+
+    availableSkills.forEach((skill) => {
+      const optionContainer = new Container();
+      
+      const optionBg = new Graphics();
+      optionBg.roundRect(0, 0, dialogWidth - 40, 50, 6)
+        .fill({ color: Colors.CONTAINER_BACKGROUND, alpha: 0.8 })
+        .stroke({ width: 1, color: Colors.BUTTON_BORDER });
+      
+      const skillName = new Text({
+        text: skill.name,
+        style: {
+          fontFamily: 'Kalam',
+          fontSize: 14,
+          fontWeight: 'bold',
+          fill: Colors.TEXT_PRIMARY
+        }
+      });
+      skillName.x = 10;
+      skillName.y = 5;
+      
+      const skillDescription = new Text({
+        text: skill.description,
+        style: {
+          fontFamily: 'Kalam',
+          fontSize: 12,
+          fill: Colors.TEXT_SECONDARY,
+          wordWrap: true,
+          wordWrapWidth: dialogWidth - 60
+        }
+      });
+      skillDescription.x = 10;
+      skillDescription.y = 25;
+      
+      optionContainer.addChild(optionBg, skillName, skillDescription);
+      optionContainer.x = dialogX + 20;
+      optionContainer.y = optionY;
+      
+      // Make option interactive
+      optionContainer.interactive = true;
+      optionContainer.cursor = 'pointer';
+      optionContainer.on('pointerdown', () => {
+        this.learnSkill(skillType, skill);
+        this.container.removeChild(dialogContainer);
+      });
+      
+      // Add hover effect
+      optionContainer.on('pointerover', () => {
+        optionBg.tint = 0xdddddd;
+      });
+      optionContainer.on('pointerout', () => {
+        optionBg.tint = 0xffffff;
+      });
+      
+      skillOptions.push(optionContainer);
+      optionY += 60;
+    });
 
     const closeButton = this.createButton(
       'Close',
@@ -498,7 +597,7 @@ export class CharacterDetailScene extends BaseScene {
     );
 
     const dialogContainer = new Container();
-    dialogContainer.addChild(dialogBg, dialogPanel, dialogTitle, dialogText, closeButton);
+    dialogContainer.addChild(dialogBg, dialogPanel, dialogTitle, instructionText, ...skillOptions, closeButton);
     
     // Make background clickable to close
     dialogBg.interactive = true;
@@ -507,6 +606,183 @@ export class CharacterDetailScene extends BaseScene {
     });
     
     this.container.addChild(dialogContainer);
+  }
+
+  private learnSkill(skillType: string, skill: {name: string, description: string}): void {
+    // This is where you would add the skill to the character
+    // For now, just log and refresh the display
+    console.log(`Learned ${skillType}: ${skill.name}`);
+    
+    // Update the skills display
+    this.skillsContainer.removeChildren();
+    this.createSkillsDisplay();
+  }
+
+  private showSkillChangeDialog(skillType: string, currentSkill: any): void {
+    // Create skill change dialog
+    const dialogBg = new Graphics();
+    dialogBg.rect(0, 0, this.gameWidth, this.gameHeight)
+      .fill({ color: 0x000000, alpha: 0.7 });
+    
+    const dialogPanel = new Graphics();
+    const dialogWidth = Math.min(500, this.gameWidth - 40);
+    const dialogHeight = 450;
+    const dialogX = (this.gameWidth - dialogWidth) / 2;
+    const dialogY = (this.gameHeight - dialogHeight) / 2;
+    
+    dialogPanel.roundRect(dialogX, dialogY, dialogWidth, dialogHeight, 12)
+      .fill({ color: Colors.PANEL_BACKGROUND })
+      .stroke({ width: 3, color: Colors.BUTTON_PRIMARY });
+
+    const dialogTitle = new Text({
+      text: `Change ${skillType.replace('_', ' ').toUpperCase()} Skill`,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 18,
+        fontWeight: 'bold',
+        fill: Colors.TEXT_PRIMARY,
+        align: 'center'
+      }
+    });
+    dialogTitle.anchor.set(0.5, 0);
+    dialogTitle.x = this.gameWidth / 2;
+    dialogTitle.y = dialogY + 20;
+
+    // Current skill info
+    const currentText = new Text({
+      text: `Current: ${currentSkill.name}`,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 14,
+        fontWeight: 'bold',
+        fill: Colors.TEXT_SECONDARY,
+        align: 'center'
+      }
+    });
+    currentText.anchor.set(0.5, 0);
+    currentText.x = this.gameWidth / 2;
+    currentText.y = dialogY + 55;
+
+    // Available skills (mock data for now)
+    const availableSkills = this.getAvailableSkills(skillType);
+    let optionY = dialogY + 90;
+
+    const skillOptions: Container[] = [];
+
+    availableSkills.forEach((skill) => {
+      const optionContainer = new Container();
+      
+      const optionBg = new Graphics();
+      const isCurrentSkill = skill.name === currentSkill.name;
+      optionBg.roundRect(0, 0, dialogWidth - 40, 50, 6)
+        .fill({ color: isCurrentSkill ? Colors.BUTTON_PRIMARY : Colors.CONTAINER_BACKGROUND, alpha: 0.8 })
+        .stroke({ width: 1, color: Colors.BUTTON_BORDER });
+      
+      const skillName = new Text({
+        text: skill.name,
+        style: {
+          fontFamily: 'Kalam',
+          fontSize: 14,
+          fontWeight: 'bold',
+          fill: isCurrentSkill ? Colors.TEXT_BUTTON : Colors.TEXT_PRIMARY
+        }
+      });
+      skillName.x = 10;
+      skillName.y = 5;
+      
+      const skillDescription = new Text({
+        text: skill.description,
+        style: {
+          fontFamily: 'Kalam',
+          fontSize: 12,
+          fill: isCurrentSkill ? Colors.TEXT_BUTTON : Colors.TEXT_SECONDARY,
+          wordWrap: true,
+          wordWrapWidth: dialogWidth - 60
+        }
+      });
+      skillDescription.x = 10;
+      skillDescription.y = 25;
+      
+      optionContainer.addChild(optionBg, skillName, skillDescription);
+      optionContainer.x = dialogX + 20;
+      optionContainer.y = optionY;
+      
+      // Make option interactive (except current skill)
+      if (!isCurrentSkill) {
+        optionContainer.interactive = true;
+        optionContainer.cursor = 'pointer';
+        optionContainer.on('pointerdown', () => {
+          this.changeSkill(skillType, skill);
+          this.container.removeChild(dialogContainer);
+        });
+        
+        // Add hover effect
+        optionContainer.on('pointerover', () => {
+          optionBg.tint = 0xdddddd;
+        });
+        optionContainer.on('pointerout', () => {
+          optionBg.tint = 0xffffff;
+        });
+      }
+      
+      skillOptions.push(optionContainer);
+      optionY += 60;
+    });
+
+    const closeButton = this.createButton(
+      'Close',
+      dialogX + (dialogWidth - 100) / 2,
+      dialogY + dialogHeight - 60,
+      100,
+      40,
+      () => {
+        this.container.removeChild(dialogContainer);
+      }
+    );
+
+    const dialogContainer = new Container();
+    dialogContainer.addChild(dialogBg, dialogPanel, dialogTitle, currentText, ...skillOptions, closeButton);
+    
+    // Make background clickable to close
+    dialogBg.interactive = true;
+    dialogBg.on('pointerdown', () => {
+      this.container.removeChild(dialogContainer);
+    });
+    
+    this.container.addChild(dialogContainer);
+  }
+
+  private getAvailableSkills(skillType: string): Array<{name: string, description: string}> {
+    // Mock available skills data - this could be fetched from API later
+    const skillsData: Record<string, Array<{name: string, description: string}>> = {
+      active_skill: [
+        { name: 'Fireball', description: 'Deals fire damage to target enemy. Moderate damage with burn effect.' },
+        { name: 'Heal', description: 'Restores HP to target ally. Can be used multiple times per battle.' },
+        { name: 'Lightning Strike', description: 'Electric attack that can chain to nearby enemies. High damage.' },
+        { name: 'Shield Bash', description: 'Physical attack that also reduces enemy defense temporarily.' },
+        { name: 'Frost Bolt', description: 'Ice attack that slows enemy movement and attack speed.' }
+      ],
+      passive_skill: [
+        { name: 'Iron Will', description: 'Increases resistance to debuffs and status effects by 25%.' },
+        { name: 'Critical Focus', description: 'Increases critical hit rate by 10% and critical damage by 15%.' },
+        { name: 'Battle Fury', description: 'Attack power increases by 5% for each enemy defeated in battle.' },
+        { name: 'Mana Shield', description: 'Absorbs 20% of incoming damage using MP instead of HP.' },
+        { name: 'Swift Strike', description: 'Increases attack speed by 15% and dodge rate by 8%.' },
+        { name: 'Berserker Rage', description: 'Attack power increases as HP decreases. Max +30% at 25% HP.' }
+      ]
+    };
+    
+    return skillsData[skillType] || [];
+  }
+
+  private changeSkill(skillType: string, skill: {name: string, description: string}): void {
+    // This is where you would update the character's skill
+    // For now, just log and refresh the display
+    console.log(`Changed ${skillType} to ${skill.name}`);
+    
+    // Update the skills display
+    this.skillsContainer.removeChildren();
+    this.createSkillsDisplay();
   }
 
   private createEquipmentDisplay(): void {
