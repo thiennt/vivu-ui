@@ -43,6 +43,10 @@ export const Colors = {
   // Card borders
   CARD_BORDER: 0x3e2723,
 
+  // Panel and container backgrounds
+  PANEL_BACKGROUND: 0x4e342e,
+  CONTAINER_BACKGROUND: 0x5d4037,
+
   // Decorative elements
   DECORATION_MAGIC: 0x4fc3f7,
 

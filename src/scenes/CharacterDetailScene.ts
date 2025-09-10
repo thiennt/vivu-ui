@@ -5,6 +5,7 @@ import { BaseScene } from '@/utils/BaseScene';
 import { CharactersScene } from './CharactersScene';
 import { charactersApi, ApiError, isLikelyUsingMockData } from '@/services/api';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
+import { Colors } from '@/utils/colors';
 
 export class CharacterDetailScene extends BaseScene {
   /** Assets bundles required by this screen */
@@ -130,7 +131,7 @@ export class CharacterDetailScene extends BaseScene {
 
   private createBackground(): void {
     const bg = new Graphics();
-    bg.fill(0x2c1810).rect(0, 0, this.gameWidth, this.gameHeight);
+    bg.fill(Colors.BACKGROUND_PRIMARY).rect(0, 0, this.gameWidth, this.gameHeight);
     this.backgroundContainer.addChild(bg);
   }
 
@@ -146,15 +147,15 @@ export class CharacterDetailScene extends BaseScene {
     // Header panel background
     const headerPanel = new Graphics();
     headerPanel.roundRect(0, 0, panelWidth, 120, 12)
-      .fill({ color: 0x3e2723, alpha: 0.9 })
-      .stroke({ width: 3, color: 0x8d6e63 });
+      .fill({ color: Colors.PANEL_BACKGROUND, alpha: 0.9 })
+      .stroke({ width: 3, color: Colors.BUTTON_PRIMARY });
     
     // Avatar placeholder (left side)
     const avatarSize = 80;
     const avatar = new Graphics();
     avatar.roundRect(padding, 20, avatarSize, avatarSize, 8)
-      .fill({ color: 0x5d4037, alpha: 0.8 })
-      .stroke({ width: 2, color: 0x8d6e63 });
+      .fill({ color: Colors.BUTTON_BORDER, alpha: 0.8 })
+      .stroke({ width: 2, color: Colors.BUTTON_PRIMARY });
     
     // Avatar text (ticker symbol)
     const avatarText = new Text({
@@ -163,7 +164,7 @@ export class CharacterDetailScene extends BaseScene {
         fontFamily: 'Kalam',
         fontSize: 24,
         fontWeight: 'bold',
-        fill: 0xffffff
+        fill: Colors.TEXT_WHITE
       }
     });
     avatarText.anchor.set(0.5);
@@ -177,7 +178,7 @@ export class CharacterDetailScene extends BaseScene {
         fontFamily: 'Kalam',
         fontSize: 28,
         fontWeight: 'bold',
-        fill: 0xffecb3
+        fill: Colors.TEXT_PRIMARY
       }
     });
     nameText.x = padding + avatarSize + 20;
@@ -188,7 +189,7 @@ export class CharacterDetailScene extends BaseScene {
     const tickerWidth = 60;
     tickerBadge.roundRect(nameText.x + nameText.width + 15, 25, tickerWidth, 30, 4)
       .fill({ color: this.getRarityColor(this.character!.rarity), alpha: 0.8 })
-      .stroke({ width: 1, color: 0xffffff });
+      .stroke({ width: 1, color: Colors.TEXT_WHITE });
     
     const tickerText = new Text({
       text: this.character!.ticker,
@@ -196,7 +197,7 @@ export class CharacterDetailScene extends BaseScene {
         fontFamily: 'Kalam',
         fontSize: 14,
         fontWeight: 'bold',
-        fill: 0xffffff
+        fill: Colors.TEXT_WHITE
       }
     });
     tickerText.anchor.set(0.5);
@@ -210,7 +211,7 @@ export class CharacterDetailScene extends BaseScene {
         fontFamily: 'Kalam',
         fontSize: 20,
         fontWeight: 'bold',
-        fill: 0xd7ccc8
+        fill: Colors.TEXT_SECONDARY
       }
     });
     classLevelText.x = panelWidth - classLevelText.width - padding;
@@ -222,7 +223,7 @@ export class CharacterDetailScene extends BaseScene {
       style: {
         fontFamily: 'Kalam',
         fontSize: 14,
-        fill: 0xa1887f,
+        fill: Colors.TEXT_TERTIARY,
         wordWrap: true,
         wordWrapWidth: panelWidth - padding - avatarSize - 40
       }
@@ -245,8 +246,8 @@ export class CharacterDetailScene extends BaseScene {
     const coreStatsHeight = 80;
     const coreStatsPanel = new Graphics();
     coreStatsPanel.roundRect(0, 0, panelWidth, coreStatsHeight, 12)
-      .fill({ color: 0x3e2723, alpha: 0.9 })
-      .stroke({ width: 3, color: 0x8d6e63 });
+      .fill({ color: Colors.PANEL_BACKGROUND, alpha: 0.9 })
+      .stroke({ width: 3, color: Colors.BUTTON_PRIMARY });
 
     // Core stats: HP, ATK, DEF, AGI (prominent display)
     const coreStats = [
@@ -267,7 +268,7 @@ export class CharacterDetailScene extends BaseScene {
           fontFamily: 'Kalam',
           fontSize: 18,
           fontWeight: 'bold',
-          fill: 0xd7ccc8
+          fill: Colors.TEXT_SECONDARY
         }
       });
       nameText.x = x;
@@ -293,8 +294,8 @@ export class CharacterDetailScene extends BaseScene {
     const otherStatsHeight = 120;
     const otherStatsPanel = new Graphics();
     otherStatsPanel.roundRect(0, 0, panelWidth, otherStatsHeight, 12)
-      .fill({ color: 0x3e2723, alpha: 0.9 })
-      .stroke({ width: 3, color: 0x8d6e63 });
+      .fill({ color: Colors.PANEL_BACKGROUND, alpha: 0.9 })
+      .stroke({ width: 3, color: Colors.BUTTON_PRIMARY });
 
     // Other stats in grid layout
     const otherStats = [
@@ -352,8 +353,8 @@ export class CharacterDetailScene extends BaseScene {
     // Skills panel background
     const skillsPanel = new Graphics();
     skillsPanel.roundRect(0, 0, panelWidth, panelHeight, 12)
-      .fill({ color: 0x3e2723, alpha: 0.9 })
-      .stroke({ width: 3, color: 0x8d6e63 });
+      .fill({ color: Colors.PANEL_BACKGROUND, alpha: 0.9 })
+      .stroke({ width: 3, color: Colors.BUTTON_PRIMARY });
 
     // Title
     const title = new Text({
@@ -362,7 +363,7 @@ export class CharacterDetailScene extends BaseScene {
         fontFamily: 'Kalam',
         fontSize: 18,
         fontWeight: 'bold',
-        fill: 0xffecb3
+        fill: Colors.TEXT_PRIMARY
       }
     });
     title.x = padding;
@@ -396,7 +397,7 @@ export class CharacterDetailScene extends BaseScene {
       const badge = new Graphics();
       badge.roundRect(padding, y - 5, 70, 20, 4)
         .fill({ color: badgeColor, alpha: 0.8 })
-        .stroke({ width: 1, color: 0xffffff });
+        .stroke({ width: 1, color: Colors.TEXT_WHITE });
       
       // Badge text
       const badgeText = new Text({
@@ -405,7 +406,7 @@ export class CharacterDetailScene extends BaseScene {
           fontFamily: 'Kalam',
           fontSize: 10,
           fontWeight: 'bold',
-          fill: 0xffffff
+          fill: Colors.TEXT_WHITE
         }
       });
       badgeText.anchor.set(0.5);
@@ -419,7 +420,7 @@ export class CharacterDetailScene extends BaseScene {
           fontFamily: 'Kalam',
           fontSize: 14,
           fontWeight: 'bold',
-          fill: 0xffecb3
+          fill: Colors.TEXT_PRIMARY
         }
       });
       skillName.x = padding + 80;
@@ -436,7 +437,7 @@ export class CharacterDetailScene extends BaseScene {
         style: {
           fontFamily: 'Kalam',
           fontSize: 12,
-          fill: 0xd7ccc8
+          fill: Colors.TEXT_SECONDARY
         }
       });
       skillDesc.x = padding + 80 + skillName.width + 10;
@@ -459,8 +460,8 @@ export class CharacterDetailScene extends BaseScene {
     // Equipment panel background
     const equipmentPanel = new Graphics();
     equipmentPanel.roundRect(0, 0, panelWidth, panelHeight, 12)
-      .fill({ color: 0x3e2723, alpha: 0.9 })
-      .stroke({ width: 3, color: 0x8d6e63 });
+      .fill({ color: Colors.PANEL_BACKGROUND, alpha: 0.9 })
+      .stroke({ width: 3, color: Colors.BUTTON_PRIMARY });
 
     // Title
     const title = new Text({
@@ -469,7 +470,7 @@ export class CharacterDetailScene extends BaseScene {
         fontFamily: 'Kalam',
         fontSize: 18,
         fontWeight: 'bold',
-        fill: 0xffecb3
+        fill: Colors.TEXT_PRIMARY
       }
     });
     title.x = padding;
@@ -493,8 +494,8 @@ export class CharacterDetailScene extends BaseScene {
       // Slot background
       const slotBg = new Graphics();
       slotBg.roundRect(x, y, slotWidth - 10, 40, 6)
-        .fill({ color: slot.item === '(empty)' ? 0x424242 : 0x5d4037, alpha: 0.8 })
-        .stroke({ width: 1, color: 0x8d6e63 });
+        .fill({ color: slot.item === '(empty)' ? 0x424242 : Colors.BUTTON_BORDER, alpha: 0.8 })
+        .stroke({ width: 1, color: Colors.BUTTON_PRIMARY });
       
       // Slot type label
       const slotLabel = new Text({
@@ -503,7 +504,7 @@ export class CharacterDetailScene extends BaseScene {
           fontFamily: 'Kalam',
           fontSize: 12,
           fontWeight: 'bold',
-          fill: 0xd7ccc8
+          fill: Colors.TEXT_SECONDARY
         }
       });
       slotLabel.x = x + 5;
@@ -515,7 +516,7 @@ export class CharacterDetailScene extends BaseScene {
         style: {
           fontFamily: 'Kalam',
           fontSize: 14,
-          fill: slot.item === '(empty)' ? 0x9e9e9e : 0xffecb3
+          fill: slot.item === '(empty)' ? Colors.TEXT_TERTIARY : Colors.TEXT_PRIMARY
         }
       });
       itemText.x = x + 5;
@@ -530,7 +531,7 @@ export class CharacterDetailScene extends BaseScene {
 
   private getRarityColor(rarity: string): number {
     const colors: { [key: string]: number } = {
-      common: 0x8d6e63,
+      common: Colors.RARITY_COMMON,
       uncommon: 0x66bb6a,
       rare: 0x42a5f5,
       epic: 0xab47bc,
