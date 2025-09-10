@@ -3,7 +3,7 @@ import { navigation } from '@/utils/navigation';
 import { HomeScene } from './HomeScene';
 import { BaseScene } from '@/utils/BaseScene';
 import { CharactersScene } from './CharactersScene';
-import { charactersApi, ApiError, isLikelyUsingMockData } from '@/services/api';
+import { charactersApi, isLikelyUsingMockData } from '@/services/api';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
 import { Colors } from '@/utils/colors';
 
@@ -295,7 +295,7 @@ export class CharacterDetailScene extends BaseScene {
   private createSkillsDisplay(): void {
     const padding = 15;
     const panelWidth = this.gameWidth - 2 * padding;
-    const panelHeight = 180;
+    const panelHeight = 220; // Increased height for multi-line descriptions
 
     // Skills panel background
     const skillsPanel = new Graphics();
@@ -318,37 +318,31 @@ export class CharacterDetailScene extends BaseScene {
 
     this.skillsContainer.addChild(skillsPanel, title);
 
-    // Skills layout - one per row
+    // Define all skill types that should always be shown
+    const skillTypes = [
+      { type: 'normal_attack', label: 'Normal', color: 0x9e9e9e },
+      { type: 'active_skill', label: 'Active', color: 0x2196f3 },
+      { type: 'passive_skill', label: 'Passive', color: 0x4caf50 }
+    ];
+
+    // Skills layout - always show 3 skill types
     let y = 50;
     
-    this.characterSkills.forEach((char_skill, index: number) => {
-      if (!char_skill) return;
-      const skill = char_skill.skill;
-      // Skill type badge
-      const badgeColors: { [key: string]: number } = {
-        'normal_attack': 0x9e9e9e,
-        'active_skill': 0x2196f3,
-        'passive_skill': 0x4caf50
-      };
-      
-      const badgeLabels: { [key: string]: string } = {
-        'normal_attack': 'Normal',
-        'active_skill': 'Active',
-        'passive_skill': 'Passive'
-      };
-      
-      const badgeColor = badgeColors[skill.skill_type] || 0x9e9e9e;
-      const badgeLabel = badgeLabels[skill.skill_type] || 'Unknown';
+    skillTypes.forEach((skillType) => {
+      // Find existing skill of this type
+      const charSkill = this.characterSkills.find(cs => 
+        cs && cs.skill && cs.skill.skill_type === skillType.type
+      );
       
       // Badge background
       const badge = new Graphics();
       badge.roundRect(padding, y - 5, 70, 20, 4)
-        .fill({ color: badgeColor, alpha: 0.8 })
+        .fill({ color: skillType.color, alpha: 0.8 })
         .stroke({ width: 1, color: Colors.TEXT_WHITE });
       
       // Badge text
       const badgeText = new Text({
-        text: badgeLabel,
+        text: skillType.label,
         style: {
           fontFamily: 'Kalam',
           fontSize: 10,
@@ -360,43 +354,159 @@ export class CharacterDetailScene extends BaseScene {
       badgeText.x = padding + 35;
       badgeText.y = y + 5;
 
-      // Skill name
-      const skillName = new Text({
-        text: skill.name,
-        style: {
-          fontFamily: 'Kalam',
-          fontSize: 14,
-          fontWeight: 'bold',
-          fill: Colors.TEXT_PRIMARY
-        }
-      });
-      skillName.x = padding + 80;
-      skillName.y = y;
-
-      // Skill description (truncated)
-      const maxDescLength = 50;
-      const truncatedDesc = skill.description.length > maxDescLength 
-        ? skill.description.substring(0, maxDescLength) + '...'
-        : skill.description;
+      if (charSkill && charSkill.skill) {
+        // Skill exists - show skill details
+        const skill = charSkill.skill;
         
-      const skillDesc = new Text({
-        text: truncatedDesc,
-        style: {
-          fontFamily: 'Kalam',
-          fontSize: 12,
-          fill: Colors.TEXT_SECONDARY
-        }
-      });
-      skillDesc.x = padding + 80 + skillName.width + 10;
-      skillDesc.y = y;
+        // Skill name
+        const skillName = new Text({
+          text: skill.name,
+          style: {
+            fontFamily: 'Kalam',
+            fontSize: 14,
+            fontWeight: 'bold',
+            fill: Colors.TEXT_PRIMARY
+          }
+        });
+        skillName.x = padding + 80;
+        skillName.y = y;
 
-      this.skillsContainer.addChild(badge, badgeText, skillName, skillDesc);
+        // Skill description with multi-line support
+        const descriptionWidth = panelWidth - (padding + 80 + skillName.width + 20) - padding;
+        const skillDesc = new Text({
+          text: skill.description,
+          style: {
+            fontFamily: 'Kalam',
+            fontSize: 12,
+            fill: Colors.TEXT_SECONDARY,
+            wordWrap: true,
+            wordWrapWidth: Math.max(200, descriptionWidth)
+          }
+        });
+        skillDesc.x = padding + 80 + skillName.width + 10;
+        skillDesc.y = y;
 
-      y += 30;
+        this.skillsContainer.addChild(badge, badgeText, skillName, skillDesc);
+      } else {
+        // Skill slot is empty - show learn option
+        const emptyText = new Text({
+          text: '(Empty)',
+          style: {
+            fontFamily: 'Kalam',
+            fontSize: 14,
+            fontStyle: 'italic',
+            fill: Colors.TEXT_TERTIARY
+          }
+        });
+        emptyText.x = padding + 80;
+        emptyText.y = y;
+
+        // Learn skill button
+        const learnButton = new Container();
+        const buttonBg = new Graphics();
+        buttonBg.roundRect(0, 0, 80, 20, 4)
+          .fill({ color: Colors.BUTTON_PRIMARY, alpha: 0.7 })
+          .stroke({ width: 1, color: Colors.BUTTON_BORDER });
+        
+        const buttonText = new Text({
+          text: 'Learn Skill',
+          style: {
+            fontFamily: 'Kalam',
+            fontSize: 10,
+            fill: Colors.TEXT_BUTTON
+          }
+        });
+        buttonText.anchor.set(0.5);
+        buttonText.x = 40;
+        buttonText.y = 10;
+
+        learnButton.addChild(buttonBg, buttonText);
+        learnButton.x = padding + 80 + emptyText.width + 10;
+        learnButton.y = y - 2;
+        
+        // Make learn button interactive
+        learnButton.interactive = true;
+        learnButton.cursor = 'pointer';
+        learnButton.on('pointerdown', () => {
+          this.showLearnSkillDialog(skillType.type);
+        });
+
+        this.skillsContainer.addChild(badge, badgeText, emptyText, learnButton);
+      }
+
+      y += 55; // Increased spacing for multi-line descriptions
     });
 
     this.skillsContainer.x = padding;
     this.skillsContainer.y = 400; // Below stats sections
+  }
+
+  private showLearnSkillDialog(skillType: string): void {
+    // Create a simple dialog for now - this could be expanded later
+    const dialogBg = new Graphics();
+    dialogBg.rect(0, 0, this.gameWidth, this.gameHeight)
+      .fill({ color: 0x000000, alpha: 0.7 });
+    
+    const dialogPanel = new Graphics();
+    const dialogWidth = Math.min(400, this.gameWidth - 40);
+    const dialogHeight = 200;
+    const dialogX = (this.gameWidth - dialogWidth) / 2;
+    const dialogY = (this.gameHeight - dialogHeight) / 2;
+    
+    dialogPanel.roundRect(dialogX, dialogY, dialogWidth, dialogHeight, 12)
+      .fill({ color: Colors.PANEL_BACKGROUND })
+      .stroke({ width: 3, color: Colors.BUTTON_PRIMARY });
+
+    const dialogTitle = new Text({
+      text: `Learn ${skillType.replace('_', ' ').toUpperCase()} Skill`,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 18,
+        fontWeight: 'bold',
+        fill: Colors.TEXT_PRIMARY,
+        align: 'center'
+      }
+    });
+    dialogTitle.anchor.set(0.5, 0);
+    dialogTitle.x = this.gameWidth / 2;
+    dialogTitle.y = dialogY + 20;
+
+    const dialogText = new Text({
+      text: 'Skill learning feature coming soon!\nThis will allow you to choose from available skills.',
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 14,
+        fill: Colors.TEXT_SECONDARY,
+        align: 'center',
+        wordWrap: true,
+        wordWrapWidth: dialogWidth - 40
+      }
+    });
+    dialogText.anchor.set(0.5);
+    dialogText.x = this.gameWidth / 2;
+    dialogText.y = dialogY + dialogHeight / 2;
+
+    const closeButton = this.createButton(
+      'Close',
+      dialogX + (dialogWidth - 100) / 2,
+      dialogY + dialogHeight - 60,
+      100,
+      40,
+      () => {
+        this.container.removeChild(dialogContainer);
+      }
+    );
+
+    const dialogContainer = new Container();
+    dialogContainer.addChild(dialogBg, dialogPanel, dialogTitle, dialogText, closeButton);
+    
+    // Make background clickable to close
+    dialogBg.interactive = true;
+    dialogBg.on('pointerdown', () => {
+      this.container.removeChild(dialogContainer);
+    });
+    
+    this.container.addChild(dialogContainer);
   }
 
   private createEquipmentDisplay(): void {
@@ -427,9 +537,9 @@ export class CharacterDetailScene extends BaseScene {
 
     // Equipment slots
     const equipmentSlots = [
-      { name: 'Weapon', item: 'Sword' },
-      { name: 'Armor', item: 'Plate' },
-      { name: 'Accessory', item: '(empty)' }
+      { name: 'Weapon', item: 'Sword', type: 'weapon' },
+      { name: 'Armor', item: 'Plate', type: 'armor' },
+      { name: 'Accessory', item: '(empty)', type: 'accessory' }
     ];
 
     const slotWidth = (panelWidth - 2 * padding) / 3;
@@ -438,9 +548,12 @@ export class CharacterDetailScene extends BaseScene {
       const x = padding + (index * slotWidth);
       const y = 45;
       
+      // Create equipment slot container for click handling
+      const slotContainer = new Container();
+      
       // Slot background
       const slotBg = new Graphics();
-      slotBg.roundRect(x, y, slotWidth - 10, 40, 6)
+      slotBg.roundRect(0, 0, slotWidth - 10, 40, 6)
         .fill({ color: slot.item === '(empty)' ? 0x424242 : Colors.BUTTON_BORDER, alpha: 0.8 })
         .stroke({ width: 1, color: Colors.BUTTON_PRIMARY });
       
@@ -454,8 +567,8 @@ export class CharacterDetailScene extends BaseScene {
           fill: Colors.TEXT_SECONDARY
         }
       });
-      slotLabel.x = x + 5;
-      slotLabel.y = y + 5;
+      slotLabel.x = 5;
+      slotLabel.y = 5;
       
       // Item name
       const itemText = new Text({
@@ -466,14 +579,198 @@ export class CharacterDetailScene extends BaseScene {
           fill: slot.item === '(empty)' ? Colors.TEXT_TERTIARY : Colors.TEXT_PRIMARY
         }
       });
-      itemText.x = x + 5;
-      itemText.y = y + 22;
+      itemText.x = 5;
+      itemText.y = 22;
       
-      this.equipmentContainer.addChild(slotBg, slotLabel, itemText);
+      slotContainer.addChild(slotBg, slotLabel, itemText);
+      slotContainer.x = x;
+      slotContainer.y = y;
+      
+      // Make equipment slot interactive
+      slotContainer.interactive = true;
+      slotContainer.cursor = 'pointer';
+      slotContainer.on('pointerdown', () => {
+        this.showEquipmentChangeDialog(slot.type, slot.name, slot.item);
+      });
+      
+      // Add hover effect
+      slotContainer.on('pointerover', () => {
+        slotBg.tint = 0xcccccc;
+      });
+      slotContainer.on('pointerout', () => {
+        slotBg.tint = 0xffffff;
+      });
+      
+      this.equipmentContainer.addChild(slotContainer);
     });
 
     this.equipmentContainer.x = padding;
-    this.equipmentContainer.y = 615; // Below skills section
+    this.equipmentContainer.y = 655; // Below skills section (adjusted for larger skills panel)
+  }
+
+  private showEquipmentChangeDialog(equipmentType: string, slotName: string, currentItem: string): void {
+    // Create equipment change dialog
+    const dialogBg = new Graphics();
+    dialogBg.rect(0, 0, this.gameWidth, this.gameHeight)
+      .fill({ color: 0x000000, alpha: 0.7 });
+    
+    const dialogPanel = new Graphics();
+    const dialogWidth = Math.min(500, this.gameWidth - 40);
+    const dialogHeight = 400;
+    const dialogX = (this.gameWidth - dialogWidth) / 2;
+    const dialogY = (this.gameHeight - dialogHeight) / 2;
+    
+    dialogPanel.roundRect(dialogX, dialogY, dialogWidth, dialogHeight, 12)
+      .fill({ color: Colors.PANEL_BACKGROUND })
+      .stroke({ width: 3, color: Colors.BUTTON_PRIMARY });
+
+    const dialogTitle = new Text({
+      text: `Change ${slotName}`,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 20,
+        fontWeight: 'bold',
+        fill: Colors.TEXT_PRIMARY,
+        align: 'center'
+      }
+    });
+    dialogTitle.anchor.set(0.5, 0);
+    dialogTitle.x = this.gameWidth / 2;
+    dialogTitle.y = dialogY + 20;
+
+    // Current equipment
+    const currentText = new Text({
+      text: `Current: ${currentItem}`,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 14,
+        fill: Colors.TEXT_SECONDARY,
+        align: 'center'
+      }
+    });
+    currentText.anchor.set(0.5, 0);
+    currentText.x = this.gameWidth / 2;
+    currentText.y = dialogY + 55;
+
+    // Available equipment options (mock data for now)
+    const availableEquipment = this.getAvailableEquipment(equipmentType);
+    let optionY = dialogY + 90;
+
+    const equipmentOptions: Container[] = [];
+
+    availableEquipment.forEach((equipment) => {
+      const optionContainer = new Container();
+      
+      const optionBg = new Graphics();
+      optionBg.roundRect(0, 0, dialogWidth - 40, 40, 6)
+        .fill({ color: equipment.name === currentItem ? Colors.BUTTON_PRIMARY : Colors.CONTAINER_BACKGROUND, alpha: 0.8 })
+        .stroke({ width: 1, color: Colors.BUTTON_BORDER });
+      
+      const equipmentName = new Text({
+        text: equipment.name,
+        style: {
+          fontFamily: 'Kalam',
+          fontSize: 14,
+          fontWeight: 'bold',
+          fill: Colors.TEXT_PRIMARY
+        }
+      });
+      equipmentName.x = 10;
+      equipmentName.y = 5;
+      
+      const equipmentStats = new Text({
+        text: equipment.description,
+        style: {
+          fontFamily: 'Kalam',
+          fontSize: 12,
+          fill: Colors.TEXT_SECONDARY
+        }
+      });
+      equipmentStats.x = 10;
+      equipmentStats.y = 22;
+      
+      optionContainer.addChild(optionBg, equipmentName, equipmentStats);
+      optionContainer.x = dialogX + 20;
+      optionContainer.y = optionY;
+      
+      // Make option interactive
+      optionContainer.interactive = true;
+      optionContainer.cursor = 'pointer';
+      optionContainer.on('pointerdown', () => {
+        this.equipItem(equipmentType, equipment);
+        this.container.removeChild(dialogContainer);
+      });
+      
+      // Add hover effect
+      optionContainer.on('pointerover', () => {
+        optionBg.tint = 0xdddddd;
+      });
+      optionContainer.on('pointerout', () => {
+        optionBg.tint = 0xffffff;
+      });
+      
+      equipmentOptions.push(optionContainer);
+      optionY += 50;
+    });
+
+    const closeButton = this.createButton(
+      'Close',
+      dialogX + (dialogWidth - 100) / 2,
+      dialogY + dialogHeight - 60,
+      100,
+      40,
+      () => {
+        this.container.removeChild(dialogContainer);
+      }
+    );
+
+    const dialogContainer = new Container();
+    dialogContainer.addChild(dialogBg, dialogPanel, dialogTitle, currentText, ...equipmentOptions, closeButton);
+    
+    // Make background clickable to close
+    dialogBg.interactive = true;
+    dialogBg.on('pointerdown', () => {
+      this.container.removeChild(dialogContainer);
+    });
+    
+    this.container.addChild(dialogContainer);
+  }
+
+  private getAvailableEquipment(equipmentType: string): Array<{name: string, description: string}> {
+    // Mock available equipment data - this could be fetched from API later
+    const equipmentData: Record<string, Array<{name: string, description: string}>> = {
+      weapon: [
+        { name: 'Rusty Sword', description: '+5 ATK' },
+        { name: 'Steel Blade', description: '+12 ATK, +2% Crit Rate' },
+        { name: 'Flame Sword', description: '+18 ATK, Fire damage' },
+        { name: 'Dragon Slayer', description: '+25 ATK, +5% Crit Rate, +10% Crit Dmg' }
+      ],
+      armor: [
+        { name: 'Cloth Armor', description: '+3 DEF' },
+        { name: 'Leather Vest', description: '+8 DEF, +2% Dodge' },
+        { name: 'Chain Mail', description: '+15 DEF, +5% Mitigation' },
+        { name: 'Plate Armor', description: '+22 DEF, +8% Mitigation, +5 RES' }
+      ],
+      accessory: [
+        { name: '(empty)', description: 'No accessory equipped' },
+        { name: 'Lucky Ring', description: '+3% Crit Rate' },
+        { name: 'Power Amulet', description: '+10% Damage' },
+        { name: 'Guardian Pendant', description: '+5% Hit Rate, +3% Dodge' },
+        { name: 'Mystic Orb', description: '+8 RES, +5% Magic Damage' }
+      ]
+    };
+    
+    return equipmentData[equipmentType] || [];
+  }
+
+  private equipItem(equipmentType: string, equipment: {name: string, description: string}): void {
+    // This is where you would update the character's equipment
+    // For now, just refresh the display
+    console.log(`Equipped ${equipment.name} in ${equipmentType} slot`);
+    
+    // Update the equipment display
+    this.equipmentContainer.removeChildren();
+    this.createEquipmentDisplay();
   }
 
   private getRarityColor(rarity: string): number {
@@ -499,7 +796,7 @@ export class CharacterDetailScene extends BaseScene {
     this.buttonContainer.addChild(backButton);
   }
 
-  update(time: Ticker): void {
+  update(_time: Ticker): void {
     // No specific animations needed
   }
 }
