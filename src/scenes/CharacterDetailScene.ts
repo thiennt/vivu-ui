@@ -1,4 +1,4 @@
-import { Container, Graphics, Text, Ticker } from 'pixi.js';
+import { Assets, Container, Graphics, Sprite, Text, Ticker } from 'pixi.js';
 import { navigation } from '@/utils/navigation';
 import { HomeScene } from './HomeScene';
 import { BaseScene } from '@/utils/BaseScene';
@@ -58,7 +58,7 @@ export class CharacterDetailScene extends BaseScene {
   }
   
   private async loadCharacterData(): Promise<void> {
-    if (!this.character || !this.character.id) {
+    if (!this.character) {
       navigation.showScreen(HomeScene);
       return;
     }
@@ -66,8 +66,9 @@ export class CharacterDetailScene extends BaseScene {
     this.loadingManager.showLoading();
     
     // Load character skills
-    this.characterSkills = await charactersApi.getCharacterSkills(this.character.id);
-    
+    this.character = await charactersApi.getCharacter(this.character.id);
+    this.characterSkills = this.character.character_skills || [];
+
     this.loadingManager.hideLoading();
     
     // Show mock data indicator if we're likely using mock data
@@ -140,9 +141,12 @@ export class CharacterDetailScene extends BaseScene {
     this.headerContainer.addChild(title);
   }
 
-  private createCharacterInfo(): void {
+  private async createCharacterInfo(): Promise<void> {
     const padding = 15;
     const panelWidth = this.gameWidth - 2 * padding;
+
+    // Panel container
+    const headerPanelContainer = new Container();
     
     // Header panel background
     const headerPanel = new Graphics();
@@ -154,22 +158,17 @@ export class CharacterDetailScene extends BaseScene {
     const avatarSize = 80;
     const avatar = new Graphics();
     avatar.roundRect(padding, 20, avatarSize, avatarSize, 8)
-      .fill({ color: Colors.BUTTON_BORDER, alpha: 0.8 })
+      .fill({ color: this.getRarityColor(this.character!.rarity), alpha: 0.8 })
       .stroke({ width: 2, color: Colors.BUTTON_PRIMARY });
-    
+
     // Avatar text (ticker symbol)
-    const avatarText = new Text({
-      text: this.character!.ticker,
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 24,
-        fontWeight: 'bold',
-        fill: Colors.TEXT_WHITE
-      }
-    });
-    avatarText.anchor.set(0.5);
-    avatarText.x = padding + avatarSize / 2;
-    avatarText.y = 20 + avatarSize / 2;
+    const avatarTexture = await Assets.load(this.character!.avatar_url || 'https://pixijs.com/assets/bunny.png');
+    const avatarIcon = new Sprite(avatarTexture);
+    avatarIcon.width = avatarSize - 10;
+    avatarIcon.height = avatarSize - 10;
+    avatarIcon.anchor.set(0.5);
+    avatarIcon.x = padding + avatarSize / 2;
+    avatarIcon.y = 20 + avatarSize / 2;
 
     // Character name (center-left)
     const nameText = new Text({
@@ -184,86 +183,28 @@ export class CharacterDetailScene extends BaseScene {
     nameText.x = padding + avatarSize + 20;
     nameText.y = 25;
 
-    // Ticker badge (right of name)
-    const tickerBadge = new Graphics();
-    const tickerWidth = 60;
-    tickerBadge.roundRect(nameText.x + nameText.width + 15, 25, tickerWidth, 30, 4)
-      .fill({ color: this.getRarityColor(this.character!.rarity), alpha: 0.8 })
-      .stroke({ width: 1, color: Colors.TEXT_WHITE });
-    
-    const tickerText = new Text({
-      text: this.character!.ticker,
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 14,
-        fontWeight: 'bold',
-        fill: Colors.TEXT_WHITE
-      }
-    });
-    tickerText.anchor.set(0.5);
-    tickerText.x = nameText.x + nameText.width + 15 + tickerWidth / 2;
-    tickerText.y = 40;
-
-    // Class and level (right side)
-    const classLevelText = new Text({
-      text: `${this.character!.c_class} L${this.character!.level}`,
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 20,
-        fontWeight: 'bold',
-        fill: Colors.TEXT_SECONDARY
-      }
-    });
-    classLevelText.x = panelWidth - classLevelText.width - padding;
-    classLevelText.y = 25;
-
-    // Description (below name)
-    const descText = new Text({
-      text: `"${this.character!.description}"`,
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 14,
-        fill: Colors.TEXT_TERTIARY,
-        wordWrap: true,
-        wordWrapWidth: panelWidth - padding - avatarSize - 40
-      }
-    });
-    descText.x = padding + avatarSize + 20;
-    descText.y = 65;
-
-    headerPanel.addChild(avatar, avatarText, nameText, tickerBadge, tickerText, classLevelText, descText);
-    
-    this.infoContainer.x = padding;
-    this.infoContainer.y = 120;
-    this.infoContainer.addChild(headerPanel);
-  }
-
-  private createStatsDisplay(): void {
-    const padding = 15;
-    const panelWidth = this.gameWidth - 2 * padding;
-    
-    // Core Stats Section
-    const coreStatsHeight = 80;
-    const coreStatsPanel = new Graphics();
-    coreStatsPanel.roundRect(0, 0, panelWidth, coreStatsHeight, 12)
-      .fill({ color: Colors.PANEL_BACKGROUND, alpha: 0.9 })
-      .stroke({ width: 3, color: Colors.BUTTON_PRIMARY });
+    headerPanelContainer.addChild(
+      headerPanel,
+      avatar,
+      avatarIcon,
+      nameText
+    );
 
     // Core stats: HP, ATK, DEF, AGI (prominent display)
     const coreStats = [
-      { name: 'HP', value: this.character!.max_hp, color: 0x4caf50 },
-      { name: 'ATK', value: this.character!.atk, color: 0xf44336 },
-      { name: 'DEF', value: this.character!.def, color: 0x2196f3 },
-      { name: 'AGI', value: this.character!.agi, color: 0xffeb3b }
+      { name: '❤️', value: this.character!.hp, color: 0x4caf50 },
+      { name: '⚔️', value: this.character!.atk, color: 0xf44336 },
+      { name: '🛡️', value: this.character!.def, color: 0x2196f3 },
+      { name: '⚡', value: this.character!.agi, color: 0xffeb3b }
     ];
 
-    const statWidth = (panelWidth - 2 * padding) / 4;
+    const statWidth = (panelWidth - 2 * padding - avatar.width) / 4;
     coreStats.forEach((stat, index) => {
-      const x = padding + (index * statWidth);
-      
+      const x = padding + avatarSize + 20 + (index * statWidth);
+
       // Stat name
-      const nameText = new Text({
-        text: stat.name + ':',
+      const statNameText = new Text({
+        text: stat.name,
         style: {
           fontFamily: 'Kalam',
           fontSize: 18,
@@ -271,31 +212,42 @@ export class CharacterDetailScene extends BaseScene {
           fill: Colors.TEXT_SECONDARY
         }
       });
-      nameText.x = x;
-      nameText.y = 20;
-      
+      statNameText.x = x;
+      statNameText.y = 60;
+
       // Stat value
       const valueText = new Text({
         text: stat.value.toString(),
         style: {
           fontFamily: 'Kalam',
-          fontSize: 24,
+          fontSize: 20,
           fontWeight: 'bold',
           fill: stat.color
         }
       });
       valueText.x = x;
-      valueText.y = 45;
-      
-      coreStatsPanel.addChild(nameText, valueText);
+      valueText.y = 80;
+
+      headerPanelContainer.addChild(statNameText, valueText);
     });
 
+    this.infoContainer.x = padding;
+    this.infoContainer.y = 120;
+    this.infoContainer.addChild(headerPanelContainer);
+  }
+
+  private createStatsDisplay(): void {
+    const padding = 15;
+    const panelWidth = this.gameWidth - 2 * padding;
+
     // Other Stats Section
+    const otherStatsContainer = new Container();
     const otherStatsHeight = 120;
     const otherStatsPanel = new Graphics();
     otherStatsPanel.roundRect(0, 0, panelWidth, otherStatsHeight, 12)
       .fill({ color: Colors.PANEL_BACKGROUND, alpha: 0.9 })
       .stroke({ width: 3, color: Colors.BUTTON_PRIMARY });
+    otherStatsContainer.addChild(otherStatsPanel);
 
     // Other stats in grid layout
     const otherStats = [
@@ -329,26 +281,21 @@ export class CharacterDetailScene extends BaseScene {
       statText.x = x;
       statText.y = y;
       
-      otherStatsPanel.addChild(statText);
+      otherStatsContainer.addChild(statText);
     });
 
     // Position both panels vertically
-    const startY = 260; // Below header
-    coreStatsPanel.x = 0;
-    coreStatsPanel.y = 0;
-    
-    otherStatsPanel.x = 0;
-    otherStatsPanel.y = coreStatsHeight + 15;
+    const startY = 260; // Below info panel
 
     this.statsContainer.x = padding;
     this.statsContainer.y = startY;
-    this.statsContainer.addChild(coreStatsPanel, otherStatsPanel);
+    this.statsContainer.addChild(otherStatsContainer);
   }
 
   private createSkillsDisplay(): void {
     const padding = 15;
     const panelWidth = this.gameWidth - 2 * padding;
-    const panelHeight = 120;
+    const panelHeight = 180;
 
     // Skills panel background
     const skillsPanel = new Graphics();
@@ -372,11 +319,11 @@ export class CharacterDetailScene extends BaseScene {
     this.skillsContainer.addChild(skillsPanel, title);
 
     // Skills layout - one per row
-    let y = 45;
+    let y = 50;
     
-    this.characterSkills.forEach((skill, index: number) => {
-      if (!skill) return;
-      
+    this.characterSkills.forEach((char_skill, index: number) => {
+      if (!char_skill) return;
+      const skill = char_skill.skill;
       // Skill type badge
       const badgeColors: { [key: string]: number } = {
         'normal_attack': 0x9e9e9e,
@@ -444,12 +391,12 @@ export class CharacterDetailScene extends BaseScene {
       skillDesc.y = y;
 
       this.skillsContainer.addChild(badge, badgeText, skillName, skillDesc);
-      
-      y += 25;
+
+      y += 30;
     });
 
     this.skillsContainer.x = padding;
-    this.skillsContainer.y = 475; // Below stats sections
+    this.skillsContainer.y = 400; // Below stats sections
   }
 
   private createEquipmentDisplay(): void {

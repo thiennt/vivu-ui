@@ -103,63 +103,33 @@ export const playerApi = {
 // Characters API methods
 export const charactersApi = {
   async getAllCharacters(): Promise<any[]> {
-    return apiRequest('/characters', {}, mockCharacters);
+    const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
+    return apiRequest(`/players/${playerId}/characters`, {}, mockCharacters);
   },
 
   async getCharacter(characterId: string): Promise<any> {
+    const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
     const character = mockCharacters.find(char => char.id === characterId);
-    return apiRequest(`/characters/${characterId}`, {}, character);
+    return apiRequest(`/players/${playerId}/characters/${characterId}`, {}, character);
   },
 
   async getCharacterSkills(characterId: string): Promise<any[]> {
-    return apiRequest(`/characters/${characterId}/skills`, {}, mockSkills);
+    const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
+    return apiRequest(`/players/${playerId}/characters/${characterId}/skills`, {}, mockSkills);
   },
 };
 
 // Dungeons API methods
 export const dungeonsApi = {
   async getAllDungeons(): Promise<any[]> {
-    return apiRequest('/dungeons', {}, mockDungeons);
-  },
-
-  async getDungeon(dungeonId: string): Promise<any> {
-    const dungeon = mockDungeons.find(d => d.id === dungeonId);
-    return apiRequest(`/dungeons/${dungeonId}`, {}, dungeon);
+    const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
+    return apiRequest(`/players/${playerId}/stages`, {}, mockDungeons);
   },
 
   async getDungeonStages(dungeonId: string): Promise<any[]> {
+    const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
     const dungeon = mockDungeons.find(d => d.id === dungeonId);
-    return apiRequest(`/dungeons/${dungeonId}/stages`, {}, dungeon?.stages || []);
-  },
-};
-
-// Stages API methods
-export const stagesApi = {
-  async getStage(stageId: string): Promise<any> {
-    // Find stage in mockDungeons
-    let foundStage = null;
-    for (const dungeon of mockDungeons) {
-      if (dungeon.stages) {
-        foundStage = dungeon.stages.find((stage: any) => stage.id === stageId);
-        if (foundStage) break;
-      }
-    }
-    return apiRequest(`/stages/${stageId}`, {}, foundStage);
-  },
-
-  async getStageRewards(stageId: string): Promise<any[]> {
-    // Find stage rewards in mockDungeons
-    let rewards: any[] = [];
-    for (const dungeon of mockDungeons) {
-      if (dungeon.stages) {
-        const stage = dungeon.stages.find((s: any) => s.id === stageId);
-        if (stage) {
-          rewards = stage.rewards || [];
-          break;
-        }
-      }
-    }
-    return apiRequest(`/stages/${stageId}/rewards`, {}, rewards);
+    return apiRequest(`/players/${playerId}/stages/${dungeonId}/stages`, {}, dungeon?.stages || []);
   },
 };
 

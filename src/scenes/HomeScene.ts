@@ -37,9 +37,15 @@ export class HomeScene extends BaseScene {
     this.loadingManager.showLoading();
     
     // For now, using a default player ID - this should come from authentication/context
-    const playerId = 'P1';
-    this.player = await playerApi.getPlayer(playerId);
+    const playerId = 'player_fc_001';
+    sessionStorage.setItem('playerId', playerId);
+    this.player = sessionStorage.getItem('player') ? JSON.parse(sessionStorage.getItem('player') as string) : null;
+    if (!this.player) {
+      this.player = await playerApi.getPlayer(playerId);
+      sessionStorage.setItem('player', JSON.stringify(this.player));
+    }
     
+
     this.loadingManager.hideLoading();
     
     // Show mock data indicator if we're likely using mock data

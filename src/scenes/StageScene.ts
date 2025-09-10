@@ -5,6 +5,8 @@ import { navigation } from '@/utils/navigation';
 import { HomeScene } from './HomeScene';
 import { Colors } from '@/utils/colors';
 import { DungeonScene } from './DungeonScene';
+import { LoadingStateManager } from '@/utils/loadingStateManager';
+import { waitFor } from '@/utils/asyncUtils';
 
 export class StageScene extends BaseScene {
   private dungeon: Dungeon | null = null;
@@ -17,10 +19,12 @@ export class StageScene extends BaseScene {
   private stageContainer: Container;
   private buttonContainer: Container;
 
+  private loadingManager: LoadingStateManager;
+
   constructor(params?: { selectedDungeon: Dungeon }) {
     super();
     this.dungeon = params?.selectedDungeon || null;
-    
+
     // Create containers once
     this.container = new Container();
     this.backgroundContainer = new Container();
@@ -35,24 +39,30 @@ export class StageScene extends BaseScene {
       this.stageContainer,
       this.buttonContainer
     );
+
+    this.loadingManager = new LoadingStateManager(this.container, this.gameWidth, this.gameHeight);
     
     // Create UI once
     this.initializeUI();
   }
   
-  private initializeUI(): void {
+  private async initializeUI(): Promise<void> {
     if (!this.dungeon) {
       navigation.showScreen(HomeScene);
       return;
     }
-    
+
+    this.loadingManager.showLoading();
+    await waitFor(0.1);
+    this.loadingManager.hideLoading();
+
     this.createBackground();
     this.createHeader();
     this.createStageList();
     this.createBackButton();
   }
 
-  resize(width: number, height: number): void {
+  async resize(width: number, height: number): Promise<void> {
     this.gameWidth = width;
     this.gameHeight = height;
     
@@ -60,6 +70,11 @@ export class StageScene extends BaseScene {
       navigation.showScreen(HomeScene);
       return;
     }
+    
+    this.loadingManager.showLoading();
+    await waitFor(0.1);
+    // Update loading manager dimensions
+    this.loadingManager.updateDimensions(width, height);
 
     // Update UI layout without recreating
     this.updateLayout();

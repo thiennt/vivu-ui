@@ -215,19 +215,19 @@ export class DungeonScene extends BaseScene {
       }
     });
     requiredLevel.x = contentStartX;
-    requiredLevel.y = 90;
-    
-    const chapters = new Text({
-      text: `Chapters: ${dungeon.stages.length}`,
+    requiredLevel.y = 100;
+
+    const stages = new Text({
+      text: `Stages: ${dungeon.stages.length}`,
       style: {
         fontFamily: 'Kalam',
         fontSize: 14,
         fill: Colors.TEXT_TERTIARY
       }
     });
-    chapters.x = contentStartX;
-    chapters.y = 115;
-    
+    stages.x = contentStartX;
+    stages.y = 120;
+  
     // Enter button - positioned with standard padding
     const buttonX = cardWidth - buttonWidth - this.STANDARD_PADDING;
     const buttonY = (cardHeight - 60) / 2;
@@ -243,7 +243,7 @@ export class DungeonScene extends BaseScene {
       }
     );
     
-    card.addChild(bg, iconBg, icon, title, description, requiredLevel, chapters, enterButton);
+    card.addChild(bg, iconBg, icon, title, description, requiredLevel, stages, enterButton);
     
     // Hover effects
     card.interactive = true;

@@ -32,8 +32,6 @@ export abstract class BaseScene extends Container {
     this.gameHeight = app.screen?.height || 600;
   }
 
-
-
   /**
    * Creates a centered container with standard padding
    */
@@ -201,22 +199,22 @@ export abstract class BaseScene extends Container {
     const { width, height } = cardSizes[cardType];
     const card = this.createCard(x, y, width, height, character.rarity || 'common');
     (card as any).character = character;
-    
-    // Character symbol (crypto token) - always at top center
-    const symbolSize = cardType === 'detailed' ? 24 : (cardType === 'preview' ? 18 : 16);
-    const symbolText = new Text({
-      text: character.ticker,
+
+    // Character name - always at top center
+    const nameSize = cardType === 'detailed' ? 24 : (cardType === 'preview' ? 18 : 16);
+    const nameText = new Text({
+      text: character.name,
       style: {
         fontFamily: 'Kalam',
-        fontSize: symbolSize,
+        fontSize: nameSize,
         fontWeight: 'bold',
         fill: Colors.TEXT_WHITE,
         align: 'center'
       }
     });
-    symbolText.anchor.set(0.5);
-    symbolText.x = width / 2;
-    symbolText.y = cardType === 'lineup' || cardType === 'pool' ? height / 2 - 15 : 25;
+    nameText.anchor.set(0.5);
+    nameText.x = width / 2;
+    nameText.y = cardType === 'lineup' || cardType === 'pool' ? height / 2 - 15 : 25;
     
     // Level text - positioned below symbol
     const levelSize = cardType === 'detailed' ? 14 : (cardType === 'preview' ? 12 : 10);
@@ -233,7 +231,7 @@ export abstract class BaseScene extends Container {
     levelText.x = width / 2;
     levelText.y = cardType === 'lineup' || cardType === 'pool' ? height / 2 + 10 : 50;
 
-    card.addChild(symbolText, levelText);
+    card.addChild(nameText, levelText);
     
     // Add additional elements based on card type
     if (cardType === 'detailed') {
@@ -250,24 +248,7 @@ export abstract class BaseScene extends Container {
     return card;
   }
 
-  private addDetailedCardElements(card: Container, character: any, width: number, height: number): void {
-    // Character name - below level
-    const nameText = new Text({
-      text: character.name,
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 11,
-        fontWeight: 'bold',
-        fill: Colors.TEXT_PRIMARY,
-        align: 'center',
-        wordWrap: true,
-        wordWrapWidth: width - 20
-      }
-    });
-    nameText.anchor.set(0.5);
-    nameText.x = width / 2;
-    nameText.y = 75;
-    
+  private addDetailedCardElements(card: Container, character: any, width: number, height: number): void {    
     // Experience
     const expText = new Text({
       text: `EXP: ${character.exp}`,
@@ -284,7 +265,7 @@ export abstract class BaseScene extends Container {
     
     // Stats in a compact grid
     const stats = [
-      `HP: ${character.max_hp}`,
+      `HP: ${character.hp}`,
       `ATK: ${character.atk}`,
       `DEF: ${character.def}`,
       `AGI: ${character.agi}`
@@ -304,13 +285,13 @@ export abstract class BaseScene extends Container {
       card.addChild(statText);
     });
     
-    card.addChild(nameText, expText);
+    card.addChild(expText);
   }
 
   private addPreviewCardElements(card: Container, character: any, width: number, height: number): void {
     // Basic stats for preview
     const hpText = new Text({
-      text: `HP: ${character.max_hp}`,
+      text: `HP: ${character.hp}`,
       style: {
         fontFamily: 'Kalam',
         fontSize: 9,
