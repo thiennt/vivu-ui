@@ -455,14 +455,14 @@ export class LineupScene extends BaseScene {
   }
 
   private createActionButtons(): void {
-    const buttonWidth = 150;
-    const buttonHeight = 50;
+    const buttonWidth = Math.min(130, (this.gameWidth - 4 * this.STANDARD_PADDING) / 3); // Reduced from 150 and made responsive
+    const buttonHeight = Math.max(40, Math.min(46, this.gameHeight * 0.07)); // Responsive height
     const buttonCount = 3;
 
     // Calculate total width for all buttons with standard spacing
     const totalWidth = buttonWidth * buttonCount + this.STANDARD_SPACING * (buttonCount - 1);
     const startX = (this.gameWidth - totalWidth) / 2;
-    const y = this.gameHeight - 80;
+    const y = this.gameHeight - buttonHeight - this.STANDARD_PADDING; // Use calculated height
 
     // Back button - positioned separately at left with standard padding
     const backButton = this.createButton(
@@ -471,7 +471,8 @@ export class LineupScene extends BaseScene {
       y,
       buttonWidth,
       buttonHeight,
-      () => navigation.showScreen(HomeScene)
+      () => navigation.showScreen(HomeScene),
+      14 // Added base font size
     );
 
     // Save button - centered
@@ -485,7 +486,8 @@ export class LineupScene extends BaseScene {
         // Convert Character objects back to string IDs for saving
         mockPlayer.lineup.positions = this.lineupPositions.map(char => char ? char.id : null);
         alert('Lineup saved successfully!');
-      }
+      },
+      14 // Added base font size
     );
 
     // Auto button - centered

@@ -359,9 +359,9 @@ export class StageScene extends BaseScene {
   }
 
   private createBackButton(): void {
-    // Responsive button sizing
-    const buttonWidth = Math.min(180, this.gameWidth - 2 * this.STANDARD_PADDING);
-    const buttonHeight = Math.max(44, Math.min(50, this.gameHeight * 0.08));
+    // Responsive button sizing - improved for small screens
+    const buttonWidth = Math.min(160, this.gameWidth - 2 * this.STANDARD_PADDING); // Reduced from 180
+    const buttonHeight = Math.max(40, Math.min(46, this.gameHeight * 0.07)); // Reduced heights for small screens
     
     const backButton = this.createButton(
       '← Back to Dungeons',
@@ -370,7 +370,7 @@ export class StageScene extends BaseScene {
       buttonWidth,
       buttonHeight,
       () => navigation.showScreen(DungeonScene),
-      16 // Base font size for responsive scaling
+      14 // Reduced base font size from 16
     );
     this.buttonContainer.addChild(backButton);
   }

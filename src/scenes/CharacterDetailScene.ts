@@ -9,6 +9,7 @@ import { Colors } from '@/utils/colors';
 import { LearnSkillPopup } from '@/popups/LearnSkillPopup';
 import { SkillChangePopup } from '@/popups/SkillChangePopup';
 import { EquipmentChangePopup } from '@/popups/EquipmentChangePopup';
+import { SkillDetailPopup } from '@/popups/SkillDetailPopup';
 
 export class CharacterDetailScene extends BaseScene {
   /** Assets bundles required by this screen */
@@ -298,7 +299,7 @@ export class CharacterDetailScene extends BaseScene {
   private createSkillsDisplay(): void {
     const padding = 15;
     const panelWidth = this.gameWidth - 2 * padding;
-    const panelHeight = 220; // Increased height for multi-line descriptions
+    const panelHeight = 180; // Reduced height since we're only showing skill names
 
     // Skills panel background
     const skillsPanel = new Graphics();
@@ -358,13 +359,13 @@ export class CharacterDetailScene extends BaseScene {
       badgeText.y = y + 5;
 
       if (charSkill && charSkill.skill) {
-        // Skill exists - show skill details
+        // Skill exists - show skill name only (no description)
         const skill = charSkill.skill;
         
         // Create a container for the skill to make it clickable
         const skillContainer = new Container();
         
-        // Skill name
+        // Skill name - made clickable to show details
         const skillName = new Text({
           text: skill.name,
           style: {
@@ -376,27 +377,27 @@ export class CharacterDetailScene extends BaseScene {
         });
         skillName.x = padding + 80;
         skillName.y = y;
-
-        // Skill description with multi-line support
-        const descriptionWidth = panelWidth - (padding + 80 + skillName.width + 20) - padding;
-        const skillDesc = new Text({
-          text: skill.description,
-          style: {
-            fontFamily: 'Kalam',
-            fontSize: 12,
-            fill: Colors.TEXT_SECONDARY,
-            wordWrap: true,
-            wordWrapWidth: Math.max(200, descriptionWidth)
-          }
+        
+        // Make skill name clickable to show detail popup
+        skillName.interactive = true;
+        skillName.cursor = 'pointer';
+        skillName.on('pointerdown', () => {
+          this.showSkillDetailPopup(skill);
         });
-        skillDesc.x = padding + 80 + skillName.width + 10;
-        skillDesc.y = y;
+        
+        // Add hover effect for skill name
+        skillName.on('pointerover', () => {
+          skillName.style.fill = Colors.BUTTON_PRIMARY;
+        });
+        skillName.on('pointerout', () => {
+          skillName.style.fill = Colors.TEXT_PRIMARY;
+        });
 
         // Add change skill button for active and passive skills
         if (skillType.type === 'active_skill' || skillType.type === 'passive_skill') {
           const changeButton = new Container();
           const buttonBg = new Graphics();
-          buttonBg.roundRect(0, 0, 70, 20, 4)
+          buttonBg.roundRect(0, 0, 60, 18, 4) // Reduced button size
             .fill({ color: Colors.BUTTON_HOVER, alpha: 0.7 })
             .stroke({ width: 1, color: Colors.BUTTON_BORDER });
           
@@ -404,17 +405,17 @@ export class CharacterDetailScene extends BaseScene {
             text: 'Change',
             style: {
               fontFamily: 'Kalam',
-              fontSize: 10,
+              fontSize: 9, // Reduced font size
               fill: Colors.TEXT_BUTTON
             }
           });
           buttonText.anchor.set(0.5);
-          buttonText.x = 35;
-          buttonText.y = 10;
+          buttonText.x = 30;
+          buttonText.y = 9;
 
           changeButton.addChild(buttonBg, buttonText);
-          changeButton.x = panelWidth - padding - 80;
-          changeButton.y = y - 2;
+          changeButton.x = panelWidth - padding - 70;
+          changeButton.y = y - 1;
           
           // Make change button interactive
           changeButton.interactive = true;
@@ -426,7 +427,7 @@ export class CharacterDetailScene extends BaseScene {
           skillContainer.addChild(changeButton);
         }
 
-        skillContainer.addChild(skillName, skillDesc);
+        skillContainer.addChild(skillName);
         this.skillsContainer.addChild(badge, badgeText, skillContainer);
       } else {
         // Skill slot is empty - show learn option
@@ -445,7 +446,7 @@ export class CharacterDetailScene extends BaseScene {
         // Learn skill button
         const learnButton = new Container();
         const buttonBg = new Graphics();
-        buttonBg.roundRect(0, 0, 80, 20, 4)
+        buttonBg.roundRect(0, 0, 70, 18, 4) // Reduced button size
           .fill({ color: Colors.BUTTON_PRIMARY, alpha: 0.7 })
           .stroke({ width: 1, color: Colors.BUTTON_BORDER });
         
@@ -453,17 +454,17 @@ export class CharacterDetailScene extends BaseScene {
           text: 'Learn Skill',
           style: {
             fontFamily: 'Kalam',
-            fontSize: 10,
+            fontSize: 9, // Reduced font size
             fill: Colors.TEXT_BUTTON
           }
         });
         buttonText.anchor.set(0.5);
-        buttonText.x = 40;
-        buttonText.y = 10;
+        buttonText.x = 35;
+        buttonText.y = 9;
 
         learnButton.addChild(buttonBg, buttonText);
         learnButton.x = padding + 80 + emptyText.width + 10;
-        learnButton.y = y - 2;
+        learnButton.y = y - 1;
         
         // Make learn button interactive
         learnButton.interactive = true;
@@ -475,11 +476,21 @@ export class CharacterDetailScene extends BaseScene {
         this.skillsContainer.addChild(badge, badgeText, emptyText, learnButton);
       }
 
-      y += 55; // Increased spacing for multi-line descriptions
+      y += 40; // Reduced spacing since we removed descriptions
     });
 
     this.skillsContainer.x = padding;
     this.skillsContainer.y = 400; // Below stats sections
+  }
+
+  private showSkillDetailPopup(skill: any): void {
+    navigation.presentPopup(class extends SkillDetailPopup {
+      constructor() {
+        super({
+          skill: skill
+        });
+      }
+    });
   }
 
   private showLearnSkillDialog(skillType: string): void {
@@ -627,7 +638,7 @@ export class CharacterDetailScene extends BaseScene {
     });
 
     this.equipmentContainer.x = padding;
-    this.equipmentContainer.y = 655; // Below skills section (adjusted for larger skills panel)
+    this.equipmentContainer.y = 600; // Adjusted for smaller skills panel (reduced from 655)
   }
 
   private showEquipmentChangeDialog(equipmentType: string, slotName: string, currentItem: string): void {
@@ -668,13 +679,18 @@ export class CharacterDetailScene extends BaseScene {
   }
 
   private createBackButton(): void {
+    // Responsive button sizing - improved for small screens
+    const buttonWidth = Math.min(180, this.gameWidth - 2 * this.STANDARD_PADDING);
+    const buttonHeight = Math.max(40, Math.min(46, this.gameHeight * 0.07));
+    
     const backButton = this.createButton(
       '← Back to Characters',
-      5,
-      this.gameHeight - 60, // Adjust for new layout
-      200,
-      50,
-      () => navigation.showScreen(CharactersScene)
+      this.STANDARD_PADDING,
+      this.gameHeight - buttonHeight - this.STANDARD_PADDING,
+      buttonWidth,
+      buttonHeight,
+      () => navigation.showScreen(CharactersScene),
+      14 // Reduced base font size
     );
     this.buttonContainer.addChild(backButton);
   }

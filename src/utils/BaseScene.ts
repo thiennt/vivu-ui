@@ -122,19 +122,27 @@ export abstract class BaseScene extends Container {
   ): Container {
     const button = new Container();
     
+    // Ensure minimum touch target for mobile (44px) but scale down for small screens
+    const minHeight = Math.min(44, this.gameHeight * 0.08);
+    const adjustedHeight = Math.max(minHeight, height);
+    
+    // Adjust width for small screens - ensure it doesn't exceed available space
+    const maxWidth = this.gameWidth - (2 * this.STANDARD_PADDING);
+    const adjustedWidth = Math.min(width, maxWidth);
+    
     // Button background with fantasy styling
     const bg = new Graphics();
-    bg.roundRect(0, 0, width, height, 8)
+    bg.roundRect(0, 0, adjustedWidth, adjustedHeight, 8)
       .fill(Colors.BUTTON_PRIMARY)
-      .stroke({ width: 3, color: Colors.BUTTON_BORDER });
+      .stroke({ width: 2, color: Colors.BUTTON_BORDER }); // Reduced border thickness for small screens
 
     // Calculate responsive font size based on button dimensions and screen size
     const responsiveFontSize = this.calculateResponsiveFontSize(
       baseFontSize,
-      width,
+      adjustedWidth,
       this.gameWidth,
-      Math.max(10, height * 0.2), // Minimum font size based on button height
-      Math.min(24, height * 0.6)  // Maximum font size based on button height
+      Math.max(10, adjustedHeight * 0.25), // Minimum font size based on button height
+      Math.min(20, adjustedHeight * 0.5)   // Maximum font size reduced for better fit
     );
 
     // Button text
@@ -147,12 +155,12 @@ export abstract class BaseScene extends Container {
         fill: Colors.TEXT_BUTTON,
         align: 'center',
         wordWrap: true,
-        wordWrapWidth: width * 0.9 // Ensure text fits within button
+        wordWrapWidth: adjustedWidth * 0.9 // Ensure text fits within button
       }
     });
     buttonText.anchor.set(0.5);
-    buttonText.x = width / 2;
-    buttonText.y = height / 2;
+    buttonText.x = adjustedWidth / 2;
+    buttonText.y = adjustedHeight / 2;
     
     button.addChild(bg, buttonText);
     button.x = x;
