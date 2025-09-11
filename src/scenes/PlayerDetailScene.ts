@@ -12,6 +12,8 @@ import { LoadingStateManager } from '@/utils/loadingStateManager';
 export class PlayerDetailScene extends BaseScene {
   // UI containers
   public container: Container;
+  private mainScrollBox: ScrollBox | null = null;
+  private scrollContent: Container;
   private backgroundContainer: Container;
   private headerContainer: Container;
   private statsContainer: Container;
@@ -33,6 +35,7 @@ export class PlayerDetailScene extends BaseScene {
     
     // Create containers once
     this.container = new Container();
+    this.scrollContent = new Container();
     this.backgroundContainer = new Container();
     this.headerContainer = new Container();
     this.statsContainer = new Container();
@@ -41,8 +44,12 @@ export class PlayerDetailScene extends BaseScene {
     this.pointDistributionContainer = new Container();
     
     this.addChild(this.container);
-    this.container.addChild(
-      this.backgroundContainer,
+    
+    // Add background directly to main container (not scrolled)
+    this.container.addChild(this.backgroundContainer);
+    
+    // Add scrollable content
+    this.scrollContent.addChild(
       this.headerContainer,
       this.statsContainer,
       this.pointDistributionContainer,
@@ -112,6 +119,11 @@ export class PlayerDetailScene extends BaseScene {
     this.collectionContainer.removeChildren();
     this.buttonContainer.removeChildren();
     
+    // Remove existing scroll box if any
+    if (this.mainScrollBox) {
+      this.container.removeChild(this.mainScrollBox);
+    }
+    
     // Recreate layout with current dimensions
     this.createBackground();
     this.createHeader();
@@ -119,6 +131,41 @@ export class PlayerDetailScene extends BaseScene {
     this.createPointDistributionPanel();
     this.createCharacterCollection();
     this.createBackButton();
+    
+    // Set up scrolling after content is created
+    this.setupScrolling();
+  }
+
+  private setupScrolling(): void {
+    // Calculate total content height
+    let maxY = 0;
+    const containers = [this.headerContainer, this.statsContainer, this.pointDistributionContainer, this.collectionContainer, this.buttonContainer];
+    
+    containers.forEach(container => {
+      container.children.forEach(child => {
+        const childMaxY = child.y + child.height;
+        if (childMaxY > maxY) {
+          maxY = childMaxY;
+        }
+      });
+    });
+    
+    const contentHeight = maxY + this.STANDARD_PADDING;
+    const viewportHeight = this.gameHeight;
+    
+    // Only create scroll box if content exceeds viewport
+    if (contentHeight > viewportHeight) {
+      this.mainScrollBox = new ScrollBox({
+        width: this.gameWidth,
+        height: viewportHeight,
+      });
+      
+      this.mainScrollBox.addItem(this.scrollContent);
+      this.container.addChild(this.mainScrollBox);
+    } else {
+      // If no scrolling needed, add content directly
+      this.container.addChild(this.scrollContent);
+    }
   }
 
   private createBackground(): void {
@@ -219,12 +266,8 @@ export class PlayerDetailScene extends BaseScene {
 
   private createPointDistributionPanel(): void {
     if (!this.player) return;
-    
-    // Only show the panel if the player has points to distribute
-    if (this.player.points <= 0) {
-      return;
-    }
 
+    // Always show the panel - this meets the requirement to always display it
     const panelWidth = Math.min(600, this.gameWidth - 2 * this.STANDARD_PADDING);
     const panelHeight = 200;
     const startX = (this.gameWidth - panelWidth) / 2;
@@ -247,6 +290,24 @@ export class PlayerDetailScene extends BaseScene {
     }});
     titleText.x = 15;
     titleText.y = 15;
+
+    // Show different message if no points available
+    if (this.player.points <= 0) {
+      const noPointsText = new Text({text: 'No points available to distribute', style: {
+        fontFamily: 'Kalam',
+        fontSize: 16,
+        fill: Colors.TEXT_SECONDARY,
+        fontStyle: 'italic'
+      }});
+      noPointsText.x = 15;
+      noPointsText.y = 50;
+      
+      panel.addChild(bg, titleText, noPointsText);
+      panel.x = startX;
+      panel.y = startY;
+      this.pointDistributionContainer.addChild(panel);
+      return;
+    }
 
     // Remaining points display
     const remainingText = new Text({text: `Remaining Points: ${this.remainingPoints}`, style: {
@@ -423,15 +484,14 @@ export class PlayerDetailScene extends BaseScene {
     // Card layout - force 4 cards per row
     const availableWidth = this.gameWidth - 2 * this.STANDARD_PADDING;
     const cardHeight = 140;
-    const totalCards = this.characters.length;
 
     const layout = this.calculateFourCardsLayout(
       availableWidth,
       this.STANDARD_SPACING
     );
 
-    // Calculate Y position based on whether point distribution panel is shown
-    const baseY = this.player.points > 0 ? 560 : 360; // Add 200px offset if point panel is shown
+    // Calculate Y position - always account for point distribution panel since it's always shown
+    const baseY = 560; // Always add offset since point panel is always shown
 
     // Title - centered
     const collectionTitle = new Text({ text: 'Character Collection', style: {
