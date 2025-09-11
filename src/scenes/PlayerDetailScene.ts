@@ -122,6 +122,7 @@ export class PlayerDetailScene extends BaseScene {
     // Remove existing scroll box if any
     if (this.mainScrollBox) {
       this.container.removeChild(this.mainScrollBox);
+      this.mainScrollBox = null;
     }
     
     // Recreate layout with current dimensions
@@ -132,41 +133,11 @@ export class PlayerDetailScene extends BaseScene {
     this.createCharacterCollection();
     this.createBackButton();
     
-    // Set up scrolling after content is created
-    this.setupScrolling();
+    // Add non-scrollable content directly to container
+    this.container.addChild(this.scrollContent);
   }
 
-  private setupScrolling(): void {
-    // Calculate total content height
-    let maxY = 0;
-    const containers = [this.headerContainer, this.statsContainer, this.pointDistributionContainer, this.collectionContainer, this.buttonContainer];
-    
-    containers.forEach(container => {
-      container.children.forEach(child => {
-        const childMaxY = child.y + child.height;
-        if (childMaxY > maxY) {
-          maxY = childMaxY;
-        }
-      });
-    });
-    
-    const contentHeight = maxY + this.STANDARD_PADDING;
-    const viewportHeight = this.gameHeight;
-    
-    // Only create scroll box if content exceeds viewport
-    if (contentHeight > viewportHeight) {
-      this.mainScrollBox = new ScrollBox({
-        width: this.gameWidth,
-        height: viewportHeight,
-      });
-      
-      this.mainScrollBox.addItem(this.scrollContent);
-      this.container.addChild(this.mainScrollBox);
-    } else {
-      // If no scrolling needed, add content directly
-      this.container.addChild(this.scrollContent);
-    }
-  }
+
 
   private createBackground(): void {
     const bg = new Graphics();
@@ -481,14 +452,22 @@ export class PlayerDetailScene extends BaseScene {
   private createCharacterCollection(): void {
     if (!this.player) return;
     
-    // Card layout - force 4 cards per row
+    // Mobile-optimized card layout using the specified formula
     const availableWidth = this.gameWidth - 2 * this.STANDARD_PADDING;
-    const cardHeight = 140;
+    const isMobile = this.gameWidth < 768; // Mobile detection
+    const gap = isMobile ? 8 : this.STANDARD_SPACING; // Use 8px gap on mobile
+    const cardCount = 4; // Force 4 cards per row
+    
+    // Apply mobile formula: card_width = (screen_width - (gap * (card_count - 1))) / card_count
+    const cardWidth = (availableWidth - (gap * (cardCount - 1))) / cardCount;
+    // Use 4:5 aspect ratio for card height
+    const cardHeight = cardWidth * 1.25;
 
-    const layout = this.calculateFourCardsLayout(
-      availableWidth,
-      this.STANDARD_SPACING
-    );
+    const layout = {
+      itemsPerRow: cardCount,
+      itemWidth: cardWidth,
+      totalWidth: availableWidth
+    };
 
     // Calculate Y position - always account for point distribution panel since it's always shown
     const baseY = 560; // Always add offset since point panel is always shown
@@ -511,35 +490,41 @@ export class PlayerDetailScene extends BaseScene {
       const row = Math.floor(index / layout.itemsPerRow);
       const col = index % layout.itemsPerRow;
 
-      const x = col * (layout.itemWidth + this.STANDARD_SPACING);
-      const y = row * (cardHeight + this.STANDARD_SPACING);
+      const x = col * (layout.itemWidth + gap);
+      const y = row * (cardHeight + gap);
 
-      const card = this.createCharacterPreviewCard(character, x, y);
+      const card = this.createCharacterPreviewCard(character, x, y, cardWidth);
       gridContent.addChild(card);
     });
 
     // Set content height for scrolling
     const totalRows = Math.ceil(this.characters.length / layout.itemsPerRow);
-    const contentHeight = totalRows * (cardHeight + this.STANDARD_SPACING);
+    const contentHeight = totalRows * (cardHeight + gap);
 
-    // Create ScrollBox for vertical scrolling
+    // Calculate available height for scrolling (remaining screen space)
+    const titleHeight = 40;
+    const buttonHeight = 50;
+    const buttonMargin = this.STANDARD_SPACING * 2;
+    const maxScrollHeight = this.gameHeight - baseY - titleHeight - buttonHeight - buttonMargin - this.STANDARD_PADDING;
+
+    // Create ScrollBox for vertical scrolling (only for character collection)
     const scrollBox = new ScrollBox({
       width: availableWidth,
-      height: Math.min(400, contentHeight), // Limit height to 400px max
+      height: Math.min(maxScrollHeight, contentHeight), // Limit height to available space
     });
 
     scrollBox.addItem(gridContent);
 
     // Position ScrollBox centered horizontally
     scrollBox.x = this.STANDARD_PADDING;
-    scrollBox.y = baseY + 40;
+    scrollBox.y = baseY + titleHeight;
 
     // View all button - responsive width
     const buttonWidth = Math.min(250, this.gameWidth - 2 * this.STANDARD_PADDING);
     const viewAllButton = this.createButton(
       'View All Characters',
       (this.gameWidth - buttonWidth) / 2,
-      scrollBox.y + Math.min(400, contentHeight) + this.STANDARD_SPACING * 2,
+      scrollBox.y + Math.min(maxScrollHeight, contentHeight) + this.STANDARD_SPACING,
       buttonWidth,
       50,
       () => navigation.showScreen(CharactersScene)
@@ -548,8 +533,8 @@ export class PlayerDetailScene extends BaseScene {
     this.collectionContainer.addChild(collectionTitle, scrollBox, viewAllButton);
   }
 
-  private createCharacterPreviewCard(character: any, x: number, y: number): Container {
-    const card = this.createHeroCard(character, x, y, 'preview');
+  private createCharacterPreviewCard(character: any, x: number, y: number, customWidth?: number): Container {
+    const card = this.createHeroCard(character, x, y, 'preview', undefined, customWidth);
     
     // Click handler
     card.on('pointerdown', () => {
