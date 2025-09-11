@@ -161,63 +161,34 @@ export class LineupScene extends BaseScene {
   private createLineupGrid(): void {
     this.lineupContainer.label = 'lineupContainer';
 
-    // Lineup positions (2x2 grid) with standard spacing
-    const rows = 2;
-    const cols = 2;
-    const slotSize = 100;
+    // Lineup positions (single row of 4) with standard spacing
+    const cols = 4;
+    const rows = 1;
+    const availableWidth = this.gameWidth - 2 * this.STANDARD_PADDING;
+    const layout = this.calculateFourCardsLayout(availableWidth, this.STANDARD_SPACING);
+    const slotSize = Math.min(layout.itemWidth, 120); // Cap at 120px to maintain reasonable size
     const gridWidth = cols * slotSize + (cols - 1) * this.STANDARD_SPACING;
     const startX = (this.gameWidth - gridWidth) / 2;
     const startY = 150;
 
     this.lineupSlotHitBoxes = [];
-    for (let row = 0; row < rows; row++) {
-      for (let col = 0; col < cols; col++) {
-        const positionIndex = row * cols + col;
-        const x = col * (slotSize + this.STANDARD_SPACING);
-        const y = row * (slotSize + this.STANDARD_SPACING);
+    for (let col = 0; col < cols; col++) {
+      const positionIndex = col;
+      const x = col * (slotSize + this.STANDARD_SPACING);
+      const y = 0;
 
-        this.lineupSlotHitBoxes.push({index: positionIndex, x: startX + x, y: startY + y, size: slotSize});
+      this.lineupSlotHitBoxes.push({index: positionIndex, x: startX + x, y: startY + y, size: slotSize});
 
-        const slot = this.createLineupSlot(x, y, slotSize, positionIndex);
-        this.lineupContainer.addChild(slot);
+      const slot = this.createLineupSlot(x, y, slotSize, positionIndex);
+      this.lineupContainer.addChild(slot);
 
-        // Add character if present
-        const character = this.lineupPositions[positionIndex];
-        if (character) {
-          const characterCard = this.createLineupCharacterCard(character, x, y, slotSize, positionIndex);
-          this.lineupContainer.addChild(characterCard);
-        }
+      // Add character if present
+      const character = this.lineupPositions[positionIndex];
+      if (character) {
+        const characterCard = this.createLineupCharacterCard(character, x, y, slotSize, positionIndex);
+        this.lineupContainer.addChild(characterCard);
       }
     }
-
-    // Row labels with better positioning
-    const frontLabel = new Text({
-      text: 'FRONT',
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 14,
-        fontWeight: 'bold',
-        fill: Colors.LINEUP_FRONT
-      }
-    });
-    frontLabel.anchor.set(0.5);
-    frontLabel.x = -50;
-    frontLabel.y = slotSize / 2;
-
-    const backLabel = new Text({
-      text: 'BACK',
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 14,
-        fontWeight: 'bold',
-        fill: Colors.LINEUP_BACK
-      }
-    });
-    backLabel.anchor.set(0.5);
-    backLabel.x = -50;
-    backLabel.y = slotSize + this.STANDARD_SPACING + slotSize / 2;
-
-    this.lineupContainer.addChild(frontLabel, backLabel);
 
     // Center the grid container horizontally
     this.lineupContainer.x = startX;
@@ -232,7 +203,7 @@ export class LineupScene extends BaseScene {
   private createLineupSlot(x: number, y: number, size: number, positionIndex: number): Container {
     const slot = new Container();
     const bg = new Graphics();
-    bg.roundRect(0, 0, 100, size, 8)
+    bg.roundRect(0, 0, size, size, 8)
       .fill({ color: Colors.BACKGROUND_SECONDARY, alpha: 0.5 })
       .stroke({ width: 2, color: Colors.BUTTON_PRIMARY, alpha: 0.8 });
 
@@ -268,8 +239,8 @@ export class LineupScene extends BaseScene {
   private createCharacterPool(): void {
     this.poolContainer.label = 'characterPool';
 
-    // Calculate available area
-    const poolTop = 150 + 2 * 100 + 2 * this.STANDARD_SPACING; // lineup grid bottom
+    // Calculate available area - lineup is now single row instead of 2x2
+    const poolTop = 150 + 120 + 2 * this.STANDARD_SPACING; // lineup grid bottom (single row height)
     const actionButtonHeight = 50;
     const actionButtonY = this.gameHeight - 80;
     const poolBottom = actionButtonY - this.STANDARD_SPACING * 2;
