@@ -505,7 +505,7 @@ export class PlayerDetailScene extends BaseScene {
     const titleHeight = 40;
     const buttonHeight = 50;
     const buttonMargin = this.STANDARD_SPACING * 2;
-    const maxScrollHeight = this.gameHeight - baseY - titleHeight - buttonHeight - buttonMargin - this.STANDARD_PADDING;
+    const maxScrollHeight = 150;
 
     // Create ScrollBox for vertical scrolling (only for character collection)
     const scrollBox = new ScrollBox({
