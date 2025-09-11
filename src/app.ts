@@ -15,35 +15,25 @@ initDevtools({ app });
 
 /** Set up a resize function for the app */
 function resize() {
-  const windowWidth = window.innerWidth;
+  const maxWidth = 500;
+  const windowWidth = Math.min(window.innerWidth, maxWidth);
   const windowHeight = window.innerHeight;
   const minWidth = 400;
   const minHeight = 700;
-  const maxWidth = 1200; // Maximum width for centered layout
-  const maxHeight = 800; // Maximum height for centered layout
 
-  // Calculate constrained dimensions - not full screen
-  let width = Math.max(minWidth, Math.min(windowWidth * 0.9, maxWidth));
-  let height = Math.max(minHeight, Math.min(windowHeight * 0.9, maxHeight));
+  // Calculate renderer and canvas sizes based on current dimensions
+  const scaleX = windowWidth < minWidth ? minWidth / windowWidth : 1;
+  const scaleY = windowHeight < minHeight ? minHeight / windowHeight : 1;
+  const scale = scaleX > scaleY ? scaleX : scaleY;
+  const width = windowWidth * scale;
+  const height = windowHeight * scale;
 
-  // Ensure minimum dimensions are respected
-  width = Math.max(width, minWidth);
-  height = Math.max(height, minHeight);
-
-  // Update canvas style dimensions to the constrained size (not full window)
-  app.renderer.canvas.style.width = `${width}px`;
-  app.renderer.canvas.style.height = `${height}px`;
-  
-  // Allow scrolling if content exceeds viewport
-  if (height > windowHeight || width > windowWidth) {
-    document.body.style.overflow = 'auto';
-  } else {
-    document.body.style.overflow = 'hidden';
-  }
-  
+  // Update canvas style dimensions and scroll window up to avoid issues on mobile resize
+  app.renderer.canvas.style.width = `${windowWidth}px`;
+  app.renderer.canvas.style.height = `${windowHeight}px`;
   window.scrollTo(0, 0);
 
-  // Update renderer and navigation screens dimensions
+  // Update renderer  and navigation screens dimensions
   app.renderer.resize(width, height);
   navigation.resize(width, height);
 }
