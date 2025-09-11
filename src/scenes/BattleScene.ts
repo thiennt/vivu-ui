@@ -35,16 +35,16 @@ export class BattleScene extends BaseScene {
     // Select first 4 characters for team 1
     this.team1 = mockCharacters.slice(0, 4).map(char => ({
       ...char,
-      current_hp: char.max_hp,
-      current_energy: char.current_energy || 0,
+      current_hp: char.hp,
+      current_energy: 50,
       team: 1
     }));
     
     // Select next 4 characters for team 2 (or duplicate if not enough)
     this.team2 = mockCharacters.slice(4, 8).map(char => ({
       ...char,
-      current_hp: char.max_hp,
-      current_energy: char.current_energy || 0,
+      current_hp: char.hp,
+      current_energy: 50,
       team: 2
     }));
     
@@ -54,8 +54,8 @@ export class BattleScene extends BaseScene {
       this.team2.push({
         ...char,
         id: `${char.id}_copy`,
-        current_hp: char.max_hp,
-        current_energy: char.current_energy || 0,
+        current_hp: char.hp,
+        current_energy: 50,
         team: 2
       });
     }
@@ -282,14 +282,14 @@ export class BattleScene extends BaseScene {
       .fill(Colors.BACKGROUND_SECONDARY)
       .stroke({ width: 1, color: Colors.CARD_BORDER });
     
-    const hpPercentage = character.current_hp / character.max_hp;
+    const hpPercentage = character.current_hp / character.hp;
     const hpBarFill = new Graphics();
     hpBarFill.roundRect(6, 46, (cardWidth - 12) * hpPercentage, 6, 3)
       .fill(hpPercentage > 0.5 ? 0x4caf50 : hpPercentage > 0.25 ? 0xff9800 : 0xf44336);
     
     // HP Text
     const hpText = new Text({
-      text: `HP: ${character.current_hp}/${character.max_hp}`,
+      text: `HP: ${character.current_hp}/${character.hp}`,
       style: {
         fontFamily: 'Kalam',
         fontSize: 8,
@@ -782,12 +782,12 @@ export class BattleScene extends BaseScene {
     const energyText = cardContainer.children[8] as Text; // Energy text
     
     if (hpBarFill && hpText) {
-      const hpPercentage = character.current_hp / character.max_hp;
+      const hpPercentage = character.current_hp / character.hp;
       hpBarFill.clear();
       hpBarFill.roundRect(6, 46, (100 - 12) * hpPercentage, 6, 3)
         .fill(hpPercentage > 0.5 ? 0x4caf50 : hpPercentage > 0.25 ? 0xff9800 : 0xf44336);
       
-      hpText.text = `HP: ${character.current_hp}/${character.max_hp}`;
+      hpText.text = `HP: ${character.current_hp}/${character.hp}`;
     }
     
     if (energyBarFill && energyText) {

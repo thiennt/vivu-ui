@@ -1,4 +1,4 @@
-import { Container, Graphics, Text } from 'pixi.js';
+import { Assets, Container, Graphics, Sprite, Text } from 'pixi.js';
 import { app } from '@/app';
 import { navigation } from './navigation';
 import { Colors } from './colors';
@@ -216,36 +216,55 @@ export abstract class BaseScene extends Container {
     nameText.x = width / 2;
     nameText.y = cardType === 'lineup' || cardType === 'pool' ? height / 2 - 15 : 25;
     
-    // Level text - positioned below symbol
-    const levelSize = cardType === 'detailed' ? 14 : (cardType === 'preview' ? 12 : 10);
-    const levelText = new Text({
-      text: `Lv.${character.level}`,
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: levelSize,
-        fill: Colors.TEXT_SECONDARY,
-        align: 'center'
-      }
-    });
-    levelText.anchor.set(0.5);
-    levelText.x = width / 2;
-    levelText.y = cardType === 'lineup' || cardType === 'pool' ? height / 2 + 10 : 50;
+    // // Level text - positioned below symbol
+    // const levelSize = cardType === 'detailed' ? 14 : (cardType === 'preview' ? 12 : 10);
+    // const levelText = new Text({
+    //   text: `Lv.${character.level}`,
+    //   style: {
+    //     fontFamily: 'Kalam',
+    //     fontSize: levelSize,
+    //     fill: Colors.TEXT_SECONDARY,
+    //     align: 'center'
+    //   }
+    // });
+    // levelText.anchor.set(0.5);
+    // levelText.x = width / 2;
+    // levelText.y = cardType === 'lineup' || cardType === 'pool' ? height / 2 + 10 : 50;
 
-    card.addChild(nameText, levelText);
+    // card.addChild(nameText, levelText);
+
+    // Avatar text (ticker symbol)
+    this.createAvatar(character).then(avatarIcon => {
+      card.addChild(avatarIcon);
+    });
+    card.addChild(nameText);
     
     // Add additional elements based on card type
     if (cardType === 'detailed') {
       this.addDetailedCardElements(card, character, width, height);
     } else if (cardType === 'preview') {
-      this.addPreviewCardElements(card, character, width, height);
+      //this.addPreviewCardElements(card, character, width, height);
     }
 
     // Add element indicator for all types except lineup/pool
     if (cardType !== 'lineup' && cardType !== 'pool') {
-      this.addElementIndicator(card, character, width);
+      //this.addElementIndicator(card, character, width);
     }
     
     return card;
+  }
+
+  private createAvatar(character: any): Promise<Sprite> {
+    return new Promise(async (resolve) => {
+      const avatarTexture = await Assets.load(character?.avatar_url || 'https://pixijs.com/assets/bunny.png');
+      const avatarIcon = new Sprite(avatarTexture);
+      avatarIcon.width = 90;
+      avatarIcon.height = 90;
+      avatarIcon.anchor.set(0.5);
+      avatarIcon.x = 100 / 2 + 10;
+      avatarIcon.y = 90;
+      resolve(avatarIcon);
+    });
   }
 
   private addDetailedCardElements(card: Container, character: any, width: number, height: number): void {    

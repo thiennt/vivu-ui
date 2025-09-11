@@ -54,23 +54,14 @@ export class PlayerDetailScene extends BaseScene {
     this.loadingManager = new LoadingStateManager(this.container, this.gameWidth, this.gameHeight);
     
     // Load data and create UI
-    this.loadPlayerData();
+    //this.loadPlayerData();
   }
   
   private async loadPlayerData(): Promise<void> {
     this.loadingManager.showLoading();
-    
-    // For now, using a default player ID - this should come from authentication/context
-    const playerId = 'P1';
-    
-    // Load player data and characters in parallel
-    const [playerData, charactersData] = await Promise.all([
-      playerApi.getPlayer(playerId),
-      playerApi.getPlayerCharacters(playerId)
-    ]);
 
-    this.player = playerData;
-    this.characters = charactersData;
+    this.player = sessionStorage.getItem('player') ? JSON.parse(sessionStorage.getItem('player') as string) : null;
+    this.characters = this.player?.characters || [];
     this.remainingPoints = this.player.points || 0;
     this.tempStatChanges = { sta: 0, str: 0, agi: 0 };
 
@@ -81,7 +72,7 @@ export class PlayerDetailScene extends BaseScene {
       this.loadingManager.showMockDataIndicator();
     }
     
-    this.initializeUI();
+    //this.initializeUI();
   }
 
   private initializeUI(): void {
@@ -93,6 +84,10 @@ export class PlayerDetailScene extends BaseScene {
     this.createPointDistributionPanel();
     this.createCharacterCollection();
     this.createBackButton();
+  }
+
+  prepare(): void {
+    this.loadPlayerData();
   }
 
   resize(width: number, height: number): void {
@@ -252,7 +247,7 @@ export class PlayerDetailScene extends BaseScene {
     }});
     titleText.x = 15;
     titleText.y = 15;
-    
+
     // Remaining points display
     const remainingText = new Text({text: `Remaining Points: ${this.remainingPoints}`, style: {
       fontFamily: 'Kalam',
@@ -314,7 +309,7 @@ export class PlayerDetailScene extends BaseScene {
       
       panel.addChild(nameText, valueText, minusButton, plusButton);
     });
-    
+
     // Action buttons
     const resetButton = this.createButton(
       'Reset',
@@ -339,20 +334,13 @@ export class PlayerDetailScene extends BaseScene {
         try {
           // Apply changes to player data via API
           const updatedStats = {
-            sta: this.player.sta + this.tempStatChanges.sta,
-            str: this.player.str + this.tempStatChanges.str,
-            agi: this.player.agi + this.tempStatChanges.agi,
-            points: this.remainingPoints
+            sta_point: this.tempStatChanges.sta,
+            str_point: this.tempStatChanges.str,
+            agi_point: this.tempStatChanges.agi
           };
           
           this.loadingManager.showLoading();
-          await playerApi.updatePlayerStats(this.player.id, updatedStats);
-          
-          // Update local player data
-          this.player.sta = updatedStats.sta;
-          this.player.str = updatedStats.str;
-          this.player.agi = updatedStats.agi;
-          this.player.points = updatedStats.points;
+          this.player = await playerApi.updatePlayerStats(this.player.id, updatedStats);
           
           // Reset temporary changes
           this.tempStatChanges = { sta: 0, str: 0, agi: 0 };

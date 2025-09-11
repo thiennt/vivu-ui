@@ -63,15 +63,15 @@ export class CharactersScene extends BaseScene {
       this.loadingManager.showMockDataIndicator();
     }
     
-    this.initializeUI();
+    await this.initializeUI();
   }
   
-  private initializeUI(): void {
+  private async initializeUI(): Promise<void> {
     if (!this.characters.length) return;
     
     this.createBackground();
     this.createHeader();
-    this.createCharacterGrid();
+    await this.createCharacterGrid();
     this.createBackButton();
   }
 
@@ -89,7 +89,7 @@ export class CharactersScene extends BaseScene {
     }
   }
   
-  private updateLayout(): void {
+  private async updateLayout(): Promise<void> {
     // Clear and recreate layout - this is more efficient than destroying/recreating all elements
     this.backgroundContainer.removeChildren();
     this.headerContainer.removeChildren();
@@ -99,7 +99,7 @@ export class CharactersScene extends BaseScene {
     // Recreate layout with current dimensions
     this.createBackground();
     this.createHeader();
-    this.createCharacterGrid();
+    await this.createCharacterGrid();
     this.createBackButton();
   }
 
@@ -176,7 +176,7 @@ export class CharactersScene extends BaseScene {
     this.headerContainer.addChild(title, subtitle);
   }
 
-  private createCharacterGrid(): void {
+  private async createCharacterGrid(): Promise<void> {
     // Calculate area for grid (leave space for back button)
     const gridTop = 140;
     const backButtonHeight = 50;
@@ -199,14 +199,15 @@ export class CharactersScene extends BaseScene {
     // Create a container for all cards
     const gridContent = new Container();
 
-    this.characters.forEach((character, index) => {
+    for (let index = 0; index < this.characters.length; index++) {
+      const character = this.characters[index];
       const row = Math.floor(index / layout.itemsPerRow);
       const col = index % layout.itemsPerRow;
 
       const x = col * (layout.itemWidth + this.STANDARD_SPACING);
       const y = row * (cardHeight + this.STANDARD_SPACING);
 
-      const characterCard = this.createHeroCard(character, x, y, 'detailed');
+      const characterCard = await this.createHeroCard(character, x, y, 'detailed');
       characterCard.width = layout.itemWidth;
       characterCard.height = cardHeight;
 
@@ -215,7 +216,7 @@ export class CharactersScene extends BaseScene {
       });
 
       gridContent.addChild(characterCard);
-    });
+    }
 
     // Set content height for scrolling
     const totalRows = Math.ceil(this.characters.length / layout.itemsPerRow);
@@ -237,24 +238,24 @@ export class CharactersScene extends BaseScene {
     scrollBox.label = 'gridContainer';
   }
 
-  private createDetailedCharacterCard(character: any, x: number, y: number): Container {
-    const card = this.createHeroCard(character, x, y, 'detailed');
+  // private createDetailedCharacterCard(character: any, x: number, y: number): Container {
+  //   const card = this.createHeroCard(character, x, y, 'detailed');
     
-    // Click handler
-    card.on('pointerdown', () => {
-      navigation.showScreen(CharacterDetailScene, { selectedCharacter: character });
-    });
+  //   // Click handler
+  //   card.on('pointerdown', () => {
+  //     navigation.showScreen(CharacterDetailScene, { selectedCharacter: character });
+  //   });
     
-    // Hover effects
-    // card.on('pointerover', () => {
-    //   card.scale.set(1.05);
-    // });
-    // card.on('pointerout', () => {
-    //   card.scale.set(1.0);
-    // });
+  //   // Hover effects
+  //   // card.on('pointerover', () => {
+  //   //   card.scale.set(1.05);
+  //   // });
+  //   // card.on('pointerout', () => {
+  //   //   card.scale.set(1.0);
+  //   // });
     
-    return card;
-  }
+  //   return card;
+  // }
 
   private setupScrolling(): void {
     this.interactive = true;
