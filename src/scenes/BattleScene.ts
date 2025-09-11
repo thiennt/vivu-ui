@@ -127,14 +127,13 @@ export class BattleScene extends BaseScene {
     this.team1Container = new Container();
     this.team2Container = new Container();
 
-    const cardWidth = 100;
-    const spacing = 15;
-    const rowSpacing = 20;
-    const cardsPerRow = 2;
-    const teamWidth = (cardWidth + spacing) * cardsPerRow - spacing;
+    // Calculate layout for 4 cards per row
+    const availableWidth = this.gameWidth - 2 * this.STANDARD_PADDING;
+    const layout = this.calculateFourCardsLayout(availableWidth, this.STANDARD_SPACING);
+    const cardWidth = layout.itemWidth;
+    const teamWidth = layout.totalWidth;
     const cardHeight = 120;
-    const teamRows = 2;
-    const teamBlockHeight = cardHeight * teamRows + rowSpacing;
+    const teamBlockHeight = cardHeight; // Single row now
 
     // Battle log height (should match createBattleLog)
     const logHeight = 80;
@@ -155,37 +154,18 @@ export class BattleScene extends BaseScene {
     const team2X = this.gameWidth / 2 - teamWidth / 2;
     const team2Y = logY + logHeight + logMargin;
 
-    // Split into front and back rows
-    const team1Front = this.team1.slice(0, 2);
-    const team1Back = this.team1.slice(2, 4);
-    const team2Front = this.team2.slice(0, 2);
-    const team2Back = this.team2.slice(2, 4);
-
-    // Team 1: back row (top), then front row (closer to center)
-    team1Back.forEach((character, index) => {
-      const x = index * (cardWidth + spacing);
+    // Single row of 4 cards for each team
+    this.team1.forEach((character, index) => {
+      const x = index * (cardWidth + this.STANDARD_SPACING);
       const y = 0;
-      const card = this.createBattleCard(character, x, y);
-      this.team1Container.addChild(card);
-    });
-    team1Front.forEach((character, index) => {
-      const x = index * (cardWidth + spacing);
-      const y = cardHeight + rowSpacing;
-      const card = this.createBattleCard(character, x, y);
+      const card = this.createBattleCard(character, x, y, cardWidth);
       this.team1Container.addChild(card);
     });
 
-    // Team 2: front row (closer to center), then back row (bottom)
-    team2Front.forEach((character, index) => {
-      const x = index * (cardWidth + spacing);
+    this.team2.forEach((character, index) => {
+      const x = index * (cardWidth + this.STANDARD_SPACING);
       const y = 0;
-      const card = this.createBattleCard(character, x, y);
-      this.team2Container.addChild(card);
-    });
-    team2Back.forEach((character, index) => {
-      const x = index * (cardWidth + spacing);
-      const y = cardHeight + rowSpacing;
-      const card = this.createBattleCard(character, x, y);
+      const card = this.createBattleCard(character, x, y, cardWidth);
       this.team2Container.addChild(card);
     });
 
@@ -227,8 +207,7 @@ export class BattleScene extends BaseScene {
     (this as any)._battleLogY = logY;
   }
 
-  private createBattleCard(character: any, x: number, y: number): Container {
-    const cardWidth = 100;
+  private createBattleCard(character: any, x: number, y: number, cardWidth: number = 100): Container {
     const cardHeight = 120;
     const card = new Container();
     
@@ -350,8 +329,10 @@ export class BattleScene extends BaseScene {
     card.x = x;
     card.y = y;
     
-    // Store character reference for updates
+    // Store character reference and card dimensions for updates
     (card as any).character = character;
+    (card as any).cardWidth = cardWidth;
+    (card as any).cardHeight = cardHeight;
     
     return card;
   }
@@ -780,6 +761,10 @@ export class BattleScene extends BaseScene {
   }
 
   private updateCardBars(cardContainer: Container, character: any): void {
+    // Get card dimensions from stored properties
+    const cardWidth = (cardContainer as any).cardWidth || 100;
+    const cardHeight = (cardContainer as any).cardHeight || 120;
+    
     // Find and update HP bar
     const hpBarFill = cardContainer.children[4] as Graphics; // HP bar fill
     const hpText = cardContainer.children[5] as Text; // HP text
@@ -789,7 +774,7 @@ export class BattleScene extends BaseScene {
     if (hpBarFill && hpText) {
       const hpPercentage = character.current_hp / character.hp;
       hpBarFill.clear();
-      hpBarFill.roundRect(6, 46, (100 - 12) * hpPercentage, 6, 3)
+      hpBarFill.roundRect(6, 46, (cardWidth - 12) * hpPercentage, 6, 3)
         .fill(hpPercentage > 0.5 ? 0x4caf50 : hpPercentage > 0.25 ? 0xff9800 : 0xf44336);
       
       hpText.text = `HP: ${character.current_hp}/${character.hp}`;
@@ -798,7 +783,7 @@ export class BattleScene extends BaseScene {
     if (energyBarFill && energyText) {
       const energyPercentage = character.current_energy / 100;
       energyBarFill.clear();
-      energyBarFill.roundRect(6, 71, (100 - 12) * energyPercentage, 6, 3)
+      energyBarFill.roundRect(6, 71, (cardWidth - 12) * energyPercentage, 6, 3)
         .fill(0x2196f3);
       
       energyText.text = `EN: ${character.current_energy}/100`;
@@ -811,7 +796,7 @@ export class BattleScene extends BaseScene {
       // Add "DEFEATED" overlay if not already present
       if (!cardContainer.children.find(child => (child as any).isDefeatedOverlay)) {
         const defeatedOverlay = new Graphics();
-        defeatedOverlay.roundRect(0, 0, 100, 120, 8)
+        defeatedOverlay.roundRect(0, 0, cardWidth, cardHeight, 8)
           .fill({ color: 0x000000, alpha: 0.6 });
         
         const defeatedText = new Text({
@@ -825,8 +810,8 @@ export class BattleScene extends BaseScene {
           }
         });
         defeatedText.anchor.set(0.5);
-        defeatedText.x = 50;
-        defeatedText.y = 60;
+        defeatedText.x = cardWidth / 2;
+        defeatedText.y = cardHeight / 2;
         
         (defeatedOverlay as any).isDefeatedOverlay = true;
         (defeatedText as any).isDefeatedOverlay = true;
