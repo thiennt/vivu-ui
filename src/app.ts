@@ -15,25 +15,37 @@ initDevtools({ app });
 
 /** Set up a resize function for the app */
 function resize() {
-  const maxWidth = 500;
-  const windowWidth = Math.min(window.innerWidth, maxWidth);
+  const windowWidth = window.innerWidth;
   const windowHeight = window.innerHeight;
   const minWidth = 400;
-  const minHeight = 600;
+  const minHeight = 700; // Updated to meet requirements
 
-  // Calculate renderer and canvas sizes based on current dimensions
+  // For mobile/vertical screens, ensure minimum dimensions
+  const effectiveWidth = Math.max(windowWidth, minWidth);
+  const effectiveHeight = Math.max(windowHeight, minHeight);
+
+  // Calculate scaling only if window is smaller than minimum requirements
   const scaleX = windowWidth < minWidth ? minWidth / windowWidth : 1;
   const scaleY = windowHeight < minHeight ? minHeight / windowHeight : 1;
-  const scale = scaleX > scaleY ? scaleX : scaleY;
-  const width = windowWidth * scale;
-  const height = windowHeight * scale;
+  
+  // Use effective dimensions for game content
+  const width = effectiveWidth;
+  const height = effectiveHeight;
 
-  // Update canvas style dimensions and scroll window up to avoid issues on mobile resize
+  // Update canvas style dimensions
   app.renderer.canvas.style.width = `${windowWidth}px`;
   app.renderer.canvas.style.height = `${windowHeight}px`;
+  
+  // Allow scrolling if content exceeds viewport
+  if (height > windowHeight || width > windowWidth) {
+    document.body.style.overflow = 'auto';
+  } else {
+    document.body.style.overflow = 'hidden';
+  }
+  
   window.scrollTo(0, 0);
 
-  // Update renderer  and navigation screens dimensions
+  // Update renderer and navigation screens dimensions
   app.renderer.resize(width, height);
   navigation.resize(width, height);
 }
@@ -101,6 +113,8 @@ async function init() {
   } else if (getUrlParam("battle") !== null) {
     const { BattleScene } = await import('./scenes/BattleScene');
     await navigation.showScreen(BattleScene);
+  } else if (getUrlParam("player") !== null) {
+    await navigation.showScreen(PlayerDetailScene);
   } else if (getUrlParam("home") !== null) {
     await navigation.showScreen(HomeScene);
   } else {

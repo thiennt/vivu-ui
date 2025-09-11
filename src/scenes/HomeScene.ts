@@ -274,11 +274,21 @@ export class HomeScene extends BaseScene {
     // Make buttons wider to utilize more screen space
     const buttonWidth = Math.min(this.gameWidth - 2 * this.STANDARD_PADDING, 280);
     
+    // Calculate button spacing based on available space
+    const headerHeight = 320; // Approximate height used by title and player info
+    const availableHeight = this.gameHeight - headerHeight - this.STANDARD_PADDING;
+    const totalButtonHeight = buttons.length * 60 + (buttons.length - 1) * this.STANDARD_SPACING;
+    
+    // Use smaller spacing if content doesn't fit
+    const spacing = totalButtonHeight > availableHeight ? 
+      Math.max(5, (availableHeight - (buttons.length * 60)) / (buttons.length - 1)) : 
+      this.STANDARD_SPACING;
+    
     buttons.forEach((buttonData, index) => {
       const button = this.createButton(
         buttonData.text,
         0,
-        index * (60 + this.STANDARD_SPACING), // Use standard spacing between buttons
+        index * (60 + spacing),
         buttonWidth,
         60,
         () => navigation.showScreen(buttonData.screen)
@@ -286,9 +296,9 @@ export class HomeScene extends BaseScene {
       buttonContainer.addChild(button);
     });
     
-    // Center horizontally with standard padding consideration
+    // Center horizontally and position based on content
     buttonContainer.x = (this.gameWidth - buttonWidth) / 2;
-    buttonContainer.y = Math.max(350, this.gameHeight * 0.55);
+    buttonContainer.y = Math.min(350, headerHeight);
     
     this.container.addChild(buttonContainer);
   }
