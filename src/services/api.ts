@@ -145,6 +145,17 @@ export const skillsApi = {
   },
 };
 
+// Battle API methods
+export const battleApi = {
+  async createBattle(battleData: any): Promise<any> {
+    const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
+    return apiRequest(`/players/${playerId}/battles`, {
+      method: 'POST',
+      body: JSON.stringify(battleData),
+    }, { battleId: `battle_${Date.now()}`, status: 'created' });
+  },
+};
+
 // Export the ApiError class and LoadingState interface for use in components
 export { ApiError };
 export type { LoadingState };

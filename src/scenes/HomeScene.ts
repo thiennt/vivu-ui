@@ -63,6 +63,9 @@ export class HomeScene extends BaseScene {
     this.createMenuButtons();
     this.createDecorations();
     
+    // Ensure bottom navigation is created and visible
+    this.createBottomNavigation();
+    
     // Animate decorative elements
     this.decorativeElements.forEach((element, index) => {
       element.alpha = 0;
@@ -86,6 +89,9 @@ export class HomeScene extends BaseScene {
 
     // Update loading manager dimensions
     this.loadingManager.updateDimensions(width, height);
+    
+    // Create/update bottom navigation
+    this.updateBottomNavigation();
     
     // Only update layout if we have loaded data
     if (this.player) {
@@ -145,9 +151,12 @@ export class HomeScene extends BaseScene {
     // Create a mystical gradient background
     const bgContainer = new Container();
     
-    // Main background with gradient effect
+    // Get available height excluding bottom navigation
+    const availableHeight = this.getContentHeight();
+    
+    // Main background with gradient effect - only cover available height
     const bg = new Graphics();
-    bg.fill(Colors.BACKGROUND_PRIMARY).rect(0, 0, this.gameWidth, this.gameHeight);
+    bg.fill(Colors.BACKGROUND_PRIMARY).rect(0, 0, this.gameWidth, availableHeight);
     bgContainer.addChild(bg);
     
     // Add some mystical patterns
@@ -156,7 +165,7 @@ export class HomeScene extends BaseScene {
       star.fill({ color: Colors.DECORATION_MAGIC, alpha: 0.3 + Math.random() * 0.4 })
         .circle(0, 0, 2 + Math.random() * 3);
       star.x = Math.random() * this.gameWidth;
-      star.y = Math.random() * this.gameHeight;
+      star.y = Math.random() * availableHeight; // Only within available height
       bgContainer.addChild(star);
     }
     

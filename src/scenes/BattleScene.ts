@@ -5,6 +5,7 @@ import { BaseScene } from '@/utils/BaseScene';
 import { HomeScene } from './HomeScene';
 import { Colors } from '@/utils/colors';
 import { gsap } from 'gsap';
+import { battleApi } from '@/services/api';
 
 export class BattleScene extends BaseScene {
   /** Assets bundles required by this screen */
@@ -611,6 +612,14 @@ export class BattleScene extends BaseScene {
   }
 
   private startBattle(): void {
+    // Call createBattle API (skip handling response as requested)
+    battleApi.createBattle({
+      team1: this.team1.map(char => ({ id: char.id, name: char.name, level: char.level })),
+      team2: this.team2.map(char => ({ id: char.id, name: char.name, level: char.level })),
+      battleType: '4v4',
+      timestamp: Date.now()
+    });
+
     this.battleLog = ['Battle Started!'];
     this.currentTurn = 1;
     this.updateBattleLog();
