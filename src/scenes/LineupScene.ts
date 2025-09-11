@@ -276,19 +276,15 @@ export class LineupScene extends BaseScene {
     const poolHeight = poolBottom - poolTop;
     const poolWidth = this.gameWidth - 2 * this.STANDARD_PADDING;
 
-    const minCardWidth = 90;
     const cardHeight = 80;
     const spacing = this.STANDARD_SPACING;
     const padding = this.STANDARD_PADDING; // Use for left/right padding
     const marginTop = 45;
 
-    // Calculate cards per row to fit width, including left/right padding
-    const maxCardsPerRow = Math.floor((poolWidth - 2 * padding + spacing) / (minCardWidth + spacing));
-    const cardsPerRow = Math.min(maxCardsPerRow, this.availableCharacters.length || 1);
-
-    // Dynamically calculate card width to fill the row (with left/right padding)
-    const totalSpacing = spacing * (cardsPerRow - 1);
-    const cardWidth = (poolWidth - 2 * padding - totalSpacing) / cardsPerRow;
+    // Calculate cards per row - force 4 cards per row for character pool
+    const layout = this.calculateFourCardsLayout(poolWidth - 2 * padding, spacing);
+    const cardWidth = layout.itemWidth;
+    const cardsPerRow = layout.itemsPerRow;
 
     // Background
     const poolBg = new Graphics();

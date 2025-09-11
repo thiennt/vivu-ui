@@ -183,16 +183,12 @@ export class CharactersScene extends BaseScene {
     const backButtonMargin = 30;
     const gridHeight = this.gameHeight - gridTop - backButtonHeight - backButtonMargin - this.STANDARD_PADDING;
 
-    // Card layout
+    // Card layout - force 4 cards per row
     const availableWidth = this.gameWidth - 2 * this.STANDARD_PADDING;
-    const minCardWidth = 120;
-    const maxCardWidth = 180;
     const cardHeight = 180;
 
-    const layout = this.calculateGridLayout(
+    const layout = this.calculateFourCardsLayout(
       availableWidth,
-      minCardWidth,
-      maxCardWidth,
       this.STANDARD_SPACING
     );
 

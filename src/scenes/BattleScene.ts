@@ -341,6 +341,11 @@ export class BattleScene extends BaseScene {
     statsText.x = cardWidth / 2;
     statsText.y = 95;
     
+    // Add avatar/logo
+    this.createAvatar(character, cardWidth, cardHeight).then(avatarIcon => {
+      card.addChild(avatarIcon);
+    });
+    
     card.addChild(bg, symbolText, levelText, hpBarBg, hpBarFill, hpText, energyBarBg, energyBarFill, energyText, statsText);
     card.x = x;
     card.y = y;
