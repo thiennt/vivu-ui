@@ -18,23 +18,21 @@ function resize() {
   const windowWidth = window.innerWidth;
   const windowHeight = window.innerHeight;
   const minWidth = 400;
-  const minHeight = 700; // Updated to meet requirements
+  const minHeight = 700;
+  const maxWidth = 1200; // Maximum width for centered layout
+  const maxHeight = 800; // Maximum height for centered layout
 
-  // For mobile/vertical screens, ensure minimum dimensions
-  const effectiveWidth = Math.max(windowWidth, minWidth);
-  const effectiveHeight = Math.max(windowHeight, minHeight);
+  // Calculate constrained dimensions - not full screen
+  let width = Math.max(minWidth, Math.min(windowWidth * 0.9, maxWidth));
+  let height = Math.max(minHeight, Math.min(windowHeight * 0.9, maxHeight));
 
-  // Calculate scaling only if window is smaller than minimum requirements
-  const scaleX = windowWidth < minWidth ? minWidth / windowWidth : 1;
-  const scaleY = windowHeight < minHeight ? minHeight / windowHeight : 1;
-  
-  // Use effective dimensions for game content
-  const width = effectiveWidth;
-  const height = effectiveHeight;
+  // Ensure minimum dimensions are respected
+  width = Math.max(width, minWidth);
+  height = Math.max(height, minHeight);
 
-  // Update canvas style dimensions
-  app.renderer.canvas.style.width = `${windowWidth}px`;
-  app.renderer.canvas.style.height = `${windowHeight}px`;
+  // Update canvas style dimensions to the constrained size (not full window)
+  app.renderer.canvas.style.width = `${width}px`;
+  app.renderer.canvas.style.height = `${height}px`;
   
   // Allow scrolling if content exceeds viewport
   if (height > windowHeight || width > windowWidth) {
