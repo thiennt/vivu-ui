@@ -183,14 +183,22 @@ export class CharactersScene extends BaseScene {
     const backButtonMargin = 30;
     const gridHeight = this.gameHeight - gridTop - backButtonHeight - backButtonMargin - this.STANDARD_PADDING;
 
-    // Card layout - force 4 cards per row
+    // Mobile-optimized card layout using the specified formula
     const availableWidth = this.gameWidth - 2 * this.STANDARD_PADDING;
-    const cardHeight = 180;
+    const isMobile = this.gameWidth < 768; // Mobile detection
+    const gap = isMobile ? 8 : this.STANDARD_SPACING; // Use 8px gap on mobile
+    const cardCount = 4; // Force 4 cards per row
+    
+    // Apply mobile formula: card_width = (screen_width - (gap * (card_count - 1))) / card_count
+    const cardWidth = (availableWidth - (gap * (cardCount - 1))) / cardCount;
+    // Use 4:5 aspect ratio for card height
+    const cardHeight = cardWidth * 1.25;
 
-    const layout = this.calculateFourCardsLayout(
-      availableWidth,
-      this.STANDARD_SPACING
-    );
+    const layout = {
+      itemsPerRow: cardCount,
+      itemWidth: cardWidth,
+      totalWidth: availableWidth
+    };
 
     // Create a container for all cards
     const gridContent = new Container();
@@ -200,10 +208,10 @@ export class CharactersScene extends BaseScene {
       const row = Math.floor(index / layout.itemsPerRow);
       const col = index % layout.itemsPerRow;
 
-      const x = col * (layout.itemWidth + this.STANDARD_SPACING);
-      const y = row * (cardHeight + this.STANDARD_SPACING);
+      const x = col * (layout.itemWidth + gap);
+      const y = row * (cardHeight + gap);
 
-      const characterCard = await this.createHeroCard(character, x, y, 'detailed');
+      const characterCard = await this.createHeroCard(character, x, y, 'detailed', undefined, cardWidth);
       characterCard.width = layout.itemWidth;
       characterCard.height = cardHeight;
 
@@ -216,7 +224,7 @@ export class CharactersScene extends BaseScene {
 
     // Set content height for scrolling
     const totalRows = Math.ceil(this.characters.length / layout.itemsPerRow);
-    const contentHeight = totalRows * (cardHeight + this.STANDARD_SPACING);
+    const contentHeight = totalRows * (cardHeight + gap);
 
     // Create ScrollBox for vertical scrolling
     const scrollBox = new ScrollBox({

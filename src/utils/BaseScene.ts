@@ -86,6 +86,31 @@ export abstract class BaseScene extends Container {
     return { itemsPerRow, itemWidth, totalWidth };
   }
 
+  /**
+   * Calculates responsive font size based on card dimensions and screen size
+   */
+  protected calculateResponsiveFontSize(
+    baseSize: number,
+    cardWidth: number,
+    screenWidth: number,
+    minSize: number = 8,
+    maxSize: number = 24
+  ): number {
+    // Scale font size based on card width relative to a base card width (120px)
+    const baseCardWidth = 120;
+    const cardScale = cardWidth / baseCardWidth;
+    
+    // Scale font size based on screen width relative to base screen width (800px)
+    const baseScreenWidth = 800;
+    const screenScale = Math.min(screenWidth / baseScreenWidth, 1.2); // Cap at 120% scaling
+    
+    // Combine both scaling factors
+    const scaledSize = baseSize * cardScale * screenScale;
+    
+    // Ensure font size stays within bounds
+    return Math.max(minSize, Math.min(maxSize, scaledSize));
+  }
+
   protected createButton(
     text: string, 
     x: number, 
@@ -201,22 +226,24 @@ export abstract class BaseScene extends Container {
     x: number,
     y: number,
     cardType: 'preview' | 'detailed' | 'lineup' | 'pool' = 'detailed',
-    positionIndex?: number
+    positionIndex?: number,
+    customWidth?: number
   ): Container {
-    // Define card dimensions based on type
+    // Define card dimensions based on type, or use custom width
     const cardSizes = {
-      preview: { width: 120, height: 140 },
-      detailed: { width: 140, height: 180 },
-      lineup: { width: 100, height: 100 },
-      pool: { width: 90, height: 90 }
+      preview: { width: customWidth || 120, height: (customWidth || 120) * 1.25 }, // 4:5 aspect ratio
+      detailed: { width: customWidth || 140, height: (customWidth || 140) * 1.25 }, // 4:5 aspect ratio  
+      lineup: { width: customWidth || 100, height: customWidth || 100 },
+      pool: { width: customWidth || 90, height: customWidth || 90 }
     };
     
     const { width, height } = cardSizes[cardType];
     const card = this.createCard(x, y, width, height, character.rarity || 'common');
     (card as any).character = character;
 
-    // Character name - always at top center
-    const nameSize = cardType === 'detailed' ? 24 : (cardType === 'preview' ? 18 : 16);
+    // Character name - responsive font size
+    const baseNameSize = cardType === 'detailed' ? 16 : (cardType === 'preview' ? 14 : 12);
+    const nameSize = this.calculateResponsiveFontSize(baseNameSize, width, this.gameWidth, 10, 20);
     const nameText = new Text({
       text: character.name,
       style: {
@@ -229,7 +256,7 @@ export abstract class BaseScene extends Container {
     });
     nameText.anchor.set(0.5);
     nameText.x = width / 2;
-    nameText.y = cardType === 'lineup' || cardType === 'pool' ? height / 2 - 15 : 25;
+    nameText.y = cardType === 'lineup' || cardType === 'pool' ? height / 2 - 15 : height * 0.15;
     
     // // Level text - positioned below symbol
     // const levelSize = cardType === 'detailed' ? 14 : (cardType === 'preview' ? 12 : 10);
@@ -286,21 +313,25 @@ export abstract class BaseScene extends Container {
   }
 
   private addDetailedCardElements(card: Container, character: any, width: number, height: number): void {    
-    // Experience
+    // Experience with responsive font
+    const baseExpSize = 9;
+    const expSize = this.calculateResponsiveFontSize(baseExpSize, width, this.gameWidth, 7, 12);
     const expText = new Text({
       text: `EXP: ${character.exp}`,
       style: {
         fontFamily: 'Kalam',
-        fontSize: 9,
+        fontSize: expSize,
         fill: Colors.TEXT_SECONDARY,
         align: 'center'
       }
     });
     expText.anchor.set(0.5);
     expText.x = width / 2;
-    expText.y = 95;
+    expText.y = height * 0.65;
     
-    // Stats in a compact grid
+    // Stats in a compact grid with responsive font
+    const baseStatSize = 8;
+    const statSize = this.calculateResponsiveFontSize(baseStatSize, width, this.gameWidth, 6, 10);
     const stats = [
       `HP: ${character.hp}`,
       `ATK: ${character.atk}`,
@@ -313,12 +344,12 @@ export abstract class BaseScene extends Container {
         text: stat,
         style: {
           fontFamily: 'Kalam',
-          fontSize: 8,
+          fontSize: statSize,
           fill: Colors.TEXT_SECONDARY
         }
       });
-      statText.x = 10 + (index % 2) * (width / 2 - 10);
-      statText.y = 115 + Math.floor(index / 2) * 18;
+      statText.x = width * 0.08 + (index % 2) * (width / 2 - width * 0.08);
+      statText.y = height * 0.72 + Math.floor(index / 2) * (height * 0.08);
       card.addChild(statText);
     });
     
