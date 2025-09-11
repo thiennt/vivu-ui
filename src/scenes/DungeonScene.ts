@@ -137,13 +137,24 @@ export class DungeonScene extends BaseScene {
     // Calculate responsive card dimensions with standard padding
     const availableWidth = this.gameWidth - 2 * this.STANDARD_PADDING;
     const cardWidth = Math.min(availableWidth, 500); // Limit max width but use available space
-    const cardHeight = 160;
+    
+    // Responsive card height - smaller on mobile
+    const cardHeight = Math.max(140, Math.min(160, this.gameHeight * 0.15));
     const startY = 150;
+    
+    // Calculate available height for cards to prevent overflow
+    const availableHeight = this.gameHeight - startY - 100; // Leave space for back button
+    const totalCardsHeight = this.dungeons.length * (cardHeight + this.STANDARD_SPACING) - this.STANDARD_SPACING;
+    
+    // Use smaller spacing if content doesn't fit
+    const spacing = totalCardsHeight > availableHeight ? 
+      Math.max(5, (availableHeight - (this.dungeons.length * cardHeight)) / (this.dungeons.length - 1)) : 
+      this.STANDARD_SPACING;
     
     this.dungeons.forEach((dungeon, index) => {
       const dungeonCard = this.createDungeonCard(dungeon, index, cardWidth, cardHeight);
       dungeonCard.x = (this.gameWidth - cardWidth) / 2; // Center each card
-      dungeonCard.y = startY + (index * (cardHeight + this.STANDARD_SPACING));
+      dungeonCard.y = startY + (index * (cardHeight + spacing));
       this.listContainer.addChild(dungeonCard);
     });
   }
@@ -158,12 +169,15 @@ export class DungeonScene extends BaseScene {
       .stroke({ width: 3, color: Colors.BUTTON_PRIMARY });
 
     // Calculate responsive sizes with standard padding
-    const iconSize = 100;
+    const iconSize = Math.min(80, cardHeight * 0.6); // Responsive icon size
     const iconX = this.STANDARD_PADDING;
-    const iconY = 30;
+    const iconY = (cardHeight - iconSize) / 2;
     const contentStartX = iconX + iconSize + this.STANDARD_SPACING;
     const contentWidth = cardWidth - contentStartX - this.STANDARD_PADDING;
-    const buttonWidth = Math.min(140, contentWidth / 3);
+    
+    // Responsive button width - ensure minimum touch target of 80px
+    const buttonWidth = Math.max(80, Math.min(120, contentWidth / 3));
+    const textWidth = contentWidth - buttonWidth - this.STANDARD_SPACING;
     
     // Dungeon icon/preview
     const iconBg = new Graphics();
@@ -179,68 +193,76 @@ export class DungeonScene extends BaseScene {
     icon.x = iconX + iconSize / 2;
     icon.y = iconY + iconSize / 2;
     
-    // Dungeon info
+    // Dungeon info with responsive font sizes
+    const titleFontSize = this.calculateResponsiveFontSize(24, cardWidth, this.gameWidth, 16, 28);
     const title = new Text({
       text: dungeon.name,
       style: {
         fontFamily: 'Kalam',
-        fontSize: 24,
+        fontSize: titleFontSize,
         fontWeight: 'bold',
-        fill: Colors.TEXT_PRIMARY
+        fill: Colors.TEXT_PRIMARY,
+        wordWrap: true,
+        wordWrapWidth: textWidth
       }
     });
     title.x = contentStartX;
-    title.y = 20;
+    title.y = cardHeight * 0.1;
     
+    const descFontSize = this.calculateResponsiveFontSize(14, cardWidth, this.gameWidth, 10, 16);
     const description = new Text({
       text: dungeon.description,
       style: {
         fontFamily: 'Kalam',
-        fontSize: 14,
+        fontSize: descFontSize,
         fill: Colors.TEXT_SECONDARY,
         wordWrap: true,
-        wordWrapWidth: contentWidth - buttonWidth - this.STANDARD_SPACING
+        wordWrapWidth: textWidth
       }
     });
     description.x = contentStartX;
-    description.y = 50;
+    description.y = cardHeight * 0.3;
     
+    const levelFontSize = this.calculateResponsiveFontSize(16, cardWidth, this.gameWidth, 12, 18);
     const requiredLevel = new Text({
       text: `Required Level: ${dungeon.requiredLevel}`,
       style: {
         fontFamily: 'Kalam',
-        fontSize: 16,
+        fontSize: levelFontSize,
         fontWeight: 'bold',
         fill: Colors.RARITY_LEGENDARY
       }
     });
     requiredLevel.x = contentStartX;
-    requiredLevel.y = 100;
+    requiredLevel.y = cardHeight * 0.55;
 
+    const stagesFontSize = this.calculateResponsiveFontSize(14, cardWidth, this.gameWidth, 10, 16);
     const stages = new Text({
       text: `Stages: ${dungeon.stages.length}`,
       style: {
         fontFamily: 'Kalam',
-        fontSize: 14,
+        fontSize: stagesFontSize,
         fill: Colors.TEXT_TERTIARY
       }
     });
     stages.x = contentStartX;
-    stages.y = 120;
+    stages.y = cardHeight * 0.75;
   
-    // Enter button - positioned with standard padding
+    // Enter button - positioned with standard padding and responsive height
     const buttonX = cardWidth - buttonWidth - this.STANDARD_PADDING;
-    const buttonY = (cardHeight - 60) / 2;
+    const buttonY = (cardHeight - Math.min(50, cardHeight * 0.4)) / 2;
+    const buttonHeight = Math.min(50, cardHeight * 0.4);
     
     const enterButton = this.createButton(
-      'Enter Dungeon',
+      'Enter',
       buttonX,
       buttonY,
       buttonWidth,
-      60,
+      buttonHeight,
       () => {
         navigation.showScreen(StageScene, { selectedDungeon: dungeon });
-      }
+      },
+      14 // Base font size for responsive scaling
     );
     
     card.addChild(bg, iconBg, icon, title, description, requiredLevel, stages, enterButton);
@@ -258,13 +280,18 @@ export class DungeonScene extends BaseScene {
   }
 
   private createBackButton(): void {
+    // Responsive button sizing
+    const buttonWidth = Math.min(180, this.gameWidth - 2 * this.STANDARD_PADDING);
+    const buttonHeight = Math.max(44, Math.min(50, this.gameHeight * 0.08)); // Ensure minimum touch target
+    
     const backButton = this.createButton(
       '← Back to Home',
       this.STANDARD_PADDING,
-      this.gameHeight - 80,
-      200,
-      50,
-      () => navigation.showScreen(HomeScene)
+      this.gameHeight - buttonHeight - this.STANDARD_PADDING,
+      buttonWidth,
+      buttonHeight,
+      () => navigation.showScreen(HomeScene),
+      16 // Base font size for responsive scaling
     );
     this.buttonContainer.addChild(backButton);
   }

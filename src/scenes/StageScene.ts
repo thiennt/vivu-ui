@@ -312,17 +312,23 @@ export class StageScene extends BaseScene {
     rewardText.x = 10;
     rewardText.y = 85;
     
-    // Enter button
+    // Enter button with responsive sizing
+    const cardWidth = 180; // From the background rectangle above
+    const cardHeight = 130; // From the background rectangle above
+    const buttonWidth = Math.max(60, Math.min(70, cardWidth * 0.3));
+    const buttonHeight = Math.max(20, Math.min(25, cardHeight * 0.15));
+    
     const enterButton = this.createButton(
       'Enter',
-      100,
-      100,
-      70,
-      25,
+      cardWidth - buttonWidth - 5,
+      cardHeight - buttonHeight - 5,
+      buttonWidth,
+      buttonHeight,
       () => {
         // In a real game, this would start the battle
         alert(`Starting battle in ${stage.name}!`);
-      }
+      },
+      12 // Base font size for responsive scaling
     );
     
     card.addChild(bg, stageNumber, stageName, difficulty, rewardText, enterButton);
@@ -353,13 +359,18 @@ export class StageScene extends BaseScene {
   }
 
   private createBackButton(): void {
+    // Responsive button sizing
+    const buttonWidth = Math.min(180, this.gameWidth - 2 * this.STANDARD_PADDING);
+    const buttonHeight = Math.max(44, Math.min(50, this.gameHeight * 0.08));
+    
     const backButton = this.createButton(
       '← Back to Dungeons',
-      5,
-      this.gameHeight - 80,
-      200,
-      50,
-      () => navigation.showScreen(DungeonScene)
+      this.STANDARD_PADDING,
+      this.gameHeight - buttonHeight - this.STANDARD_PADDING,
+      buttonWidth,
+      buttonHeight,
+      () => navigation.showScreen(DungeonScene),
+      16 // Base font size for responsive scaling
     );
     this.buttonContainer.addChild(backButton);
   }

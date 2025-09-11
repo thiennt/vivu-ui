@@ -291,7 +291,8 @@ export class HomeScene extends BaseScene {
         index * (60 + spacing),
         buttonWidth,
         60,
-        () => navigation.showScreen(buttonData.screen)
+        () => navigation.showScreen(buttonData.screen),
+        18 // Base font size for responsive scaling
       );
       buttonContainer.addChild(button);
     });
