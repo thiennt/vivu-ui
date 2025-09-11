@@ -24,17 +24,12 @@ export abstract class BaseScene extends Container {
   }
 
   protected createBottomNavigation(): void {
-    console.log('createBottomNavigation called with dimensions:', this.gameWidth, 'x', this.gameHeight);
     if (!this.bottomNavigation && this.gameWidth > 0 && this.gameHeight > 0) {
-      console.log('Creating bottom navigation menu');
       this.bottomNavigation = new BottomNavigationMenu(this.gameWidth, this.gameHeight);
       this.addChild(this.bottomNavigation);
       // Ensure it's on top
       this.bottomNavigation.zIndex = 9999;
       this.sortChildren();
-      console.log('Bottom navigation created and added');
-    } else {
-      console.log('Bottom navigation not created - either exists or bad dimensions');
     }
   }
 

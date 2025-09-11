@@ -148,6 +148,7 @@ export const skillsApi = {
 // Battle API methods
 export const battleApi = {
   async createBattle(battleData: any): Promise<any> {
+    console.log('🔥 createBattle API called with data:', battleData);
     const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
     return apiRequest(`/players/${playerId}/battles`, {
       method: 'POST',

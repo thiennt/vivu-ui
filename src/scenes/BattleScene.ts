@@ -66,6 +66,9 @@ export class BattleScene extends BaseScene {
     this.gameWidth = width;
     this.gameHeight = height;
 
+    // Create/update bottom navigation first
+    this.updateBottomNavigation();
+
     // Clear and recreate layout
     this.container.removeChildren();
     this.createBackground();
@@ -97,24 +100,10 @@ export class BattleScene extends BaseScene {
 
   private createBackground(): void {
     const bg = new Graphics();
-    bg.rect(0, 0, this.gameWidth, this.gameHeight).fill(Colors.BACKGROUND_PRIMARY);
+    // Use content height to avoid covering bottom navigation
+    const availableHeight = this.getContentHeight();
+    bg.rect(0, 0, this.gameWidth, availableHeight).fill(Colors.BACKGROUND_PRIMARY);
     this.container.addChild(bg);
-    
-    // // Add title
-    // const title = new Text({
-    //   text: '4v4 Battle Arena',
-    //   style: {
-    //     fontFamily: 'Kalam',
-    //     fontSize: 32,
-    //     fontWeight: 'bold',
-    //     fill: Colors.TEXT_PRIMARY,
-    //     align: 'center'
-    //   }
-    // });
-    // title.anchor.set(0.5);
-    // title.x = this.gameWidth / 2;
-    // title.y = 30;
-    // this.container.addChild(title);
   }
 
   private createEffectsContainer(): void {

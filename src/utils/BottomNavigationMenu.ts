@@ -48,7 +48,6 @@ export class BottomNavigationMenu extends Container {
     // Position at bottom of screen
     this.y = this.gameHeight - this.menuHeight;
     this.zIndex = 9999; // Even higher z-index
-    console.log('Bottom navigation created at y:', this.y, 'with height:', this.menuHeight);
   }
 
   private handleNavigation(action: string): void {
