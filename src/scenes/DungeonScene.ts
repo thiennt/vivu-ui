@@ -169,14 +169,14 @@ export class DungeonScene extends BaseScene {
       .stroke({ width: 3, color: Colors.BUTTON_PRIMARY });
 
     // Calculate responsive sizes with standard padding
-    const iconSize = Math.min(80, cardHeight * 0.6); // Responsive icon size
+    const iconSize = Math.min(60, cardHeight * 0.5, cardWidth * 0.2); // Reduced max icon size for small screens
     const iconX = this.STANDARD_PADDING;
     const iconY = (cardHeight - iconSize) / 2;
     const contentStartX = iconX + iconSize + this.STANDARD_SPACING;
     const contentWidth = cardWidth - contentStartX - this.STANDARD_PADDING;
     
-    // Responsive button width - ensure minimum touch target of 80px
-    const buttonWidth = Math.max(80, Math.min(120, contentWidth / 3));
+    // Responsive button width - ensure minimum touch target of 80px but limit for small cards
+    const buttonWidth = Math.max(60, Math.min(100, contentWidth / 3)); // Reduced from 80-120 to 60-100
     const textWidth = contentWidth - buttonWidth - this.STANDARD_SPACING;
     
     // Dungeon icon/preview
@@ -185,7 +185,7 @@ export class DungeonScene extends BaseScene {
     const icon = new Text({
       text: '🏰',
       style: {
-        fontSize: 48,
+        fontSize: Math.min(32, iconSize * 0.8), // Responsive icon font size
         align: 'center'
       }
     });
@@ -193,8 +193,8 @@ export class DungeonScene extends BaseScene {
     icon.x = iconX + iconSize / 2;
     icon.y = iconY + iconSize / 2;
     
-    // Dungeon info with responsive font sizes
-    const titleFontSize = this.calculateResponsiveFontSize(24, cardWidth, this.gameWidth, 16, 28);
+    // Dungeon info with responsive font sizes - improved for small screens
+    const titleFontSize = this.calculateResponsiveFontSize(20, cardWidth, this.gameWidth, 12, 24); // Reduced from 24 base
     const title = new Text({
       text: dungeon.name,
       style: {
@@ -203,13 +203,14 @@ export class DungeonScene extends BaseScene {
         fontWeight: 'bold',
         fill: Colors.TEXT_PRIMARY,
         wordWrap: true,
-        wordWrapWidth: textWidth
+        wordWrapWidth: textWidth,
+        breakWords: true // Allow breaking long words to prevent overflow
       }
     });
     title.x = contentStartX;
-    title.y = cardHeight * 0.1;
+    title.y = cardHeight * 0.08; // Slightly adjusted for better spacing
     
-    const descFontSize = this.calculateResponsiveFontSize(14, cardWidth, this.gameWidth, 10, 16);
+    const descFontSize = this.calculateResponsiveFontSize(12, cardWidth, this.gameWidth, 9, 14); // Reduced from 14 base
     const description = new Text({
       text: dungeon.description,
       style: {
@@ -217,13 +218,14 @@ export class DungeonScene extends BaseScene {
         fontSize: descFontSize,
         fill: Colors.TEXT_SECONDARY,
         wordWrap: true,
-        wordWrapWidth: textWidth
+        wordWrapWidth: textWidth,
+        breakWords: true // Allow breaking long words to prevent overflow
       }
     });
     description.x = contentStartX;
-    description.y = cardHeight * 0.3;
+    description.y = Math.min(cardHeight * 0.32, title.y + title.height + 5); // Dynamic positioning to avoid overlap
     
-    const levelFontSize = this.calculateResponsiveFontSize(16, cardWidth, this.gameWidth, 12, 18);
+    const levelFontSize = this.calculateResponsiveFontSize(14, cardWidth, this.gameWidth, 10, 16); // Reduced from 16 base
     const requiredLevel = new Text({
       text: `Required Level: ${dungeon.requiredLevel}`,
       style: {
@@ -234,9 +236,9 @@ export class DungeonScene extends BaseScene {
       }
     });
     requiredLevel.x = contentStartX;
-    requiredLevel.y = cardHeight * 0.55;
+    requiredLevel.y = Math.min(cardHeight * 0.58, description.y + description.height + 5); // Dynamic positioning
 
-    const stagesFontSize = this.calculateResponsiveFontSize(14, cardWidth, this.gameWidth, 10, 16);
+    const stagesFontSize = this.calculateResponsiveFontSize(12, cardWidth, this.gameWidth, 9, 14); // Reduced from 14 base
     const stages = new Text({
       text: `Stages: ${dungeon.stages.length}`,
       style: {
@@ -246,12 +248,12 @@ export class DungeonScene extends BaseScene {
       }
     });
     stages.x = contentStartX;
-    stages.y = cardHeight * 0.75;
+    stages.y = Math.min(cardHeight * 0.78, requiredLevel.y + requiredLevel.height + 3); // Dynamic positioning
   
     // Enter button - positioned with standard padding and responsive height
     const buttonX = cardWidth - buttonWidth - this.STANDARD_PADDING;
-    const buttonY = (cardHeight - Math.min(50, cardHeight * 0.4)) / 2;
-    const buttonHeight = Math.min(50, cardHeight * 0.4);
+    const buttonY = (cardHeight - Math.min(40, cardHeight * 0.35)) / 2; // Reduced from 50px max height
+    const buttonHeight = Math.min(40, cardHeight * 0.35); // Reduced from 50px max height
     
     const enterButton = this.createButton(
       'Enter',
@@ -262,7 +264,7 @@ export class DungeonScene extends BaseScene {
       () => {
         navigation.showScreen(StageScene, { selectedDungeon: dungeon });
       },
-      14 // Base font size for responsive scaling
+      12 // Reduced base font size from 14
     );
     
     card.addChild(bg, iconBg, icon, title, description, requiredLevel, stages, enterButton);
@@ -280,9 +282,9 @@ export class DungeonScene extends BaseScene {
   }
 
   private createBackButton(): void {
-    // Responsive button sizing
-    const buttonWidth = Math.min(180, this.gameWidth - 2 * this.STANDARD_PADDING);
-    const buttonHeight = Math.max(44, Math.min(50, this.gameHeight * 0.08)); // Ensure minimum touch target
+    // Responsive button sizing - improved for small screens
+    const buttonWidth = Math.min(160, this.gameWidth - 2 * this.STANDARD_PADDING); // Reduced from 180
+    const buttonHeight = Math.max(40, Math.min(46, this.gameHeight * 0.07)); // Reduced heights for small screens
     
     const backButton = this.createButton(
       '← Back to Home',
@@ -291,7 +293,7 @@ export class DungeonScene extends BaseScene {
       buttonWidth,
       buttonHeight,
       () => navigation.showScreen(HomeScene),
-      16 // Base font size for responsive scaling
+      14 // Reduced base font size from 16
     );
     this.buttonContainer.addChild(backButton);
   }
