@@ -342,26 +342,31 @@ export class PlayerDetailScene extends BaseScene {
       panel.addChild(nameText, valueText, minusButton, plusButton);
     });
 
-    // Action buttons
+    // Action buttons - responsive sizing
+    const buttonHeight = Math.min(35, panelHeight * 0.15); // Responsive button height
+    const resetButtonWidth = Math.min(70, panelWidth * 0.15);
+    const confirmButtonWidth = Math.min(90, panelWidth * 0.2);
+    
     const resetButton = this.createButton(
       'Reset',
-      panelWidth - 280,
-      panelHeight - 50,
-      80,
-      40,
+      panelWidth - resetButtonWidth - confirmButtonWidth - 20,
+      panelHeight - buttonHeight - 10,
+      resetButtonWidth,
+      buttonHeight,
       () => {
         this.tempStatChanges = { sta: 0, str: 0, agi: 0 };
         this.remainingPoints = this.player.points;
         this.refreshPointDistributionPanel();
-      }
+      },
+      12 // Base font size
     );
     
     const confirmButton = this.createButton(
       'Confirm',
-      panelWidth - 190,
-      panelHeight - 50,
-      100,
-      40,
+      panelWidth - confirmButtonWidth - 10,
+      panelHeight - buttonHeight - 10,
+      confirmButtonWidth,
+      buttonHeight,
       async () => {
         try {
           // Apply changes to player data via API
@@ -387,7 +392,8 @@ export class PlayerDetailScene extends BaseScene {
             : 'Failed to update stats. Please try again.';
           this.loadingManager.showError(errorMessage);
         }
-      }
+      },
+      12 // Base font size
     );
     
     panel.addChild(resetButton, confirmButton);
@@ -503,7 +509,7 @@ export class PlayerDetailScene extends BaseScene {
 
     // Calculate available height for scrolling (remaining screen space)
     const titleHeight = 40;
-    const buttonHeight = 50;
+    const footerButtonHeight = 50; // Renamed to avoid conflict
     const buttonMargin = this.STANDARD_SPACING * 2;
     const maxScrollHeight = 150;
 
@@ -519,15 +525,17 @@ export class PlayerDetailScene extends BaseScene {
     scrollBox.x = this.STANDARD_PADDING;
     scrollBox.y = baseY + titleHeight;
 
-    // View all button - responsive width
-    const buttonWidth = Math.min(250, this.gameWidth - 2 * this.STANDARD_PADDING);
+    // View all button - responsive sizing
+    const buttonWidth = Math.min(200, this.gameWidth - 2 * this.STANDARD_PADDING); // Reduced from 250
+    const buttonHeight = Math.max(40, Math.min(46, this.gameHeight * 0.07));
     const viewAllButton = this.createButton(
       'View All Characters',
       (this.gameWidth - buttonWidth) / 2,
       scrollBox.y + Math.min(maxScrollHeight, contentHeight) + this.STANDARD_SPACING,
       buttonWidth,
-      50,
-      () => navigation.showScreen(CharactersScene)
+      buttonHeight,
+      () => navigation.showScreen(CharactersScene),
+      14 // Base font size
     );
 
     this.collectionContainer.addChild(collectionTitle, scrollBox, viewAllButton);
@@ -545,13 +553,18 @@ export class PlayerDetailScene extends BaseScene {
   }
 
   private createBackButton(): void {
+    // Responsive button sizing - improved for small screens
+    const buttonWidth = Math.min(160, this.gameWidth - 2 * this.STANDARD_PADDING);
+    const buttonHeight = Math.max(40, Math.min(46, this.gameHeight * 0.07));
+    
     const backButton = this.createButton(
       '← Back to Home',
       this.STANDARD_PADDING,
-      this.gameHeight - 80,
-      200,
-      50,
-      () => navigation.showScreen(HomeScene)
+      this.gameHeight - buttonHeight - this.STANDARD_PADDING,
+      buttonWidth,
+      buttonHeight,
+      () => navigation.showScreen(HomeScene),
+      14 // Added base font size
     );
     this.buttonContainer.addChild(backButton);
   }
