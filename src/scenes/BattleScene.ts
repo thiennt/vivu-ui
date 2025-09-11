@@ -372,29 +372,34 @@ export class BattleScene extends BaseScene {
   private createActionButtons(): void {
     const buttonContainer = new Container();
     
+    // Responsive button sizing
+    const buttonWidth = Math.min(120, (this.gameWidth - 3 * this.STANDARD_PADDING) / 2);
+    const buttonHeight = Math.max(44, Math.min(40, this.gameHeight * 0.08));
+    
     // Start Battle button
     const startButton = this.createButton(
       'Start Battle',
-      (this.width - 120) / 2,
+      (this.gameWidth - buttonWidth) / 2,
       0,
-      120,
-      40,
-      () => this.startBattle()
+      buttonWidth,
+      buttonHeight,
+      () => this.startBattle(),
+      14 // Base font size for responsive scaling
     );
     
     // Back button
     const backButton = this.createButton(
       '← Back to Home',
-      15,
+      this.STANDARD_PADDING,
       0,
-      140,
-      40,
-      () => navigation.showScreen(HomeScene)
+      buttonWidth,
+      buttonHeight,
+      () => navigation.showScreen(HomeScene),
+      14 // Base font size for responsive scaling
     );
 
     buttonContainer.addChild(backButton, startButton);
-    buttonContainer.x = (this.gameWidth - 520) / 2;
-    buttonContainer.y = this.gameHeight - 60;
+    buttonContainer.y = this.gameHeight - buttonHeight - this.STANDARD_PADDING;
     
     this.container.addChild(buttonContainer);
   }

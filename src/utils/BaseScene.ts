@@ -117,7 +117,8 @@ export abstract class BaseScene extends Container {
     y: number, 
     width: number = 200, 
     height: number = 50,
-    onClick?: () => void
+    onClick?: () => void,
+    baseFontSize: number = 18
   ): Container {
     const button = new Container();
     
@@ -127,15 +128,26 @@ export abstract class BaseScene extends Container {
       .fill(Colors.BUTTON_PRIMARY)
       .stroke({ width: 3, color: Colors.BUTTON_BORDER });
 
+    // Calculate responsive font size based on button dimensions and screen size
+    const responsiveFontSize = this.calculateResponsiveFontSize(
+      baseFontSize,
+      width,
+      this.gameWidth,
+      Math.max(10, height * 0.2), // Minimum font size based on button height
+      Math.min(24, height * 0.6)  // Maximum font size based on button height
+    );
+
     // Button text
     const buttonText = new Text({
       text: text,
       style: {
         fontFamily: 'Kalam',
-        fontSize: 18,
+        fontSize: responsiveFontSize,
         fontWeight: 'bold',
         fill: Colors.TEXT_BUTTON,
-        align: 'center'
+        align: 'center',
+        wordWrap: true,
+        wordWrapWidth: width * 0.9 // Ensure text fits within button
       }
     });
     buttonText.anchor.set(0.5);

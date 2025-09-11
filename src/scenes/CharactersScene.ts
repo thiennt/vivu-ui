@@ -276,13 +276,18 @@ export class CharactersScene extends BaseScene {
   }
 
   private createBackButton(): void {
+    // Responsive button sizing
+    const buttonWidth = Math.min(150, this.gameWidth - 2 * this.STANDARD_PADDING);
+    const buttonHeight = Math.max(44, Math.min(50, this.gameHeight * 0.08)); // Ensure minimum touch target
+    
     const backButton = this.createButton(
       '← Back',
       this.STANDARD_PADDING,
-      this.gameHeight - 80,
-      150,
-      50,
-      () => navigation.showScreen(HomeScene)
+      this.gameHeight - buttonHeight - this.STANDARD_PADDING,
+      buttonWidth,
+      buttonHeight,
+      () => navigation.showScreen(HomeScene),
+      16 // Base font size for responsive scaling
     );
     this.buttonContainer.addChild(backButton);
   }
