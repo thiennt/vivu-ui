@@ -420,10 +420,15 @@ export class PlayerDetailScene extends BaseScene {
   private createCharacterCollection(): void {
     if (!this.player) return;
     
-    // Card layout with standard spacing
-    const cardWidth = 120;
+    // Card layout - force 4 cards per row
+    const availableWidth = this.gameWidth - 2 * this.STANDARD_PADDING;
     const cardHeight = 140;
     const totalCards = this.characters.length;
+
+    const layout = this.calculateFourCardsLayout(
+      availableWidth,
+      this.STANDARD_SPACING
+    );
 
     // Calculate Y position based on whether point distribution panel is shown
     const baseY = this.player.points > 0 ? 560 : 360; // Add 200px offset if point panel is shown
@@ -439,27 +444,31 @@ export class PlayerDetailScene extends BaseScene {
     collectionTitle.x = this.gameWidth / 2;
     collectionTitle.y = baseY;
 
-    // ScrollBox setup (no padding/overflow/verticalScroll/horizontalScroll options)
-    const availableWidth = this.gameWidth - 2 * this.STANDARD_PADDING;
-    const visibleCards = Math.min(Math.floor(availableWidth / (cardWidth + this.STANDARD_SPACING)), totalCards);
-    const scrollBoxWidth = (cardWidth * visibleCards) + (this.STANDARD_SPACING * (visibleCards - 1));
-    const scrollBoxHeight = cardHeight;
-    const scrollBox = new ScrollBox({
-      width: scrollBoxWidth,
-      height: scrollBoxHeight,
-    });
+    // Create a container for all cards
+    const gridContent = new Container();
 
-    // Add cards to ScrollBox viewport, always from left (no marginLeft)
     this.characters.forEach((character, index) => {
-      const card = this.createCharacterPreviewCard(character, this.STANDARD_PADDING + index * (cardWidth + this.STANDARD_SPACING), 0);
-      // Position cards horizontally with spacing, always from left
-      card.x = index * (cardWidth + this.STANDARD_SPACING);
-      card.y = 0;
-      scrollBox.addItem(card);
+      const row = Math.floor(index / layout.itemsPerRow);
+      const col = index % layout.itemsPerRow;
+
+      const x = col * (layout.itemWidth + this.STANDARD_SPACING);
+      const y = row * (cardHeight + this.STANDARD_SPACING);
+
+      const card = this.createCharacterPreviewCard(character, x, y);
+      gridContent.addChild(card);
     });
 
-    // Set viewport width for scrolling (include padding)
-    scrollBox.width = this.STANDARD_PADDING + totalCards * cardWidth + (totalCards - 1) * this.STANDARD_SPACING + this.STANDARD_PADDING;
+    // Set content height for scrolling
+    const totalRows = Math.ceil(this.characters.length / layout.itemsPerRow);
+    const contentHeight = totalRows * (cardHeight + this.STANDARD_SPACING);
+
+    // Create ScrollBox for vertical scrolling
+    const scrollBox = new ScrollBox({
+      width: availableWidth,
+      height: Math.min(400, contentHeight), // Limit height to 400px max
+    });
+
+    scrollBox.addItem(gridContent);
 
     // Position ScrollBox centered horizontally
     scrollBox.x = this.STANDARD_PADDING;
@@ -470,7 +479,7 @@ export class PlayerDetailScene extends BaseScene {
     const viewAllButton = this.createButton(
       'View All Characters',
       (this.gameWidth - buttonWidth) / 2,
-      scrollBox.y + cardHeight + this.STANDARD_SPACING * 2,
+      scrollBox.y + Math.min(400, contentHeight) + this.STANDARD_SPACING * 2,
       buttonWidth,
       50,
       () => navigation.showScreen(CharactersScene)

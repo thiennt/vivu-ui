@@ -71,6 +71,21 @@ export abstract class BaseScene extends Container {
     return { itemsPerRow, itemWidth, totalWidth };
   }
 
+  /**
+   * Calculates grid layout with exactly 4 cards per row
+   */
+  protected calculateFourCardsLayout(
+    availableWidth: number,
+    spacing: number = this.STANDARD_SPACING
+  ): { itemsPerRow: number; itemWidth: number; totalWidth: number } {
+    const itemsPerRow = 4;
+    const totalSpacing = (itemsPerRow - 1) * spacing;
+    const itemWidth = (availableWidth - totalSpacing) / itemsPerRow;
+    const totalWidth = itemsPerRow * itemWidth + (itemsPerRow - 1) * spacing;
+    
+    return { itemsPerRow, itemWidth, totalWidth };
+  }
+
   protected createButton(
     text: string, 
     x: number, 
@@ -234,7 +249,7 @@ export abstract class BaseScene extends Container {
     // card.addChild(nameText, levelText);
 
     // Avatar text (ticker symbol)
-    this.createAvatar(character).then(avatarIcon => {
+    this.createAvatar(character, width, height).then(avatarIcon => {
       card.addChild(avatarIcon);
     });
     card.addChild(nameText);
@@ -254,15 +269,18 @@ export abstract class BaseScene extends Container {
     return card;
   }
 
-  private createAvatar(character: any): Promise<Sprite> {
+  protected createAvatar(character: any, cardWidth: number, cardHeight: number): Promise<Sprite> {
     return new Promise(async (resolve) => {
       const avatarTexture = await Assets.load(character?.avatar_url || 'https://pixijs.com/assets/bunny.png');
       const avatarIcon = new Sprite(avatarTexture);
-      avatarIcon.width = 90;
-      avatarIcon.height = 90;
+      
+      // Calculate avatar size based on card dimensions
+      const avatarSize = Math.min(cardWidth * 0.6, cardHeight * 0.4, 80);
+      avatarIcon.width = avatarSize;
+      avatarIcon.height = avatarSize;
       avatarIcon.anchor.set(0.5);
-      avatarIcon.x = 100 / 2 + 10;
-      avatarIcon.y = 90;
+      avatarIcon.x = cardWidth / 2;
+      avatarIcon.y = cardHeight * 0.55; // Position in lower half of card
       resolve(avatarIcon);
     });
   }
