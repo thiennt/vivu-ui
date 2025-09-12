@@ -5,7 +5,7 @@ import { Character } from '@/types';
 import { mockPlayer, mockCharacters } from '@/utils/mockData';
 import { navigation } from '@/utils/navigation';
 import { HomeScene } from './HomeScene';
-import { Colors } from '@/utils/colors';
+import { Colors, Gradients } from '@/utils/colors';
 import { app } from '../app';
 
 export class LineupScene extends BaseScene {
@@ -115,9 +115,10 @@ export class LineupScene extends BaseScene {
 
   private createBackground(): void {
     const bg = new Graphics();
-    bg.rect(0, 0, this.gameWidth, this.gameHeight).fill(Colors.BACKGROUND_PRIMARY);
+    const backgroundGradient = Gradients.createBackgroundGradient(this.gameWidth, this.gameHeight);
+    bg.rect(0, 0, this.gameWidth, this.gameHeight).fill(backgroundGradient);
 
-    // Battle field grid lines
+    // Battle field grid lines with orange theme
     const gridSpacing = 40;
     const grid = new Graphics();
     grid.stroke({ width: 1, color: Colors.BACKGROUND_SECONDARY, alpha: 0.3 });

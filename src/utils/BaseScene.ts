@@ -1,7 +1,7 @@
 import { Assets, Container, Graphics, Sprite, Text } from 'pixi.js';
 import { app } from '@/app';
 import { navigation } from './navigation';
-import { Colors } from './colors';
+import { Colors, Gradients } from './colors';
 import { BottomNavigationMenu } from './BottomNavigationMenu';
 
 export abstract class BaseScene extends Container {
@@ -51,7 +51,8 @@ export abstract class BaseScene extends Container {
     // Only create background if dimensions are properly set
     if (this.gameWidth && this.gameHeight) {
       const bg = new Graphics();
-      bg.rect(0, 0, this.gameWidth, this.gameHeight).fill(Colors.BACKGROUND_PRIMARY);
+      const backgroundGradient = Gradients.createBackgroundGradient(this.gameWidth, this.gameHeight);
+      bg.rect(0, 0, this.gameWidth, this.gameHeight).fill(backgroundGradient);
       this.addChild(bg);
     }
   }
@@ -159,10 +160,11 @@ export abstract class BaseScene extends Container {
     const maxWidth = this.gameWidth - (2 * this.STANDARD_PADDING);
     const adjustedWidth = Math.min(width, maxWidth);
     
-    // Button background with fantasy styling
+    // Button background with orange gradient styling
     const bg = new Graphics();
+    const buttonGradient = Gradients.createButtonGradient(adjustedWidth, adjustedHeight);
     bg.roundRect(0, 0, adjustedWidth, adjustedHeight, 8)
-      .fill(Colors.BUTTON_PRIMARY)
+      .fill(buttonGradient)
       .stroke({ width: 2, color: Colors.BUTTON_BORDER }); // Reduced border thickness for small screens
 
     // Calculate responsive font size based on button dimensions and screen size
