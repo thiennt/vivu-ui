@@ -5,6 +5,7 @@ import { BaseScene } from '@/utils/BaseScene';
 import { HomeScene } from './HomeScene';
 import { Colors } from '@/utils/colors';
 import { gsap } from 'gsap';
+import { battleApi } from '@/services/api';
 
 export class BattleScene extends BaseScene {
   /** Assets bundles required by this screen */
@@ -65,6 +66,9 @@ export class BattleScene extends BaseScene {
     this.gameWidth = width;
     this.gameHeight = height;
 
+    // Create/update bottom navigation first
+    this.updateBottomNavigation();
+
     // Clear and recreate layout
     this.container.removeChildren();
     this.createBackground();
@@ -96,24 +100,10 @@ export class BattleScene extends BaseScene {
 
   private createBackground(): void {
     const bg = new Graphics();
-    bg.rect(0, 0, this.gameWidth, this.gameHeight).fill(Colors.BACKGROUND_PRIMARY);
+    // Use content height to avoid covering bottom navigation
+    const availableHeight = this.getContentHeight();
+    bg.rect(0, 0, this.gameWidth, availableHeight).fill(Colors.BACKGROUND_PRIMARY);
     this.container.addChild(bg);
-    
-    // // Add title
-    // const title = new Text({
-    //   text: '4v4 Battle Arena',
-    //   style: {
-    //     fontFamily: 'Kalam',
-    //     fontSize: 32,
-    //     fontWeight: 'bold',
-    //     fill: Colors.TEXT_PRIMARY,
-    //     align: 'center'
-    //   }
-    // });
-    // title.anchor.set(0.5);
-    // title.x = this.gameWidth / 2;
-    // title.y = 30;
-    // this.container.addChild(title);
   }
 
   private createEffectsContainer(): void {
@@ -611,6 +601,14 @@ export class BattleScene extends BaseScene {
   }
 
   private startBattle(): void {
+    // Call createBattle API (skip handling response as requested)
+    battleApi.createBattle({
+      team1: this.team1.map(char => ({ id: char.id, name: char.name, level: char.level })),
+      team2: this.team2.map(char => ({ id: char.id, name: char.name, level: char.level })),
+      battleType: '4v4',
+      timestamp: Date.now()
+    });
+
     this.battleLog = ['Battle Started!'];
     this.currentTurn = 1;
     this.updateBattleLog();

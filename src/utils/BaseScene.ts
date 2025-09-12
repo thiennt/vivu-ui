@@ -2,6 +2,7 @@ import { Assets, Container, Graphics, Sprite, Text } from 'pixi.js';
 import { app } from '@/app';
 import { navigation } from './navigation';
 import { Colors } from './colors';
+import { BottomNavigationMenu } from './BottomNavigationMenu';
 
 export abstract class BaseScene extends Container {
   /** Assets bundles required by this screen */
@@ -14,8 +15,36 @@ export abstract class BaseScene extends Container {
   protected readonly STANDARD_PADDING = 10;
   protected readonly STANDARD_SPACING = 10;
 
+  // Bottom navigation
+  protected bottomNavigation: BottomNavigationMenu | null = null;
+
   constructor() {
     super();
+    // Don't create bottom navigation in constructor yet - wait for proper dimensions
+  }
+
+  protected createBottomNavigation(): void {
+    if (!this.bottomNavigation && this.gameWidth > 0 && this.gameHeight > 0) {
+      this.bottomNavigation = new BottomNavigationMenu(this.gameWidth, this.gameHeight);
+      this.addChild(this.bottomNavigation);
+      // Ensure it's on top
+      this.bottomNavigation.zIndex = 9999;
+      this.sortChildren();
+    }
+  }
+
+  protected updateBottomNavigation(): void {
+    if (this.bottomNavigation) {
+      this.bottomNavigation.updateDimensions(this.gameWidth, this.gameHeight);
+    } else if (this.gameWidth > 0 && this.gameHeight > 0) {
+      // Create it if it doesn't exist and we have proper dimensions
+      this.createBottomNavigation();
+    }
+  }
+
+  protected getContentHeight(): number {
+    // Return available height excluding bottom navigation
+    return this.gameHeight - (this.bottomNavigation?.getMenuHeight() || 0);
   }
 
   protected setupBackground() {
