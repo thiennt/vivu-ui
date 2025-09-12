@@ -1,5 +1,5 @@
 import { Container, Graphics, Text } from 'pixi.js';
-import { Colors } from './colors';
+import { Colors, Gradients } from './colors';
 
 export class BottomNavigationMenu extends Container {
   private menuHeight = 60;
@@ -14,11 +14,12 @@ export class BottomNavigationMenu extends Container {
   }
 
   private createBottomMenu(): void {
-    // Background for the bottom menu - make it more visible
+    // Background for the bottom menu with orange gradient
     const menuBg = new Graphics();
+    const panelGradient = Gradients.createPanelGradient(this.gameWidth, this.menuHeight);
     menuBg.rect(0, 0, this.gameWidth, this.menuHeight)
-      .fill({ color: 0x2c1810, alpha: 0.98 }) // More opaque brown background
-      .stroke({ width: 3, color: 0x8b4513 }); // Stronger border
+      .fill(panelGradient)
+      .stroke({ width: 3, color: Colors.BUTTON_BORDER }); // Orange theme border
 
     // Menu items
     const menuItems = [

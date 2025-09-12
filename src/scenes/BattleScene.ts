@@ -3,7 +3,7 @@ import { navigation } from '@/utils/navigation';
 import { mockCharacters } from '@/utils/mockData';
 import { BaseScene } from '@/utils/BaseScene';
 import { HomeScene } from './HomeScene';
-import { Colors } from '@/utils/colors';
+import { Colors, Gradients } from '@/utils/colors';
 import { gsap } from 'gsap';
 import { battleApi } from '@/services/api';
 
@@ -102,7 +102,8 @@ export class BattleScene extends BaseScene {
     const bg = new Graphics();
     // Use content height to avoid covering bottom navigation
     const availableHeight = this.getContentHeight();
-    bg.rect(0, 0, this.gameWidth, availableHeight).fill(Colors.BACKGROUND_PRIMARY);
+    const backgroundGradient = Gradients.createBackgroundGradient(this.gameWidth, availableHeight);
+    bg.rect(0, 0, this.gameWidth, availableHeight).fill(backgroundGradient);
     this.container.addChild(bg);
   }
 

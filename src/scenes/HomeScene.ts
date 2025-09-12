@@ -6,7 +6,7 @@ import { DungeonScene } from './DungeonScene';
 import { PlayerDetailScene } from './PlayerDetailScene';
 import { LineupScene } from './LineupScene';
 import { BattleScene } from './BattleScene';
-import { Colors } from '@/utils/colors';
+import { Colors, Gradients } from '@/utils/colors';
 import { playerApi, ApiError, isLikelyUsingMockData } from '@/services/api';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
 
@@ -148,18 +148,19 @@ export class HomeScene extends BaseScene {
   }
 
   private createBackground(): void {
-    // Create a mystical gradient background
+    // Create an orange gradient background
     const bgContainer = new Container();
     
     // Get available height excluding bottom navigation
     const availableHeight = this.getContentHeight();
     
-    // Main background with gradient effect - only cover available height
+    // Main background with orange gradient effect - only cover available height
     const bg = new Graphics();
-    bg.fill(Colors.BACKGROUND_PRIMARY).rect(0, 0, this.gameWidth, availableHeight);
+    const backgroundGradient = Gradients.createBackgroundGradient(this.gameWidth, availableHeight);
+    bg.fill(backgroundGradient).rect(0, 0, this.gameWidth, availableHeight);
     bgContainer.addChild(bg);
     
-    // Add some mystical patterns
+    // Add some mystical patterns with orange theme
     for (let i = 0; i < 15; i++) {
       const star = new Graphics();
       star.fill({ color: Colors.DECORATION_MAGIC, alpha: 0.3 + Math.random() * 0.4 })
