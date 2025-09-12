@@ -203,7 +203,7 @@ export class BattleScene extends BaseScene {
     const card = new Container();
     
     // Rarity colors
-    const rarityColors: { [key: string]: number } = {
+    const rarityColors: { [key: string]: string } = {
       common: Colors.RARITY_COMMON,
       uncommon: Colors.RARITY_UNCOMMON,
       rare: Colors.RARITY_RARE,
@@ -364,7 +364,7 @@ export class BattleScene extends BaseScene {
     const buttonContainer = new Container();
     
     // Responsive button sizing
-    const buttonWidth = Math.min(120, (this.gameWidth - 3 * this.STANDARD_PADDING) / 2);
+    const buttonWidth = Math.min(100, (this.gameWidth - 3 * this.STANDARD_PADDING) / 2);
     const buttonHeight = Math.max(44, Math.min(40, this.gameHeight * 0.08));
     
     // Start Battle button
@@ -390,7 +390,12 @@ export class BattleScene extends BaseScene {
     );
 
     buttonContainer.addChild(backButton, startButton);
-    buttonContainer.y = this.gameHeight - buttonHeight - this.STANDARD_PADDING;
+
+    // Get bottom navigation height (default to 60 if not available)
+    const navHeight = this.bottomNavigation?.getMenuHeight?.() ?? 60;
+
+    // Position above the bottom navigation
+    buttonContainer.y = this.gameHeight - navHeight - buttonHeight - this.STANDARD_PADDING;
     
     this.container.addChild(buttonContainer);
   }

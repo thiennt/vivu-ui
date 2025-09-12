@@ -667,13 +667,13 @@ export class CharacterDetailScene extends BaseScene {
     this.createEquipmentDisplay();
   }
 
-  private getRarityColor(rarity: string): number {
-    const colors: { [key: string]: number } = {
+  private getRarityColor(rarity: string): string {
+    const colors: { [key: string]: string } = {
       common: Colors.RARITY_COMMON,
-      uncommon: 0x66bb6a,
-      rare: 0x42a5f5,
-      epic: 0xab47bc,
-      legendary: 0xff9800
+      uncommon: Colors.RARITY_UNCOMMON,
+      rare: Colors.RARITY_RARE,
+      epic: Colors.RARITY_EPIC,
+      legendary: Colors.RARITY_LEGENDARY
     };
     return colors[rarity] || colors.common;
   }

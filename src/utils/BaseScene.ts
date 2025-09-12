@@ -250,7 +250,7 @@ export abstract class BaseScene extends Container {
   ): Container {
     const card = new Container();
     
-    const rarityColors: { [key: string]: number } = {
+    const rarityColors: { [key: string]: string } = {
       common: Colors.RARITY_COMMON,
       uncommon: Colors.RARITY_UNCOMMON,
       rare: Colors.RARITY_RARE,
@@ -435,7 +435,7 @@ export abstract class BaseScene extends Container {
   }
 
   private addElementIndicator(card: Container, character: any, width: number): void {
-    const elementColors: { [key: string]: number } = {
+    const elementColors: { [key: string]: string } = {
       fire: Colors.ELEMENT_FIRE,
       water: Colors.ELEMENT_WATER,
       earth: Colors.ELEMENT_EARTH,

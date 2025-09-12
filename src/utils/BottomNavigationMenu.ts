@@ -21,6 +21,8 @@ export class BottomNavigationMenu extends Container {
       .fill(panelGradient)
       .stroke({ width: 3, color: Colors.BUTTON_BORDER }); // Orange theme border
 
+    this.addChild(menuBg);
+
     // Menu items
     const menuItems = [
       { text: '🏠', label: 'Home', action: 'home' },
@@ -43,8 +45,6 @@ export class BottomNavigationMenu extends Container {
       );
       this.addChild(menuItem);
     });
-
-    this.addChild(menuBg);
 
     // Position at bottom of screen
     this.y = this.gameHeight - this.menuHeight;
