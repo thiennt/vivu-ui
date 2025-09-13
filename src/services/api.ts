@@ -5,6 +5,7 @@
  */
 
 import { mockPlayer, mockCharacters, mockSkills, mockDungeons } from '@/utils/mockData';
+import { mock } from 'node:test';
 
 // Base API configuration
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.vivu.game';
@@ -80,7 +81,8 @@ async function apiRequest<T>(
 // Player API methods
 export const playerApi = {
   async getPlayer(playerId: string): Promise<any> {
-    return apiRequest(`/players/${playerId}`, {}, mockPlayer);
+    return mockPlayer;
+    //return apiRequest(`/players/${playerId}`, {}, mockPlayer);
   },
 
   async updatePlayerStats(playerId: string, stats: any): Promise<any> {

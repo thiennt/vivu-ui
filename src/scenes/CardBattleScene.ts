@@ -37,8 +37,8 @@ export class CardBattleScene extends BaseScene {
   private dragOffset = { x: 0, y: 0 };
   private isDragging = false;
   private dropZones: { area: Container, type: 'character' | 'discard', playerId: number, characterIndex?: number }[] = [];
-  private originalParent: Container | null = null;
-  private originalPosition = { x: 0, y: 0 };
+
+  private battleStarted = false;
 
   constructor() {
     super();
@@ -127,7 +127,7 @@ export class CardBattleScene extends BaseScene {
     this.container.removeChildren();
     this.createBackground();
     this.createGameLayout();
-    this.createUI();
+    this.createActionButtons();
   }
 
   /** Show the screen with animation */
@@ -224,7 +224,7 @@ export class CardBattleScene extends BaseScene {
       .stroke({ width: 1, color: Colors.CARD_BORDER });
     
     const energyText = new Text({
-      text: `Energy: ${player.energy}/${player.maxEnergy}`,
+      text: `Energy: ${player.energy}`,
       style: {
         fontFamily: 'Kalam',
         fontSize: 12,
@@ -242,12 +242,8 @@ export class CardBattleScene extends BaseScene {
       const y = 35;
       const characterCard = this.createCharacterCard(character, x, y, characterWidth);
       
-      // Create drop zone for this character
-      const dropZone = new Container();
-      dropZone.x = x;
-      dropZone.y = y;
       this.dropZones.push({
-        area: dropZone,
+        area: characterCard,
         type: 'character',
         playerId: player.id === 'player1' ? 1 : 2,
         characterIndex: index
@@ -268,12 +264,8 @@ export class CardBattleScene extends BaseScene {
     // Discard pile
     const discardCard = this.createDiscardPile(discardX, pileY, player.discardPile);
     
-    // Create drop zone for discard pile
-    const discardDropZone = new Container();
-    discardDropZone.x = discardX;
-    discardDropZone.y = pileY;
     this.dropZones.push({
-      area: discardDropZone,
+      area: discardCard,
       type: 'discard',
       playerId: player.id === 'player1' ? 1 : 2
     });
@@ -282,42 +274,43 @@ export class CardBattleScene extends BaseScene {
   }
 
   private createHandArea(container: Container, player: CardBattlePlayer, showCards: boolean): void {
-    const cardWidth = 60;
-    const cardSpacing = 5;
-    const maxCards = 7; // Maximum cards to display
-    const visibleCards = Math.min(player.hand.length, maxCards);
-    const totalWidth = visibleCards * cardWidth + (visibleCards - 1) * cardSpacing;
-    const startX = (this.gameWidth - totalWidth) / 2;
+    // Do not show hand cards until battle has started
+    if (!this.battleStarted) return;
 
-    player.hand.slice(0, maxCards).forEach((card, index) => {
-      const x = startX + index * (cardWidth + cardSpacing);
+    const cardWidth = 60;
+    const handCount = player.hand.length;
+    const padding = this.STANDARD_PADDING;
+    const maxVisible = 5;
+    let cardSpacing: number;
+    let totalWidth: number;
+    let startX: number;
+
+    if (handCount <= maxVisible) {
+      // Fixed spacing, center the hand
+      cardSpacing = cardWidth + 12; // 12px gap between cards
+      totalWidth = cardWidth + (handCount - 1) * cardSpacing;
+      startX = (this.gameWidth - totalWidth) / 2;
+    } else {
+      // Overlap so all cards fit between paddings
+      cardSpacing = (this.gameWidth - 2 * padding - cardWidth) / (handCount - 1);
+      cardSpacing = Math.min(cardSpacing, cardWidth); // Prevent negative/too much overlap
+      startX = padding;
+    }
+
+    for (let index = 0; index < handCount; index++) {
+      const x = startX + index * cardSpacing;
       const y = 10;
-      
-      const cardContainer = showCards 
-        ? this.createHandCard(card, x, y, cardWidth)
+
+      const cardContainer = showCards
+        ? this.createHandCard(player.hand[index], x, y, cardWidth)
         : this.createFaceDownCard(x, y, cardWidth);
-      
+
       // Make player 1 cards draggable
       if (showCards && player.id === 'player1') {
-        this.makeCardDraggable(cardContainer, card);
+        this.makeCardDraggable(cardContainer, player.hand[index]);
       }
-      
-      container.addChild(cardContainer);
-    });
 
-    // Show hand count if there are more cards
-    if (player.hand.length > maxCards) {
-      const overflowText = new Text({
-        text: `+${player.hand.length - maxCards} more`,
-        style: {
-          fontFamily: 'Kalam',
-          fontSize: 10,
-          fill: Colors.TEXT_SECONDARY
-        }
-      });
-      overflowText.x = startX + totalWidth + 10;
-      overflowText.y = 25;
-      container.addChild(overflowText);
+      container.addChild(cardContainer);
     }
   }
 
@@ -675,36 +668,70 @@ export class CardBattleScene extends BaseScene {
     this.battleLogContainer.x = this.STANDARD_PADDING;
   }
 
-  private createUI(): void {
+  private createActionButtons(): void {
     const buttonContainer = new Container();
-    
-    const buttonWidth = 100;
-    const buttonHeight = 40;
-    
-    // End Turn button
-    const endTurnButton = this.createButton(
-      'End Turn',
-      this.gameWidth - buttonWidth - this.STANDARD_PADDING,
-      this.getContentHeight() - buttonHeight - 10,
-      buttonWidth,
-      buttonHeight,
-      () => this.endTurn(),
-      12
-    );
-    
-    // Back button
-    const backButton = this.createButton(
-      '← Back',
-      this.STANDARD_PADDING,
-      this.getContentHeight() - buttonHeight - 10,
-      buttonWidth,
-      buttonHeight,
-      () => navigation.showScreen(HomeScene),
-      12
-    );
+    const buttonWidth = 120;
+    const buttonHeight = 44;
 
-    buttonContainer.addChild(endTurnButton, backButton);
+    if (!this.battleStarted) {
+      // Start Battle button
+      const startButton = this.createButton(
+        'Start Battle',
+        (this.gameWidth - buttonWidth) / 2,
+        this.getContentHeight() - buttonHeight - 10,
+        buttonWidth,
+        buttonHeight,
+        async () => {
+          this.battleStarted = true;
+          this.container.removeChild(buttonContainer);
+          await this.animateInitialDraw();
+          this.refreshUI();
+        },
+        14
+      );
+      buttonContainer.addChild(startButton);
+    } else {
+      // End Turn button
+      const endTurnButton = this.createButton(
+        'End Turn',
+        this.gameWidth - buttonWidth - this.STANDARD_PADDING,
+        this.getContentHeight() - buttonHeight - 10,
+        buttonWidth,
+        buttonHeight,
+        () => this.endTurn(),
+        12
+      );
+      // Back button
+      const backButton = this.createButton(
+        '← Back',
+        this.STANDARD_PADDING,
+        this.getContentHeight() - buttonHeight - 10,
+        buttonWidth,
+        buttonHeight,
+        () => navigation.showScreen(HomeScene),
+        12
+      );
+      buttonContainer.addChild(endTurnButton, backButton);
+    }
+
     this.container.addChild(buttonContainer);
+  }
+
+  private async animateInitialDraw(): Promise<void> {
+    // Remove all cards from player1's hand and put them back to deck
+    const player = this.battleState.player1;
+    player.deck = [...player.hand, ...player.deck];
+    player.hand = [];
+
+    // Draw and animate 5 cards
+    for (let i = 0; i < 5; i++) {
+      if (player.deck.length > 0) {
+        const card = player.deck.shift()!;
+        player.hand.push(card);
+        await this.animateDrawCard(card, player);
+        this.refreshUI();
+      }
+    }
   }
 
   private makeCardDraggable(cardContainer: Container, card: BattleCard): void {
@@ -712,11 +739,6 @@ export class CardBattleScene extends BaseScene {
     cardContainer.cursor = 'pointer';
 
     cardContainer.on('pointerdown', (event) => {
-      // Check if player has enough energy
-      if (this.battleState.player1.energy < card.energyCost) {
-        return; // Can't afford this card
-      }
-
       this.onDragStart(event, cardContainer, card);
     });
   }
@@ -732,10 +754,6 @@ export class CardBattleScene extends BaseScene {
   private onDragStart(event: any, cardContainer: Container, card: BattleCard): void {
     cardContainer.alpha = 0.8;
     this.dragTarget = cardContainer;
-
-    // Store original position and parent for potential return
-    this.originalParent = cardContainer.parent;
-    this.originalPosition = { x: cardContainer.x, y: cardContainer.y };
 
     // Calculate and store drag offset
     const globalCardPos = cardContainer.parent?.toGlobal({ x: cardContainer.x, y: cardContainer.y });
@@ -787,19 +805,22 @@ export class CardBattleScene extends BaseScene {
       if (dropTarget) {
         if (dropTarget.type === 'character') {
           this.playCardOnCharacter(card, dropTarget.playerId, dropTarget.characterIndex!);
+          this.refreshUI();
         } else if (dropTarget.type === 'discard') {
           this.discardCard(card);
         }
         // Clean up after successful action
-        this.cleanupDrag();
+        this.cleanupDrag(true);
       } else {
         // No valid drop target - return card to original position
-        this.returnCardToOriginalPosition();
+        this.cleanupDrag(false);
+        this.refreshUI();
       }
     } else {
       this.showCardDetails(card);
       // Clean up after showing card details
-      this.cleanupDrag();
+      this.cleanupDrag(false);
+      this.refreshUI();
     }
   }
 
@@ -818,6 +839,13 @@ export class CardBattleScene extends BaseScene {
   private playCardOnCharacter(card: BattleCard, targetPlayerId: number, characterIndex: number): void {
     // Apply card effects
     const targetPlayer = targetPlayerId === 1 ? this.battleState.player1 : this.battleState.player2;
+
+    // Check if player has enough energy
+    if (targetPlayer.energy < card.energyCost) {
+      alert('Not enough energy to play this card.');
+      return; // Can't afford this card
+    }
+
     const targetCharacter = targetPlayer.characters[characterIndex];
 
     // Deduct energy cost
@@ -831,14 +859,11 @@ export class CardBattleScene extends BaseScene {
     // Move card to discard pile
     this.battleState.player1.hand = this.battleState.player1.hand.filter(c => c.id !== card.id);
     this.battleState.player1.discardPile.push(card);
-
-    // Refresh UI
-    this.refreshUI();
   }
 
   private discardCard(card: BattleCard): void {
     // Gain 1 energy for discarding
-    this.battleState.player1.energy = Math.min(this.battleState.player1.maxEnergy, this.battleState.player1.energy + 1);
+    this.battleState.player1.energy += 1;
 
     // Move card to discard pile
     this.battleState.player1.hand = this.battleState.player1.hand.filter(c => c.id !== card.id);
@@ -857,90 +882,122 @@ export class CardBattleScene extends BaseScene {
         targetCharacter.hp = Math.min(targetCharacter.maxHp, targetCharacter.hp + effect.value);
         break;
       case CardEffectType.ENERGY_GAIN:
-        targetPlayer.energy = Math.min(targetPlayer.maxEnergy, targetPlayer.energy + effect.value);
+        targetPlayer.energy += effect.value;
         break;
       // Add more effect types as needed
     }
   }
 
-  private async returnCardToOriginalPosition(): Promise<void> {
-    if (!this.dragTarget || !this.originalParent) return;
-
-    try {
-      // Convert original position to global coordinates
-      const originalGlobalPos = this.originalParent.toGlobal(this.originalPosition);
-      
-      // Animate card back to original position
-      await gsap.to(this.dragTarget, {
-        x: originalGlobalPos.x,
-        y: originalGlobalPos.y,
-        duration: 0.3,
-        ease: "power2.out"
-      });
-
-      // Return card to original parent
-      if (this.dragTarget.parent) {
-        this.dragTarget.parent.removeChild(this.dragTarget);
-      }
-      this.originalParent.addChild(this.dragTarget);
-      this.dragTarget.position.set(this.originalPosition.x, this.originalPosition.y);
-      this.dragTarget.alpha = 1;
-    } catch (error) {
-      // If animation fails, fall back to immediate cleanup
-      console.warn('Card return animation failed, falling back to cleanup:', error);
-      this.cleanupDrag();
-      return;
-    }
-
-    // Clean up drag state
-    this.dragTarget = null;
-    this.originalParent = null;
-    this.isDragging = false;
-    
-    // Remove event listeners
-    app.stage.off('pointermove', this.onDragMove, this);
-    app.stage.off('pointerup', this.onDragEnd, this);
-    app.stage.off('pointerupoutside', this.onDragEnd, this);
-  }
-
-  private cleanupDrag(): void {
+  private cleanupDrag(removeCard: boolean = false): void {
     if (this.dragTarget) {
-      // Remove card from stage and destroy it (it will be recreated in refreshUI)
+      // Always remove the dragged card from its parent to prevent duplicates
       if (this.dragTarget.parent) {
         this.dragTarget.parent.removeChild(this.dragTarget);
       }
-      this.dragTarget.destroy();
+      if (removeCard) {
+        // Destroy the card if it was played/discarded
+        this.dragTarget.destroy();
+      }
     }
 
     this.dragTarget = null;
-    this.originalParent = null;
     this.isDragging = false;
-    
+
     // Remove event listeners
     app.stage.off('pointermove', this.onDragMove, this);
     app.stage.off('pointerup', this.onDragEnd, this);
     app.stage.off('pointerupoutside', this.onDragEnd, this);
   }
 
-  private endTurn(): void {
+  private async endTurn(): Promise<void> {
     // Switch to other player
     this.battleState.activePlayer = this.battleState.activePlayer === 1 ? 2 : 1;
-    
+
     if (this.battleState.activePlayer === 1) {
       this.battleState.currentTurn++;
-      // Player gains 1 energy per turn
-      this.battleState.player1.energy = Math.min(this.battleState.player1.maxEnergy, this.battleState.player1.energy + 1);
+      await this.drawCardsToFive(this.battleState.player1);
+    } else {
+      await this.drawCardsToFive(this.battleState.player2);
     }
 
     // Simple AI turn for player 2
     if (this.battleState.activePlayer === 2) {
-      this.handleAITurn();
+      await this.handleAITurn();
     }
 
     this.refreshUI();
   }
 
-  private handleAITurn(): void {
+  private async drawCardsToFive(player: CardBattlePlayer): Promise<void> {
+    const handCount = player.hand.length;
+    if (handCount >= 5) {
+      // Draw only 1 card if hand already has 5 or more
+      if (player.deck.length > 0) {
+        const card = player.deck.shift()!;
+        player.hand.push(card);
+        await this.animateDrawCard(card, player);
+      }
+    } else {
+      // Draw up to 5 cards
+      const cardsToDraw = Math.min(5 - handCount, player.deck.length);
+      for (let i = 0; i < cardsToDraw; i++) {
+        const card = player.deck.shift()!;
+        player.hand.push(card);
+        await this.animateDrawCard(card, player);
+      }
+    }
+  }
+
+  private async animateDrawCard(card: BattleCard, player: CardBattlePlayer): Promise<void> {
+    // Find the deck position (where the card should fly from)
+    const isPlayer1 = player.id === 'player1';
+    const deckContainer = isPlayer1 ? this.player1Container : this.player2Container;
+    const deckX = this.STANDARD_PADDING + 25; // Center of deck card
+    const deckY = 35 + 35; // Y of deck + half height
+
+    // Create a temporary card sprite at the deck position
+    const tempCard = this.createHandCard(card, deckX, deckY, 60);
+    tempCard.alpha = 0.8;
+    this.container.addChild(tempCard);
+
+    // Calculate target position in hand
+    // After pushing to hand, the card will be at the end
+    const handIndex = player.hand.length - 1;
+    const handCount = player.hand.length;
+    const padding = this.STANDARD_PADDING;
+    const maxVisible = 5;
+    let cardSpacing: number;
+    let totalWidth: number;
+    let startX: number;
+
+    if (handCount <= maxVisible) {
+      cardSpacing = 60 + 12;
+      totalWidth = 60 + (handCount - 1) * cardSpacing;
+      startX = (this.gameWidth - totalWidth) / 2;
+    } else {
+      cardSpacing = (this.gameWidth - 2 * padding - 60) / (handCount - 1);
+      cardSpacing = Math.min(cardSpacing, 60);
+      startX = padding;
+    }
+    const targetX = startX + handIndex * cardSpacing;
+    const targetY = isPlayer1
+      ? this.player1HandContainer.y + 10
+      : this.player2HandContainer.y + 10;
+
+    // Animate the card flying to the hand
+    await gsap.to(tempCard, {
+      x: targetX,
+      y: targetY,
+      alpha: 1,
+      duration: 0.4,
+      ease: 'power2.out'
+    });
+
+    // Remove the temp card (the real card will be rendered in refreshUI)
+    this.container.removeChild(tempCard);
+  }
+
+  private async handleAITurn(): Promise<void> {
     // Simple AI: play a random affordable card on a random target
     const ai = this.battleState.player2;
     const affordableCards = ai.hand.filter(card => card.energyCost <= ai.energy);
@@ -961,8 +1018,8 @@ export class CardBattleScene extends BaseScene {
     }
 
     // End AI turn after a delay
-    setTimeout(() => {
-      this.endTurn();
+    setTimeout(async () => {
+      await this.endTurn();
     }, 1000);
   }
 
@@ -970,6 +1027,10 @@ export class CardBattleScene extends BaseScene {
     // Recreate the entire game layout
     this.gameContainer.removeChildren();
     this.dropZones = [];
+
+    // Clear hand containers before re-adding cards
+    this.player1HandContainer.removeChildren();
+    this.player2HandContainer.removeChildren();
     
     // Recreate player areas
     this.createPlayerArea(this.player1Container, this.battleState.player1, true);
@@ -986,6 +1047,8 @@ export class CardBattleScene extends BaseScene {
       this.player1Container,
       this.player1HandContainer
     );
+
+    this.createActionButtons();
   }
 
   public update(_time: Ticker): void {
