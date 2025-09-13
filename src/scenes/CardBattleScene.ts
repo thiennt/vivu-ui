@@ -866,24 +866,31 @@ export class CardBattleScene extends BaseScene {
   private async returnCardToOriginalPosition(): Promise<void> {
     if (!this.dragTarget || !this.originalParent) return;
 
-    // Convert original position to global coordinates
-    const originalGlobalPos = this.originalParent.toGlobal(this.originalPosition);
-    
-    // Animate card back to original position
-    await gsap.to(this.dragTarget, {
-      x: originalGlobalPos.x,
-      y: originalGlobalPos.y,
-      duration: 0.3,
-      ease: "power2.out"
-    });
+    try {
+      // Convert original position to global coordinates
+      const originalGlobalPos = this.originalParent.toGlobal(this.originalPosition);
+      
+      // Animate card back to original position
+      await gsap.to(this.dragTarget, {
+        x: originalGlobalPos.x,
+        y: originalGlobalPos.y,
+        duration: 0.3,
+        ease: "power2.out"
+      });
 
-    // Return card to original parent
-    if (this.dragTarget.parent) {
-      this.dragTarget.parent.removeChild(this.dragTarget);
+      // Return card to original parent
+      if (this.dragTarget.parent) {
+        this.dragTarget.parent.removeChild(this.dragTarget);
+      }
+      this.originalParent.addChild(this.dragTarget);
+      this.dragTarget.position.set(this.originalPosition.x, this.originalPosition.y);
+      this.dragTarget.alpha = 1;
+    } catch (error) {
+      // If animation fails, fall back to immediate cleanup
+      console.warn('Card return animation failed, falling back to cleanup:', error);
+      this.cleanupDrag();
+      return;
     }
-    this.originalParent.addChild(this.dragTarget);
-    this.dragTarget.position.set(this.originalPosition.x, this.originalPosition.y);
-    this.dragTarget.alpha = 1;
 
     // Clean up drag state
     this.dragTarget = null;
@@ -906,6 +913,7 @@ export class CardBattleScene extends BaseScene {
     }
 
     this.dragTarget = null;
+    this.originalParent = null;
     this.isDragging = false;
     
     // Remove event listeners
