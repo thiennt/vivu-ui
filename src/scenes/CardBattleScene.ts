@@ -177,16 +177,16 @@ export class CardBattleScene extends BaseScene {
     const characterAreaHeight = 100;
     const logHeight = 60;
     
-    // Player 2 (AI) at top
-    this.player2Container.y = padding;
-    this.createPlayerArea(this.player2Container, this.battleState.player2, false);
-    
-    // Player 2 hand (face down)
-    this.player2HandContainer.y = this.player2Container.y + characterAreaHeight + 10;
+    // Player 2 hand at top (face down)
+    this.player2HandContainer.y = padding;
     this.createHandArea(this.player2HandContainer, this.battleState.player2, false);
     
+    // Player 2 (AI) characters
+    this.player2Container.y = this.player2HandContainer.y + handHeight + 10;
+    this.createPlayerArea(this.player2Container, this.battleState.player2, false);
+    
     // Battle log in middle
-    this.battleLogContainer.y = this.player2HandContainer.y + handHeight + 10;
+    this.battleLogContainer.y = this.player2Container.y + characterAreaHeight + 10;
     this.createBattleLog();
     
     // Player 1 (human) characters - above hand cards
@@ -198,8 +198,8 @@ export class CardBattleScene extends BaseScene {
     this.createHandArea(this.player1HandContainer, this.battleState.player1, true);
 
     this.gameContainer.addChild(
-      this.player2Container,
       this.player2HandContainer,
+      this.player2Container,
       this.battleLogContainer,
       this.player1Container,
       this.player1HandContainer
@@ -955,8 +955,8 @@ export class CardBattleScene extends BaseScene {
     this.createBattleLog();
 
     this.gameContainer.addChild(
-      this.player2Container,
       this.player2HandContainer,
+      this.player2Container,
       this.battleLogContainer,
       this.player1Container,
       this.player1HandContainer
