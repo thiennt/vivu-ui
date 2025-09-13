@@ -150,3 +150,101 @@ export enum Difficulty {
   HARD = 'hard',
   NIGHTMARE = 'nightmare'
 }
+
+// Card Battle System Types
+export interface BattleCard {
+  id: string;
+  name: string;
+  description: string;
+  energyCost: number;
+  cardType: CardType;
+  rarity: CardRarity;
+  effects: CardEffect[];
+  artwork?: string;
+}
+
+export interface CardEffect {
+  type: CardEffectType;
+  value: number;
+  target: CardTarget;
+  duration?: number; // for buffs/debuffs
+}
+
+export enum CardType {
+  ATTACK = 'attack',
+  HEAL = 'heal',
+  BUFF = 'buff',
+  DEBUFF = 'debuff',
+  SPECIAL = 'special'
+}
+
+export enum CardRarity {
+  COMMON = 'common',
+  UNCOMMON = 'uncommon',
+  RARE = 'rare',
+  EPIC = 'epic',
+  LEGENDARY = 'legendary'
+}
+
+export enum CardEffectType {
+  DAMAGE = 'damage',
+  HEAL = 'heal',
+  SHIELD = 'shield',
+  ATTACK_BUFF = 'attack_buff',
+  DEFENSE_BUFF = 'defense_buff',
+  SPEED_BUFF = 'speed_buff',
+  ATTACK_DEBUFF = 'attack_debuff',
+  DEFENSE_DEBUFF = 'defense_debuff',
+  SPEED_DEBUFF = 'speed_debuff',
+  ENERGY_GAIN = 'energy_gain'
+}
+
+export enum CardTarget {
+  SINGLE_ALLY = 'single_ally',
+  SINGLE_ENEMY = 'single_enemy',
+  ALL_ALLIES = 'all_allies',
+  ALL_ENEMIES = 'all_enemies',
+  SELF = 'self',
+  RANDOM_ENEMY = 'random_enemy'
+}
+
+export interface BattleCharacter {
+  id: string;
+  name: string;
+  ticker: string;
+  level: number;
+  rarity: string;
+  hp: number;
+  maxHp: number;
+  atk: number;
+  def: number;
+  agi: number;
+  currentBuffs: CardEffect[];
+  avatar_url?: string;
+}
+
+export interface CardBattlePlayer {
+  id: string;
+  name: string;
+  energy: number;
+  maxEnergy: number;
+  characters: BattleCharacter[];
+  deck: BattleCard[];
+  hand: BattleCard[];
+  discardPile: BattleCard[];
+}
+
+export interface CardBattleState {
+  player1: CardBattlePlayer;
+  player2: CardBattlePlayer;
+  currentTurn: number;
+  activePlayer: number; // 1 or 2
+  turnPhase: TurnPhase;
+  winner?: number;
+}
+
+export enum TurnPhase {
+  DRAW = 'draw',
+  MAIN = 'main',
+  END = 'end'
+}

@@ -6,6 +6,7 @@ import { DungeonScene } from './DungeonScene';
 import { PlayerDetailScene } from './PlayerDetailScene';
 import { LineupScene } from './LineupScene';
 import { BattleScene } from './BattleScene';
+import { CardBattleScene } from './CardBattleScene';
 import { Colors, Gradients } from '@/utils/colors';
 import { playerApi, ApiError, isLikelyUsingMockData } from '@/services/api';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
@@ -277,6 +278,7 @@ export class HomeScene extends BaseScene {
       { text: 'Adventure', screen: DungeonScene },
       { text: 'Characters', screen: CharactersScene },
       { text: 'Battle Arena', screen: BattleScene },
+      { text: 'Card Battle', screen: CardBattleScene },
       { text: 'Player Profile', screen: PlayerDetailScene },
       { text: 'Lineup', screen: LineupScene },
     ];

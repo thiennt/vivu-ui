@@ -101,6 +101,9 @@ async function init() {
   } else if (getUrlParam("battle") !== null) {
     const { BattleScene } = await import('./scenes/BattleScene');
     await navigation.showScreen(BattleScene);
+  } else if (getUrlParam("cardbattle") !== null) {
+    const { CardBattleScene } = await import('./scenes/CardBattleScene');
+    await navigation.showScreen(CardBattleScene);
   } else if (getUrlParam("player") !== null) {
     await navigation.showScreen(PlayerDetailScene);
   } else if (getUrlParam("home") !== null) {
