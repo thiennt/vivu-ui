@@ -38,11 +38,6 @@ export class CardBattleScene extends BaseScene {
   private isDragging = false;
   private dropZones: { area: Container, type: 'character' | 'discard', playerId: number, characterIndex?: number }[] = [];
 
-  // Hold detection for card details
-  private holdTimer: NodeJS.Timeout | null = null;
-  private holdThreshold = 800; // 800ms hold to show details
-  private isHolding = false;
-
   constructor() {
     super();
 
@@ -206,6 +201,11 @@ export class CardBattleScene extends BaseScene {
     );
 
     this.container.addChild(this.gameContainer);
+
+    app.stage.eventMode = 'static';
+    app.stage.on('pointerup', this.onDragEnd, this);
+    app.stage.on('pointerupoutside', this.onDragEnd, this);
+    app.stage.hitArea = app.screen;
   }
 
   private createPlayerArea(container: Container, player: CardBattlePlayer, isBottomPlayer: boolean): void {
@@ -715,31 +715,8 @@ export class CardBattleScene extends BaseScene {
         return; // Can't afford this card
       }
 
-      // Start hold timer
-      this.isHolding = false;
-      this.holdTimer = setTimeout(() => {
-        this.isHolding = true;
-        this.showCardDetails(card);
-      }, this.holdThreshold);
-
       this.onDragStart(event, cardContainer, card);
     });
-
-    // Clean up hold timer on pointer up
-    cardContainer.on('pointerup', () => {
-      this.clearHoldTimer();
-    });
-
-    cardContainer.on('pointerupoutside', () => {
-      this.clearHoldTimer();
-    });
-  }
-
-  private clearHoldTimer(): void {
-    if (this.holdTimer) {
-      clearTimeout(this.holdTimer);
-      this.holdTimer = null;
-    }
   }
 
   private showCardDetails(card: BattleCard): void {
@@ -779,11 +756,6 @@ export class CardBattleScene extends BaseScene {
 
   private onDragMove(event: any): void {
     if (this.dragTarget) {
-      // Clear hold timer if user starts dragging
-      if (!this.isDragging && !this.isHolding) {
-        this.clearHoldTimer();
-      }
-      
       const parent = this.dragTarget.parent;
       if (parent) {
         const newPos = parent.toLocal({
@@ -802,15 +774,19 @@ export class CardBattleScene extends BaseScene {
     this.dragTarget.alpha = 1;
     const card = (this.dragTarget as any).cardData as BattleCard;
 
-    // Check if dropped on a valid target
-    const dropTarget = this.getDropTarget(event.global);
-    
-    if (dropTarget && this.isDragging) {
-      if (dropTarget.type === 'character') {
-        this.playCardOnCharacter(card, dropTarget.playerId, dropTarget.characterIndex!);
-      } else if (dropTarget.type === 'discard') {
-        this.discardCard(card);
+    if (this.isDragging) {
+      // Check if dropped on a valid target
+      const dropTarget = this.getDropTarget(event.global);
+
+      if (dropTarget) {
+        if (dropTarget.type === 'character') {
+          this.playCardOnCharacter(card, dropTarget.playerId, dropTarget.characterIndex!);
+        } else if (dropTarget.type === 'discard') {
+          this.discardCard(card);
+        }
       }
+    } else {
+      this.showCardDetails(card);
     }
 
     // Clean up
@@ -888,8 +864,6 @@ export class CardBattleScene extends BaseScene {
 
     this.dragTarget = null;
     this.isDragging = false;
-    this.isHolding = false;
-    this.clearHoldTimer();
     
     // Remove event listeners
     app.stage.off('pointermove', this.onDragMove, this);
