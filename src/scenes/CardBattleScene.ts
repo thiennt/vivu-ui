@@ -7,6 +7,7 @@ import { HomeScene } from './HomeScene';
 import { Colors, Gradients } from '@/utils/colors';
 import { gsap } from 'gsap';
 import { app } from '@/app';
+import { CardDetailPopup } from '@/popups/CardDetailPopup';
 import { 
   BattleCard, 
   BattleCharacter, 
@@ -36,6 +37,11 @@ export class CardBattleScene extends BaseScene {
   private dragOffset = { x: 0, y: 0 };
   private isDragging = false;
   private dropZones: { area: Container, type: 'character' | 'discard', playerId: number, characterIndex?: number }[] = [];
+
+  // Hold detection for card details
+  private holdTimer: NodeJS.Timeout | null = null;
+  private holdThreshold = 800; // 800ms hold to show details
+  private isHolding = false;
 
   constructor() {
     super();
@@ -183,20 +189,20 @@ export class CardBattleScene extends BaseScene {
     this.battleLogContainer.y = this.player2HandContainer.y + handHeight + 10;
     this.createBattleLog();
     
-    // Player 1 hand
-    this.player1HandContainer.y = this.battleLogContainer.y + logHeight + 10;
-    this.createHandArea(this.player1HandContainer, this.battleState.player1, true);
-    
-    // Player 1 (human) at bottom
-    this.player1Container.y = this.player1HandContainer.y + handHeight + 10;
+    // Player 1 (human) characters - above hand cards
+    this.player1Container.y = this.battleLogContainer.y + logHeight + 10;
     this.createPlayerArea(this.player1Container, this.battleState.player1, true);
+    
+    // Player 1 hand at bottom
+    this.player1HandContainer.y = this.player1Container.y + characterAreaHeight + 10;
+    this.createHandArea(this.player1HandContainer, this.battleState.player1, true);
 
     this.gameContainer.addChild(
       this.player2Container,
       this.player2HandContainer,
       this.battleLogContainer,
-      this.player1HandContainer,
-      this.player1Container
+      this.player1Container,
+      this.player1HandContainer
     );
 
     this.container.addChild(this.gameContainer);
@@ -709,7 +715,38 @@ export class CardBattleScene extends BaseScene {
         return; // Can't afford this card
       }
 
+      // Start hold timer
+      this.isHolding = false;
+      this.holdTimer = setTimeout(() => {
+        this.isHolding = true;
+        this.showCardDetails(card);
+      }, this.holdThreshold);
+
       this.onDragStart(event, cardContainer, card);
+    });
+
+    // Clean up hold timer on pointer up
+    cardContainer.on('pointerup', () => {
+      this.clearHoldTimer();
+    });
+
+    cardContainer.on('pointerupoutside', () => {
+      this.clearHoldTimer();
+    });
+  }
+
+  private clearHoldTimer(): void {
+    if (this.holdTimer) {
+      clearTimeout(this.holdTimer);
+      this.holdTimer = null;
+    }
+  }
+
+  private showCardDetails(card: BattleCard): void {
+    navigation.presentPopup(class extends CardDetailPopup {
+      constructor() {
+        super({ card });
+      }
     });
   }
 
@@ -742,6 +779,11 @@ export class CardBattleScene extends BaseScene {
 
   private onDragMove(event: any): void {
     if (this.dragTarget) {
+      // Clear hold timer if user starts dragging
+      if (!this.isDragging && !this.isHolding) {
+        this.clearHoldTimer();
+      }
+      
       const parent = this.dragTarget.parent;
       if (parent) {
         const newPos = parent.toLocal({
@@ -846,6 +888,8 @@ export class CardBattleScene extends BaseScene {
 
     this.dragTarget = null;
     this.isDragging = false;
+    this.isHolding = false;
+    this.clearHoldTimer();
     
     // Remove event listeners
     app.stage.off('pointermove', this.onDragMove, this);
@@ -914,8 +958,8 @@ export class CardBattleScene extends BaseScene {
       this.player2Container,
       this.player2HandContainer,
       this.battleLogContainer,
-      this.player1HandContainer,
-      this.player1Container
+      this.player1Container,
+      this.player1HandContainer
     );
   }
 
