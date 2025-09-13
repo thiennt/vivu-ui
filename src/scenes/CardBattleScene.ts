@@ -37,6 +37,8 @@ export class CardBattleScene extends BaseScene {
   private dragOffset = { x: 0, y: 0 };
   private isDragging = false;
   private dropZones: { area: Container, type: 'character' | 'discard', playerId: number, characterIndex?: number }[] = [];
+  private originalParent: Container | null = null;
+  private originalPosition = { x: 0, y: 0 };
 
   constructor() {
     super();
@@ -731,6 +733,10 @@ export class CardBattleScene extends BaseScene {
     cardContainer.alpha = 0.8;
     this.dragTarget = cardContainer;
 
+    // Store original position and parent for potential return
+    this.originalParent = cardContainer.parent;
+    this.originalPosition = { x: cardContainer.x, y: cardContainer.y };
+
     // Calculate and store drag offset
     const globalCardPos = cardContainer.parent?.toGlobal({ x: cardContainer.x, y: cardContainer.y });
     this.dragOffset = {
@@ -784,13 +790,17 @@ export class CardBattleScene extends BaseScene {
         } else if (dropTarget.type === 'discard') {
           this.discardCard(card);
         }
+        // Clean up after successful action
+        this.cleanupDrag();
+      } else {
+        // No valid drop target - return card to original position
+        this.returnCardToOriginalPosition();
       }
     } else {
       this.showCardDetails(card);
+      // Clean up after showing card details
+      this.cleanupDrag();
     }
-
-    // Clean up
-    this.cleanupDrag();
   }
 
   private getDropTarget(globalPos: { x: number, y: number }): { type: 'character' | 'discard', playerId: number, characterIndex?: number } | null {
@@ -851,6 +861,39 @@ export class CardBattleScene extends BaseScene {
         break;
       // Add more effect types as needed
     }
+  }
+
+  private async returnCardToOriginalPosition(): Promise<void> {
+    if (!this.dragTarget || !this.originalParent) return;
+
+    // Convert original position to global coordinates
+    const originalGlobalPos = this.originalParent.toGlobal(this.originalPosition);
+    
+    // Animate card back to original position
+    await gsap.to(this.dragTarget, {
+      x: originalGlobalPos.x,
+      y: originalGlobalPos.y,
+      duration: 0.3,
+      ease: "power2.out"
+    });
+
+    // Return card to original parent
+    if (this.dragTarget.parent) {
+      this.dragTarget.parent.removeChild(this.dragTarget);
+    }
+    this.originalParent.addChild(this.dragTarget);
+    this.dragTarget.position.set(this.originalPosition.x, this.originalPosition.y);
+    this.dragTarget.alpha = 1;
+
+    // Clean up drag state
+    this.dragTarget = null;
+    this.originalParent = null;
+    this.isDragging = false;
+    
+    // Remove event listeners
+    app.stage.off('pointermove', this.onDragMove, this);
+    app.stage.off('pointerup', this.onDragEnd, this);
+    app.stage.off('pointerupoutside', this.onDragEnd, this);
   }
 
   private cleanupDrag(): void {
