@@ -7,6 +7,7 @@ import { PlayerDetailScene } from './PlayerDetailScene';
 import { LineupScene } from './LineupScene';
 import { BattleScene } from './BattleScene';
 import { CardBattleScene } from './CardBattleScene';
+import { TowerScene } from './TowerScene';
 import { Colors, Gradients } from '@/utils/colors';
 import { playerApi, ApiError, isLikelyUsingMockData } from '@/services/api';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
@@ -275,12 +276,12 @@ export class HomeScene extends BaseScene {
     const buttonContainer = new Container();
     
     const buttons = [
-      { text: 'Adventure', screen: DungeonScene },
-      { text: 'Characters', screen: CharactersScene },
-      { text: 'Battle Arena', screen: BattleScene },
-      { text: 'Card Battle', screen: CardBattleScene },
-      { text: 'Player Profile', screen: PlayerDetailScene },
-      { text: 'Lineup', screen: LineupScene },
+      { text: '🏛️ Adventure (Turn-Based)', screen: DungeonScene },
+      { text: '🗼 Tower (Card Battle)', screen: TowerScene },
+      { text: '👥 Characters', screen: CharactersScene },
+      { text: '⚔️ Battle Arena', screen: BattleScene },
+      { text: '🃏 Card Battle', screen: CardBattleScene },
+      { text: '👤 Player Profile', screen: PlayerDetailScene },
     ];
     
     // Make buttons wider to utilize more screen space
