@@ -4,6 +4,7 @@ import { mockCharacters } from '@/utils/mockData';
 import { mockCards, createRandomDeck, drawCards } from '@/utils/cardData';
 import { BaseScene } from '@/utils/BaseScene';
 import { HomeScene } from './HomeScene';
+import { StageScene } from './StageScene';
 import { Colors, Gradients } from '@/utils/colors';
 import { gsap } from 'gsap';
 import { app } from '@/app';
@@ -17,6 +18,13 @@ import {
   CardEffectType,
   CardTarget 
 } from '@/types';
+
+interface CardBattleSceneParams {
+  stage?: any;
+  playerDeck?: BattleCard[];
+  battleId?: string;
+  battleData?: any;
+}
 
 export class CardBattleScene extends BaseScene {
   /** Assets bundles required by this screen */
@@ -39,12 +47,19 @@ export class CardBattleScene extends BaseScene {
   private dropZones: { area: Container, type: 'character' | 'discard', playerId: number, characterIndex?: number }[] = [];
 
   private battleStarted = false;
+  private stageInfo: any;
+  private providedDeck?: BattleCard[];
+  private battleId?: string;
 
-  constructor() {
+  constructor(params?: CardBattleSceneParams) {
     super();
 
     this.container = new Container();
     this.addChild(this.container);
+    
+    this.stageInfo = params?.stage;
+    this.providedDeck = params?.playerDeck;
+    this.battleId = params?.battleId;
     
     this.initializeBattleState();
   }
@@ -130,10 +145,33 @@ export class CardBattleScene extends BaseScene {
     this.createActionButtons();
   }
 
+  /** Prepare the screen before showing */
+  prepare(): void {
+    this.createGameLayout();
+    this.refreshUI();
+  }
+
   /** Show the screen with animation */
   async show(): Promise<void> {
-    this.container.alpha = 1;
-    return Promise.resolve();
+    this.container.alpha = 0;
+    const tween = { alpha: 0 };
+    
+    return new Promise((resolve) => {
+      const animate = () => {
+        tween.alpha += 0.05;
+        this.container.alpha = tween.alpha;
+        
+        if (tween.alpha >= 1) {
+          this.container.alpha = 1;
+          // Start the battle sequence automatically
+          this.startBattleSequence();
+          resolve();
+        } else {
+          requestAnimationFrame(animate);
+        }
+      };
+      animate();
+    });
   }
 
   /** Hide the screen with animation */
@@ -146,6 +184,99 @@ export class CardBattleScene extends BaseScene {
   reset(): void {
     this.container.removeChildren();
     this.initializeBattleState();
+  }
+
+  private async startBattleSequence(): Promise<void> {
+    console.log('🎯 Starting battle sequence...');
+    
+    // Step 3: Show characters, decks, discard piles, energy, empty hands
+    this.battleStarted = false; // Start with setup view
+    this.refreshUI();
+    
+    // Give a moment to see the initial setup
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // Step 4: Player Turn - Draw phase
+    await this.startPlayerTurn();
+  }
+
+  private async startPlayerTurn(): Promise<void> {
+    console.log('🎯 Starting player turn...');
+    this.battleState.turnPhase = TurnPhase.DRAW;
+    this.battleState.activePlayer = 1;
+    
+    // Show "Your Turn" message
+    await this.showTurnMessage('Your Turn!');
+    
+    // Animate drawing cards to hand
+    this.battleStarted = true;
+    await this.animateInitialDraw();
+    
+    // Step 5: Enter main phase
+    this.battleState.turnPhase = TurnPhase.MAIN;
+    this.refreshUI();
+    
+    console.log('🎯 Player turn: Main phase - you can now play cards');
+  }
+
+  private async showTurnMessage(message: string): Promise<void> {
+    const messageContainer = new Container();
+    
+    const bg = new Graphics()
+      .roundRect(0, 0, 300, 80, 15)
+      .fill({ color: Colors.BACKGROUND_SECONDARY, alpha: 0.9 })
+      .stroke({ width: 2, color: Colors.BUTTON_PRIMARY });
+    
+    const text = new Text({
+      text: message,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 24,
+        fontWeight: 'bold',
+        fill: Colors.TEXT_PRIMARY
+      }
+    });
+    text.anchor.set(0.5);
+    text.x = 150;
+    text.y = 40;
+    
+    messageContainer.addChild(bg, text);
+    messageContainer.x = (this.gameWidth - 300) / 2;
+    messageContainer.y = (this.gameHeight - 80) / 2;
+    messageContainer.alpha = 0;
+    
+    this.container.addChild(messageContainer);
+    
+    // Fade in
+    const fadeIn = { alpha: 0 };
+    return new Promise(resolve => {
+      const animate = () => {
+        fadeIn.alpha += 0.05;
+        messageContainer.alpha = fadeIn.alpha;
+        
+        if (fadeIn.alpha >= 1) {
+          // Hold for a moment, then fade out
+          setTimeout(() => {
+            const fadeOut = { alpha: 1 };
+            const animateOut = () => {
+              fadeOut.alpha -= 0.05;
+              messageContainer.alpha = fadeOut.alpha;
+              
+              if (fadeOut.alpha <= 0) {
+                this.container.removeChild(messageContainer);
+                resolve();
+              } else {
+                requestAnimationFrame(animateOut);
+              }
+            };
+            animateOut();
+          }, 1500);
+        } else {
+          requestAnimationFrame(animate);
+        }
+      };
+      animate();
+    });
   }
 
   private createBackground(): void {
@@ -910,22 +1041,120 @@ export class CardBattleScene extends BaseScene {
   }
 
   private async endTurn(): Promise<void> {
-    // Switch to other player
-    this.battleState.activePlayer = this.battleState.activePlayer === 1 ? 2 : 1;
-
-    if (this.battleState.activePlayer === 1) {
-      this.battleState.currentTurn++;
-      await this.drawCardsToFive(this.battleState.player1);
-    } else {
-      await this.drawCardsToFive(this.battleState.player2);
+    console.log('🎯 Ending player turn...');
+    
+    // Step 6: End Turn - animate turn end, process backend state
+    this.battleState.turnPhase = TurnPhase.END;
+    await this.showTurnMessage('Turn Ending...');
+    
+    // Check for win/loss conditions
+    if (this.checkBattleEnd()) {
+      return;
     }
+    
+    // Step 7: AI Turn (if PvE)
+    this.battleState.activePlayer = 2;
+    this.battleState.currentTurn++;
+    
+    await this.handleAITurn();
+    
+    // Step 8: Repeat cycle - back to player turn
+    await this.startPlayerTurn();
+  }
 
-    // Simple AI turn for player 2
-    if (this.battleState.activePlayer === 2) {
-      await this.handleAITurn();
+  private checkBattleEnd(): boolean {
+    // Check if all characters of player 1 are defeated
+    const player1Alive = this.battleState.player1.characters.some(char => char.hp > 0);
+    const player2Alive = this.battleState.player2.characters.some(char => char.hp > 0);
+    
+    if (!player1Alive) {
+      this.battleState.winner = 2;
+      this.showBattleEnd(false);
+      return true;
     }
+    
+    if (!player2Alive) {
+      this.battleState.winner = 1;
+      this.showBattleEnd(true);
+      return true;
+    }
+    
+    return false;
+  }
 
-    this.refreshUI();
+  private async showBattleEnd(playerWon: boolean): Promise<void> {
+    console.log('🎯 Battle ended!', playerWon ? 'Player wins!' : 'Player loses!');
+    
+    const message = playerWon ? 'Victory!' : 'Defeat!';
+    const color = playerWon ? Colors.RARITY_LEGENDARY : Colors.ELEMENT_FIRE;
+    
+    const endContainer = new Container();
+    
+    const bg = new Graphics()
+      .roundRect(0, 0, 400, 200, 20)
+      .fill({ color: Colors.BACKGROUND_SECONDARY, alpha: 0.95 })
+      .stroke({ width: 3, color });
+    
+    const titleText = new Text({
+      text: message,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 36,
+        fontWeight: 'bold',
+        fill: color
+      }
+    });
+    titleText.anchor.set(0.5);
+    titleText.x = 200;
+    titleText.y = 60;
+    
+    const rewardsText = new Text({
+      text: playerWon ? 'You earned rewards!\n+100 Gold\n+50 EXP' : 'Better luck next time!',
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 16,
+        fill: Colors.TEXT_SECONDARY,
+        align: 'center'
+      }
+    });
+    rewardsText.anchor.set(0.5);
+    rewardsText.x = 200;
+    rewardsText.y = 120;
+    
+    const continueButton = this.createButton(
+      'Continue',
+      150,
+      150,
+      100,
+      30,
+      () => {
+        navigation.showScreen(this.stageInfo ? StageScene : HomeScene);
+      }
+    );
+    
+    endContainer.addChild(bg, titleText, rewardsText, continueButton);
+    endContainer.x = (this.gameWidth - 400) / 2;
+    endContainer.y = (this.gameHeight - 200) / 2;
+    endContainer.alpha = 0;
+    
+    this.container.addChild(endContainer);
+    
+    // Fade in
+    const fadeIn = { alpha: 0 };
+    return new Promise(resolve => {
+      const animate = () => {
+        fadeIn.alpha += 0.03;
+        endContainer.alpha = fadeIn.alpha;
+        
+        if (fadeIn.alpha >= 1) {
+          endContainer.alpha = 1;
+          resolve();
+        } else {
+          requestAnimationFrame(animate);
+        }
+      };
+      animate();
+    });
   }
 
   private async drawCardsToFive(player: CardBattlePlayer): Promise<void> {
@@ -998,6 +1227,18 @@ export class CardBattleScene extends BaseScene {
   }
 
   private async handleAITurn(): Promise<void> {
+    console.log('🎯 AI Turn starting...');
+    
+    // Show AI turn message
+    await this.showTurnMessage('AI Turn');
+    
+    // Draw cards for AI
+    await this.drawCardsToFive(this.battleState.player2);
+    this.refreshUI();
+    
+    // AI thinks for a moment
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
     // Simple AI: play a random affordable card on a random target
     const ai = this.battleState.player2;
     const affordableCards = ai.hand.filter(card => card.energyCost <= ai.energy);
@@ -1005,6 +1246,11 @@ export class CardBattleScene extends BaseScene {
     if (affordableCards.length > 0) {
       const randomCard = affordableCards[Math.floor(Math.random() * affordableCards.length)];
       const targetCharacterIndex = Math.floor(Math.random() * this.battleState.player1.characters.length);
+
+      console.log(`🎯 AI plays: ${randomCard.name} on target ${targetCharacterIndex}`);
+      
+      // Show what AI is doing
+      await this.showTurnMessage(`AI plays: ${randomCard.name}`);
 
       // Apply effects (simplified)
       ai.energy -= randomCard.energyCost;
@@ -1015,12 +1261,16 @@ export class CardBattleScene extends BaseScene {
       for (const effect of randomCard.effects) {
         this.applyCardEffect(effect, this.battleState.player1.characters[targetCharacterIndex], this.battleState.player1);
       }
+      
+      this.refreshUI();
+      await new Promise(resolve => setTimeout(resolve, 1500));
+    } else {
+      console.log('🎯 AI has no playable cards');
+      await this.showTurnMessage('AI passes turn');
+      await new Promise(resolve => setTimeout(resolve, 1000));
     }
 
-    // End AI turn after a delay
-    setTimeout(async () => {
-      await this.endTurn();
-    }, 1000);
+    console.log('🎯 AI Turn ended');
   }
 
   private refreshUI(): void {
