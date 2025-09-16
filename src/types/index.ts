@@ -248,3 +248,47 @@ export enum TurnPhase {
   MAIN = 'main',
   END = 'end'
 }
+
+// API Integration Types
+export interface BattleApiResponse {
+  battleId: string;
+  status: 'created' | 'active' | 'completed' | 'cancelled';
+}
+
+export interface BattleStateResponse {
+  battleId: string;
+  status: string;
+  currentTurn: number;
+  activePlayer: number;
+  turnPhase: TurnPhase;
+  player1?: CardBattlePlayer;
+  player2?: CardBattlePlayer;
+}
+
+export interface BattleMoveData {
+  cardId: string;
+  targetCharacterIndex?: number;
+  targetPlayerId?: number;
+  action: 'play_card' | 'discard' | 'special_action';
+}
+
+export interface BattleMoveResponse {
+  success: boolean;
+  newState?: Partial<CardBattleState>;
+  result: string;
+  error?: string;
+}
+
+export interface BattleEndData {
+  winner: number; // 1 or 2
+  reason: 'defeat' | 'surrender' | 'timeout';
+  finalState: CardBattleState;
+}
+
+export interface BattleRewards {
+  gold: number;
+  experience: number;
+  items: any[];
+  newLevel?: boolean;
+  levelUpRewards?: any[];
+}
