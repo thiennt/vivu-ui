@@ -282,10 +282,10 @@ export class StageScene extends BaseScene {
     
     // Difficulty
     const difficultyColors: { [key: number]: number } = {
-      1: Colors.ELEMENT_EARTH,
-      2: Colors.RARITY_LEGENDARY,
-      3: Colors.ELEMENT_FIRE,
-      4: Colors.ELEMENT_DARK
+      1: 0x4caf50, // Green for easy
+      2: 0xff9800, // Orange for normal
+      3: 0xff4500, // Red for hard
+      4: 0x9c27b0  // Purple for nightmare
     };
 
     const difficulty = new Text({

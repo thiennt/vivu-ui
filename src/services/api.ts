@@ -8,7 +8,7 @@ import { mockPlayer, mockCharacters, mockSkills, mockDungeons } from '@/utils/mo
 import { mock } from 'node:test';
 
 // Base API configuration
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.vivu.game';
+const API_BASE_URL = (import.meta as any).env?.VITE_API_BASE_URL || 'https://api.vivu.game';
 
 // API Response wrapper interface
 interface ApiResponse<T> {
@@ -142,7 +142,7 @@ export const skillsApi = {
   },
 
   async getSkill(skillId: string): Promise<any> {
-    const skill = mockSkills.find(s => s.id === skillId);
+    const skill = mockSkills.find(s => (s as any).id === skillId);
     return apiRequest(`/skills/${skillId}`, {}, skill);
   },
 };
