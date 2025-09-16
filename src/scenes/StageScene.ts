@@ -219,46 +219,84 @@ export class StageScene extends BaseScene {
     
     const stages = this.dungeon!.stages;
     if (stages.length > 0) {
-      // Calculate responsive grid layout
-      const cardWidth = 180;
-      const cardHeight = 130;
-      const cardSpacing = 20;
-      const maxColumns = Math.floor((this.gameWidth - 100) / (cardWidth + cardSpacing));
-      const columns = Math.min(3, maxColumns);
-      const gridWidth = (cardWidth * columns) + (cardSpacing * (columns - 1));
+      // Calculate responsive tower layout
+      const cardWidth = Math.min(200, this.gameWidth - 100); // Wider cards for tower
+      const cardHeight = 120;
+      const floorSpacing = 40; // Space between tower floors
+      
+      // Calculate total tower height and starting position
+      const totalHeight = stages.length * cardHeight + (stages.length - 1) * floorSpacing;
+      const availableHeight = this.gameHeight - 200; // Leave space for header and back button
+      const startY = Math.max(20, (availableHeight - totalHeight) / 2);
       
       stages.forEach((stage, index) => {
         const stageCard = this.createStageCard(stage, index);
-        const col = index % columns;
-        const row = Math.floor(index / columns);
         
-        stageCard.x = col * (cardWidth + cardSpacing);
-        stageCard.y = row * (cardHeight + cardSpacing);
+        // Position cards vertically - bottom to top (like climbing a tower)
+        // Reverse the order so first stage (floor 1) is at the bottom
+        const reverseIndex = stages.length - 1 - index;
+        stageCard.x = 0; // Centered horizontally
+        stageCard.y = startY + reverseIndex * (cardHeight + floorSpacing);
+        
+        // Add tower floor connecting line (except for the top floor)
+        if (index < stages.length - 1) {
+          const connectionLine = this.createTowerConnection(cardWidth, cardHeight);
+          connectionLine.x = cardWidth / 2 - 2; // Center the line
+          connectionLine.y = stageCard.y + cardHeight;
+          this.stageContainer.addChild(connectionLine);
+        }
+        
         this.stageContainer.addChild(stageCard);
       });
       
-      // Center the stage grid
-      this.stageContainer.x = (this.gameWidth - gridWidth) / 2;
+      // Center the tower horizontally
+      this.stageContainer.x = (this.gameWidth - cardWidth) / 2;
     } else {
-      this.stageContainer.x = (this.gameWidth - 600) / 2;
+      this.stageContainer.x = (this.gameWidth - 200) / 2;
     }
 
     this.stageContainer.y = 120;
     this.addChild(this.stageContainer);
   }
 
+  private createTowerConnection(cardWidth: number, cardHeight: number): Container {
+    const connection = new Container();
+    
+    // Vertical connecting line
+    const line = new Graphics();
+    line.moveTo(0, 0)
+        .lineTo(0, 40) // Height of the floor spacing
+        .stroke({ width: 4, color: Colors.BUTTON_PRIMARY, alpha: 0.6 });
+    
+    // Small decorative nodes at top and bottom
+    const topNode = new Graphics();
+    topNode.circle(0, 0, 3)
+           .fill({ color: Colors.BUTTON_PRIMARY, alpha: 0.8 });
+    
+    const bottomNode = new Graphics();
+    bottomNode.circle(0, 40, 3)
+              .fill({ color: Colors.BUTTON_PRIMARY, alpha: 0.8 });
+    
+    connection.addChild(line, topNode, bottomNode);
+    return connection;
+  }
+
   private createStageCard(stage: any, index: number): Container {
     const card = new Container();
     
-    // Background
+    // Updated dimensions for tower layout
+    const cardWidth = Math.min(200, this.gameWidth - 100);
+    const cardHeight = 120;
+    
+    // Background with tower floor styling
     const bg = new Graphics();
-    bg.roundRect(0, 0, 180, 130, 10)
+    bg.roundRect(0, 0, cardWidth, cardHeight, 10)
       .fill({ color: Colors.BACKGROUND_SECONDARY, alpha: 0.9 })
       .stroke({ width: 3, color: Colors.BUTTON_PRIMARY });
     
-    // Stage number
-    const stageNumber = new Text({
-      text: `Stage ${stage.stageNumber}`,
+    // Floor number (shows progression up the tower)
+    const floorNumber = new Text({
+      text: `Floor ${stage.stageNumber || index + 1}`,
       style: {
         fontFamily: 'Kalam',
         fontSize: 16,
@@ -266,8 +304,8 @@ export class StageScene extends BaseScene {
         fill: Colors.TEXT_PRIMARY
       }
     });
-    stageNumber.x = 10;
-    stageNumber.y = 10;
+    floorNumber.x = 10;
+    floorNumber.y = 8;
     
     // Stage name
     const stageName = new Text({
@@ -278,13 +316,13 @@ export class StageScene extends BaseScene {
         fontWeight: 'bold',
         fill: Colors.TEXT_SECONDARY,
         wordWrap: true,
-        wordWrapWidth: 160
+        wordWrapWidth: cardWidth - 20
       }
     });
     stageName.x = 10;
-    stageName.y = 35;
+    stageName.y = 30;
     
-    // Difficulty
+    // Difficulty indicator with tower-appropriate styling
     const difficultyColors: { [key: number]: number } = {
       1: 0x4caf50, // Green for easy
       2: 0xff9800, // Orange for normal
@@ -293,39 +331,37 @@ export class StageScene extends BaseScene {
     };
 
     const difficulty = new Text({
-      text: stage.difficulty.toString(),
+      text: `Difficulty: ${stage.difficulty}`,
       style: {
         fontFamily: 'Kalam',
-        fontSize: 12,
+        fontSize: 11,
         fontWeight: 'bold',
         fill: difficultyColors[stage.difficulty] || Colors.TEXT_WHITE
       }
     });
     difficulty.x = 10;
-    difficulty.y = 65;
+    difficulty.y = 55;
     
-    // Rewards preview
-    const rewardText = new Text({
-      text: `Rewards: ${stage.rewards.length} items`,
+    // Energy cost (important for card games)
+    const energyCost = new Text({
+      text: `Energy: ${stage.energy_cost}`,
       style: {
         fontFamily: 'Kalam',
-        fontSize: 10,
+        fontSize: 11,
         fill: Colors.TEXT_TERTIARY
       }
     });
-    rewardText.x = 10;
-    rewardText.y = 85;
+    energyCost.x = 10;
+    energyCost.y = 75;
     
-    // Enter button with responsive sizing
-    const cardWidth = 180; // From the background rectangle above
-    const cardHeight = 130; // From the background rectangle above
-    const buttonWidth = Math.max(60, Math.min(70, cardWidth * 0.3));
-    const buttonHeight = Math.max(20, Math.min(25, cardHeight * 0.15));
+    // Enter button with updated positioning for wider card
+    const buttonWidth = Math.max(60, Math.min(80, cardWidth * 0.3));
+    const buttonHeight = Math.max(25, Math.min(30, cardHeight * 0.2));
     
     const enterButton = this.createButton(
       'Enter',
-      cardWidth - buttonWidth - 5,
-      cardHeight - buttonHeight - 5,
+      cardWidth - buttonWidth - 10,
+      cardHeight - buttonHeight - 10,
       buttonWidth,
       buttonHeight,
       async () => {
@@ -334,7 +370,7 @@ export class StageScene extends BaseScene {
       12 // Base font size for responsive scaling
     );
     
-    card.addChild(bg, stageNumber, stageName, difficulty, rewardText, enterButton);
+    card.addChild(bg, floorNumber, stageName, difficulty, energyCost, enterButton);
     
     // Hover effects
     card.interactive = true;
