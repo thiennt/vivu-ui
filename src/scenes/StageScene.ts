@@ -1,10 +1,14 @@
 import { Container, Graphics, Text, Ticker } from 'pixi.js';
-import { BaseScene } from '@/utils/BaseScene';
-import { Dungeon } from '@/types';
 import { navigation } from '@/utils/navigation';
-import { HomeScene } from './HomeScene';
-import { Colors } from '@/utils/colors';
+import { BaseScene } from '@/utils/BaseScene';
+import { mockDungeons } from '@/utils/mockData';
 import { DungeonScene } from './DungeonScene';
+import { CardBattleScene } from './CardBattleScene';
+import { PrepareScene } from './PrepareScene';
+import { HomeScene } from './HomeScene';
+import { Colors, Gradients } from '@/utils/colors';
+import { battleApi } from '@/services/api';
+import { Dungeon } from '@/types';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
 import { waitFor } from '@/utils/asyncUtils';
 
@@ -324,9 +328,8 @@ export class StageScene extends BaseScene {
       cardHeight - buttonHeight - 5,
       buttonWidth,
       buttonHeight,
-      () => {
-        // In a real game, this would start the battle
-        alert(`Starting battle in ${stage.name}!`);
+      async () => {
+        await this.enterStage(stage);
       },
       12 // Base font size for responsive scaling
     );
@@ -373,5 +376,21 @@ export class StageScene extends BaseScene {
       14 // Reduced base font size from 16
     );
     this.buttonContainer.addChild(backButton);
+  }
+
+  private async enterStage(stage: any): Promise<void> {
+    try {
+      console.log('Entering stage:', stage.name);
+      
+      // Navigate to PrepareScene to review deck before battle
+      navigation.showScreen(PrepareScene, {
+        stage: stage
+      });
+    } catch (error) {
+      console.error('Failed to enter stage:', error);
+      // Fallback to direct battle navigation
+      alert(`Error entering stage: ${error}. Starting battle anyway...`);
+      navigation.showScreen(CardBattleScene, { stage });
+    }
   }
 }
