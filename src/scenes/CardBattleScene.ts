@@ -1,7 +1,7 @@
 import { Container, Graphics, Text, Ticker } from 'pixi.js';
 import { navigation } from '@/utils/navigation';
 import { mockCharacters } from '@/utils/mockData';
-import { mockCards, createRandomDeck, drawCards } from '@/utils/cardData';
+import { createRandomDeck, drawCards } from '@/utils/cardData';
 import { BaseScene } from '@/utils/BaseScene';
 import { HomeScene } from './HomeScene';
 import { StageScene } from './StageScene';
@@ -9,6 +9,7 @@ import { Colors, Gradients } from '@/utils/colors';
 import { gsap } from 'gsap';
 import { app } from '@/app';
 import { CardDetailPopup } from '@/popups/CardDetailPopup';
+import { battleApi } from '@/services/api';
 import { 
   BattleCard, 
   BattleCharacter, 
@@ -16,7 +17,9 @@ import {
   CardBattleState, 
   TurnPhase,
   CardEffectType,
-  CardTarget 
+  BattleMoveData,
+  BattleEndData,
+  BattleRewards
 } from '@/types';
 
 interface CardBattleSceneParams {
@@ -935,10 +938,14 @@ export class CardBattleScene extends BaseScene {
 
       if (dropTarget) {
         if (dropTarget.type === 'character') {
-          this.playCardOnCharacter(card, dropTarget.playerId, dropTarget.characterIndex!);
-          this.refreshUI();
+          // Make this async to handle API calls
+          this.playCardOnCharacter(card, dropTarget.playerId, dropTarget.characterIndex!).then(() => {
+            this.refreshUI();
+          });
         } else if (dropTarget.type === 'discard') {
-          this.discardCard(card);
+          this.discardCard(card).then(() => {
+            // Card discard completed
+          });
         }
         // Clean up after successful action
         this.cleanupDrag(true);
@@ -967,7 +974,7 @@ export class CardBattleScene extends BaseScene {
     return null;
   }
 
-  private playCardOnCharacter(card: BattleCard, targetPlayerId: number, characterIndex: number): void {
+  private async playCardOnCharacter(card: BattleCard, targetPlayerId: number, characterIndex: number): Promise<void> {
     // Apply card effects
     const targetPlayer = targetPlayerId === 1 ? this.battleState.player1 : this.battleState.player2;
 
@@ -979,29 +986,114 @@ export class CardBattleScene extends BaseScene {
 
     const targetCharacter = targetPlayer.characters[characterIndex];
 
-    // Deduct energy cost
-    this.battleState.player1.energy -= card.energyCost;
+    // Prepare move data for API
+    const moveData: BattleMoveData = {
+      cardId: card.id,
+      targetCharacterIndex: characterIndex,
+      targetPlayerId: targetPlayerId,
+      action: 'play_card'
+    };
 
-    // Apply card effects
-    for (const effect of card.effects) {
-      this.applyCardEffect(effect, targetCharacter, targetPlayer);
+    try {
+      // If we have a battleId, sync with backend
+      if (this.battleId) {
+        console.log('🔄 Syncing card play with backend...', moveData);
+        const moveResponse = await battleApi.playCard(this.battleId, moveData);
+        
+        if (!moveResponse.success) {
+          alert('Move was not accepted by the server.');
+          return;
+        }
+
+        // Apply any state updates from the server
+        if (moveResponse.newState) {
+          console.log('📥 Applying server state updates:', moveResponse.newState);
+          Object.assign(this.battleState, moveResponse.newState);
+        }
+      } else {
+        console.log('⚠️ No battleId - playing locally only');
+      }
+
+      // Apply local card effects (this ensures UI responsiveness)
+      // Deduct energy cost
+      this.battleState.player1.energy -= card.energyCost;
+
+      // Apply card effects
+      for (const effect of card.effects) {
+        this.applyCardEffect(effect, targetCharacter, targetPlayer);
+      }
+
+      // Move card to discard pile
+      this.battleState.player1.hand = this.battleState.player1.hand.filter(c => c.id !== card.id);
+      this.battleState.player1.discardPile.push(card);
+
+      // Refresh UI to show changes
+      this.refreshUI();
+
+    } catch (error) {
+      console.error('❌ Error playing card:', error);
+      // In case of API error, allow local play to continue
+      alert('Network error occurred. Continuing with local gameplay.');
+      
+      // Apply local effects as fallback
+      this.battleState.player1.energy -= card.energyCost;
+      for (const effect of card.effects) {
+        this.applyCardEffect(effect, targetCharacter, targetPlayer);
+      }
+      this.battleState.player1.hand = this.battleState.player1.hand.filter(c => c.id !== card.id);
+      this.battleState.player1.discardPile.push(card);
+      this.refreshUI();
     }
-
-    // Move card to discard pile
-    this.battleState.player1.hand = this.battleState.player1.hand.filter(c => c.id !== card.id);
-    this.battleState.player1.discardPile.push(card);
   }
 
-  private discardCard(card: BattleCard): void {
-    // Gain 1 energy for discarding
-    this.battleState.player1.energy += 1;
+  private async discardCard(card: BattleCard): Promise<void> {
+    // Prepare move data for API
+    const moveData: BattleMoveData = {
+      cardId: card.id,
+      action: 'discard'
+    };
 
-    // Move card to discard pile
-    this.battleState.player1.hand = this.battleState.player1.hand.filter(c => c.id !== card.id);
-    this.battleState.player1.discardPile.push(card);
+    try {
+      // If we have a battleId, sync with backend
+      if (this.battleId) {
+        console.log('🔄 Syncing card discard with backend...', moveData);
+        const moveResponse = await battleApi.playCard(this.battleId, moveData);
+        
+        if (!moveResponse.success) {
+          alert('Discard was not accepted by the server.');
+          return;
+        }
 
-    // Refresh UI
-    this.refreshUI();
+        // Apply any state updates from the server
+        if (moveResponse.newState) {
+          console.log('📥 Applying server discard state:', moveResponse.newState);
+          Object.assign(this.battleState, moveResponse.newState);
+        }
+      } else {
+        console.log('⚠️ No battleId - discarding locally only');
+      }
+
+      // Apply local discard effects
+      // Gain 1 energy for discarding
+      this.battleState.player1.energy += 1;
+
+      // Move card to discard pile
+      this.battleState.player1.hand = this.battleState.player1.hand.filter(c => c.id !== card.id);
+      this.battleState.player1.discardPile.push(card);
+
+      // Refresh UI
+      this.refreshUI();
+
+    } catch (error) {
+      console.error('❌ Error discarding card:', error);
+      // Fallback to local discard
+      alert('Network error occurred. Continuing with local gameplay.');
+      
+      this.battleState.player1.energy += 1;
+      this.battleState.player1.hand = this.battleState.player1.hand.filter(c => c.id !== card.id);
+      this.battleState.player1.discardPile.push(card);
+      this.refreshUI();
+    }
   }
 
   private applyCardEffect(effect: any, targetCharacter: BattleCharacter, targetPlayer: CardBattlePlayer): void {
@@ -1043,23 +1135,61 @@ export class CardBattleScene extends BaseScene {
   private async endTurn(): Promise<void> {
     console.log('🎯 Ending player turn...');
     
-    // Step 6: End Turn - animate turn end, process backend state
-    this.battleState.turnPhase = TurnPhase.END;
-    await this.showTurnMessage('Turn Ending...');
-    
-    // Check for win/loss conditions
-    if (this.checkBattleEnd()) {
-      return;
+    try {
+      // Step 1: Sync turn end with backend if we have a battleId
+      if (this.battleId) {
+        console.log('🔄 Syncing turn end with backend...');
+        const turnResponse = await battleApi.endTurn(this.battleId);
+        
+        if (!turnResponse.success) {
+          alert('Unable to end turn. Please try again.');
+          return;
+        }
+
+        // Apply any state updates from the server
+        if (turnResponse.newState) {
+          console.log('📥 Applying server turn end state:', turnResponse.newState);
+          Object.assign(this.battleState, turnResponse.newState);
+        }
+      } else {
+        console.log('⚠️ No battleId - processing turn locally only');
+      }
+
+      // Step 2: Local turn end processing
+      this.battleState.turnPhase = TurnPhase.END;
+      await this.showTurnMessage('Turn Ending...');
+      
+      // Check for win/loss conditions
+      if (this.checkBattleEnd()) {
+        return;
+      }
+      
+      // Step 3: AI Turn (if PvE)
+      this.battleState.activePlayer = 2;
+      this.battleState.currentTurn++;
+      
+      await this.handleAITurn();
+      
+      // Step 4: Repeat cycle - back to player turn
+      await this.startPlayerTurn();
+
+    } catch (error) {
+      console.error('❌ Error ending turn:', error);
+      // Fallback to local turn processing
+      alert('Network error occurred. Continuing with local gameplay.');
+      
+      this.battleState.turnPhase = TurnPhase.END;
+      await this.showTurnMessage('Turn Ending...');
+      
+      if (this.checkBattleEnd()) {
+        return;
+      }
+      
+      this.battleState.activePlayer = 2;
+      this.battleState.currentTurn++;
+      await this.handleAITurn();
+      await this.startPlayerTurn();
     }
-    
-    // Step 7: AI Turn (if PvE)
-    this.battleState.activePlayer = 2;
-    this.battleState.currentTurn++;
-    
-    await this.handleAITurn();
-    
-    // Step 8: Repeat cycle - back to player turn
-    await this.startPlayerTurn();
   }
 
   private checkBattleEnd(): boolean {
@@ -1085,6 +1215,41 @@ export class CardBattleScene extends BaseScene {
   private async showBattleEnd(playerWon: boolean): Promise<void> {
     console.log('🎯 Battle ended!', playerWon ? 'Player wins!' : 'Player loses!');
     
+    // Prepare battle end data
+    const battleEndData: BattleEndData = {
+      winner: playerWon ? 1 : 2,
+      reason: 'defeat',
+      finalState: this.battleState
+    };
+
+    let rewards: BattleRewards | null = null;
+
+    try {
+      // Step 1: Report battle end to backend if we have a battleId
+      if (this.battleId) {
+        console.log('🔄 Reporting battle end to backend...', battleEndData);
+        const battleEndResponse = await battleApi.endBattle(this.battleId, battleEndData);
+        
+        // Get rewards from the response
+        if (battleEndResponse.rewards) {
+          rewards = battleEndResponse.rewards;
+          console.log('🎁 Battle rewards received:', rewards);
+        } else if (playerWon) {
+          // Fallback: try to fetch rewards separately
+          try {
+            rewards = await battleApi.getBattleRewards(this.battleId);
+          } catch (rewardError) {
+            console.warn('⚠️ Could not fetch rewards:', rewardError);
+          }
+        }
+      } else {
+        console.log('⚠️ No battleId - using default rewards');
+      }
+    } catch (error) {
+      console.error('❌ Error reporting battle end:', error);
+    }
+
+    // Step 2: Display battle end UI
     const message = playerWon ? 'Victory!' : 'Defeat!';
     const color = playerWon ? Colors.RARITY_LEGENDARY : Colors.ELEMENT_FIRE;
     
@@ -1108,8 +1273,26 @@ export class CardBattleScene extends BaseScene {
     titleText.x = 200;
     titleText.y = 60;
     
+    // Display rewards from backend or use fallback
+    let rewardsTextContent: string;
+    if (playerWon) {
+      if (rewards) {
+        rewardsTextContent = `You earned rewards!\n+${rewards.gold} Gold\n+${rewards.experience} EXP`;
+        if (rewards.newLevel) {
+          rewardsTextContent += '\n🎉 LEVEL UP!';
+        }
+        if (rewards.items && rewards.items.length > 0) {
+          rewardsTextContent += `\n+${rewards.items.length} items`;
+        }
+      } else {
+        rewardsTextContent = 'You earned rewards!\n+100 Gold\n+50 EXP';
+      }
+    } else {
+      rewardsTextContent = 'Better luck next time!';
+    }
+    
     const rewardsText = new Text({
-      text: playerWon ? 'You earned rewards!\n+100 Gold\n+50 EXP' : 'Better luck next time!',
+      text: rewardsTextContent,
       style: {
         fontFamily: 'Kalam',
         fontSize: 16,

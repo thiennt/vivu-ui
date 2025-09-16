@@ -5,7 +5,15 @@
  */
 
 import { mockPlayer, mockCharacters, mockSkills, mockDungeons } from '@/utils/mockData';
-import { mock } from 'node:test';
+import { 
+  BattleApiResponse, 
+  BattleStateResponse, 
+  BattleMoveData, 
+  BattleMoveResponse, 
+  BattleEndData, 
+  BattleRewards,
+  TurnPhase 
+} from '@/types';
 
 // Base API configuration
 const API_BASE_URL = (import.meta as any).env?.VITE_API_BASE_URL || 'https://api.vivu.game';
@@ -149,13 +157,74 @@ export const skillsApi = {
 
 // Battle API methods
 export const battleApi = {
-  async createBattle(battleData: any): Promise<any> {
+  async createBattle(battleData: any): Promise<BattleApiResponse> {
     console.log('🔥 createBattle API called with data:', battleData);
     const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
     return apiRequest(`/players/${playerId}/battles`, {
       method: 'POST',
       body: JSON.stringify(battleData),
     }, { battleId: `battle_${Date.now()}`, status: 'created' });
+  },
+
+  async getBattleState(battleId: string): Promise<BattleStateResponse> {
+    console.log('🔍 getBattleState API called for battle:', battleId);
+    return apiRequest(`/battles/${battleId}/state`, {}, {
+      battleId,
+      status: 'active',
+      currentTurn: 1,
+      activePlayer: 1,
+      turnPhase: TurnPhase.MAIN
+    });
+  },
+
+  async playCard(battleId: string, moveData: BattleMoveData): Promise<BattleMoveResponse> {
+    console.log('🃏 playCard API called for battle:', battleId, 'with move:', moveData);
+    return apiRequest(`/battles/${battleId}/moves`, {
+      method: 'POST',
+      body: JSON.stringify(moveData),
+    }, { 
+      success: true, 
+      newState: {},
+      result: 'move_applied'
+    });
+  },
+
+  async endTurn(battleId: string): Promise<BattleMoveResponse> {
+    console.log('⏭️ endTurn API called for battle:', battleId);
+    return apiRequest(`/battles/${battleId}/end-turn`, {
+      method: 'POST',
+    }, { 
+      success: true,
+      newState: {},
+      result: 'turn_ended'
+    });
+  },
+
+  async endBattle(battleId: string, battleResult: BattleEndData): Promise<BattleApiResponse & { rewards?: BattleRewards }> {
+    console.log('🏁 endBattle API called for battle:', battleId, 'with result:', battleResult);
+    const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
+    return apiRequest(`/battles/${battleId}/end`, {
+      method: 'POST',
+      body: JSON.stringify(battleResult),
+    }, {
+      battleId,
+      status: 'completed',
+      rewards: battleResult.winner === 1 ? {
+        gold: 100,
+        experience: 50,
+        items: []
+      } : undefined
+    });
+  },
+
+  async getBattleRewards(battleId: string): Promise<BattleRewards> {
+    console.log('🎁 getBattleRewards API called for battle:', battleId);
+    return apiRequest(`/battles/${battleId}/rewards`, {}, {
+      gold: 100,
+      experience: 50,
+      items: [],
+      newLevel: false
+    });
   },
 };
 
