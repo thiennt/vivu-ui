@@ -8,7 +8,7 @@ import { PrepareScene } from './PrepareScene';
 import { HomeScene } from './HomeScene';
 import { Colors, Gradients } from '@/utils/colors';
 import { battleApi } from '@/services/api';
-import { Dungeon } from '@/types';
+import { Dungeon, Stage } from '@/types';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
 import { waitFor } from '@/utils/asyncUtils';
 
@@ -281,7 +281,7 @@ export class StageScene extends BaseScene {
     return connection;
   }
 
-  private createStageCard(stage: any, index: number): Container {
+  private createStageCard(stage: Stage, index: number): Container {
     const card = new Container();
     
     // Updated dimensions for tower layout
@@ -414,7 +414,7 @@ export class StageScene extends BaseScene {
     this.buttonContainer.addChild(backButton);
   }
 
-  private async enterStage(stage: any): Promise<void> {
+  private async enterStage(stage: Stage): Promise<void> {
     try {
       console.log('Entering stage:', stage.name);
       
