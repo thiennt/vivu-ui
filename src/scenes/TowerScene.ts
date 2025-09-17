@@ -11,6 +11,7 @@ import { battleApi } from '@/services/api';
 import { Dungeon, Stage } from '@/types';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
 import { waitFor } from '@/utils/asyncUtils';
+import { TowerFloorPopup } from '@/popups/TowerFloorPopup';
 
 export class TowerScene extends BaseScene {
   private dungeon: Dungeon | null = null;
@@ -47,7 +48,9 @@ export class TowerScene extends BaseScene {
     this.loadingManager = new LoadingStateManager(this.container, this.gameWidth, this.gameHeight);
     
     // Create UI once
-    this.initializeUI();
+    this.initializeUI().catch(error => {
+      console.error('Failed to initialize TowerScene:', error);
+    });
   }
   
   private async initializeUI(): Promise<void> {
@@ -55,8 +58,22 @@ export class TowerScene extends BaseScene {
       this.loadingManager.showLoading();
       
       if (!this.dungeon) {
-        // Use the first dungeon as default for tower mode
-        this.dungeon = mockDungeons[0];
+        // Use the first dungeon as default for tower mode, cast to Dungeon type
+        const mockDungeon = mockDungeons[0];
+        this.dungeon = {
+          id: mockDungeon.id,
+          name: mockDungeon.name,
+          description: mockDungeon.description,
+          requiredLevel: 1,
+          rewards: [],
+          stages: mockDungeon.stages.map((stage, index) => ({
+            ...stage,
+            enemies: [], // Add missing enemies array
+            rewards: [], // Convert rewards to proper array
+            stageNumber: index + 1, // Add missing stage number
+            is_boss_stage: false as false // Type assertion for literal false
+          }))
+        };
       }
       
       this.createBackground();
@@ -172,9 +189,9 @@ export class TowerScene extends BaseScene {
     
     const stages = this.dungeon!.stages;
     if (stages.length > 0) {
-      // Calculate responsive tower layout
-      const cardWidth = Math.min(250, this.gameWidth - 60); // Wider cards for tower
-      const cardHeight = 140;
+      // Calculate responsive tower layout with updated card dimensions
+      const cardWidth = Math.min(200, this.gameWidth - 60); // Updated to match new card width
+      const cardHeight = 120;
       const floorSpacing = 50; // Space between tower floors
       
       // Calculate total tower height and starting position
@@ -205,7 +222,7 @@ export class TowerScene extends BaseScene {
       // Center the tower horizontally
       this.towerContainer.x = (this.gameWidth - cardWidth) / 2;
     } else {
-      this.towerContainer.x = (this.gameWidth - 250) / 2;
+      this.towerContainer.x = (this.gameWidth - 200) / 2;
     }
 
     this.towerContainer.y = 120;
@@ -242,9 +259,9 @@ export class TowerScene extends BaseScene {
   private createFloorCard(stage: Stage, index: number): Container {
     const card = new Container();
     
-    // Updated dimensions for tower layout
-    const cardWidth = Math.min(250, this.gameWidth - 60);
-    const cardHeight = 140;
+    // Simplified dimensions for tower layout - smaller cards with just floor number and icon
+    const cardWidth = Math.min(200, this.gameWidth - 60);
+    const cardHeight = 120;
     
     // Background with tower floor styling
     const bg = new Graphics();
@@ -252,91 +269,53 @@ export class TowerScene extends BaseScene {
       .fill({ color: Colors.BACKGROUND_SECONDARY, alpha: 0.95 })
       .stroke({ width: 4, color: Colors.BUTTON_PRIMARY });
     
-    // Floor number (shows progression up the tower)
+    // Floor number at the top
     const floorNumber = new Text({
-      text: `🏗️ Floor ${stage.stageNumber || index + 1}`,
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 18,
-        fontWeight: 'bold',
-        fill: Colors.TEXT_PRIMARY
-      }
-    });
-    floorNumber.x = 15;
-    floorNumber.y = 12;
-    
-    // Stage name
-    const stageName = new Text({
-      text: stage.name,
+      text: `Floor ${stage.stageNumber || index + 1}`,
       style: {
         fontFamily: 'Kalam',
         fontSize: 16,
         fontWeight: 'bold',
-        fill: Colors.TEXT_SECONDARY,
-        wordWrap: true,
-        wordWrapWidth: cardWidth - 30
+        fill: Colors.TEXT_PRIMARY,
+        align: 'center'
       }
     });
-    stageName.x = 15;
-    stageName.y = 40;
+    floorNumber.anchor.set(0.5, 0);
+    floorNumber.x = cardWidth / 2;
+    floorNumber.y = 15;
     
-    // Difficulty indicator with tower-appropriate styling
-    const difficultyColors: { [key: number]: number } = {
-      1: 0x4caf50, // Green for easy
-      2: 0xff9800, // Orange for normal
-      3: 0xff4500, // Red for hard
-      4: 0x9c27b0  // Purple for nightmare
-    };
-
-    const difficulty = new Text({
-      text: `⚔️ Difficulty: ${stage.difficulty}`,
+    // Big tower icon in center
+    const towerIcon = new Text({
+      text: '🗼',
       style: {
         fontFamily: 'Kalam',
-        fontSize: 13,
-        fontWeight: 'bold',
-        fill: difficultyColors[stage.difficulty] || Colors.TEXT_WHITE
+        fontSize: 48,
+        fill: Colors.BUTTON_PRIMARY
       }
     });
-    difficulty.x = 15;
-    difficulty.y = 70;
+    towerIcon.anchor.set(0.5);
+    towerIcon.x = cardWidth / 2;
+    towerIcon.y = cardHeight / 2 + 5;
     
-    // Energy cost (important for card games)
-    const energyCost = new Text({
-      text: `⚡ Energy: ${stage.energy_cost}`,
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 13,
-        fill: Colors.TEXT_TERTIARY
-      }
-    });
-    energyCost.x = 15;
-    energyCost.y = 95;
+    card.addChild(bg, floorNumber, towerIcon);
     
-    // Battle button with updated positioning for wider card
-    const buttonWidth = Math.max(80, Math.min(100, cardWidth * 0.3));
-    const buttonHeight = Math.max(30, Math.min(35, cardHeight * 0.2));
-    
-    const battleButton = this.createButton(
-      '⚔️ Battle',
-      cardWidth - buttonWidth - 15,
-      cardHeight - buttonHeight - 15,
-      buttonWidth,
-      buttonHeight,
-      async () => {
-        await this.enterTowerFloor(stage);
-      },
-      13 // Base font size for responsive scaling
-    );
-    
-    card.addChild(bg, floorNumber, stageName, difficulty, energyCost, battleButton);
+    // Make entire card clickable to show popup
+    card.interactive = true;
+    card.cursor = 'pointer';
     
     // Hover effects with tower theme
-    card.interactive = true;
     card.on('pointerover', () => {
       bg.tint = 0xe0e0ff; // Slight blue tint for tower theme
+      towerIcon.scale.set(1.1); // Slightly enlarge icon on hover
     });
     card.on('pointerout', () => {
       bg.tint = 0xffffff;
+      towerIcon.scale.set(1.0);
+    });
+    
+    // Click to show floor popup
+    card.on('pointerdown', () => {
+      this.showFloorPopup(stage);
     });
     
     return card;
@@ -357,6 +336,12 @@ export class TowerScene extends BaseScene {
       14
     );
     this.buttonContainer.addChild(backButton);
+  }
+
+  private showFloorPopup(stage: Stage): void {
+    // Create and show the tower floor popup
+    const popup = new TowerFloorPopup({ stage });
+    this.container.addChild(popup);
   }
 
   private async enterTowerFloor(stage: Stage): Promise<void> {
