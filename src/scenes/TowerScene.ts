@@ -48,7 +48,9 @@ export class TowerScene extends BaseScene {
     this.loadingManager = new LoadingStateManager(this.container, this.gameWidth, this.gameHeight);
     
     // Create UI once
-    this.initializeUI();
+    this.initializeUI().catch(error => {
+      console.error('Failed to initialize TowerScene:', error);
+    });
   }
   
   private async initializeUI(): Promise<void> {
