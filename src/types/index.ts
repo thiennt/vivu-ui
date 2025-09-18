@@ -22,8 +22,13 @@ export interface Character {
   id: string;
   name: string;
   tokenSymbol: string; // crypto coin/token symbol (e.g., BTC, ETH)
+  avatar_url?: string; // URL to character avatar image
   rarity: CharacterRarity;
   level: number;
+  hp: number;
+  atk: number;
+  def: number;
+  agi: number;
   experience: number;
   stats: CharacterStats;
   skills: Skill[];
@@ -90,11 +95,13 @@ export interface Stage {
   parent_stage_id: string,
   energy_cost: number,
   max_attempts: number,
-  is_boss_stage: false,
+  is_completed: boolean;
+  is_current: boolean;
   enemies: Enemy[],
   rewards: Reward[];
   stageNumber: number;
   difficulty: number;
+  characters: Character[]; // Enemies or NPCs in this stage
 }
 
 export interface Enemy {

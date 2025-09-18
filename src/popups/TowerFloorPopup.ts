@@ -1,8 +1,9 @@
-import { Container, Graphics, Text } from 'pixi.js';
+import { Assets, Container, Graphics, Sprite, Text } from 'pixi.js';
 import { navigation } from '@/utils/navigation';
 import { Colors } from '@/utils/colors';
-import { Stage, Enemy } from '@/types';
+import { Stage, Enemy, Character } from '@/types';
 import { CardBattleScene } from '@/scenes/CardBattleScene';
+import { PrepareScene } from '@/scenes/PrepareScene';
 
 export class TowerFloorPopup extends Container {
   private dialogBg!: Graphics;
@@ -38,7 +39,7 @@ export class TowerFloorPopup extends Container {
 
     // Dialog title
     const dialogTitle = new Text({
-      text: `🗼 Floor ${this.stage.stageNumber || 1}`,
+      text: `🗼 ${this.stage.name}`,
       style: {
         fontFamily: 'Kalam',
         fontSize: 24,
@@ -51,26 +52,14 @@ export class TowerFloorPopup extends Container {
     dialogTitle.x = this.gameWidth / 2;
     dialogTitle.y = dialogY + 20;
 
-    // Stage name
-    const stageName = new Text({
-      text: this.stage.name,
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 18,
-        fontWeight: 'bold',
-        fill: Colors.TEXT_SECONDARY,
-        align: 'center',
-        wordWrap: true,
-        wordWrapWidth: dialogWidth - 40
-      }
-    });
-    stageName.anchor.set(0.5, 0);
-    stageName.x = this.gameWidth / 2;
-    stageName.y = dialogY + 60;
+    const lineup_power = (this.stage.characters || []).reduce(
+      (sum, c) => sum + (c.atk || 0) + (c.def || 0) + (c.hp || 0),
+      0
+    );
 
     // Enemy lineup section
     const enemyTitle = new Text({
-      text: '⚔️ Enemy Lineup',
+      text: `⚔️ Enemy Lineup ⚡${lineup_power}`,
       style: {
         fontFamily: 'Kalam',
         fontSize: 18,
@@ -103,7 +92,7 @@ export class TowerFloorPopup extends Container {
 
     // Locked treasure chest
     const treasureChest = new Text({
-      text: '🔒📦',
+      text: this.stage.is_completed ? '🎁 x1' : '🎁 x10',
       style: {
         fontFamily: 'Kalam',
         fontSize: 32,
@@ -114,7 +103,7 @@ export class TowerFloorPopup extends Container {
     treasureChest.y = dialogY + 340;
 
     const chestText = new Text({
-      text: 'Locked Treasure Chest\n(Find the key to unlock rewards!)',
+      text: 'Crystal Ball',
       style: {
         fontFamily: 'Kalam',
         fontSize: 14,
@@ -156,19 +145,17 @@ export class TowerFloorPopup extends Container {
       this.dialogBg,
       this.dialogPanel,
       dialogTitle,
-      stageName,
       enemyTitle,
       enemyContainer,
       rewardTitle,
       treasureChest,
-      chestText,
       challengeButton,
       closeButton
     );
   }
 
   private createEnemyLineup(container: Container, maxWidth: number): void {
-    const enemies = this.stage.enemies || [];
+    const enemies = this.stage.characters || [];
     
     if (enemies.length === 0) {
       // Show placeholder enemies if none defined
@@ -190,72 +177,91 @@ export class TowerFloorPopup extends Container {
     const spacing = 10;
     const maxEnemiesPerRow = Math.floor((maxWidth - spacing) / (enemyWidth + spacing));
     
-    enemies.forEach((enemy: Enemy, index: number) => {
+    enemies.forEach((enemy: Character, index: number) => {
       const row = Math.floor(index / maxEnemiesPerRow);
       const col = index % maxEnemiesPerRow;
       
       const enemyCard = this.createEnemyCard(enemy, enemyWidth, enemyHeight);
-      enemyCard.x = col * (enemyWidth + spacing);
+      // Center the lineup in the available width
+      const totalRowWidth = enemies.length * enemyWidth + (enemies.length - 1) * spacing;
+      const offsetX = Math.max(0, (maxWidth - totalRowWidth) / 2);
+
+      enemyCard.x = offsetX + col * (enemyWidth + spacing);
       enemyCard.y = row * (enemyHeight + spacing);
       
       container.addChild(enemyCard);
     });
   }
 
-  private createEnemyCard(enemy: Enemy, width: number, height: number): Container {
+  private createEnemyCard(enemy: Character, width: number, height: number): Container {
     const card = new Container();
-    
     // Background
     const bg = new Graphics();
     bg.roundRect(0, 0, width, height, 8)
       .fill({ color: Colors.BACKGROUND_SECONDARY, alpha: 0.9 })
       .stroke({ width: 2, color: Colors.ELEMENT_FIRE });
-    
-    // Enemy icon (simplified)
-    const enemyIcon = new Text({
-      text: '👹',
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 24,
-        fill: Colors.ELEMENT_FIRE
+    card.addChild(bg);
+
+    (async () => {
+      if (enemy.avatar_url && typeof enemy.avatar_url === 'string') {
+        // create async here to load image from URL
+        const texture = await Assets.load(enemy.avatar_url as string);
+        const sprite = new Sprite(texture);
+        sprite.width = 40;
+        sprite.height = 40;
+        sprite.anchor.set(0.5);
+        sprite.x = width / 2;
+        sprite.y = 25;
+        card.addChild(sprite);
+      } else {
+        const enemyIcon = new Text({
+          text: '👹',
+          style: {
+            fontFamily: 'Kalam',
+            fontSize: 24,
+            fill: Colors.ELEMENT_FIRE
+          }
+        });
+        enemyIcon.anchor.set(0.5);
+        enemyIcon.x = width / 2;
+        enemyIcon.y = 25;
+        card.addChild(enemyIcon);
       }
-    });
-    enemyIcon.anchor.set(0.5);
-    enemyIcon.x = width / 2;
-    enemyIcon.y = 25;
+      
+      // Enemy name
+      const nameText = new Text({
+        text: enemy.name,
+        style: {
+          fontFamily: 'Kalam',
+          fontSize: 14,
+          fontWeight: 'bold',
+          fill: Colors.TEXT_PRIMARY,
+          align: 'center',
+          wordWrap: true,
+          wordWrapWidth: width - 10
+        }
+      });
+      nameText.anchor.set(0.5, 0);
+      nameText.x = width / 2;
+      nameText.y = 45;
+      
+      // Stats: hp, atk, def
+      const statsText = new Text({
+        text: `❤️ ${enemy.hp}\n⚔️ ${enemy.atk}\n🛡️ ${enemy.def}`,
+        style: {
+          fontFamily: 'Kalam',
+          fontSize: 13,
+          fill: Colors.TEXT_SECONDARY,
+          align: 'center'
+        }
+      });
+      statsText.anchor.set(0.5);
+      statsText.x = width / 2;
+      statsText.y = height - 38;
+
+      card.addChild(nameText);
+    })();
     
-    // Enemy name
-    const nameText = new Text({
-      text: enemy.name,
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 10,
-        fontWeight: 'bold',
-        fill: Colors.TEXT_PRIMARY,
-        align: 'center',
-        wordWrap: true,
-        wordWrapWidth: width - 10
-      }
-    });
-    nameText.anchor.set(0.5, 0);
-    nameText.x = width / 2;
-    nameText.y = 45;
-    
-    // Enemy level
-    const levelText = new Text({
-      text: `Lv.${enemy.level}`,
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 10,
-        fill: Colors.TEXT_SECONDARY,
-        align: 'center'
-      }
-    });
-    levelText.anchor.set(0.5);
-    levelText.x = width / 2;
-    levelText.y = height - 15;
-    
-    card.addChild(bg, enemyIcon, nameText, levelText);
     return card;
   }
 
@@ -306,20 +312,27 @@ export class TowerFloorPopup extends Container {
     return button;
   }
 
-  private startChallenge(): void {
-    // Close popup and navigate to battle
-    this.closeDialog();
-    navigation.showScreen(CardBattleScene, { 
-      stage: this.stage, 
-      mode: 'tower' 
-    });
+  private async startChallenge(): Promise<void> {
+    try {
+      // Close popup and navigate to battle
+      this.closeDialog();
+      console.log('Entering tower floor:', this.stage.name);
+      
+      // Navigate to PrepareScene to review deck before tower battle
+      navigation.showScreen(PrepareScene, {
+        stage: this.stage,
+        mode: 'tower' // Indicate this is tower mode
+      });
+    } catch (error) {
+      console.error('Failed to enter tower floor:', error);
+      // Fallback to direct battle navigation
+      alert(`Error entering tower floor: ${error}. Starting battle anyway...`);
+      navigation.showScreen(CardBattleScene, { stage: this.stage, mode: 'tower' });
+    }
   }
 
   private closeDialog(): void {
-    // Remove this popup from parent
-    if (this.parent) {
-      this.parent.removeChild(this);
-    }
+    navigation.dismissPopup();
   }
 
   resize(width: number, height: number): void {

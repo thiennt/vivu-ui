@@ -61,8 +61,8 @@ export const mockSkills = [
         damage_type: "physical",
         can_crit: true,
         conditions: [
-          { type: "target_has_effect", value: "slow_down", modifier: { armor_ignore: 30 }},
-          { type: "target_has_effect", value: "freeze", modifier: { armor_ignore: 30 }}
+          { type: "target_has_effect", value: "slow_down", modifier: { armor_ignore: 30 } },
+          { type: "target_has_effect", value: "freeze", modifier: { armor_ignore: 30 } }
         ]
       }
     ]
@@ -393,7 +393,7 @@ export const mockPlayer = {
   str: 18,
   agi: 14,
   luck: 9,
-  characters: ["1","2","3","4","5","6","7","8","9","10"],
+  characters: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
   lineup: {
     positions: ["1", "2", null, null]
   },
@@ -421,7 +421,6 @@ export const mockDungeons = [
     energy_cost: 0,
     max_attempts: 999,
     rewards: null,
-    is_boss_stage: false,
     stages: [
       {
         id: "b1459c34-4dd6-4ccd-9859-8866fe110d28",
@@ -444,7 +443,6 @@ export const mockDungeons = [
             "Mana Potion"
           ]
         },
-        is_boss_stage: false,
         isCompleted: false
       },
       {
@@ -468,7 +466,6 @@ export const mockDungeons = [
             "Leather Armor"
           ]
         },
-        is_boss_stage: false,
         isCompleted: false
       },
       {
@@ -492,7 +489,6 @@ export const mockDungeons = [
             "Mystic Robe"
           ]
         },
-        is_boss_stage: false,
         isCompleted: false
       },
       {
@@ -516,7 +512,6 @@ export const mockDungeons = [
             "Dragon Scale Armor"
           ]
         },
-        is_boss_stage: true,
         isCompleted: false
       }
     ]
@@ -535,7 +530,762 @@ export const mockDungeons = [
     energy_cost: 0,
     max_attempts: 999,
     rewards: null,
-    is_boss_stage: false,
     stages: []
+  }
+];
+
+export const mockStages = [
+  {
+    "id": "87a3290c-7c24-4f77-bbfd-c09fb2b33d06",
+    "name": "Floor 1",
+    "player_id": "e412b2fe-1118-4bee-9726-f5a683bdd5c3",
+    "rewards": "{\"chest\":1}",
+    "is_completed": false,
+    "characters": [
+      {
+        "name": "Avalanche",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/5805.png",
+        "hp": 88,
+        "atk": 17,
+        "def": 9
+      },
+      {
+        "name": "Cardano",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/2010.png",
+        "hp": 86,
+        "atk": 18,
+        "def": 7
+      }
+    ]
+  },
+  {
+    "id": "140c88cf-682d-46a5-af2b-1975b5cbae64",
+    "name": "Floor 2",
+    "player_id": "61d5c219-5292-431c-bd44-bea65022a6b8",
+    "rewards": "{\"chest\":1}",
+    "is_completed": false,
+    "characters": [
+      {
+        "name": "Bitcoin Cash",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/1831.png",
+        "hp": 98,
+        "atk": 18,
+        "def": 9
+      },
+      {
+        "name": "BNB",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/1839.png",
+        "hp": 93,
+        "atk": 19,
+        "def": 9
+      }
+    ]
+  },
+  {
+    "id": "ec425c62-83b7-4f29-be27-3bdf7d20ea94",
+    "name": "Floor 3",
+    "player_id": "567f1b28-d26e-48fb-a57a-573140270afe",
+    "rewards": "{\"chest\":1}",
+    "is_completed": false,
+    "characters": [
+      {
+        "name": "Bitcoin",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/1.png",
+        "hp": 106,
+        "atk": 21,
+        "def": 9
+      }
+    ]
+  },
+  {
+    "id": "ef12edcd-da24-44d1-bbfd-3f5d45c7ba0d",
+    "name": "Floor 4",
+    "player_id": "8bab427a-d8c7-4338-84a6-bf4502255c2e",
+    "rewards": "{\"chest\":1}",
+    "is_completed": false,
+    "characters": [
+      {
+        "name": "Cronos",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/3635.png",
+        "hp": 111,
+        "atk": 22,
+        "def": 10
+      },
+      {
+        "name": "Dogecoin",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/74.png",
+        "hp": 114,
+        "atk": 24,
+        "def": 11
+      }
+    ]
+  },
+  {
+    "id": "091acd13-ac50-46e1-8186-60bcef26983a",
+    "name": "Floor 5",
+    "player_id": "1dbb9194-5b38-4c2c-bd2b-0b6c68e01f02",
+    "rewards": "{\"chest\":1}",
+    "is_completed": false,
+    "characters": [
+      {
+        "name": "Ethena",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/30171.png",
+        "hp": 122,
+        "atk": 24,
+        "def": 13
+      },
+      {
+        "name": "Polkadot",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/6636.png",
+        "hp": 117,
+        "atk": 24,
+        "def": 14
+      }
+    ]
+  },
+  {
+    "id": "1978f20a-4b08-4620-89f0-6e2477187d46",
+    "name": "Floor 6",
+    "player_id": "bc88ffea-07d3-4f4e-b5aa-26e485863453",
+    "rewards": "{\"chest\":1}",
+    "is_completed": false,
+    "characters": [
+      {
+        "name": "Ethereum",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png",
+        "hp": 128,
+        "atk": 27,
+        "def": 13
+      }
+    ]
+  },
+  {
+    "id": "16c8dee0-0743-4452-a7da-432c77231fbd",
+    "name": "Floor 7",
+    "player_id": "3188f8ab-0e20-4da0-aa99-144c0c8c16b5",
+    "rewards": "{\"chest\":1}",
+    "is_completed": false,
+    "characters": [
+      {
+        "name": "Hedera",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/4642.png",
+        "hp": 134,
+        "atk": 30,
+        "def": 16
+      },
+      {
+        "name": "Hyperliquid",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/32196.png",
+        "hp": 139,
+        "atk": 28,
+        "def": 15
+      }
+    ]
+  },
+  {
+    "id": "e0b8883b-50b8-44a4-aeb7-7cc51f4d4ab2",
+    "name": "Floor 8",
+    "player_id": "2aa20a6f-fa37-49ba-9097-556afce480d6",
+    "rewards": "{\"chest\":1}",
+    "is_completed": false,
+    "characters": [
+      {
+        "name": "Chainlink",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/1975.png",
+        "hp": 143,
+        "atk": 31,
+        "def": 17
+      }
+    ]
+  },
+  {
+    "id": "561b79b6-08fc-4386-8d36-f3681020bbf2",
+    "name": "Floor 9",
+    "player_id": "114920fc-ca6c-4818-8802-db3526bc522a",
+    "rewards": "{\"chest\":1}",
+    "is_completed": false,
+    "characters": [
+      {
+        "name": "Litecoin",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/2.png",
+        "hp": 149,
+        "atk": 32,
+        "def": 16
+      },
+      {
+        "name": "Mantle",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/27075.png",
+        "hp": 153,
+        "atk": 32,
+        "def": 18
+      }
+    ]
+  },
+  {
+    "id": "7a9bd214-d12e-4278-bdf4-3274d5f84585",
+    "name": "Floor 10",
+    "player_id": "1011b252-59d9-419d-bda1-a8a666d2209d",
+    "rewards": "{\"chest\":1}",
+    "is_completed": false,
+    "characters": [
+      {
+        "name": "Solana",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/5426.png",
+        "hp": 162,
+        "atk": 35,
+        "def": 20
+      },
+      {
+        "name": "Shiba Inu",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/5994.png",
+        "hp": 158,
+        "atk": 36,
+        "def": 20
+      }
+    ]
+  },
+  {
+    "id": "d52c5b5a-fbd5-4588-ab07-8837705bcbed",
+    "name": "Floor 11",
+    "player_id": "04af6365-965e-4327-8583-975232c0de9a",
+    "rewards": "{\"chest\":1}",
+    "is_completed": false,
+    "characters": [
+      {
+        "name": "Sui",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/20947.png",
+        "hp": 167,
+        "atk": 38,
+        "def": 20
+      }
+    ]
+  },
+  {
+    "id": "263e7ef0-618f-4392-9207-fc6683f33680",
+    "name": "Floor 12",
+    "player_id": "25ae6a70-6aa0-4a16-8431-a850a993788f",
+    "rewards": "{\"chest\":1}",
+    "is_completed": false,
+    "characters": [
+      {
+        "name": "Toncoin",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/11419.png",
+        "hp": 175,
+        "atk": 39,
+        "def": 21
+      },
+      {
+        "name": "TRON",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/1958.png",
+        "hp": 178,
+        "atk": 40,
+        "def": 21
+      }
+    ]
+  },
+  {
+    "id": "02b9068e-fb8d-4ce3-aca4-f48d3ab71837",
+    "name": "Floor 13",
+    "player_id": "6cb559dc-e8c1-4ce5-b21c-831bc6af07fe",
+    "rewards": "{\"chest\":1}",
+    "is_completed": false,
+    "characters": [
+      {
+        "name": "World Liberty Financial",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/33251.png",
+        "hp": 183,
+        "atk": 40,
+        "def": 21
+      },
+      {
+        "name": "Uniswap",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/7083.png",
+        "hp": 182,
+        "atk": 40,
+        "def": 21
+      }
+    ]
+  },
+  {
+    "id": "12ffb1b3-257c-4f7e-833f-8c55214b1516",
+    "name": "Floor 14",
+    "player_id": "2cda0cbc-4d88-4954-8eff-066b52548ad5",
+    "rewards": "{\"chest\":1}",
+    "is_completed": false,
+    "characters": [
+      {
+        "name": "Stellar",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/512.png",
+        "hp": 194,
+        "atk": 43,
+        "def": 22
+      }
+    ]
+  },
+  {
+    "id": "93740f02-586b-4bb9-ae0c-6912d7d6f549",
+    "name": "Floor 15",
+    "player_id": "a772e00c-2d6e-4aa0-a35c-b1008b1f8565",
+    "rewards": "{\"chest\":1}",
+    "is_completed": false,
+    "characters": [
+      {
+        "name": "Monero",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/328.png",
+        "hp": 198,
+        "atk": 46,
+        "def": 24
+      },
+      {
+        "name": "XRP",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/52.png",
+        "hp": 197,
+        "atk": 44,
+        "def": 26
+      }
+    ]
+  },
+  {
+    "id": "eb10ac6a-d409-4c8b-8930-49f6b56f4899",
+    "name": "Floor 16",
+    "player_id": "3e41a420-0444-4f63-942d-8d2e98b5f199",
+    "rewards": "{\"chest\":1}",
+    "is_completed": false,
+    "characters": [
+      {
+        "name": "Cardano",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/2010.png",
+        "hp": 208,
+        "atk": 48,
+        "def": 25
+      },
+      {
+        "name": "Avalanche",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/5805.png",
+        "hp": 209,
+        "atk": 48,
+        "def": 27
+      },
+      {
+        "name": "Aave",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/7278.png",
+        "hp": 211,
+        "atk": 47,
+        "def": 26
+      }
+    ]
+  },
+  {
+    "id": "8e160960-90b4-49dd-b043-dd7e40324e68",
+    "name": "Floor 17",
+    "player_id": "1307f21f-5cc7-4728-89cf-8899aa56d532",
+    "rewards": "{\"chest\":1}",
+    "is_completed": false,
+    "characters": [
+      {
+        "name": "Algorand",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/4030.png",
+        "hp": 216,
+        "atk": 49,
+        "def": 28
+      },
+      {
+        "name": "Aptos",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/21794.png",
+        "hp": 219,
+        "atk": 49,
+        "def": 28
+      },
+      {
+        "name": "Bitcoin Cash",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/1831.png",
+        "hp": 218,
+        "atk": 50,
+        "def": 26
+      }
+    ]
+  },
+  {
+    "id": "bc8b15b9-26a5-4d2d-80b2-ad4a415f705c",
+    "name": "Floor 18",
+    "player_id": "585dd91f-442c-4a3f-8f35-e5763c6b39a1",
+    "rewards": "{\"chest\":1}",
+    "is_completed": false,
+    "characters": [
+      {
+        "name": "Cosmos",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/3794.png",
+        "hp": 221,
+        "atk": 51,
+        "def": 29
+      },
+      {
+        "name": "Bitcoin",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/1.png",
+        "hp": 223,
+        "atk": 51,
+        "def": 28
+      },
+      {
+        "name": "Arbitrum",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/11841.png",
+        "hp": 224,
+        "atk": 52,
+        "def": 28
+      }
+    ]
+  },
+  {
+    "id": "c8318b74-1b3a-4d14-9119-8f0114503d90",
+    "name": "Floor 19",
+    "player_id": "18b93edd-58f4-4995-a4e3-26ccf5016821",
+    "rewards": "{\"chest\":1}",
+    "is_completed": false,
+    "characters": [
+      {
+        "name": "Dogecoin",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/74.png",
+        "hp": 234,
+        "atk": 52,
+        "def": 28
+      },
+      {
+        "name": "Cronos",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/3635.png",
+        "hp": 232,
+        "atk": 54,
+        "def": 28
+      },
+      {
+        "name": "Ethereum Classic",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/1321.png",
+        "hp": 234,
+        "atk": 54,
+        "def": 30
+      }
+    ]
+  },
+  {
+    "id": "ac455659-fe6a-4617-a557-cbfc7b2c6456",
+    "name": "Floor 20",
+    "player_id": "9e1015ae-44cc-4938-ad8a-627be776c8fa",
+    "rewards": "{\"chest\":1}",
+    "is_completed": false,
+    "characters": [
+      {
+        "name": "Internet Computer",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/8916.png",
+        "hp": 243,
+        "atk": 55,
+        "def": 31
+      },
+      {
+        "name": "Ethena",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/30171.png",
+        "hp": 239,
+        "atk": 54,
+        "def": 32
+      },
+      {
+        "name": "Story",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/35626.png",
+        "hp": 241,
+        "atk": 55,
+        "def": 30
+      }
+    ]
+  },
+  {
+    "id": "b7b5edb2-0492-4fc4-835a-0079cb0e93d7",
+    "name": "Floor 21",
+    "player_id": "0d4bc6d4-a851-44c2-b027-50ca199c628b",
+    "rewards": "{\"chest\":1}",
+    "is_completed": false,
+    "characters": [
+      {
+        "name": "MYX Finance",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/36410.png",
+        "hp": 248,
+        "atk": 56,
+        "def": 32
+      },
+      {
+        "name": "Kaspa",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/20396.png",
+        "hp": 251,
+        "atk": 56,
+        "def": 31
+      },
+      {
+        "name": "Ethereum",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png",
+        "hp": 249,
+        "atk": 56,
+        "def": 31
+      }
+    ]
+  },
+  {
+    "id": "d7c77ec6-01a2-4b70-85bb-a46751ef8e75",
+    "name": "Floor 22",
+    "player_id": "6381ccce-3274-4e82-8aa3-13dfa84ae5ec",
+    "rewards": "{\"chest\":1}",
+    "is_completed": false,
+    "characters": [
+      {
+        "name": "NEAR Protocol",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/6535.png",
+        "hp": 255,
+        "atk": 59,
+        "def": 34
+      },
+      {
+        "name": "Hedera",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/4642.png",
+        "hp": 253,
+        "atk": 59,
+        "def": 33
+      },
+      {
+        "name": "Hyperliquid",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/32196.png",
+        "hp": 258,
+        "atk": 59,
+        "def": 34
+      }
+    ]
+  },
+  {
+    "id": "837549fd-32c0-469b-9eb2-594892dbd2ac",
+    "name": "Floor 23",
+    "player_id": "6d050746-f368-40ec-a6da-03f53c3fa93b",
+    "rewards": "{\"chest\":1}",
+    "is_completed": false,
+    "characters": [
+      {
+        "name": "OKB",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/3897.png",
+        "hp": 261,
+        "atk": 62,
+        "def": 35
+      },
+      {
+        "name": "Ondo",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/21159.png",
+        "hp": 261,
+        "atk": 61,
+        "def": 34
+      },
+      {
+        "name": "Chainlink",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/1975.png",
+        "hp": 263,
+        "atk": 61,
+        "def": 34
+      }
+    ]
+  },
+  {
+    "id": "376978f7-e26c-4e5d-a1cd-e962c6930fde",
+    "name": "Floor 24",
+    "player_id": "86fcd43a-c1ba-413b-af8f-2317f379fcbe",
+    "rewards": "{\"chest\":1}",
+    "is_completed": false,
+    "characters": [
+      {
+        "name": "Mantle",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/27075.png",
+        "hp": 270,
+        "atk": 62,
+        "def": 35
+      },
+      {
+        "name": "Litecoin",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/2.png",
+        "hp": 274,
+        "atk": 64,
+        "def": 34
+      },
+      {
+        "name": "Pudgy Penguins",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/34466.png",
+        "hp": 272,
+        "atk": 62,
+        "def": 34
+      }
+    ]
+  },
+  {
+    "id": "98e999c1-e1ca-45ac-b9a8-9f878873c9cd",
+    "name": "Floor 25",
+    "player_id": "cc9911ae-e6fb-4053-a475-dd5e11a318a5",
+    "rewards": "{\"chest\":1}",
+    "is_completed": false,
+    "characters": [
+      {
+        "name": "Pepe",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/24478.png",
+        "hp": 282,
+        "atk": 66,
+        "def": 37
+      },
+      {
+        "name": "Solana",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/5426.png",
+        "hp": 282,
+        "atk": 65,
+        "def": 36
+      },
+      {
+        "name": "Pi",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/35697.png",
+        "hp": 279,
+        "atk": 66,
+        "def": 38
+      }
+    ]
+  },
+  {
+    "id": "8f7b8c64-ec11-40e4-8fdb-347d006055b2",
+    "name": "Floor 26",
+    "player_id": "e7875282-9b8d-4b38-a691-a55ce2a85a92",
+    "rewards": "{\"chest\":1}",
+    "is_completed": false,
+    "characters": [
+      {
+        "name": "Sui",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/20947.png",
+        "hp": 291,
+        "atk": 68,
+        "def": 37
+      },
+      {
+        "name": "POL (prev. MATIC)",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/28321.png",
+        "hp": 290,
+        "atk": 66,
+        "def": 38
+      },
+      {
+        "name": "Pump.fun",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/36507.png",
+        "hp": 290,
+        "atk": 66,
+        "def": 37
+      }
+    ]
+  },
+  {
+    "id": "16d789d9-a5c4-4439-b014-b1b1a6f00da0",
+    "name": "Floor 27",
+    "player_id": "39296d65-1eb1-4388-a8f4-060f65fead50",
+    "rewards": "{\"chest\":1}",
+    "is_completed": false,
+    "characters": [
+      {
+        "name": "Toncoin",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/11419.png",
+        "hp": 296,
+        "atk": 70,
+        "def": 38
+      },
+      {
+        "name": "TRON",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/1958.png",
+        "hp": 293,
+        "atk": 68,
+        "def": 40
+      },
+      {
+        "name": "Render",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/5690.png",
+        "hp": 299,
+        "atk": 70,
+        "def": 40
+      }
+    ]
+  },
+  {
+    "id": "c8b3108d-7251-4175-82be-317f4cc93ec4",
+    "name": "Floor 28",
+    "player_id": "0ad73893-9312-4597-8f44-c874b13c8627",
+    "rewards": "{\"chest\":1}",
+    "is_completed": false,
+    "characters": [
+      {
+        "name": "Uniswap",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/7083.png",
+        "hp": 305,
+        "atk": 70,
+        "def": 39
+      },
+      {
+        "name": "World Liberty Financial",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/33251.png",
+        "hp": 303,
+        "atk": 72,
+        "def": 41
+      },
+      {
+        "name": "Bittensor",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/22974.png",
+        "hp": 301,
+        "atk": 71,
+        "def": 41
+      }
+    ]
+  },
+  {
+    "id": "e026c821-5536-40c2-bcc1-fb1e5b303257",
+    "name": "Floor 29",
+    "player_id": "8a0b9ecf-dd50-432f-8df8-2bdedffe2226",
+    "rewards": "{\"chest\":1}",
+    "is_completed": false,
+    "characters": [
+      {
+        "name": "Worldcoin",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/13502.png",
+        "hp": 311,
+        "atk": 74,
+        "def": 40
+      },
+      {
+        "name": "Stellar",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/512.png",
+        "hp": 313,
+        "atk": 74,
+        "def": 42
+      }
+    ]
+  },
+  {
+    "id": "956a25d3-b70d-45c8-a7d6-9752cad11ea5",
+    "name": "Floor 30",
+    "player_id": "940a9a5b-9919-4166-bd6a-1b59699bc066",
+    "rewards": "{\"chest\":1}",
+    "is_completed": false,
+    "characters": [
+      {
+        "name": "Arbitrum",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/11841.png",
+        "hp": 319,
+        "atk": 76,
+        "def": 43
+      },
+      {
+        "name": "Internet Computer",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/8916.png",
+        "hp": 318,
+        "atk": 75,
+        "def": 42
+      },
+      {
+        "name": "Pepe",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/24478.png",
+        "hp": 317,
+        "atk": 76,
+        "def": 42
+      }
+    ]
   }
 ];

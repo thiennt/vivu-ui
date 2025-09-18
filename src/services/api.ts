@@ -4,7 +4,7 @@
  * Includes fallback to mock data when API calls fail
  */
 
-import { mockPlayer, mockCharacters, mockSkills, mockDungeons } from '@/utils/mockData';
+import { mockPlayer, mockCharacters, mockSkills, mockDungeons, mockStages } from '@/utils/mockData';
 import { 
   BattleApiResponse, 
   BattleStateResponse, 
@@ -89,8 +89,7 @@ async function apiRequest<T>(
 // Player API methods
 export const playerApi = {
   async getPlayer(playerId: string): Promise<any> {
-    return mockPlayer;
-    //return apiRequest(`/players/${playerId}`, {}, mockPlayer);
+    return apiRequest(`/players/${playerId}`, {}, mockPlayer);
   },
 
   async updatePlayerStats(playerId: string, stats: any): Promise<any> {
@@ -157,6 +156,11 @@ export const skillsApi = {
 
 // Battle API methods
 export const battleApi = {
+  async getAvailableStages(): Promise<any[]> {
+    const playerId = sessionStorage.getItem('playerId');
+    return apiRequest(`/players/${playerId}/card-battle/stages`, {}, mockStages);
+  },
+
   async createBattle(battleData: any): Promise<BattleApiResponse> {
     console.log('🔥 createBattle API called with data:', battleData);
     const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';

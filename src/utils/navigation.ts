@@ -165,7 +165,7 @@ class Navigation {
   /**
    * Show up a popup over current screen
    */
-  public async presentPopup(ctor: AppScreenConstructor) {
+  public async presentPopup(ctor: AppScreenConstructor, params?: any) {
     if (this.currentScreen) {
       this.currentScreen.interactiveChildren = false;
       await this.currentScreen.pause?.();
@@ -175,7 +175,7 @@ class Navigation {
       await this.hideAndRemoveScreen(this.currentPopup);
     }
 
-    this.currentPopup = new ctor();
+    this.currentPopup = new ctor(params);
     await this.addAndShowScreen(this.currentPopup);
   }
 

@@ -1,17 +1,13 @@
 import { Container, Graphics, Text, Ticker } from 'pixi.js';
 import { navigation } from '@/utils/navigation';
 import { BaseScene } from '@/utils/BaseScene';
-import { mockDungeons } from '@/utils/mockData';
-import { DungeonScene } from './DungeonScene';
-import { CardBattleScene } from './CardBattleScene';
-import { PrepareScene } from './PrepareScene';
 import { HomeScene } from './HomeScene';
 import { Colors, Gradients } from '@/utils/colors';
-import { battleApi } from '@/services/api';
+import { battleApi, isLikelyUsingMockData } from '@/services/api';
 import { Dungeon, Stage } from '@/types';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
-import { waitFor } from '@/utils/asyncUtils';
 import { TowerFloorPopup } from '@/popups/TowerFloorPopup';
+import { ScrollBox } from '@pixi/ui';
 
 export class TowerScene extends BaseScene {
   private dungeon: Dungeon | null = null;
@@ -24,6 +20,7 @@ export class TowerScene extends BaseScene {
   private towerContainer: Container;
   private buttonContainer: Container;
 
+  private stages: any[] = [];
   private loadingManager: LoadingStateManager;
 
   constructor(params?: { selectedDungeon: Dungeon }) {
@@ -47,45 +44,32 @@ export class TowerScene extends BaseScene {
 
     this.loadingManager = new LoadingStateManager(this.container, this.gameWidth, this.gameHeight);
     
-    // Create UI once
-    this.initializeUI().catch(error => {
-      console.error('Failed to initialize TowerScene:', error);
-    });
+     // Load data and create UI
+    this.loadStagesData();
+  }
+
+  private async loadStagesData(): Promise<void> {
+    this.loadingManager.showLoading();
+    
+    this.stages = await battleApi.getAvailableStages();
+    
+    this.loadingManager.hideLoading();
+
+    // Show mock data indicator if we're likely using mock data
+    if (isLikelyUsingMockData()) {
+      this.loadingManager.showMockDataIndicator();
+    }
+    
+    this.initializeUI();
   }
   
   private async initializeUI(): Promise<void> {
-    try {
-      this.loadingManager.showLoading();
-      
-      if (!this.dungeon) {
-        // Use the first dungeon as default for tower mode, cast to Dungeon type
-        const mockDungeon = mockDungeons[0];
-        this.dungeon = {
-          id: mockDungeon.id,
-          name: mockDungeon.name,
-          description: mockDungeon.description,
-          requiredLevel: 1,
-          rewards: [],
-          stages: mockDungeon.stages.map((stage, index) => ({
-            ...stage,
-            enemies: [], // Add missing enemies array
-            rewards: [], // Convert rewards to proper array
-            stageNumber: index + 1, // Add missing stage number
-            is_boss_stage: false as false // Type assertion for literal false
-          }))
-        };
-      }
-      
-      this.createBackground();
-      this.createHeader();
-      this.createTowerList();
-      this.createBackButton();
-      
-      this.loadingManager.hideLoading();
-    } catch (error) {
-      console.error('Failed to initialize Tower UI:', error);
-      this.loadingManager.hideLoading();
-    }
+    if (!this.stages.length) return;
+
+    this.createBackground();
+    this.createHeader();
+    this.createTowerList();
+    this.createBackButton();
   }
 
   async resize(width: number, height: number): Promise<void> {
@@ -165,40 +149,26 @@ export class TowerScene extends BaseScene {
     title.x = this.gameWidth / 2;
     title.y = 40;
     
-    const subtitle = new Text({
-      text: 'Climb the tower floor by floor in epic card battles!',
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 16,
-        fontStyle: 'italic',
-        fill: Colors.TEXT_SECONDARY,
-        align: 'center',
-        wordWrap: true,
-        wordWrapWidth: this.gameWidth - 40
-      }
-    });
-    subtitle.anchor.set(0.5);
-    subtitle.x = this.gameWidth / 2;
-    subtitle.y = 80;
-    
-    this.headerContainer.addChild(title, subtitle);
+    this.headerContainer.addChild(title);
   }
 
   private createTowerList(): void {
     this.towerContainer.label = 'towerContainer';
     
-    const stages = this.dungeon!.stages;
-    if (stages.length > 0) {
-      // Calculate responsive tower layout with updated card dimensions
-      const cardWidth = Math.min(200, this.gameWidth - 60); // Updated to match new card width
-      const cardHeight = 120;
-      const floorSpacing = 50; // Space between tower floors
-      
+    const stages = this.stages;
+    // Calculate responsive tower layout with updated card dimensions
+    const cardWidth = Math.min(200, this.gameWidth - 60); // Updated to match new card width
+    const cardHeight = 120;
+    const floorSpacing = 50; // Space between tower floors
+    
+    let firstFloorY = 0; // To track the Y position of the first floor for scrolling
+    
+    if (stages.length > 0) {  
       // Calculate total tower height and starting position
       const totalHeight = stages.length * cardHeight + (stages.length - 1) * floorSpacing;
       const availableHeight = this.gameHeight - 220; // Leave space for header and back button
       const startY = Math.max(20, (availableHeight - totalHeight) / 2);
-      
+
       stages.forEach((stage, index) => {
         const floorCard = this.createFloorCard(stage, index);
         
@@ -208,8 +178,13 @@ export class TowerScene extends BaseScene {
         floorCard.x = 0; // Centered horizontally
         floorCard.y = startY + reverseIndex * (cardHeight + floorSpacing);
         
-        // Add tower floor connecting line (except for the top floor)
-        if (index < stages.length - 1) {
+        // Set firstFloorY to the first (bottom-most) not completed stage only once
+        if (stage.is_current) {
+          firstFloorY = floorCard.y;
+        }
+
+        // Add tower floor connecting line
+        if (index < stages.length) {
           const connectionLine = this.createTowerConnection(cardWidth, cardHeight);
           connectionLine.x = cardWidth / 2 - 2; // Center the line
           connectionLine.y = floorCard.y + cardHeight;
@@ -218,15 +193,29 @@ export class TowerScene extends BaseScene {
         
         this.towerContainer.addChild(floorCard);
       });
-      
-      // Center the tower horizontally
-      this.towerContainer.x = (this.gameWidth - cardWidth) / 2;
-    } else {
-      this.towerContainer.x = (this.gameWidth - 200) / 2;
     }
 
-    this.towerContainer.y = 120;
-    this.addChild(this.towerContainer);
+    const scrollBoxWidth = cardWidth + 40; // Add some padding
+    const scrollBoxHeight = this.gameHeight - 180;
+
+    this.towerContainer.width = scrollBoxWidth;
+
+    // Create ScrollBox for vertical scrolling
+    const scrollBox = new ScrollBox({
+      width: scrollBoxWidth,
+      height: scrollBoxHeight
+    });
+    scrollBox.x = (this.gameWidth - scrollBoxWidth) / 2;
+    scrollBox.y = 60;
+
+    const maxScrollY = Math.max(this.towerContainer.height - scrollBoxHeight, 0);
+    const targetY = Math.min(Math.max(firstFloorY - (scrollBoxHeight - cardHeight), 0), maxScrollY);
+
+    // scroll to the first uncompleted floor, ensuring we don't exceed scroll bounds
+    scrollBox.scrollToPosition({ x: 0, y: targetY });
+    scrollBox.addItem(this.towerContainer);
+
+    this.addChild(scrollBox);
   }
 
   private createTowerConnection(cardWidth: number, cardHeight: number): Container {
@@ -262,16 +251,19 @@ export class TowerScene extends BaseScene {
     // Simplified dimensions for tower layout - smaller cards with just floor number and icon
     const cardWidth = Math.min(200, this.gameWidth - 60);
     const cardHeight = 120;
-    
+
+    // Choose color based on completion
+    const bgColor = stage.is_completed ? Colors.ELEMENT_DEFAULT : Colors.BACKGROUND_SECONDARY;
+
     // Background with tower floor styling
     const bg = new Graphics();
     bg.roundRect(0, 0, cardWidth, cardHeight, 12)
-      .fill({ color: Colors.BACKGROUND_SECONDARY, alpha: 0.95 })
+      .fill({ color: bgColor, alpha: 0.95 })
       .stroke({ width: 4, color: Colors.BUTTON_PRIMARY });
     
     // Floor number at the top
     const floorNumber = new Text({
-      text: `Floor ${stage.stageNumber || index + 1}`,
+      text: stage.name,
       style: {
         fontFamily: 'Kalam',
         fontSize: 16,
@@ -284,39 +276,51 @@ export class TowerScene extends BaseScene {
     floorNumber.x = cardWidth / 2;
     floorNumber.y = 15;
     
-    // Big tower icon in center
-    const towerIcon = new Text({
-      text: '🗼',
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 48,
-        fill: Colors.BUTTON_PRIMARY
-      }
-    });
+    // Tower icon: locked if not completed and not current
+    let towerIcon: Text;
+    if (!stage.is_completed && !stage.is_current) {
+      towerIcon = new Text({
+        text: '🔒',
+        style: {
+          fontFamily: 'Kalam',
+          fontSize: 48,
+          fill: Colors.BUTTON_PRIMARY
+        }
+      });
+    } else {
+      towerIcon = new Text({
+        text: '🗼',
+        style: {
+          fontFamily: 'Kalam',
+          fontSize: 48,
+          fill: Colors.BUTTON_PRIMARY
+        }
+      });
+    }
     towerIcon.anchor.set(0.5);
     towerIcon.x = cardWidth / 2;
     towerIcon.y = cardHeight / 2 + 5;
     
     card.addChild(bg, floorNumber, towerIcon);
     
-    // Make entire card clickable to show popup
-    card.interactive = true;
-    card.cursor = 'pointer';
-    
-    // Hover effects with tower theme
-    card.on('pointerover', () => {
-      bg.tint = 0xe0e0ff; // Slight blue tint for tower theme
-      towerIcon.scale.set(1.1); // Slightly enlarge icon on hover
-    });
-    card.on('pointerout', () => {
-      bg.tint = 0xffffff;
-      towerIcon.scale.set(1.0);
-    });
-    
-    // Click to show floor popup
-    card.on('pointerdown', () => {
-      this.showFloorPopup(stage);
-    });
+    // Only allow click/hover for completed or current stage
+    const isClickable = stage.is_completed || stage.is_current;
+    card.interactive = isClickable;
+    card.cursor = isClickable ? 'pointer' : 'not-allowed';
+
+    if (isClickable) {
+      card.on('pointerover', () => {
+        bg.tint = 0xe0e0ff;
+        towerIcon.scale.set(1.1);
+      });
+      card.on('pointerout', () => {
+        bg.tint = 0xffffff;
+        towerIcon.scale.set(1.0);
+      });
+      card.on('pointerdown', () => {
+        this.showFloorPopup(stage);
+      });
+    }
     
     return card;
   }
@@ -339,26 +343,7 @@ export class TowerScene extends BaseScene {
   }
 
   private showFloorPopup(stage: Stage): void {
-    // Create and show the tower floor popup
-    const popup = new TowerFloorPopup({ stage });
-    this.container.addChild(popup);
-  }
-
-  private async enterTowerFloor(stage: Stage): Promise<void> {
-    try {
-      console.log('Entering tower floor:', stage.name);
-      
-      // Navigate to PrepareScene to review deck before tower battle
-      navigation.showScreen(PrepareScene, {
-        stage: stage,
-        mode: 'tower' // Indicate this is tower mode
-      });
-    } catch (error) {
-      console.error('Failed to enter tower floor:', error);
-      // Fallback to direct battle navigation
-      alert(`Error entering tower floor: ${error}. Starting battle anyway...`);
-      navigation.showScreen(CardBattleScene, { stage, mode: 'tower' });
-    }
+    navigation.presentPopup(TowerFloorPopup, { stage });
   }
 
   update(time: Ticker): void {
