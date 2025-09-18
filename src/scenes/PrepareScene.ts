@@ -4,14 +4,11 @@ import { BaseScene } from '@/utils/BaseScene';
 import { Colors, Gradients } from '@/utils/colors';
 import { CardBattleScene } from './CardBattleScene';
 import { StageScene } from './StageScene';
-import { BattleCard } from '@/types';
+import { BattleCard, Character } from '@/types';
 import { createRandomDeck } from '@/utils/cardData';
 import { battleApi } from '@/services/api';
-
-interface PrepareSceneParams {
-  stage: any;
-  battleData?: any;
-}
+import { LoadingStateManager } from '@/utils/loadingStateManager';
+import { TowerScene } from './TowerScene';
 
 export class PrepareScene extends BaseScene {
   /** Assets bundles required by this screen */
@@ -23,22 +20,31 @@ export class PrepareScene extends BaseScene {
   private generatedDeck: BattleCard[] = [];
   private deckContainer!: Container;
   private uiContainer!: Container;
+  private loadingManager: LoadingStateManager;
+  private player: any = null;
   
-  constructor(params?: PrepareSceneParams) {
+  constructor(params?: { stage: any }) {
     super();
     
     this.container = new Container();
     this.addChild(this.container);
     
     this.stage = params?.stage;
-    this.battleData = params?.battleData;
+    this.battleData = [];
     
-    // Generate deck for preview
-    this.generatedDeck = createRandomDeck(20); // Smaller deck for battle
+    this.loadingManager = new LoadingStateManager(this.container, this.gameWidth, this.gameHeight);
   }
 
-  /** Prepare the screen before showing */
-  prepare(): void {
+  async prepare(): Promise<void> {
+    this.loadingManager.showLoading();
+
+    this.player = JSON.parse(sessionStorage.getItem('player') || '{}');
+
+    // Generate deck for preview
+    this.generatedDeck = createRandomDeck(50);
+
+    this.loadingManager.hideLoading();
+    
     this.createUI();
   }
 
@@ -46,6 +52,7 @@ export class PrepareScene extends BaseScene {
     this.container.removeChildren();
     this.createBackground();
     this.createHeader();
+    this.createPlayerLineup();
     this.createDeckPreview();
     this.createActionButtons();
   }
@@ -59,47 +66,84 @@ export class PrepareScene extends BaseScene {
   }
 
   private createHeader(): void {
-    const headerContainer = new Container();
-    
-    // Stage info panel
-    const panelWidth = Math.min(this.gameWidth - 40, 600);
-    const panelHeight = 120;
-    
-    const panel = new Graphics()
-      .roundRect(0, 0, panelWidth, panelHeight, 15)
-      .fill(Gradients.createPanelGradient(panelWidth, panelHeight))
-      .stroke({ width: 3, color: Colors.BUTTON_BORDER });
-    
-    const stageName = new Text({
-      text: `Prepare for Battle: ${this.stage?.name || 'Unknown Stage'}`,
+    const title = new Text({
+      text: this.stage.name,
       style: {
         fontFamily: 'Kalam',
-        fontSize: 24,
+        fontSize: 32,
+        fontWeight: 'bold',
+        fill: Colors.TEXT_PRIMARY,
+        stroke: {
+          color: Colors.BACKGROUND_SECONDARY,
+          width: 2,
+        },
+        dropShadow: {
+          color: Colors.SHADOW_COLOR,
+          blur: 4,
+          angle: Math.PI / 6,
+          distance: 4,
+          alpha: 0.5,
+        },
+      }
+    });
+    title.anchor.set(0.5);
+    title.x = this.gameWidth / 2;
+    title.y = 40;
+    
+    this.container.addChild(title);
+  }
+
+  private createPlayerLineup(): void {
+    const lineupContainer = new Container();
+
+    const lineup_power = (this.player.lineup || []).reduce(
+      (sum: number, c: any) => sum + (c.atk || 0) + (c.def || 0) + (c.hp || 0),
+      0
+    );
+
+    const lineupTitle = new Text({
+      text: `🧑‍🤝‍🧑 Your Lineup ⚡${lineup_power}`,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 18,
         fontWeight: 'bold',
         fill: Colors.TEXT_PRIMARY
       }
     });
-    stageName.x = 20;
-    stageName.y = 20;
+    lineupTitle.x = 20;
+    lineupTitle.y = 0;
+    lineupContainer.addChild(lineupTitle);
+
+    const cardWidth = 80;
+    const cardHeight = 100;
+    const spacing = 10;
+    const maxWidth = this.gameWidth - 40;
+    const maxEnemiesPerRow = Math.floor((maxWidth + spacing) / (cardWidth + spacing));
     
-    const description = new Text({
-      text: 'Review your generated deck cards before starting the battle.\nYou cannot modify the deck once the battle begins.',
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 16,
-        fill: Colors.TEXT_SECONDARY,
-        wordWrap: true,
-        wordWrapWidth: panelWidth - 40
-      }
+    const chars = this.player.lineup || [];
+
+    chars.forEach((char: Character, index: number) => {
+      const row = Math.floor(index / maxEnemiesPerRow);
+      const col = index % maxEnemiesPerRow;
+
+      const x = col * (cardWidth + spacing);
+      const y = row * (cardHeight + spacing);
+
+      const enemyCard = this.createHeroCard(char, x, y, 'lineup');
+      // Center the lineup in the available width
+      const totalRowWidth = chars.length * cardWidth + (chars.length - 1) * spacing;
+      const offsetX = Math.max(0, (maxWidth - totalRowWidth) / 2);
+
+      enemyCard.x = offsetX + col * (cardWidth + spacing);
+      enemyCard.y = row * (cardHeight + spacing);
+
+      lineupContainer.addChild(enemyCard);
     });
-    description.x = 20;
-    description.y = 55;
-    
-    headerContainer.addChild(panel, stageName, description);
-    headerContainer.x = (this.gameWidth - panelWidth) / 2;
-    headerContainer.y = 20;
-    
-    this.container.addChild(headerContainer);
+
+    lineupContainer.x = 0;
+    lineupContainer.y = 90; // Just below the header
+
+    this.container.addChild(lineupContainer);
   }
 
   private createDeckPreview(): void {
@@ -245,13 +289,13 @@ export class PrepareScene extends BaseScene {
     
     // Back button
     const backButton = this.createButton(
-      '← Back to Stage',
+      '← Back to Stages',
       0,
       0,
       buttonWidth,
       buttonHeight,
       () => {
-        navigation.showScreen(StageScene);
+        navigation.showScreen(TowerScene);
       }
     );
     
@@ -310,47 +354,6 @@ export class PrepareScene extends BaseScene {
         playerDeck: this.generatedDeck
       });
     }
-  }
-
-  /** Show the screen with animation */
-  async show(): Promise<void> {
-    this.container.alpha = 0;
-    const tween = { alpha: 0 };
-    
-    return new Promise((resolve) => {
-      const animate = () => {
-        tween.alpha += 0.05;
-        this.container.alpha = tween.alpha;
-        
-        if (tween.alpha >= 1) {
-          this.container.alpha = 1;
-          resolve();
-        } else {
-          requestAnimationFrame(animate);
-        }
-      };
-      animate();
-    });
-  }
-
-  /** Hide the screen with animation */
-  async hide(): Promise<void> {
-    const tween = { alpha: 1 };
-    
-    return new Promise((resolve) => {
-      const animate = () => {
-        tween.alpha -= 0.1;
-        this.container.alpha = tween.alpha;
-        
-        if (tween.alpha <= 0) {
-          this.container.alpha = 0;
-          resolve();
-        } else {
-          requestAnimationFrame(animate);
-        }
-      };
-      animate();
-    });
   }
 
   /** Reset screen after hidden */

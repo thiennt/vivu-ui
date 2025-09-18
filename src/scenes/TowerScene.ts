@@ -43,12 +43,9 @@ export class TowerScene extends BaseScene {
     );
 
     this.loadingManager = new LoadingStateManager(this.container, this.gameWidth, this.gameHeight);
-    
-     // Load data and create UI
-    this.loadStagesData();
   }
 
-  private async loadStagesData(): Promise<void> {
+  async prepare(): Promise<void> {
     this.loadingManager.showLoading();
     
     this.stages = await battleApi.getAvailableStages();

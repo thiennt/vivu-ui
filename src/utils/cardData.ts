@@ -197,7 +197,7 @@ export const mockCards: BattleCard[] = [
 ];
 
 // Helper function to create a random deck
-export function createRandomDeck(cardCount: number = 20): BattleCard[] {
+export function createRandomDeck(cardCount: number = 50): BattleCard[] {
   const deck: BattleCard[] = [];
   
   // Add cards multiple times to reach the desired count

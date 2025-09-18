@@ -276,12 +276,11 @@ export class HomeScene extends BaseScene {
     const buttonContainer = new Container();
     
     const buttons = [
-      { text: '🏛️ Adventure (Turn-Based)', screen: DungeonScene },
       { text: '🗼 Tower (Card Battle)', screen: TowerScene },
       { text: '👥 Characters', screen: CharactersScene },
       { text: '⚔️ Battle Arena', screen: BattleScene },
       { text: '🃏 Card Battle', screen: CardBattleScene },
-      { text: '👤 Player Profile', screen: PlayerDetailScene },
+      { text: '🧑‍🤝‍🧑 Lineup', screen: LineupScene },
     ];
     
     // Make buttons wider to utilize more screen space
