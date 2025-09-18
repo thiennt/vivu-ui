@@ -162,11 +162,11 @@ export class LineupScene extends BaseScene {
   private createLineupGrid(): void {
     this.lineupContainer.label = 'lineupContainer';
 
-    // Lineup positions (single row of 4) with standard spacing
-    const cols = 4;
+    // Lineup positions (single row of 3) with standard spacing
+    const cols = 3;
     const rows = 1;
     const availableWidth = this.gameWidth - 2 * this.STANDARD_PADDING;
-    const layout = this.calculateFourCardsLayout(availableWidth, this.STANDARD_SPACING);
+    const layout = this.calculateThreeCardsLayout(availableWidth, this.STANDARD_SPACING);
     const slotSize = Math.min(layout.itemWidth, 120); // Cap at 120px to maintain reasonable size
     const gridWidth = cols * slotSize + (cols - 1) * this.STANDARD_SPACING;
     const startX = (this.gameWidth - gridWidth) / 2;
@@ -253,8 +253,8 @@ export class LineupScene extends BaseScene {
     const padding = this.STANDARD_PADDING; // Use for left/right padding
     const marginTop = 45;
 
-    // Calculate cards per row - force 4 cards per row for character pool
-    const layout = this.calculateFourCardsLayout(poolWidth - 2 * padding, spacing);
+    // Calculate cards per row - force 3 cards per row for character pool
+    const layout = this.calculateThreeCardsLayout(poolWidth - 2 * padding, spacing);
     const cardWidth = layout.itemWidth;
     const cardsPerRow = layout.itemsPerRow;
 

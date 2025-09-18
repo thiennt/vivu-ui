@@ -462,7 +462,7 @@ export class PlayerDetailScene extends BaseScene {
     const availableWidth = this.gameWidth - 2 * this.STANDARD_PADDING;
     const isMobile = this.gameWidth < 768; // Mobile detection
     const gap = isMobile ? 8 : this.STANDARD_SPACING; // Use 8px gap on mobile
-    const cardCount = 4; // Force 4 cards per row
+    const cardCount = 3; // Force 3 cards per row
     
     // Apply mobile formula: card_width = (screen_width - (gap * (card_count - 1))) / card_count
     const cardWidth = (availableWidth - (gap * (cardCount - 1))) / cardCount;

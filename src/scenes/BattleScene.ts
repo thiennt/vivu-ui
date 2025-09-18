@@ -118,9 +118,9 @@ export class BattleScene extends BaseScene {
     this.team1Container = new Container();
     this.team2Container = new Container();
 
-    // Calculate layout for 4 cards per row
+    // Calculate layout for 3 cards per row
     const availableWidth = this.gameWidth - 2 * this.STANDARD_PADDING;
-    const layout = this.calculateFourCardsLayout(availableWidth, this.STANDARD_SPACING);
+    const layout = this.calculateThreeCardsLayout(availableWidth, this.STANDARD_SPACING);
     const cardWidth = layout.itemWidth;
     const teamWidth = layout.totalWidth;
     const cardHeight = 120;
