@@ -118,7 +118,7 @@ export class PrepareScene extends BaseScene {
     const cardHeight = 100;
     const spacing = 10;
     const maxWidth = this.gameWidth - 40;
-    const maxEnemiesPerRow = Math.floor((maxWidth + spacing) / (cardWidth + spacing));
+    const maxEnemiesPerRow = 3; // Force 3 cards per row
     
     const chars = this.player.lineup || [];
 
@@ -166,7 +166,7 @@ export class PrepareScene extends BaseScene {
     // Create card grid
     const cardWidth = 120;
     const cardHeight = 160;
-    const cardsPerRow = Math.floor((this.gameWidth - 40) / (cardWidth + 10));
+    const cardsPerRow = 3; // Force 3 cards per row
     const startX = (this.gameWidth - (cardsPerRow * (cardWidth + 10) - 10)) / 2;
     
     this.generatedDeck.forEach((card, index) => {

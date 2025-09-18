@@ -102,6 +102,21 @@ export abstract class BaseScene extends Container {
   }
 
   /**
+   * Calculates grid layout with exactly 3 cards per row
+   */
+  protected calculateThreeCardsLayout(
+    availableWidth: number,
+    spacing: number = this.STANDARD_SPACING
+  ): { itemsPerRow: number; itemWidth: number; totalWidth: number } {
+    const itemsPerRow = 3;
+    const totalSpacing = (itemsPerRow - 1) * spacing;
+    const itemWidth = (availableWidth - totalSpacing) / itemsPerRow;
+    const totalWidth = itemsPerRow * itemWidth + (itemsPerRow - 1) * spacing;
+    
+    return { itemsPerRow, itemWidth, totalWidth };
+  }
+
+  /**
    * Calculates grid layout with exactly 4 cards per row
    */
   protected calculateFourCardsLayout(

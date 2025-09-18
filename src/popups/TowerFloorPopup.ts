@@ -175,7 +175,7 @@ export class TowerFloorPopup extends Container {
     const enemyWidth = 80;
     const enemyHeight = 100;
     const spacing = 10;
-    const maxEnemiesPerRow = Math.floor((maxWidth - spacing) / (enemyWidth + spacing));
+    const maxEnemiesPerRow = 3; // Force 3 cards per row
     
     enemies.forEach((enemy: Character, index: number) => {
       const row = Math.floor(index / maxEnemiesPerRow);
