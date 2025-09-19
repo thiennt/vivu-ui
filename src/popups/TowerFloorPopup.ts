@@ -92,7 +92,7 @@ export class TowerFloorPopup extends Container {
 
     // Locked treasure chest
     const treasureChest = new Text({
-      text: this.stage.is_completed ? '🎁 x1' : '🎁 x10',
+      text: this.stage.is_completed ? '🎟️ x1' : '🎟️ x10',
       style: {
         fontFamily: 'Kalam',
         fontSize: 32,

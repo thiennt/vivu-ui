@@ -12,8 +12,11 @@ import {
   BattleMoveResponse, 
   BattleEndData, 
   BattleRewards,
-  TurnPhase 
+  TurnPhase, 
+  BattleStageResponse
 } from '@/types';
+import { createRandomDeck } from '@/utils/cardData';
+
 
 // Base API configuration
 const API_BASE_URL = (import.meta as any).env?.VITE_API_BASE_URL || 'https://api.vivu.game';
@@ -161,29 +164,28 @@ export const battleApi = {
     return apiRequest(`/players/${playerId}/card-battle/stages`, {}, mockStages);
   },
 
-  async createBattle(battleData: any): Promise<BattleApiResponse> {
-    console.log('🔥 createBattle API called with data:', battleData);
+  async createBattleStage(stage_id: string): Promise<BattleStageResponse> {
     const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
-    return apiRequest(`/players/${playerId}/battles`, {
-      method: 'POST',
-      body: JSON.stringify(battleData),
-    }, { battleId: `battle_${Date.now()}`, status: 'created' });
-  },
-
-  async getBattleState(battleId: string): Promise<BattleStateResponse> {
-    console.log('🔍 getBattleState API called for battle:', battleId);
-    return apiRequest(`/battles/${battleId}/state`, {}, {
-      battleId,
-      status: 'active',
-      currentTurn: 1,
-      activePlayer: 1,
-      turnPhase: TurnPhase.MAIN
+    return apiRequest(`/players/${playerId}/card-battle/stages/${stage_id}`, {
+      method: 'POST'
     });
   },
 
+  async startBattle(battleId: string): Promise<BattleApiResponse> {
+    const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
+    return apiRequest(`/players/${playerId}/card-battle/${battleId}/start`, {
+      method: 'POST',
+    }, { battleId, status: 'ongoing' });
+  },
+
+  async getBattleState(battleId: string): Promise<BattleStateResponse> {
+    const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
+    return apiRequest(`/players/${playerId}/card-battle/${battleId}/state`);
+  },
+
   async playCard(battleId: string, moveData: BattleMoveData): Promise<BattleMoveResponse> {
-    console.log('🃏 playCard API called for battle:', battleId, 'with move:', moveData);
-    return apiRequest(`/battles/${battleId}/moves`, {
+    const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
+    return apiRequest(`/players/${playerId}/card-battle/${battleId}/moves`, {
       method: 'POST',
       body: JSON.stringify(moveData),
     }, { 

@@ -323,6 +323,7 @@ export abstract class BaseScene extends Container {
     nameText.anchor.set(0.5);
     nameText.x = width / 2;
     nameText.y = cardType === 'lineup' || cardType === 'pool' ? height / 2 - 15 : height * 0.15;
+    //card.addChild(nameText);
     
     // // Level text - positioned below symbol
     // const levelSize = cardType === 'detailed' ? 14 : (cardType === 'preview' ? 12 : 10);
@@ -345,13 +346,12 @@ export abstract class BaseScene extends Container {
     this.createAvatar(character, width, height).then(avatarIcon => {
       card.addChild(avatarIcon);
     });
-    card.addChild(nameText);
     
     // Add additional elements based on card type
     if (cardType === 'detailed') {
       this.addDetailedCardElements(card, character, width, height);
     } else if (cardType === 'preview') {
-      //this.addPreviewCardElements(card, character, width, height);
+      this.addPreviewCardElements(card, character, width, height);
     }
 
     // Add element indicator for all types except lineup/pool
@@ -373,7 +373,7 @@ export abstract class BaseScene extends Container {
       avatarIcon.height = avatarSize;
       avatarIcon.anchor.set(0.5);
       avatarIcon.x = cardWidth / 2;
-      avatarIcon.y = cardHeight * 0.55; // Position in lower half of card
+      avatarIcon.y = avatarSize - 10; // Position in lower half of card
       resolve(avatarIcon);
     });
   }
@@ -425,28 +425,39 @@ export abstract class BaseScene extends Container {
   private addPreviewCardElements(card: Container, character: any, width: number, height: number): void {
     // Basic stats for preview
     const hpText = new Text({
-      text: `HP: ${character.hp}`,
+      text: `❤️ ${character.hp}`,
       style: {
         fontFamily: 'Kalam',
-        fontSize: 9,
+        fontSize: 14,
         fill: Colors.TEXT_SECONDARY
       }
     });
-    hpText.x = 10;
-    hpText.y = 75;
+    hpText.x = width / 4;
+    hpText.y = 85;
 
     const atkText = new Text({
-      text: `ATK: ${character.atk}`,
+      text: `⚔️ ${character.atk}`,
       style: {
         fontFamily: 'Kalam',
-        fontSize: 9,
+        fontSize: 14,
         fill: Colors.TEXT_SECONDARY
       }
     });
-    atkText.x = 10;
-    atkText.y = 90;
-    
-    card.addChild(hpText, atkText);
+    atkText.x = width / 4;
+    atkText.y = 105;
+
+    const defText = new Text({
+      text: `🛡️ ${character.def}`,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 14,
+        fill: Colors.TEXT_SECONDARY
+      }
+    });
+    defText.x = width / 4;
+    defText.y = 125;
+
+    card.addChild(hpText, atkText, defText);
   }
 
   private addElementIndicator(card: Container, character: any, width: number): void {

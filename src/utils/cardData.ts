@@ -7,7 +7,7 @@ export const mockCards: BattleCard[] = [
     name: 'Lightning Strike',
     description: 'Deal 30 damage to target enemy',
     energyCost: 2,
-    cardType: CardType.ATTACK,
+    group: CardType.ATTACK,
     rarity: CardRarity.COMMON,
     effects: [
       {
@@ -22,7 +22,7 @@ export const mockCards: BattleCard[] = [
     name: 'Flame Burst',
     description: 'Deal 25 damage to all enemies',
     energyCost: 4,
-    cardType: CardType.ATTACK,
+    group: CardType.ATTACK,
     rarity: CardRarity.UNCOMMON,
     effects: [
       {
@@ -37,7 +37,7 @@ export const mockCards: BattleCard[] = [
     name: 'Ice Shard',
     description: 'Deal 35 damage to target enemy',
     energyCost: 3,
-    cardType: CardType.ATTACK,
+    group: CardType.ATTACK,
     rarity: CardRarity.COMMON,
     effects: [
       {
@@ -54,7 +54,7 @@ export const mockCards: BattleCard[] = [
     name: 'Healing Potion',
     description: 'Restore 40 HP to target ally',
     energyCost: 2,
-    cardType: CardType.HEAL,
+    group: CardType.HEAL,
     rarity: CardRarity.COMMON,
     effects: [
       {
@@ -69,7 +69,7 @@ export const mockCards: BattleCard[] = [
     name: 'Divine Light',
     description: 'Restore 25 HP to all allies',
     energyCost: 3,
-    cardType: CardType.HEAL,
+    group: CardType.HEAL,
     rarity: CardRarity.RARE,
     effects: [
       {
@@ -86,7 +86,7 @@ export const mockCards: BattleCard[] = [
     name: 'Strength Boost',
     description: 'Increase ally attack by 15 for 3 turns',
     energyCost: 2,
-    cardType: CardType.BUFF,
+    group: CardType.BUFF,
     rarity: CardRarity.COMMON,
     effects: [
       {
@@ -102,7 +102,7 @@ export const mockCards: BattleCard[] = [
     name: 'Shield Wall',
     description: 'Increase ally defense by 20 for 2 turns',
     energyCost: 2,
-    cardType: CardType.BUFF,
+    group: CardType.BUFF,
     rarity: CardRarity.COMMON,
     effects: [
       {
@@ -120,7 +120,7 @@ export const mockCards: BattleCard[] = [
     name: 'Weakness Curse',
     description: 'Reduce enemy attack by 10 for 2 turns',
     energyCost: 1,
-    cardType: CardType.DEBUFF,
+    group: CardType.DEBUFF,
     rarity: CardRarity.COMMON,
     effects: [
       {
@@ -136,7 +136,7 @@ export const mockCards: BattleCard[] = [
     name: 'Armor Break',
     description: 'Reduce enemy defense by 15 for 3 turns',
     energyCost: 2,
-    cardType: CardType.DEBUFF,
+    group: CardType.DEBUFF,
     rarity: CardRarity.UNCOMMON,
     effects: [
       {
@@ -154,7 +154,7 @@ export const mockCards: BattleCard[] = [
     name: 'Energy Boost',
     description: 'Gain 2 energy immediately',
     energyCost: 0,
-    cardType: CardType.SPECIAL,
+    group: CardType.SPECIAL,
     rarity: CardRarity.COMMON,
     effects: [
       {
@@ -169,7 +169,7 @@ export const mockCards: BattleCard[] = [
     name: 'Meteor Strike',
     description: 'Deal 50 damage to target enemy',
     energyCost: 5,
-    cardType: CardType.ATTACK,
+    group: CardType.ATTACK,
     rarity: CardRarity.EPIC,
     effects: [
       {
@@ -184,7 +184,7 @@ export const mockCards: BattleCard[] = [
     name: 'Greater Heal',
     description: 'Restore 60 HP to target ally',
     energyCost: 4,
-    cardType: CardType.HEAL,
+    group: CardType.HEAL,
     rarity: CardRarity.RARE,
     effects: [
       {

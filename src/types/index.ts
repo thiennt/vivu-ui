@@ -158,16 +158,27 @@ export enum Difficulty {
   NIGHTMARE = 'nightmare'
 }
 
+export interface Card {
+  id: string;
+  name: string;
+  group: string;
+  description: string;
+  icon_url?: string;
+  card_type: string;
+  energy_cost: number;
+  rarity?: string;
+  actions?: any[]; // Define specific actions/effects of the card
+}
+
 // Card Battle System Types
 export interface BattleCard {
   id: string;
   name: string;
   description: string;
   energyCost: number;
-  cardType: CardType;
+  group: CardType;
   rarity: CardRarity;
   effects: CardEffect[];
-  artwork?: string;
 }
 
 export interface CardEffect {
@@ -178,11 +189,11 @@ export interface CardEffect {
 }
 
 export enum CardType {
-  ATTACK = 'attack',
-  HEAL = 'heal',
-  BUFF = 'buff',
-  DEBUFF = 'debuff',
-  SPECIAL = 'special'
+  ATTACK = 'High Damage',
+  HEAL = 'Healing & Support',
+  BUFF = 'Buffs & Enhancements',
+  DEBUFF = 'Control & Debuff',
+  SPECIAL = 'Special'
 }
 
 export enum CardRarity {
@@ -256,21 +267,54 @@ export enum TurnPhase {
   END = 'end'
 }
 
-// API Integration Types
-export interface BattleApiResponse {
-  battleId: string;
+export interface BattleStageResponse {
+  id: string;
+  stage_id: string;
+  player1_id: string;
   status: 'created' | 'active' | 'completed' | 'cancelled';
+  cards: Card[];
 }
 
 export interface BattleStateResponse {
-  battleId: string;
+  id: string;
+  battle_type: string;
   status: string;
-  currentTurn: number;
-  activePlayer: number;
-  turnPhase: TurnPhase;
-  player1?: CardBattlePlayer;
-  player2?: CardBattlePlayer;
-}
+  current_turn: number;
+  current_player: number;
+  characters: Array<{
+    id: string;
+    character_id: string;
+    team: string;
+    position: string;
+    max_hp: number;
+    current_hp: number;
+    atk: number;
+    def: number;
+    agi: number;
+    crit_rate: number;
+    crit_dmg: number;
+    res: number;
+    damage: number;
+    mitigation: number;
+    hit_rate: number;
+    dodge: number;
+    has_acted: boolean;
+    active_effects: Array<any>;
+    equipped_skills: Array<string>;
+  }>;
+  decks: Array<{
+    id: string;
+    player_team: string;
+    deck_cards: Array<{
+      card_id: string;
+      position: number;
+    }>;
+    hand_cards: Array<string>;
+    current_energy: number;
+    cards_drawn: number;
+   }>;
+  phase: string;
+};
 
 export interface BattleMoveData {
   cardId: string;

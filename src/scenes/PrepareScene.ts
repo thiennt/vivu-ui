@@ -4,11 +4,12 @@ import { BaseScene } from '@/utils/BaseScene';
 import { Colors, Gradients } from '@/utils/colors';
 import { CardBattleScene } from './CardBattleScene';
 import { StageScene } from './StageScene';
-import { BattleCard, Character } from '@/types';
+import { BattleCard, BattleStageResponse, BattleStateResponse, Card, CardType, Character } from '@/types';
 import { createRandomDeck } from '@/utils/cardData';
 import { battleApi } from '@/services/api';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
 import { TowerScene } from './TowerScene';
+import { ScrollBox } from '@pixi/ui';
 
 export class PrepareScene extends BaseScene {
   /** Assets bundles required by this screen */
@@ -17,11 +18,12 @@ export class PrepareScene extends BaseScene {
   public container: Container;
   private stage: any;
   private battleData: any;
-  private generatedDeck: BattleCard[] = [];
+  private battleStage: BattleStageResponse | null = null;
   private deckContainer!: Container;
   private uiContainer!: Container;
   private loadingManager: LoadingStateManager;
   private player: any = null;
+  private lineupContainerHeight: number = 0;
   
   constructor(params?: { stage: any }) {
     super();
@@ -40,8 +42,7 @@ export class PrepareScene extends BaseScene {
 
     this.player = JSON.parse(sessionStorage.getItem('player') || '{}');
 
-    // Generate deck for preview
-    this.generatedDeck = createRandomDeck(50);
+    this.battleStage = await battleApi.createBattleStage(this.stage.id);
 
     this.loadingManager.hideLoading();
     
@@ -49,6 +50,10 @@ export class PrepareScene extends BaseScene {
   }
 
   private createUI(): void {
+    if (!this.battleStage) {
+      return;
+    }
+
     this.container.removeChildren();
     this.createBackground();
     this.createHeader();
@@ -114,43 +119,41 @@ export class PrepareScene extends BaseScene {
     lineupTitle.y = 0;
     lineupContainer.addChild(lineupTitle);
 
-    const cardWidth = 80;
-    const cardHeight = 100;
-    const spacing = 10;
-    const maxWidth = this.gameWidth - 40;
-    const maxEnemiesPerRow = 3; // Force 3 cards per row
-    
     const chars = this.player.lineup || [];
+    const maxPerRow = Math.min(chars.length, 3) || 1; // up to 3 per row, at least 1
+    const spacing = 10;
+    const availableWidth = this.gameWidth - 40 - (maxPerRow - 1) * spacing;
+    const cardWidth = availableWidth / maxPerRow;
+    const cardHeight = cardWidth * 1.2;
 
     chars.forEach((char: Character, index: number) => {
-      const row = Math.floor(index / maxEnemiesPerRow);
-      const col = index % maxEnemiesPerRow;
+      const row = 0; // single row for lineup
+      const col = index;
 
-      const x = col * (cardWidth + spacing);
-      const y = row * (cardHeight + spacing);
+      const charCard = this.createHeroCard(char, 0, 0, 'preview');
+      charCard.width = cardWidth;
+      charCard.height = cardHeight;
 
-      const enemyCard = this.createHeroCard(char, x, y, 'lineup');
-      // Center the lineup in the available width
-      const totalRowWidth = chars.length * cardWidth + (chars.length - 1) * spacing;
-      const offsetX = Math.max(0, (maxWidth - totalRowWidth) / 2);
+      charCard.x = 20 + col * (cardWidth + spacing);
+      charCard.y = lineupTitle.height + 10 + row * (cardHeight + spacing);
 
-      enemyCard.x = offsetX + col * (cardWidth + spacing);
-      enemyCard.y = row * (cardHeight + spacing);
-
-      lineupContainer.addChild(enemyCard);
+      lineupContainer.addChild(charCard);
     });
 
     lineupContainer.x = 0;
     lineupContainer.y = 90; // Just below the header
+
+    // Store the height for use in deck preview positioning
+    this.lineupContainerHeight = lineupTitle.height + 10 + cardHeight + (chars.length > 0 ? 0 : 0);
 
     this.container.addChild(lineupContainer);
   }
 
   private createDeckPreview(): void {
     this.deckContainer = new Container();
-    
+
     const deckTitle = new Text({
-      text: `Your Battle Deck (${this.generatedDeck.length} cards)`,
+      text: `Your Battle Deck (${this.battleStage?.cards.length || 0} cards)`,
       style: {
         fontFamily: 'Kalam',
         fontSize: 20,
@@ -160,35 +163,64 @@ export class PrepareScene extends BaseScene {
     });
     deckTitle.x = 20;
     deckTitle.y = 0;
-    
+
     this.deckContainer.addChild(deckTitle);
-    
-    // Create card grid
-    const cardWidth = 120;
+
+    // Responsive card grid
+    const cardsPerRow = 3;
+    const spacing = 10;
+    const scrollBoxWidth = this.gameWidth - 40;
+    const cardWidth = (scrollBoxWidth - (cardsPerRow - 1) * spacing) / cardsPerRow;
     const cardHeight = 160;
-    const cardsPerRow = 3; // Force 3 cards per row
-    const startX = (this.gameWidth - (cardsPerRow * (cardWidth + 10) - 10)) / 2;
-    
-    this.generatedDeck.forEach((card, index) => {
+    const gridContainer = new Container();
+
+    this.battleStage?.cards.forEach((card, index) => {
       const row = Math.floor(index / cardsPerRow);
       const col = index % cardsPerRow;
-      
+
       const cardContainer = this.createDeckCard(card, cardWidth, cardHeight);
-      cardContainer.x = startX + col * (cardWidth + 10);
-      cardContainer.y = 40 + row * (cardHeight + 10);
-      
-      this.deckContainer.addChild(cardContainer);
+      cardContainer.x = col * (cardWidth + spacing);
+      cardContainer.y = 40 + row * (cardHeight + spacing);
+
+      gridContainer.addChild(cardContainer);
     });
-    
+
+    // Calculate grid size
+    const totalRows = Math.ceil(((this.battleStage?.cards?.length ?? 0) / cardsPerRow));
+    const cardGridTop = 40; // space below deckTitle
+    const headerHeight = 40 + 32 + 20; // 40 (title y) + 32 (title font) + 20 (margin)
+    const lineupHeight = this.lineupContainerHeight || 150;
+    const buttonHeight = 50 + 40; // button height + bottom margin
+
+    // Set gridHeight so that scrollbox fits between header+lineup and buttons
+    const gridHeight = this.gameHeight - headerHeight - lineupHeight - buttonHeight - cardGridTop;
+
+    // Create ScrollBox
+    const scrollBoxHeight = Math.min(
+      cardGridTop + totalRows * (cardHeight + spacing),
+      gridHeight
+    );
+
+    // Create ScrollBox
+    const scrollBox = new ScrollBox({
+      width: scrollBoxWidth,
+      height: scrollBoxHeight
+    });
+    scrollBox.x = 20;
+    scrollBox.y = 0;
+    scrollBox.addItem(gridContainer);
+
+    this.deckContainer.addChild(scrollBox);
+
     this.deckContainer.x = 0;
-    this.deckContainer.y = 180;
-    
+    this.deckContainer.y = 90 + lineupHeight + 20;
+
     this.container.addChild(this.deckContainer);
   }
 
-  private createDeckCard(card: BattleCard, width: number, height: number): Container {
+  private createDeckCard(card: Card, width: number, height: number): Container {
     const cardContainer = new Container();
-    
+
     // Card background with rarity color
     const rarityColors = {
       common: Colors.RARITY_COMMON,
@@ -197,13 +229,44 @@ export class PrepareScene extends BaseScene {
       epic: Colors.RARITY_EPIC,
       legendary: Colors.RARITY_LEGENDARY
     };
-    
+
     const bg = new Graphics()
       .roundRect(0, 0, width, height, 8)
       .fill({ color: Colors.BACKGROUND_SECONDARY })
-      .stroke({ width: 2, color: rarityColors[card.rarity] || Colors.CARD_BORDER });
-    
-    // Card name
+      .stroke({ width: 2, color: Colors.CARD_BORDER });
+
+    // Group icon at top right
+    let groupIcon = '';
+    switch (card.group) {
+      case CardType.ATTACK:
+        groupIcon = '⚔️';
+        break;
+      case CardType.HEAL:
+        groupIcon = '✨';
+        break;
+      case CardType.DEBUFF:
+        groupIcon = '🌀';
+        break;
+      case CardType.BUFF:
+        groupIcon = '🔼';
+        break;
+      default:
+        groupIcon = '⭐';
+    }
+    const groupIconText = new Text({
+      text: groupIcon,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 16,
+        align: 'center',
+        fill: Colors.TEXT_PRIMARY
+      }
+    });
+    groupIconText.anchor.set(1, 0);
+    groupIconText.x = width - 8;
+    groupIconText.y = 6;
+
+    // Card name at top, below icon
     const cardName = new Text({
       text: card.name,
       style: {
@@ -212,81 +275,83 @@ export class PrepareScene extends BaseScene {
         fontWeight: 'bold',
         fill: Colors.TEXT_PRIMARY,
         wordWrap: true,
-        wordWrapWidth: width - 10
+        wordWrapWidth: width - 16
       }
     });
-    cardName.x = 5;
-    cardName.y = 5;
-    
-    // Energy cost
+    cardName.anchor.set(0.5, 0);
+    cardName.x = width / 2;
+    cardName.y = groupIconText.y + groupIconText.height + 5;
+
+    // Energy cost (top left)
     const energyCost = new Graphics()
-      .circle(15, 15, 12)
+      .circle(18, 18, 14)
       .fill({ color: Colors.BUTTON_PRIMARY })
       .stroke({ width: 1, color: Colors.BUTTON_BORDER });
-    
     const energyText = new Text({
-      text: card.energyCost.toString(),
+      text: card.energy_cost.toString(),
       style: {
         fontFamily: 'Kalam',
-        fontSize: 12,
+        fontSize: 14,
         fontWeight: 'bold',
         fill: Colors.TEXT_WHITE
       }
     });
     energyText.anchor.set(0.5);
-    energyText.x = 15;
-    energyText.y = 15;
-    
-    // Card description
+    energyText.x = 18;
+    energyText.y = 18;
+
+    // Card description, trimmed if too long
+    const maxDescLength = 50;
+    let descText = card.description;
+    if (descText.length > maxDescLength) {
+      descText = descText.slice(0, maxDescLength - 3) + '...';
+    }
     const description = new Text({
-      text: card.description,
+      text: descText,
       style: {
         fontFamily: 'Kalam',
-        fontSize: 10,
+        fontSize: 14,
         fill: Colors.TEXT_SECONDARY,
         wordWrap: true,
-        wordWrapWidth: width - 10
+        wordWrapWidth: width - 24,
+        align: 'center'
       }
     });
-    description.x = 5;
-    description.y = height - 60;
-    
-    // Card type
-    const typeText = new Text({
-      text: card.cardType.toUpperCase(),
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 8,
-        fill: Colors.TEXT_TERTIARY
-      }
-    });
-    typeText.x = 5;
-    typeText.y = height - 15;
-    
-    cardContainer.addChild(bg, cardName, energyCost, energyText, description, typeText);
-    
+    description.anchor.set(0.5, 0.5);
+    description.x = width / 2;
+    description.y = height / 2 + 20;
+
+    cardContainer.addChild(bg, groupIconText, cardName, energyCost, energyText, description);
+
     // Make card interactive for hover effects
     cardContainer.interactive = true;
     cardContainer.cursor = 'pointer';
-    
+
     cardContainer.on('pointerover', () => {
       bg.tint = 0xcccccc;
     });
-    
+
     cardContainer.on('pointerout', () => {
       bg.tint = 0xffffff;
     });
-    
+
+    // Ensure card fits the given width and height
+    cardContainer.width = width;
+    cardContainer.height = height;
+
     return cardContainer;
   }
 
   private createActionButtons(): void {
     const buttonContainer = new Container();
-    
-    const buttonWidth = 180;
-    const buttonHeight = 50;
+
+    // Responsive: 2 buttons, spacing, fit to screen width
+    const buttonCount = 2;
     const spacing = 20;
-    
+    const totalSpacing = spacing * (buttonCount - 1);
+    const buttonWidth = (this.gameWidth - 2 * 40 - totalSpacing) / buttonCount; // 40px side margin
+    const buttonHeight = 50;
+
     // Back button
     const backButton = this.createButton(
       '← Back to Stages',
@@ -298,11 +363,11 @@ export class PrepareScene extends BaseScene {
         navigation.showScreen(TowerScene);
       }
     );
-    
+
     // Start Battle button
     const startButton = this.createButton(
       'Start Battle',
-      buttonWidth + spacing,
+      this.gameWidth - buttonWidth - 40,
       0,
       buttonWidth,
       buttonHeight,
@@ -310,50 +375,30 @@ export class PrepareScene extends BaseScene {
         await this.startBattle();
       }
     );
-    
+
     // Style the start button differently
     const startBg = startButton.children[0] as Graphics;
     startBg.clear()
       .roundRect(0, 0, buttonWidth, buttonHeight, 8)
       .fill(Gradients.createButtonGradient(buttonWidth, buttonHeight))
       .stroke({ width: 2, color: Colors.RARITY_LEGENDARY });
-    
+
     buttonContainer.addChild(backButton, startButton);
-    
-    // Center the buttons
-    buttonContainer.x = (this.gameWidth - (buttonWidth * 2 + spacing)) / 2;
+
+    // Center the buttons with side margin
+    buttonContainer.x = 20;
     buttonContainer.y = this.gameHeight - buttonHeight - 40;
-    
+
     this.container.addChild(buttonContainer);
   }
 
   private async startBattle(): Promise<void> {
-    try {
-      // Create battle with backend (or use mock data)
-      const battleData = {
-        stageId: this.stage?.id,
-        playerDeck: this.generatedDeck.map(card => card.id),
-        ...this.battleData
-      };
-      
-      console.log('Creating battle with data:', battleData);
-      const battleResponse = await battleApi.createBattle(battleData);
-      
-      // Navigate to card battle scene with battle data
-      navigation.showScreen(CardBattleScene, {
-        battleId: battleResponse.battleId,
-        stage: this.stage,
-        playerDeck: this.generatedDeck,
-        battleData: battleResponse
-      });
-    } catch (error) {
-      console.error('Failed to create battle:', error);
-      // For now, proceed with mock data
-      navigation.showScreen(CardBattleScene, {
-        stage: this.stage,
-        playerDeck: this.generatedDeck
-      });
-    }
+    const battleResponse = await battleApi.startBattle(this.battleStage?.id || '');
+    
+    // Navigate to card battle scene with battle data
+    navigation.showScreen(CardBattleScene, {
+      battleId: this.battleStage?.id,
+    });
   }
 
   /** Reset screen after hidden */
