@@ -4,12 +4,13 @@ import { BaseScene } from '@/utils/BaseScene';
 import { Colors, Gradients } from '@/utils/colors';
 import { CardBattleScene } from './CardBattleScene';
 import { StageScene } from './StageScene';
-import { BattleCard, BattleStageResponse, BattleStateResponse, Card, CardType, Character } from '@/types';
+import { BattleCard, BattleStageResponse, BattleStateResponse, Card, CardType, CardRarity, Character } from '@/types';
 import { createRandomDeck } from '@/utils/cardData';
 import { battleApi } from '@/services/api';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
 import { TowerScene } from './TowerScene';
 import { ScrollBox } from '@pixi/ui';
+import { CardDetailPopup } from '@/popups/CardDetailPopup';
 
 export class PrepareScene extends BaseScene {
   /** Assets bundles required by this screen */
@@ -323,7 +324,7 @@ export class PrepareScene extends BaseScene {
 
     cardContainer.addChild(bg, groupIconText, cardName, energyCost, energyText, description);
 
-    // Make card interactive for hover effects
+    // Make card interactive for hover effects and click
     cardContainer.interactive = true;
     cardContainer.cursor = 'pointer';
 
@@ -333,6 +334,11 @@ export class PrepareScene extends BaseScene {
 
     cardContainer.on('pointerout', () => {
       bg.tint = 0xffffff;
+    });
+
+    // Add click event to show card details
+    cardContainer.on('pointertap', () => {
+      this.showCardDetails(card);
     });
 
     // Ensure card fits the given width and height
@@ -399,6 +405,66 @@ export class PrepareScene extends BaseScene {
     navigation.showScreen(CardBattleScene, {
       battleId: this.battleStage?.id,
     });
+  }
+
+  private showCardDetails(card: Card): void {
+    const battleCard = this.convertCardToBattleCard(card);
+    navigation.presentPopup(class extends CardDetailPopup {
+      constructor() {
+        super({ card: battleCard });
+      }
+    });
+  }
+
+  private convertCardToBattleCard(card: Card): BattleCard {
+    // Convert Card to BattleCard format
+    return {
+      id: card.id,
+      name: card.name,
+      description: card.description,
+      energyCost: card.energy_cost,
+      group: this.mapCardGroup(card.group),
+      rarity: this.mapCardRarity(card.rarity || 'common'),
+      effects: [] // Empty effects array since we don't have card effects in the Card interface
+    };
+  }
+
+  private mapCardGroup(group: string): CardType {
+    switch (group.toLowerCase()) {
+      case 'attack':
+      case 'high damage':
+        return CardType.ATTACK;
+      case 'heal':
+      case 'healing & support':
+        return CardType.HEAL;
+      case 'buff':
+      case 'buffs & enhancements':
+        return CardType.BUFF;
+      case 'debuff':
+      case 'control & debuff':
+        return CardType.DEBUFF;
+      case 'special':
+        return CardType.SPECIAL;
+      default:
+        return CardType.SPECIAL;
+    }
+  }
+
+  private mapCardRarity(rarity: string): CardRarity {
+    switch (rarity.toLowerCase()) {
+      case 'common':
+        return CardRarity.COMMON;
+      case 'uncommon':
+        return CardRarity.UNCOMMON;
+      case 'rare':
+        return CardRarity.RARE;
+      case 'epic':
+        return CardRarity.EPIC;
+      case 'legendary':
+        return CardRarity.LEGENDARY;
+      default:
+        return CardRarity.COMMON;
+    }
   }
 
   /** Reset screen after hidden */
