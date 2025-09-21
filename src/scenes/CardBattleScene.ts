@@ -178,22 +178,15 @@ export class CardBattleScene extends BaseScene {
     this.loadingManager.showLoading();
 
     try {
-      // Use getBattleState to retrieve the complete current battle state
-      // This is the authoritative source for initial render and reconnects
-      console.log('🔄 Loading battle state from server...');
-      this.battleState = await battleApi.getBattleState(this.battleId);
-      console.log('✅ Battle state loaded:', this.battleState);
+      console.log('🔄 Preparing CardBattleScene...');
       
       this.loadingManager.hideLoading();
       this.initializeUI();
       
-      // Automatically start the first player turn
-      await this.startPlayerTurn();
-      
     } catch (error) {
-      console.error('❌ Error loading battle state:', error);
+      console.error('❌ Error preparing battle scene:', error);
       this.loadingManager.hideLoading();
-      alert('Failed to load battle. Please try again.');
+      alert('Failed to prepare battle. Please try again.');
       navigation.showScreen(HomeScene);
     }
   }
@@ -215,35 +208,84 @@ export class CardBattleScene extends BaseScene {
     this.container.alpha = 0;
     const tween = { alpha: 0 };
     
-    return new Promise((resolve) => {
-      const animate = () => {
-        tween.alpha += 0.05;
-        this.container.alpha = tween.alpha;
+    return new Promise(async (resolve) => {
+      try {
+        // Call getBattleState to init UI when showing the scene
+        console.log('🔄 Loading battle state from server...');
+        this.battleState = await battleApi.getBattleState(this.battleId);
+        console.log('✅ Battle state loaded:', this.battleState);
         
-        if (tween.alpha >= 1) {
-          this.container.alpha = 1;
-          // Start the battle sequence automatically
-          this.startBattleSequence();
-          resolve();
-        } else {
-          requestAnimationFrame(animate);
-        }
-      };
-      animate();
+        // Refresh UI with loaded battle state
+        this.refreshUI();
+        
+        const animate = () => {
+          tween.alpha += 0.05;
+          this.container.alpha = tween.alpha;
+          
+          if (tween.alpha >= 1) {
+            this.container.alpha = 1;
+            // Start the battle sequence after UI is initialized
+            this.startBattleSequence();
+            resolve();
+          } else {
+            requestAnimationFrame(animate);
+          }
+        };
+        animate();
+      } catch (error) {
+        console.error('❌ Error loading battle state in show():', error);
+        alert('Failed to load battle state. Please try again.');
+        navigation.showScreen(HomeScene);
+        resolve();
+      }
     });
   }
 
   private async startBattleSequence(): Promise<void> {
     console.log('🎯 Starting battle sequence...');
     
-    // Give a moment to see the initial setup
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    try {
+      // Step 1: UI displays both teams, decks, discard piles, energy, and empty hands
+      console.log('📋 Displaying battle state - teams, decks, discard piles, energy, hands');
+      
+      // Give a moment to see the initial setup (teams, decks, etc.)
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Step 2: Start the battle turn loop
+      await this.startBattleTurnLoop();
+      
+    } catch (error) {
+      console.error('❌ Error in battle sequence:', error);
+      alert('Battle sequence failed. Please try again.');
+      navigation.showScreen(HomeScene);
+    }
+  }
 
-    if (this.battleState?.current_turn === 1) {
-      // Step 4: Player Turn - Draw phase
+  private async startBattleTurnLoop(): Promise<void> {
+    console.log('🔄 Starting battle turn loop...');
+    
+    while (true) {
+      // Check for battle end conditions first
+      if (this.checkBattleEnd()) {
+        return;
+      }
+      
+      // Step 2: Player Turn - UI highlights player's turn, calls start-turn API
+      console.log('👤 Player Turn Phase');
       await this.startPlayerTurn();
-    } else {
-      await this.handleAITurn();
+      
+      // Check for battle end after player turn
+      if (this.checkBattleEnd()) {
+        return;
+      }
+      
+      // Step 4: End Turn - calls action API with end_turn type
+      // This is handled by the End Turn button click, but we simulate the flow
+      console.log('⏭️ Waiting for player to end turn...');
+      
+      // In real implementation, this would wait for user interaction
+      // For now, we just prepare the scene for player actions
+      break; // Exit loop to allow player interaction
     }
   }
 

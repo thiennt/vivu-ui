@@ -47,10 +47,10 @@ export class PrepareScene extends BaseScene {
 
     this.loadingManager.hideLoading();
     
-    await this.initializeUI();
+    this.initializeUI();
   }
 
-  private async initializeUI(): Promise<void> {
+  private initializeUI(): void {
     if (!this.battleStage) {
       return;
     }
@@ -61,11 +61,6 @@ export class PrepareScene extends BaseScene {
     this.createPlayerLineup();
     this.createDeckPreview();
     this.createActionButtons();
-
-    // Automatically start battle after a brief delay to show the preparation screen
-    setTimeout(async () => {
-      await this.startBattle();
-    }, 2000); // 2 second delay to show preparation
   }
 
   private createBackground(): void {
@@ -356,14 +351,17 @@ export class PrepareScene extends BaseScene {
   private createActionButtons(): void {
     const buttonContainer = new Container();
 
-    // Only back button - battle starts automatically
-    const buttonWidth = 200;
+    // Responsive: 2 buttons, spacing, fit to screen width
+    const buttonCount = 2;
+    const spacing = 20;
+    const totalSpacing = spacing * (buttonCount - 1);
+    const buttonWidth = (this.gameWidth - 2 * 40 - totalSpacing) / buttonCount; // 40px side margin
     const buttonHeight = 50;
 
     // Back button
     const backButton = this.createButton(
       '← Back to Stages',
-      (this.gameWidth - buttonWidth) / 2,
+      0,
       0,
       buttonWidth,
       buttonHeight,
@@ -372,10 +370,29 @@ export class PrepareScene extends BaseScene {
       }
     );
 
-    buttonContainer.addChild(backButton);
+    // Start Battle button
+    const startButton = this.createButton(
+      'Start Battle',
+      this.gameWidth - buttonWidth - 40,
+      0,
+      buttonWidth,
+      buttonHeight,
+      async () => {
+        await this.startBattle();
+      }
+    );
 
-    // Center the button
-    buttonContainer.x = 0;
+    // Style the start button differently
+    const startBg = startButton.children[0] as Graphics;
+    startBg.clear()
+      .roundRect(0, 0, buttonWidth, buttonHeight, 8)
+      .fill(Gradients.createButtonGradient(buttonWidth, buttonHeight))
+      .stroke({ width: 2, color: Colors.RARITY_LEGENDARY });
+
+    buttonContainer.addChild(backButton, startButton);
+
+    // Center the buttons with side margin
+    buttonContainer.x = 20;
     buttonContainer.y = this.gameHeight - buttonHeight - 40;
 
     this.container.addChild(buttonContainer);
