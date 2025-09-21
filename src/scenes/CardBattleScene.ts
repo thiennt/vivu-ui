@@ -23,7 +23,10 @@ import {
   CardBattleDeck,
   Card,
   CardInDeck,
-  CardBattleCharacter
+  CardBattleCharacter,
+  BattleCard,
+  CardType,
+  CardRarity
 } from '@/types';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
 
@@ -45,6 +48,23 @@ export class CardBattleScene extends BaseScene {
   private dragTarget: Container | null = null;
   private dragOffset = { x: 0, y: 0 };
   private isDragging = false;
+  
+  // Helper functions for card property access
+  private getEnergyCost(card: Card | BattleCard): number {
+    if ('energyCost' in card) {
+      return card.energyCost;
+    } else {
+      return (card as Card).energy_cost;
+    }
+  }
+  
+  private getCardType(card: Card | BattleCard): string {
+    if ('cardType' in card) {
+      return card.cardType || 'special';
+    } else {
+      return (card as Card).card_type;
+    }
+  }
   private dropZones: { area: Container, type: 'character' | 'discard', playerId: number, characterIndex?: number }[] = [];
 
   private battleStarted = false;
@@ -490,7 +510,7 @@ export class CardBattleScene extends BaseScene {
       .stroke({ width: 1, color: Colors.CARD_BORDER });
     
     const costText = new Text({
-      text: card.card?.energy_cost.toString(),
+      text: card.card ? this.getEnergyCost(card.card).toString() : '0',
       style: {
         fontFamily: 'Kalam',
         fontSize: 8,
@@ -519,7 +539,7 @@ export class CardBattleScene extends BaseScene {
     
     // Card type indicator
     const typeText = new Text({
-      text: card.card?.card_type.toUpperCase(),
+      text: card.card ? this.getCardType(card.card).toUpperCase() : 'UNKNOWN',
       style: {
         fontFamily: 'Kalam',
         fontSize: 6,
@@ -801,9 +821,21 @@ export class CardBattleScene extends BaseScene {
   }
 
   private showCardDetails(card: CardInDeck): void {
+    // Convert CardInDeck to BattleCard for the popup
+    const battleCard: BattleCard = {
+      id: card.card_id || 'unknown',
+      name: card.card?.name || 'Unknown Card',
+      description: card.card?.description || 'No description',
+      energyCost: card.card ? this.getEnergyCost(card.card) : 0,
+      group: CardType.SPECIAL, // Default fallback
+      rarity: CardRarity.COMMON, // Default fallback
+      effects: [],
+      cardType: card.card ? this.getCardType(card.card) : 'special'
+    };
+    
     navigation.presentPopup(class extends CardDetailPopup {
       constructor() {
-        super({ card });
+        super({ card: battleCard });
       }
     });
   }

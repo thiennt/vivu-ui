@@ -67,9 +67,9 @@ export class CardDetailPopup extends Container {
 
     // Card type and rarity badge
     let cardTypeBadge: Container | null = null;
-    if (this.card.cardType) {
+    if (this.card.cardType || this.card.group) {
       cardTypeBadge = this.createCardTypeBadge(
-        this.card.cardType.toUpperCase(),
+        (this.card.cardType || this.card.group).toUpperCase(),
         this.gameWidth / 2 - 40,
         dialogY + 90
       );

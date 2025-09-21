@@ -14,7 +14,10 @@ import {
   BattleRewards,
   TurnPhase, 
   BattleStageResponse,
-  CardBattleState
+  CardBattleState,
+  DrawPhaseResult,
+  BattlePhaseResult,
+  BattleLogEntry
 } from '@/types';
 import { createRandomDeck } from '@/utils/cardData';
 
@@ -184,26 +187,104 @@ export const battleApi = {
     return apiRequest(`/players/${playerId}/card-battle/${battleId}/state`);
   },
 
-  async playCard(battleId: string, moveData: BattleMoveData): Promise<BattleMoveResponse> {
-    const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
-    return apiRequest(`/players/${playerId}/card-battle/${battleId}/moves`, {
+  async startTurn(battleId: string): Promise<DrawPhaseResult> {
+    console.log('🎯 startTurn API called for battle:', battleId);
+    return apiRequest(`/card-battle/${battleId}/start-turn`, {
+      method: 'POST',
+    }, {
+      success: true,
+      drawn_cards: [],
+      updated_hand: [],
+      energy: 3,
+      status_effects: [],
+      actions_performed: [{
+        type: 'draw_phase',
+        player_team: 1,
+        description: 'Turn started, cards drawn'
+      }]
+    });
+  },
+
+  async playAction(battleId: string, moveData: BattleMoveData): Promise<BattleMoveResponse> {
+    console.log('🎮 playAction API called for battle:', battleId, 'with data:', moveData);
+    return apiRequest(`/card-battle/${battleId}/action`, {
       method: 'POST',
       body: JSON.stringify(moveData),
     }, { 
       success: true, 
-      newState: {},
-      result: 'move_applied'
+      result: {
+        success: true,
+        damage_dealt: moveData.action === 'play_card' ? 25 : undefined,
+        actions_performed: [{
+          type: moveData.action,
+          player_team: 1,
+          card_id: moveData.card_id,
+          target_ids: moveData.target_ids,
+          description: `${moveData.action} executed`
+        }]
+      }
     });
   },
 
-  async endTurn(battleId: string): Promise<BattleMoveResponse> {
+  async getBattleLogs(battleId: string, turn?: number): Promise<BattleLogEntry[]> {
+    console.log('📋 getBattleLogs API called for battle:', battleId, 'turn:', turn);
+    const endpoint = turn ? `/card-battle/${battleId}/logs?turn=${turn}` : `/card-battle/${battleId}/logs`;
+    return apiRequest(endpoint, {}, []);
+  },
+
+  async endTurn(battleId: string): Promise<BattlePhaseResult> {
     console.log('⏭️ endTurn API called for battle:', battleId);
-    return apiRequest(`/battles/${battleId}/end-turn`, {
+    return apiRequest(`/card-battle/${battleId}/action`, {
       method: 'POST',
+      body: JSON.stringify({ action: 'end_turn' }),
     }, { 
       success: true,
-      newState: {},
-      result: 'turn_ended'
+      phase: 'ai_turn',
+      current_turn: 2,
+      current_player: 2,
+      ai_actions: [
+        {
+          type: 'draw_phase',
+          player_team: 2,
+          actions_performed: [{
+            type: 'draw_phase',
+            player_team: 2,
+            description: 'AI drew cards'
+          }]
+        },
+        {
+          type: 'play_card',
+          player_team: 2,
+          character_id: 'ai_char_001',
+          card_id: 'card_003',
+          target_ids: ['player_char_001'],
+          result: {
+            success: true,
+            damage_dealt: 30,
+            actions_performed: [{
+              type: 'play_card',
+              player_team: 2,
+              character_id: 'ai_char_001',
+              card_id: 'card_003',
+              target_ids: ['player_char_001'],
+              description: 'AI played attack card'
+            }]
+          },
+          actions_performed: [{
+            type: 'play_card',
+            player_team: 2,
+            character_id: 'ai_char_001',
+            card_id: 'card_003',
+            target_ids: ['player_char_001'],
+            description: 'AI played attack card'
+          }]
+        }
+      ],
+      actions_performed: [{
+        type: 'end_turn',
+        player_team: 1,
+        description: 'Player turn ended'
+      }]
     });
   },
 
