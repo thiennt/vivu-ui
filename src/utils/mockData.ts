@@ -1,8 +1,6 @@
 // ---- Skills ----
 // NOTE: mockSkills usage has been replaced with API calls for CharacterDetail component
 
-import { mock } from "node:test";
-
 // This data is kept for other components that haven't been migrated yet
 export const mockSkills = [
   {
