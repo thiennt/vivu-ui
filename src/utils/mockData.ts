@@ -1468,3 +1468,125 @@ export const mockBattleRewards: BattleRewards = {
   ],
   newLevel: false
 };
+
+// ---- Extended Mock Data for Complete Battle Flow ----
+import { DrawPhaseResult, BattlePhaseResult, BattleMoveResponse, AIAction, BattleActionResult, BattleLogEntry } from '../types';
+
+export const mockDrawPhaseResult: DrawPhaseResult = {
+  success: true,
+  drawn_cards: [
+    {
+      id: 'fire_bolt_001',
+      name: 'Fire Bolt',
+      group: 'High Damage',
+      description: 'Deal 25 fire damage to target enemy',
+      card_type: 'attack',
+      energy_cost: 2,
+      rarity: 'common'
+    }
+  ],
+  updated_hand: [],
+  energy: 4,
+  status_effects: [],
+  actions_performed: [{
+    type: 'draw_phase',
+    player_team: 1,
+    description: 'Drew 1 card and gained 1 energy'
+  }]
+};
+
+export const mockBattleActionResult: BattleActionResult = {
+  success: true,
+  damage_dealt: 25,
+  actions_performed: [{
+    type: 'play_card',
+    player_team: 1,
+    card_id: 'fire_bolt_001',
+    target_ids: ['enemy_char_1'],
+    description: 'Fire Bolt dealt 25 damage to enemy'
+  }]
+};
+
+export const mockPlayCardResponse: BattleMoveResponse = {
+  success: true,
+  result: mockBattleActionResult
+};
+
+export const mockAIActions: AIAction[] = [
+  {
+    type: 'draw_phase',
+    player_team: 2,
+    actions_performed: [{
+      type: 'draw_phase',
+      player_team: 2,
+      description: 'AI drew cards and gained energy'
+    }]
+  },
+  {
+    type: 'play_card',
+    player_team: 2,
+    character_id: 'enemy_char_1',
+    card_id: 'shadow_strike',
+    target_ids: ['player_char_1'],
+    result: {
+      success: true,
+      damage_dealt: 20,
+      actions_performed: [{
+        type: 'play_card',
+        player_team: 2,
+        character_id: 'enemy_char_1',
+        card_id: 'shadow_strike',
+        target_ids: ['player_char_1'],
+        description: 'Enemy cast Shadow Strike for 20 damage'
+      }]
+    },
+    actions_performed: [{
+      type: 'play_card',
+      player_team: 2,
+      character_id: 'enemy_char_1',
+      card_id: 'shadow_strike',
+      target_ids: ['player_char_1'],
+      description: 'Enemy cast Shadow Strike for 20 damage'
+    }]
+  }
+];
+
+export const mockEndTurnResult: BattlePhaseResult = {
+  success: true,
+  phase: 'ai_turn',
+  current_turn: 2,
+  current_player: 2,
+  ai_actions: mockAIActions,
+  actions_performed: [{
+    type: 'end_turn',
+    player_team: 1,
+    description: 'Player ended turn'
+  }]
+};
+
+export const mockBattleLogs: BattleLogEntry[] = [
+  {
+    type: 'draw_phase',
+    player_team: 1,
+    description: 'Battle started - Player 1 draws initial cards'
+  },
+  {
+    type: 'play_card',
+    player_team: 1,
+    card_id: 'fire_bolt_001',
+    target_ids: ['enemy_char_1'],
+    description: 'Player cast Fire Bolt'
+  },
+  {
+    type: 'end_turn',
+    player_team: 1,
+    description: 'Player ended turn'
+  },
+  {
+    type: 'play_card',
+    player_team: 2,
+    card_id: 'shadow_strike',
+    target_ids: ['player_char_1'],
+    description: 'Enemy cast Shadow Strike'
+  }
+];
