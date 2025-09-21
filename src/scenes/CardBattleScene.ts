@@ -1,32 +1,29 @@
 import { Container, Graphics, Text, Ticker } from 'pixi.js';
 import { navigation } from '@/utils/navigation';
-import { mockCharacters } from '@/utils/mockData';
-import { createRandomDeck, drawCards } from '@/utils/cardData';
 import { BaseScene } from '@/utils/BaseScene';
 import { HomeScene } from './HomeScene';
-import { StageScene } from './StageScene';
 import { Colors, Gradients } from '@/utils/colors';
 import { gsap } from 'gsap';
 import { app } from '@/app';
 import { CardDetailPopup } from '@/popups/CardDetailPopup';
 import { battleApi } from '@/services/api';
 import { 
-  BattleCharacter, 
-  CardBattlePlayer, 
   CardBattleState, 
-  TurnPhase,
   CardEffectType,
   BattleMoveData,
   BattleEndData,
   BattleRewards,
-  BattleStateResponse,
-  CardBattleDeck,
   Card,
   CardInDeck,
-  CardBattleCharacter,
   BattleCard,
   CardType,
-  CardRarity
+  CardRarity,
+  DrawPhaseResult,
+  BattlePhaseResult,
+  BattleActionResult,
+  BattleLogEntry,
+  AIAction,
+  CardBattleCharacter
 } from '@/types';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
 
@@ -50,6 +47,105 @@ export class CardBattleScene extends BaseScene {
   private isDragging = false;
   
   // Helper functions for card property access
+  private getCurrentPlayer(): number {
+    return this.battleState?.current_player || 1;
+  }
+
+  private async animateActionResult(result: BattleActionResult): Promise<void> {
+    console.log('🎨 Animating action result:', result);
+    
+    // Animate damage if any
+    if (result.damage_dealt && result.damage_dealt > 0) {
+      await this.animateDamage(result.damage_dealt);
+    }
+    
+    // Animate healing if any
+    if (result.healing_done && result.healing_done > 0) {
+      await this.animateHealing(result.healing_done);
+    }
+    
+    // Animate status effects if any
+    if (result.status_effects_applied && result.status_effects_applied.length > 0) {
+      await this.animateStatusEffects(result.status_effects_applied);
+    }
+    
+    // Log the actions performed
+    result.actions_performed.forEach(action => {
+      console.log(`📝 Action: ${action.description}`);
+    });
+  }
+
+  private async animateAIActions(aiActions: AIAction[]): Promise<void> {
+    console.log('🤖 Animating AI actions:', aiActions);
+    
+    for (const action of aiActions) {
+      await this.showTurnMessage(`AI: ${action.type.replace('_', ' ')}`);
+      
+      switch (action.type) {
+        case 'draw_phase':
+          console.log('🃏 AI drawing cards...');
+          break;
+        case 'play_card':
+          console.log(`🎯 AI playing card ${action.card_id} from ${action.character_id} targeting ${action.target_ids?.join(', ')}`);
+          if (action.result) {
+            await this.animateActionResult(action.result);
+          }
+          break;
+        case 'discard_card':
+          console.log(`🗑️ AI discarding card ${action.card_id}`);
+          break;
+        case 'end_turn':
+          console.log('⏭️ AI ending turn');
+          break;
+      }
+      
+      // Small delay between actions for better visual flow
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+  }
+
+  private async refreshBattleState(): Promise<void> {
+    try {
+      console.log('🔄 Refreshing battle state from server...');
+      this.battleState = await battleApi.getBattleState(this.battleId);
+      this.refreshUI();
+      console.log('✅ Battle state refreshed');
+    } catch (error) {
+      console.error('❌ Error refreshing battle state:', error);
+    }
+  }
+
+  private async animateDamage(damage: number): Promise<void> {
+    console.log(`💥 Animating ${damage} damage`);
+    // Placeholder for damage animation
+    await new Promise(resolve => setTimeout(resolve, 500));
+  }
+
+  private async animateHealing(healing: number): Promise<void> {
+    console.log(`💚 Animating ${healing} healing`);
+    // Placeholder for healing animation  
+    await new Promise(resolve => setTimeout(resolve, 500));
+  }
+
+  private async animateStatusEffects(effects: any[]): Promise<void> {
+    console.log('✨ Animating status effects:', effects);
+    // Placeholder for status effect animation
+    await new Promise(resolve => setTimeout(resolve, 300));
+  }
+
+  private async animateCardDraw(cards: Card[]): Promise<void> {
+    console.log(`🃏 Animating drawing ${cards.length} cards`);
+    // Placeholder for card draw animation
+    await new Promise(resolve => setTimeout(resolve, 800));
+  }
+
+  private async animateEnergyUpdate(energy: number): Promise<void> {
+    console.log(`⚡ Updating energy to ${energy}`);
+    // Placeholder for energy update animation
+    await new Promise(resolve => setTimeout(resolve, 300));
+  }
+
+  // Helper functions for card property access (still needed for UI display)
   private getEnergyCost(card: Card | BattleCard): number {
     if ('energyCost' in card) {
       return card.energyCost;
@@ -86,11 +182,22 @@ export class CardBattleScene extends BaseScene {
   async prepare(): Promise<void> {
     this.loadingManager.showLoading();
 
-    this.battleState = await battleApi.getBattleState(this.battleId);
-
-    this.loadingManager.hideLoading();
-    
-    this.initializeUI();
+    try {
+      // Use getBattleState to retrieve the complete current battle state
+      // This is the authoritative source for initial render and reconnects
+      console.log('🔄 Loading battle state from server...');
+      this.battleState = await battleApi.getBattleState(this.battleId);
+      console.log('✅ Battle state loaded:', this.battleState);
+      
+      this.loadingManager.hideLoading();
+      this.initializeUI();
+      
+    } catch (error) {
+      console.error('❌ Error loading battle state:', error);
+      this.loadingManager.hideLoading();
+      alert('Failed to load battle. Please try again.');
+      navigation.showScreen(HomeScene);
+    }
   }
 
   private initializeUI(): void {
@@ -148,14 +255,43 @@ export class CardBattleScene extends BaseScene {
   private async startPlayerTurn(): Promise<void> {
     console.log('🎯 Starting player turn...');
     
-    // Show "Your Turn" message
-    await this.showTurnMessage('Your Turn!');
-    
-    // Animate drawing cards to hand
-    this.battleStarted = true;
-    await this.animateInitialDraw();
-    
-    console.log('🎯 Player turn: Main phase - you can now play cards');
+    try {
+      // Call the new startTurn API
+      const turnStartResult = await battleApi.startTurn(this.battleId);
+      
+      if (!turnStartResult.success) {
+        alert('Unable to start turn. Please try again.');
+        return;
+      }
+
+      console.log('📥 Processing turn start result:', turnStartResult);
+      
+      // Show "Your Turn" message
+      await this.showTurnMessage('Your Turn!');
+      
+      // Animate drawn cards if any
+      if (turnStartResult.drawn_cards.length > 0) {
+        await this.animateCardDraw(turnStartResult.drawn_cards);
+      }
+      
+      // Update energy display
+      await this.animateEnergyUpdate(turnStartResult.energy);
+      
+      // Apply any status effects
+      if (turnStartResult.status_effects.length > 0) {
+        await this.animateStatusEffects(turnStartResult.status_effects);
+      }
+      
+      // Refresh battle state from server
+      await this.refreshBattleState();
+      
+      this.battleStarted = true;
+      console.log('🎯 Player turn: Main phase - you can now play cards');
+      
+    } catch (error) {
+      console.error('❌ Error starting turn:', error);
+      alert('Network error occurred. Please try again.');
+    }
   }
 
   private async showTurnMessage(message: string): Promise<void> {
@@ -930,139 +1066,69 @@ export class CardBattleScene extends BaseScene {
   }
 
   private async playCardOnCharacter(card: CardInDeck, targetPlayerId: number, characterIndex: number): Promise<void> {
-    // Apply card effects
-    // const targetPlayer = targetPlayerId === 1 ? this.battleState.player1 : this.battleState.player2;
+    try {
+      // Prepare move data for new API
+      const moveData: BattleMoveData = {
+        action: 'play_card',
+        card_id: card.card_id || 'unknown',
+        character_id: `player_char_${this.getCurrentPlayer()}`,
+        target_ids: [`${targetPlayerId === 1 ? 'player' : 'enemy'}_char_${characterIndex}`]
+      };
 
-    // // Check if player has enough energy
-    // if (targetPlayer.energy < card.energy_cost) {
-    //   alert('Not enough energy to play this card.');
-    //   return; // Can't afford this card
-    // }
-
-    // const targetCharacter = targetPlayer.characters[characterIndex];
-
-    // // Prepare move data for API
-    // const moveData: BattleMoveData = {
-    //   cardId: card.id,
-    //   targetCharacterIndex: characterIndex,
-    //   targetPlayerId: targetPlayerId,
-    //   action: 'play_card'
-    // };
-
-    //try {
-    //   // If we have a battleId, sync with backend
-    //   if (this.battleId) {
-    //     console.log('🔄 Syncing card play with backend...', moveData);
-    //     const moveResponse = await battleApi.playCard(this.battleId, moveData);
-        
-    //     if (!moveResponse.success) {
-    //       alert('Move was not accepted by the server.');
-    //       return;
-    //     }
-
-    //     // Apply any state updates from the server
-    //     if (moveResponse.newState) {
-    //       console.log('📥 Applying server state updates:', moveResponse.newState);
-    //       Object.assign(this.battleState, moveResponse.newState);
-    //     }
-    //   } else {
-    //     console.log('⚠️ No battleId - playing locally only');
-    //   }
-
-    //   // Apply local card effects (this ensures UI responsiveness)
-    //   // Deduct energy cost
-    //   this.battleState.player1.energy -= card.energyCost;
-
-    //   // Apply card effects
-    //   for (const effect of card.effects) {
-    //     this.applyCardEffect(effect, targetCharacter, targetPlayer);
-    //   }
-
-    //   // Move card to discard pile
-    //   this.battleState.player1.hand = this.battleState.player1.hand.filter(c => c.id !== card.id);
-    //   this.battleState.player1.discardPile.push(card);
-
-    //   // Refresh UI to show changes
-    //   this.refreshUI();
-
-    // } catch (error) {
-    //   console.error('❌ Error playing card:', error);
-    //   // In case of API error, allow local play to continue
-    //   alert('Network error occurred. Continuing with local gameplay.');
+      console.log('🎮 Playing card with new API...', moveData);
       
-    //   // Apply local effects as fallback
-    //   this.battleState.player1.energy -= card.energyCost;
-    //   for (const effect of card.effects) {
-    //     this.applyCardEffect(effect, targetCharacter, targetPlayer);
-    //   }
-    //   this.battleState.player1.hand = this.battleState.player1.hand.filter(c => c.id !== card.id);
-    //   this.battleState.player1.discardPile.push(card);
-    //   this.refreshUI();
-    //}
+      // Call the new playAction API
+      const moveResponse = await battleApi.playAction(this.battleId, moveData);
+      
+      if (!moveResponse.success) {
+        alert('Move was not accepted by the server.');
+        return;
+      }
+
+      // Animate the action result
+      await this.animateActionResult(moveResponse.result);
+      
+      // Refresh battle state from server
+      await this.refreshBattleState();
+      
+      console.log('✅ Card played successfully');
+      
+    } catch (error) {
+      console.error('❌ Error playing card:', error);
+      alert('Network error occurred. Please try again.');
+    }
   }
 
   private async discardCard(card: CardInDeck): Promise<void> {
-    // Prepare move data for API
-    // const moveData: BattleMoveData = {
-    //   cardId: card.id,
-    //   action: 'discard'
-    // };
+    try {
+      // Prepare move data for new API
+      const moveData: BattleMoveData = {
+        action: 'discard_card',
+        card_id: card.card_id || 'unknown',
+        character_id: `player_char_${this.getCurrentPlayer()}`
+      };
 
-    // try {
-    //   // If we have a battleId, sync with backend
-    //   if (this.battleId) {
-    //     console.log('🔄 Syncing card discard with backend...', moveData);
-    //     const moveResponse = await battleApi.playCard(this.battleId, moveData);
-        
-    //     if (!moveResponse.success) {
-    //       alert('Discard was not accepted by the server.');
-    //       return;
-    //     }
-
-    //     // Apply any state updates from the server
-    //     if (moveResponse.newState) {
-    //       console.log('📥 Applying server discard state:', moveResponse.newState);
-    //       Object.assign(this.battleState, moveResponse.newState);
-    //     }
-    //   } else {
-    //     console.log('⚠️ No battleId - discarding locally only');
-    //   }
-
-    //   // Apply local discard effects
-    //   // Gain 1 energy for discarding
-    //   this.battleState.player1.energy += 1;
-
-    //   // Move card to discard pile
-    //   this.battleState.player1.hand = this.battleState.player1.hand.filter(c => c.id !== card.id);
-    //   this.battleState.player1.discardPile.push(card);
-
-    //   // Refresh UI
-    //   this.refreshUI();
-
-    // } catch (error) {
-    //   console.error('❌ Error discarding card:', error);
-    //   // Fallback to local discard
-    //   alert('Network error occurred. Continuing with local gameplay.');
+      console.log('🗑️ Discarding card with new API...', moveData);
       
-    //   this.battleState.player1.energy += 1;
-    //   this.battleState.player1.hand = this.battleState.player1.hand.filter(c => c.id !== card.id);
-    //   this.battleState.player1.discardPile.push(card);
-    //   this.refreshUI();
-    // }
-  }
+      // Call the new playAction API
+      const moveResponse = await battleApi.playAction(this.battleId, moveData);
+      
+      if (!moveResponse.success) {
+        alert('Discard was not accepted by the server.');
+        return;
+      }
 
-  private applyCardEffect(effect: any, targetCharacter: BattleCharacter, targetPlayer: CardBattlePlayer): void {
-    switch (effect.type) {
-      case CardEffectType.DAMAGE:
-        targetCharacter.hp = Math.max(0, targetCharacter.hp - effect.value);
-        break;
-      case CardEffectType.HEAL:
-        targetCharacter.hp = Math.min(targetCharacter.maxHp, targetCharacter.hp + effect.value);
-        break;
-      case CardEffectType.ENERGY_GAIN:
-        targetPlayer.energy += effect.value;
-        break;
-      // Add more effect types as needed
+      // Animate the action result
+      await this.animateActionResult(moveResponse.result);
+      
+      // Refresh battle state from server
+      await this.refreshBattleState();
+      
+      console.log('✅ Card discarded successfully');
+      
+    } catch (error) {
+      console.error('❌ Error discarding card:', error);
+      alert('Network error occurred. Please try again.');
     }
   }
 
@@ -1090,79 +1156,58 @@ export class CardBattleScene extends BaseScene {
   private async endTurn(): Promise<void> {
     console.log('🎯 Ending player turn...');
     
-    // try {
-    //   // Step 1: Sync turn end with backend if we have a battleId
-    //   if (this.battleId) {
-    //     console.log('🔄 Syncing turn end with backend...');
-    //     const turnResponse = await battleApi.endTurn(this.battleId);
-        
-    //     if (!turnResponse.success) {
-    //       alert('Unable to end turn. Please try again.');
-    //       return;
-    //     }
+    try {
+      // Call the new endTurn API which returns AI actions
+      const turnResponse = await battleApi.endTurn(this.battleId);
+      
+      if (!turnResponse.success) {
+        alert('Unable to end turn. Please try again.');
+        return;
+      }
 
-    //     // Apply any state updates from the server
-    //     if (turnResponse.newState) {
-    //       console.log('📥 Applying server turn end state:', turnResponse.newState);
-    //       Object.assign(this.battleState, turnResponse.newState);
-    //     }
-    //   } else {
-    //     console.log('⚠️ No battleId - processing turn locally only');
-    //   }
-
-    //   // Step 2: Local turn end processing
-    //   this.battleState.turnPhase = TurnPhase.END;
-    //   await this.showTurnMessage('Turn Ending...');
+      console.log('📥 Processing turn end response:', turnResponse);
       
-    //   // Check for win/loss conditions
-    //   if (this.checkBattleEnd()) {
-    //     return;
-    //   }
+      // Show turn ending message
+      await this.showTurnMessage('Turn Ending...');
       
-    //   // Step 3: AI Turn (if PvE)
-    //   this.battleState.activePlayer = 2;
-    //   this.battleState.currentTurn++;
+      // Check if we have AI actions to animate
+      if (turnResponse.ai_actions && turnResponse.ai_actions.length > 0) {
+        await this.animateAIActions(turnResponse.ai_actions);
+      }
       
-    //   await this.handleAITurn();
+      // Refresh battle state from server
+      await this.refreshBattleState();
       
-    //   // Step 4: Repeat cycle - back to player turn
-    //   await this.startPlayerTurn();
-
-    // } catch (error) {
-    //   console.error('❌ Error ending turn:', error);
-    //   // Fallback to local turn processing
-    //   alert('Network error occurred. Continuing with local gameplay.');
+      // Check for battle end conditions
+      if (this.checkBattleEnd()) {
+        return;
+      }
       
-    //   this.battleState.turnPhase = TurnPhase.END;
-    //   await this.showTurnMessage('Turn Ending...');
+      // Start next player turn
+      await this.startPlayerTurn();
       
-    //   if (this.checkBattleEnd()) {
-    //     return;
-    //   }
-      
-    //   this.battleState.activePlayer = 2;
-    //   this.battleState.currentTurn++;
-    //   await this.handleAITurn();
-    //   await this.startPlayerTurn();
-    // }
+    } catch (error) {
+      console.error('❌ Error ending turn:', error);
+      alert('Network error occurred. Please try again.');
+    }
   }
 
   private checkBattleEnd(): boolean {
-    // // Check if all characters of player 1 are defeated
-    // const player1Alive = this.battleState.player1.characters.some(char => char.hp > 0);
-    // const player2Alive = this.battleState.player2.characters.some(char => char.hp > 0);
+    if (!this.battleState) return false;
     
-    // if (!player1Alive) {
-    //   this.battleState.winner = 2;
-    //   this.showBattleEnd(false);
-    //   return true;
-    // }
+    // Check if all characters of player 1 are defeated
+    const player1Alive = this.battleState.player1.characters.some(char => char.current_hp > 0);
+    const player2Alive = this.battleState.player2.characters.some(char => char.current_hp > 0);
     
-    // if (!player2Alive) {
-    //   this.battleState.winner = 1;
-    //   this.showBattleEnd(true);
-    //   return true;
-    // }
+    if (!player1Alive) {
+      this.showBattleEnd(false);
+      return true;
+    }
+    
+    if (!player2Alive) {
+      this.showBattleEnd(true);
+      return true;
+    }
     
     return false;
   }
