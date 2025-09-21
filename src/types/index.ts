@@ -170,17 +170,6 @@ export interface Card {
   actions?: any[]; // Define specific actions/effects of the card
 }
 
-// Card Battle System Types
-export interface BattleCard {
-  id: string;
-  name: string;
-  description: string;
-  energyCost: number;
-  group: CardType;
-  rarity: CardRarity;
-  effects: CardEffect[];
-}
-
 export interface CardEffect {
   type: CardEffectType;
   value: number;
@@ -247,18 +236,9 @@ export interface CardBattlePlayer {
   energy: number;
   maxEnergy: number;
   characters: BattleCharacter[];
-  deck: BattleCard[];
-  hand: BattleCard[];
-  discardPile: BattleCard[];
-}
-
-export interface CardBattleState {
-  player1: CardBattlePlayer;
-  player2: CardBattlePlayer;
-  currentTurn: number;
-  activePlayer: number; // 1 or 2
-  turnPhase: TurnPhase;
-  winner?: number;
+  deck: Card[];
+  hand: Card[];
+  discardPile: Card[];
 }
 
 export enum TurnPhase {
@@ -267,8 +247,66 @@ export enum TurnPhase {
   END = 'end'
 }
 
-export interface BattleStageResponse {
+export interface CardBattleCharacter {
   id: string;
+  character_id: string;
+  name?: string;
+  avatar_url?: string;
+  rarity?: string;
+  team: number;
+  position: number;
+  max_hp: number;
+  current_hp: number;
+  atk: number;
+  def: number;
+  agi: number;
+  crit_rate: number;
+  crit_dmg: number;
+  res: number;
+  damage: number;
+  mitigation: number;
+  hit_rate: number;
+  dodge: number;
+  has_acted: boolean;
+  active_effects: any[];
+  equipped_skills: string[];
+}
+
+export interface CardInDeck {
+  card_id?: string;
+  position: number; // 1-50, shuffled
+  card?: Card;
+}
+
+export interface CardBattleDeck {
+  id: string;
+  player_team: number;
+  deck_cards: CardInDeck[];
+  hand_cards: CardInDeck[];
+  discard_cards: CardInDeck[];
+  current_energy: number;
+  cards_drawn: number;
+}
+
+export interface CardBattleState {
+  id: string;
+  battle_type: 'pve' | 'pvp';
+  status: 'open' | 'ongoing' | 'completed' | 'abandoned';
+  current_turn: number;
+  current_player: number;
+  player1: {
+    characters: CardBattleCharacter[];
+    deck: CardBattleDeck;
+  },
+  player2: {
+    characters: CardBattleCharacter[];
+    deck: CardBattleDeck;
+  },
+  phase: 'start_turn' | 'draw_phase' | 'main_phase' | 'end_turn';
+}
+
+export interface BattleStageResponse {
+  battle_id: string;
   stage_id: string;
   player1_id: string;
   status: 'created' | 'active' | 'completed' | 'cancelled';
@@ -315,6 +353,11 @@ export interface BattleStateResponse {
    }>;
   phase: string;
 };
+
+export interface BattleApiResponse {
+  battleId: string;
+  status: string;
+}
 
 export interface BattleMoveData {
   cardId: string;

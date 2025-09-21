@@ -47,10 +47,10 @@ export class PrepareScene extends BaseScene {
 
     this.loadingManager.hideLoading();
     
-    this.createUI();
+    this.initializeUI();
   }
 
-  private createUI(): void {
+  private initializeUI(): void {
     if (!this.battleStage) {
       return;
     }
@@ -399,11 +399,11 @@ export class PrepareScene extends BaseScene {
   }
 
   private async startBattle(): Promise<void> {
-    const battleResponse = await battleApi.startBattle(this.battleStage?.id || '');
+    await battleApi.startBattle(this.battleStage?.battle_id || '');
     
     // Navigate to card battle scene with battle data
     navigation.showScreen(CardBattleScene, {
-      battleId: this.battleStage?.id,
+      battle_id: this.battleStage?.battle_id,
     });
   }
 
@@ -467,15 +467,9 @@ export class PrepareScene extends BaseScene {
     }
   }
 
-  /** Reset screen after hidden */
-  reset(): void {
-    this.container.removeChildren();
-  }
-
   /** Resize handler */
   resize(width: number, height: number): void {
     this.gameWidth = width;
     this.gameHeight = height;
-    this.createUI();
   }
 }

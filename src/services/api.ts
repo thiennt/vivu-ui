@@ -13,7 +13,8 @@ import {
   BattleEndData, 
   BattleRewards,
   TurnPhase, 
-  BattleStageResponse
+  BattleStageResponse,
+  CardBattleState
 } from '@/types';
 import { createRandomDeck } from '@/utils/cardData';
 
@@ -171,14 +172,14 @@ export const battleApi = {
     });
   },
 
-  async startBattle(battleId: string): Promise<BattleApiResponse> {
+  async startBattle(battleId: string): Promise<void> {
     const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
     return apiRequest(`/players/${playerId}/card-battle/${battleId}/start`, {
       method: 'POST',
-    }, { battleId, status: 'ongoing' });
+    });
   },
 
-  async getBattleState(battleId: string): Promise<BattleStateResponse> {
+  async getBattleState(battleId: string): Promise<CardBattleState> {
     const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
     return apiRequest(`/players/${playerId}/card-battle/${battleId}/state`);
   },
