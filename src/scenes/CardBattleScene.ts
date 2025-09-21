@@ -1536,11 +1536,11 @@ export class CardBattleScene extends BaseScene {
     this.player2HandContainer.removeChildren();
     
     // Recreate player areas
-    //this.createPlayerArea(this.player1Container, this.battleState.player1, true);
-    //this.createPlayerArea(this.player2Container, this.battleState.player2, false);
-    //this.createHandArea(this.player1HandContainer, this.battleState.player1, true);
-    //this.createHandArea(this.player2HandContainer, this.battleState.player2, false);
-    //this.battleLogContainer.removeChildren();
+    this.createPlayerArea(this.player1Container, 1, true);
+    this.createPlayerArea(this.player2Container, 2, false);
+    this.createHandArea(this.player1HandContainer, 1, true);
+    this.createHandArea(this.player2HandContainer, 2, false);
+    this.battleLogContainer.removeChildren();
     this.createBattleLog();
 
     this.gameContainer.addChild(
