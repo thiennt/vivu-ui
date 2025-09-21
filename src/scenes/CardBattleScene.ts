@@ -9,7 +9,6 @@ import { CardDetailPopup } from '@/popups/CardDetailPopup';
 import { battleApi } from '@/services/api';
 import { 
   CardBattleState, 
-  CardEffectType,
   BattleMoveData,
   BattleEndData,
   BattleRewards,
@@ -18,10 +17,7 @@ import {
   BattleCard,
   CardType,
   CardRarity,
-  DrawPhaseResult,
-  BattlePhaseResult,
   BattleActionResult,
-  BattleLogEntry,
   AIAction,
   CardBattleCharacter
 } from '@/types';
