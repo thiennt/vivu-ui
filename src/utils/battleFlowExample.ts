@@ -27,8 +27,10 @@ export class BattleFlowExample {
     };
 
     try {
-      const response = await battleApi.createBattle(battleData);
-      this.battleId = response.battleId;
+      // Note: createBattle method doesn't exist in the new API spec
+      // For demo purposes, we'll use createBattleStage instead
+      const response = await battleApi.createBattleStage('stage_001');
+      this.battleId = response.battle_id;
       console.log('✅ Battle created:', response);
       return response;
     } catch (error) {
@@ -46,14 +48,13 @@ export class BattleFlowExample {
     console.log('🃏 Playing card with backend sync...');
     
     const moveData: BattleMoveData = {
-      cardId,
-      targetCharacterIndex,
-      targetPlayerId: 2, // Targeting enemy
+      card_id: cardId,
+      target_ids: [`character_${targetCharacterIndex}`],
       action: 'play_card'
     };
 
     try {
-      const response = await battleApi.playCard(this.battleId, moveData);
+      const response = await battleApi.playAction(this.battleId, moveData);
       console.log('✅ Card played successfully:', response);
       return response;
     } catch (error) {

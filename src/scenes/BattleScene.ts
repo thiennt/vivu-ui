@@ -607,13 +607,13 @@ export class BattleScene extends BaseScene {
   }
 
   private startBattle(): void {
-    // Call createBattle API (skip handling response as requested)
-    battleApi.createBattle({
-      team1: this.team1.map(char => ({ id: char.id, name: char.name, level: char.level })),
-      team2: this.team2.map(char => ({ id: char.id, name: char.name, level: char.level })),
-      battleType: '4v4',
-      timestamp: Date.now()
-    });
+    // Note: The createBattle API method doesn't exist in the new specification
+    // battleApi.createBattle({
+    //   team1: this.team1.map(char => ({ id: char.id, name: char.name, level: char.level })),
+    //   team2: this.team2.map(char => ({ id: char.id, name: char.name, level: char.level })),
+    //   battleType: '4v4',
+    //   timestamp: Date.now()
+    // });
 
     this.battleLog = ['Battle Started!'];
     this.currentTurn = 1;

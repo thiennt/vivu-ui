@@ -170,6 +170,17 @@ export interface Card {
   actions?: any[]; // Define specific actions/effects of the card
 }
 
+export interface BattleCard {
+  id: string;
+  name: string;
+  description: string;
+  energyCost: number;
+  group: CardType;
+  rarity: CardRarity;
+  effects: CardEffect[];
+  cardType?: string; // Optional for backward compatibility
+}
+
 export interface CardEffect {
   type: CardEffectType;
   value: number;
@@ -275,7 +286,7 @@ export interface CardBattleCharacter {
 export interface CardInDeck {
   card_id?: string;
   position: number; // 1-50, shuffled
-  card?: Card;
+  card?: Card | BattleCard;
 }
 
 export interface CardBattleDeck {
@@ -360,16 +371,16 @@ export interface BattleApiResponse {
 }
 
 export interface BattleMoveData {
-  cardId: string;
-  targetCharacterIndex?: number;
-  targetPlayerId?: number;
-  action: 'play_card' | 'discard' | 'special_action';
+  action: 'play_card' | 'discard_card' | 'end_turn';
+  card_id?: string;
+  character_id?: string;
+  target_ids?: string[];
 }
 
 export interface BattleMoveResponse {
   success: boolean;
-  newState?: Partial<CardBattleState>;
-  result: string;
+  result: BattleActionResult;
+  updated_state?: Partial<CardBattleState>;
   error?: string;
 }
 
@@ -385,4 +396,56 @@ export interface BattleRewards {
   items: any[];
   newLevel?: boolean;
   levelUpRewards?: any[];
+}
+
+// New interfaces for updated card battle API specification
+
+export interface BattleActionResult {
+  success: boolean;
+  damage_dealt?: number;
+  healing_done?: number;
+  status_effects_applied?: any[];
+  energy_change?: number;
+  cards_drawn?: Card[];
+  actions_performed: BattleLogEntry[];
+}
+
+export interface BattleLogEntry {
+  type: 'draw_phase' | 'play_card' | 'discard_card' | 'end_turn' | 'damage' | 'heal' | 'status_effect';
+  player_team: number;
+  character_id?: string;
+  card_id?: string;
+  target_ids?: string[];
+  result?: any;
+  timestamp?: string;
+  description?: string;
+}
+
+export interface DrawPhaseResult {
+  success: boolean;
+  drawn_cards: Card[];
+  updated_hand: Card[];
+  energy: number;
+  status_effects: any[];
+  actions_performed: BattleLogEntry[];
+}
+
+export interface BattlePhaseResult {
+  success: boolean;
+  phase: 'draw' | 'main' | 'end' | 'ai_turn';
+  current_turn: number;
+  current_player: number;
+  ai_actions?: AIAction[];
+  updated_state?: Partial<CardBattleState>;
+  actions_performed: BattleLogEntry[];
+}
+
+export interface AIAction {
+  type: 'draw_phase' | 'play_card' | 'discard_card' | 'end_turn';
+  player_team: number;
+  character_id?: string;
+  card_id?: string;
+  target_ids?: string[];
+  result?: BattleActionResult;
+  actions_performed: BattleLogEntry[];
 }
