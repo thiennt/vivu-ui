@@ -4,7 +4,7 @@
  * Includes fallback to mock data when API calls fail
  */
 
-import { mockPlayer, mockCharacters, mockSkills, mockDungeons, mockStages } from '@/utils/mockData';
+import { mockPlayer, mockCharacters, mockSkills, mockDungeons, mockStages, mockCardBattleState, mockBattleRewards } from '@/utils/mockData';
 import { 
   BattleApiResponse, 
   BattleStateResponse, 
@@ -172,6 +172,12 @@ export const battleApi = {
     const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
     return apiRequest(`/players/${playerId}/card-battle/stages/${stage_id}`, {
       method: 'POST'
+    }, {
+      battle_id: 'battle_mock_001',
+      stage_id: stage_id,
+      player1_id: playerId,
+      status: 'created',
+      cards: []
     });
   },
 
@@ -179,12 +185,12 @@ export const battleApi = {
     const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
     return apiRequest(`/players/${playerId}/card-battle/${battleId}/start`, {
       method: 'POST',
-    });
+    }, undefined);
   },
 
   async getBattleState(battleId: string): Promise<CardBattleState> {
     const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
-    return apiRequest(`/players/${playerId}/card-battle/${battleId}/state`);
+    return apiRequest(`/players/${playerId}/card-battle/${battleId}/state`, {}, mockCardBattleState);
   },
 
   async startTurn(battleId: string): Promise<DrawPhaseResult> {
@@ -297,22 +303,13 @@ export const battleApi = {
     }, {
       battleId,
       status: 'completed',
-      rewards: battleResult.winner === 1 ? {
-        gold: 100,
-        experience: 50,
-        items: []
-      } : undefined
+      rewards: battleResult.winner === 1 ? mockBattleRewards : undefined
     });
   },
 
   async getBattleRewards(battleId: string): Promise<BattleRewards> {
     console.log('🎁 getBattleRewards API called for battle:', battleId);
-    return apiRequest(`/battles/${battleId}/rewards`, {}, {
-      gold: 100,
-      experience: 50,
-      items: [],
-      newLevel: false
-    });
+    return apiRequest(`/battles/${battleId}/rewards`, {}, mockBattleRewards);
   },
 };
 
