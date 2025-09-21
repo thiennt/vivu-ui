@@ -163,7 +163,6 @@ export class CardBattleScene extends BaseScene {
   }
   private dropZones: { area: Container, type: 'character' | 'discard', playerId: number, characterIndex?: number }[] = [];
 
-  private battleStarted = false;
   private battleId: string;
 
   private loadingManager: LoadingStateManager;
@@ -191,6 +190,9 @@ export class CardBattleScene extends BaseScene {
       
       this.loadingManager.hideLoading();
       this.initializeUI();
+      
+      // Automatically start the first player turn
+      await this.startPlayerTurn();
       
     } catch (error) {
       console.error('❌ Error loading battle state:', error);
@@ -238,9 +240,6 @@ export class CardBattleScene extends BaseScene {
   private async startBattleSequence(): Promise<void> {
     console.log('🎯 Starting battle sequence...');
     
-    // Step 3: Show characters, decks, discard piles, energy, empty hands
-    this.battleStarted = false; // Start with setup view
-    
     // Give a moment to see the initial setup
     await new Promise(resolve => setTimeout(resolve, 1000));
 
@@ -285,7 +284,6 @@ export class CardBattleScene extends BaseScene {
       // Refresh battle state from server
       await this.refreshBattleState();
       
-      this.battleStarted = true;
       console.log('🎯 Player turn: Main phase - you can now play cards');
       
     } catch (error) {
@@ -482,9 +480,6 @@ export class CardBattleScene extends BaseScene {
   }
 
   private createHandArea(container: Container, playerNo: number, showCards: boolean): void {
-    // Do not show hand cards until battle has started
-    if (!this.battleStarted) return;
-
     const player = this.battleState ? (playerNo === 1 ? this.battleState.player1 : this.battleState.player2) : null;
 
     if (!player) return;
@@ -890,61 +885,31 @@ export class CardBattleScene extends BaseScene {
     const buttonWidth = 120;
     const buttonHeight = 44;
 
-    if (!this.battleStarted) {
-      // Start Battle button
-      const startButton = this.createButton(
-        'Start Battle',
-        (this.gameWidth - buttonWidth) / 2,
-        this.getContentHeight() - buttonHeight - 10,
-        buttonWidth,
-        buttonHeight,
-        async () => {
-          this.battleStarted = true;
-          this.container.removeChild(buttonContainer);
-          await this.animateInitialDraw();
-          this.refreshUI();
-        },
-        14
-      );
-      buttonContainer.addChild(startButton);
-    } else {
-      // End Turn button
-      const endTurnButton = this.createButton(
-        'End Turn',
-        this.gameWidth - buttonWidth - this.STANDARD_PADDING,
-        this.getContentHeight() - buttonHeight - 10,
-        buttonWidth,
-        buttonHeight,
-        () => this.endTurn(),
-        12
-      );
-      // Back button
-      const backButton = this.createButton(
-        '← Back',
-        this.STANDARD_PADDING,
-        this.getContentHeight() - buttonHeight - 10,
-        buttonWidth,
-        buttonHeight,
-        () => navigation.showScreen(HomeScene),
-        12
-      );
-      buttonContainer.addChild(endTurnButton, backButton);
-    }
+    // End Turn button
+    const endTurnButton = this.createButton(
+      'End Turn',
+      this.gameWidth - buttonWidth - this.STANDARD_PADDING,
+      this.getContentHeight() - buttonHeight - 10,
+      buttonWidth,
+      buttonHeight,
+      () => this.endTurn(),
+      12
+    );
+    
+    // Back button
+    const backButton = this.createButton(
+      '← Back',
+      this.STANDARD_PADDING,
+      this.getContentHeight() - buttonHeight - 10,
+      buttonWidth,
+      buttonHeight,
+      () => navigation.showScreen(HomeScene),
+      12
+    );
+    
+    buttonContainer.addChild(endTurnButton, backButton);
 
     this.container.addChild(buttonContainer);
-  }
-
-  private async animateInitialDraw(): Promise<void> {
-    // Remove all cards from player1's hand and put them back to deck
-    const player1Deck = this.battleState?.player1.deck;
-
-    // Draw and animate 5 cards
-    if (player1Deck?.hand_cards) {
-      for (const cardInDeck of player1Deck.hand_cards) {
-        await this.animateDrawCard(cardInDeck, 1);
-        this.refreshUI();
-      }
-    }
   }
 
   private makeCardDraggable(cardContainer: Container, card: CardInDeck): void {
