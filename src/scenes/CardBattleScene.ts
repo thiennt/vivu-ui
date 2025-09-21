@@ -202,6 +202,25 @@ export class CardBattleScene extends BaseScene {
     try {
       console.log('🔄 Preparing CardBattleScene...');
       
+      // Move getBattleState to prepare function to load battlestate data for ui to init
+      try {
+        console.log('🔄 Loading battle state from server...');
+        this.battleState = await battleApi.getBattleState(this.battleId);
+        console.log('✅ Battle state loaded:', this.battleState);
+        this.usingMockData = false;
+        
+      } catch (error) {
+        console.error('❌ Error loading battle state from API:', error);
+        console.log('🔄 Falling back to mock data for complete battle experience...');
+        
+        // Use mock data instead of failing
+        this.battleState = mockCardBattleState;
+        this.usingMockData = true;
+        
+        // Show user-friendly message about using offline mode
+        this.showMockDataNotification();
+      }
+      
       this.loadingManager.hideLoading();
       this.initializeUI();
       
@@ -231,26 +250,7 @@ export class CardBattleScene extends BaseScene {
     const tween = { alpha: 0 };
     
     return new Promise(async (resolve) => {
-      try {
-        // Call getBattleState to init UI when showing the scene
-        console.log('🔄 Loading battle state from server...');
-        this.battleState = await battleApi.getBattleState(this.battleId);
-        console.log('✅ Battle state loaded:', this.battleState);
-        this.usingMockData = false;
-        
-      } catch (error) {
-        console.error('❌ Error loading battle state from API:', error);
-        console.log('🔄 Falling back to mock data for complete battle experience...');
-        
-        // Use mock data instead of failing
-        this.battleState = mockCardBattleState;
-        this.usingMockData = true;
-        
-        // Show user-friendly message about using offline mode
-        this.showMockDataNotification();
-      }
-      
-      // Refresh UI with loaded battle state (real or mock)
+      // Battle state is now loaded in prepare(), so we can directly refresh UI
       this.refreshUI();
       
       const animate = () => {
@@ -299,7 +299,7 @@ export class CardBattleScene extends BaseScene {
         return;
       }
       
-      // Step 2: Player Turn - UI highlights player's turn, calls start-turn API
+      // Start player turn - UI highlights player's turn, calls start-turn API
       console.log('👤 Player Turn Phase');
       await this.startPlayerTurn();
       
@@ -308,13 +308,13 @@ export class CardBattleScene extends BaseScene {
         return;
       }
       
-      // Step 4: End Turn - calls action API with end_turn type
-      // This is handled by the End Turn button click, but we simulate the flow
-      console.log('⏭️ Waiting for player to end turn...');
+      // Now waiting for player to interact (play cards, end turn)
+      // The turn will continue when player clicks "End Turn" button
+      // which calls endTurn() -> handleAITurn() -> startPlayerTurn() 
+      console.log('⏭️ Waiting for player to interact and end turn...');
       
-      // In real implementation, this would wait for user interaction
-      // For now, we just prepare the scene for player actions
-      break; // Exit loop to allow player interaction
+      // Exit loop to allow player interaction - the turn flow continues in endTurn()
+      break;
     }
   }
 
@@ -1286,6 +1286,14 @@ export class CardBattleScene extends BaseScene {
     await this.refreshBattleState();
     
     // Check for battle end conditions
+    if (this.checkBattleEnd()) {
+      return;
+    }
+    
+    // When player ends turn, go to AI turn
+    await this.handleAITurn();
+    
+    // Check for battle end conditions after AI turn
     if (this.checkBattleEnd()) {
       return;
     }
