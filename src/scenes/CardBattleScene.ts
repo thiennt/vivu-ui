@@ -9,7 +9,6 @@ import { CardDetailPopup } from '@/popups/CardDetailPopup';
 import { battleApi } from '@/services/api';
 import { 
   CardBattleState, 
-  CardEffectType,
   BattleMoveData,
   BattleEndData,
   BattleRewards,
@@ -18,10 +17,7 @@ import {
   BattleCard,
   CardType,
   CardRarity,
-  DrawPhaseResult,
-  BattlePhaseResult,
   BattleActionResult,
-  BattleLogEntry,
   AIAction,
   CardBattleCharacter
 } from '@/types';
@@ -163,7 +159,6 @@ export class CardBattleScene extends BaseScene {
   }
   private dropZones: { area: Container, type: 'character' | 'discard', playerId: number, characterIndex?: number }[] = [];
 
-  private battleStarted = false;
   private battleId: string;
 
   private loadingManager: LoadingStateManager;
@@ -183,19 +178,15 @@ export class CardBattleScene extends BaseScene {
     this.loadingManager.showLoading();
 
     try {
-      // Use getBattleState to retrieve the complete current battle state
-      // This is the authoritative source for initial render and reconnects
-      console.log('🔄 Loading battle state from server...');
-      this.battleState = await battleApi.getBattleState(this.battleId);
-      console.log('✅ Battle state loaded:', this.battleState);
+      console.log('🔄 Preparing CardBattleScene...');
       
       this.loadingManager.hideLoading();
       this.initializeUI();
       
     } catch (error) {
-      console.error('❌ Error loading battle state:', error);
+      console.error('❌ Error preparing battle scene:', error);
       this.loadingManager.hideLoading();
-      alert('Failed to load battle. Please try again.');
+      alert('Failed to prepare battle. Please try again.');
       navigation.showScreen(HomeScene);
     }
   }
@@ -217,38 +208,84 @@ export class CardBattleScene extends BaseScene {
     this.container.alpha = 0;
     const tween = { alpha: 0 };
     
-    return new Promise((resolve) => {
-      const animate = () => {
-        tween.alpha += 0.05;
-        this.container.alpha = tween.alpha;
+    return new Promise(async (resolve) => {
+      try {
+        // Call getBattleState to init UI when showing the scene
+        console.log('🔄 Loading battle state from server...');
+        this.battleState = await battleApi.getBattleState(this.battleId);
+        console.log('✅ Battle state loaded:', this.battleState);
         
-        if (tween.alpha >= 1) {
-          this.container.alpha = 1;
-          // Start the battle sequence automatically
-          this.startBattleSequence();
-          resolve();
-        } else {
-          requestAnimationFrame(animate);
-        }
-      };
-      animate();
+        // Refresh UI with loaded battle state
+        this.refreshUI();
+        
+        const animate = () => {
+          tween.alpha += 0.05;
+          this.container.alpha = tween.alpha;
+          
+          if (tween.alpha >= 1) {
+            this.container.alpha = 1;
+            // Start the battle sequence after UI is initialized
+            this.startBattleSequence();
+            resolve();
+          } else {
+            requestAnimationFrame(animate);
+          }
+        };
+        animate();
+      } catch (error) {
+        console.error('❌ Error loading battle state in show():', error);
+        alert('Failed to load battle state. Please try again.');
+        navigation.showScreen(HomeScene);
+        resolve();
+      }
     });
   }
 
   private async startBattleSequence(): Promise<void> {
     console.log('🎯 Starting battle sequence...');
     
-    // Step 3: Show characters, decks, discard piles, energy, empty hands
-    this.battleStarted = false; // Start with setup view
-    
-    // Give a moment to see the initial setup
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    try {
+      // Step 1: UI displays both teams, decks, discard piles, energy, and empty hands
+      console.log('📋 Displaying battle state - teams, decks, discard piles, energy, hands');
+      
+      // Give a moment to see the initial setup (teams, decks, etc.)
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Step 2: Start the battle turn loop
+      await this.startBattleTurnLoop();
+      
+    } catch (error) {
+      console.error('❌ Error in battle sequence:', error);
+      alert('Battle sequence failed. Please try again.');
+      navigation.showScreen(HomeScene);
+    }
+  }
 
-    if (this.battleState?.current_turn === 1) {
-      // Step 4: Player Turn - Draw phase
+  private async startBattleTurnLoop(): Promise<void> {
+    console.log('🔄 Starting battle turn loop...');
+    
+    while (true) {
+      // Check for battle end conditions first
+      if (this.checkBattleEnd()) {
+        return;
+      }
+      
+      // Step 2: Player Turn - UI highlights player's turn, calls start-turn API
+      console.log('👤 Player Turn Phase');
       await this.startPlayerTurn();
-    } else {
-      await this.handleAITurn();
+      
+      // Check for battle end after player turn
+      if (this.checkBattleEnd()) {
+        return;
+      }
+      
+      // Step 4: End Turn - calls action API with end_turn type
+      // This is handled by the End Turn button click, but we simulate the flow
+      console.log('⏭️ Waiting for player to end turn...');
+      
+      // In real implementation, this would wait for user interaction
+      // For now, we just prepare the scene for player actions
+      break; // Exit loop to allow player interaction
     }
   }
 
@@ -285,7 +322,6 @@ export class CardBattleScene extends BaseScene {
       // Refresh battle state from server
       await this.refreshBattleState();
       
-      this.battleStarted = true;
       console.log('🎯 Player turn: Main phase - you can now play cards');
       
     } catch (error) {
@@ -482,9 +518,6 @@ export class CardBattleScene extends BaseScene {
   }
 
   private createHandArea(container: Container, playerNo: number, showCards: boolean): void {
-    // Do not show hand cards until battle has started
-    if (!this.battleStarted) return;
-
     const player = this.battleState ? (playerNo === 1 ? this.battleState.player1 : this.battleState.player2) : null;
 
     if (!player) return;
@@ -890,61 +923,31 @@ export class CardBattleScene extends BaseScene {
     const buttonWidth = 120;
     const buttonHeight = 44;
 
-    if (!this.battleStarted) {
-      // Start Battle button
-      const startButton = this.createButton(
-        'Start Battle',
-        (this.gameWidth - buttonWidth) / 2,
-        this.getContentHeight() - buttonHeight - 10,
-        buttonWidth,
-        buttonHeight,
-        async () => {
-          this.battleStarted = true;
-          this.container.removeChild(buttonContainer);
-          await this.animateInitialDraw();
-          this.refreshUI();
-        },
-        14
-      );
-      buttonContainer.addChild(startButton);
-    } else {
-      // End Turn button
-      const endTurnButton = this.createButton(
-        'End Turn',
-        this.gameWidth - buttonWidth - this.STANDARD_PADDING,
-        this.getContentHeight() - buttonHeight - 10,
-        buttonWidth,
-        buttonHeight,
-        () => this.endTurn(),
-        12
-      );
-      // Back button
-      const backButton = this.createButton(
-        '← Back',
-        this.STANDARD_PADDING,
-        this.getContentHeight() - buttonHeight - 10,
-        buttonWidth,
-        buttonHeight,
-        () => navigation.showScreen(HomeScene),
-        12
-      );
-      buttonContainer.addChild(endTurnButton, backButton);
-    }
+    // End Turn button
+    const endTurnButton = this.createButton(
+      'End Turn',
+      this.gameWidth - buttonWidth - this.STANDARD_PADDING,
+      this.getContentHeight() - buttonHeight - 10,
+      buttonWidth,
+      buttonHeight,
+      () => this.endTurn(),
+      12
+    );
+    
+    // Back button
+    const backButton = this.createButton(
+      '← Back',
+      this.STANDARD_PADDING,
+      this.getContentHeight() - buttonHeight - 10,
+      buttonWidth,
+      buttonHeight,
+      () => navigation.showScreen(HomeScene),
+      12
+    );
+    
+    buttonContainer.addChild(endTurnButton, backButton);
 
     this.container.addChild(buttonContainer);
-  }
-
-  private async animateInitialDraw(): Promise<void> {
-    // Remove all cards from player1's hand and put them back to deck
-    const player1Deck = this.battleState?.player1.deck;
-
-    // Draw and animate 5 cards
-    if (player1Deck?.hand_cards) {
-      for (const cardInDeck of player1Deck.hand_cards) {
-        await this.animateDrawCard(cardInDeck, 1);
-        this.refreshUI();
-      }
-    }
   }
 
   private makeCardDraggable(cardContainer: Container, card: CardInDeck): void {
