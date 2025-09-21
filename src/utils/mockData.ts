@@ -1289,3 +1289,184 @@ export const mockStages = [
     ]
   }
 ];
+
+// ---- Card Battle Mock Data ----
+import { CardBattleState, CardBattleCharacter, CardBattleDeck, CardInDeck, BattleRewards } from '../types';
+import { mockCards } from './cardData';
+
+// Mock characters for battle
+const mockBattleCharacters: CardBattleCharacter[] = [
+  {
+    id: 'char_001',
+    character_id: 'player_char_1',
+    name: 'Bitcoin',
+    avatar_url: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1.png',
+    rarity: 'legendary',
+    team: 1,
+    position: 0,
+    max_hp: 120,
+    current_hp: 120,
+    atk: 45,
+    def: 25,
+    agi: 15,
+    crit_rate: 10,
+    crit_dmg: 150,
+    res: 8,
+    damage: 15,
+    mitigation: 5,
+    hit_rate: 95,
+    dodge: 10,
+    has_acted: false,
+    active_effects: [],
+    equipped_skills: ['skill_001', 'skill_002']
+  },
+  {
+    id: 'char_002',
+    character_id: 'player_char_2',
+    name: 'Ethereum',
+    avatar_url: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png',
+    rarity: 'epic',
+    team: 1,
+    position: 1,
+    max_hp: 100,
+    current_hp: 100,
+    atk: 40,
+    def: 20,
+    agi: 20,
+    crit_rate: 12,
+    crit_dmg: 160,
+    res: 10,
+    damage: 12,
+    mitigation: 3,
+    hit_rate: 92,
+    dodge: 15,
+    has_acted: false,
+    active_effects: [],
+    equipped_skills: ['skill_003']
+  }
+];
+
+const mockEnemyCharacters: CardBattleCharacter[] = [
+  {
+    id: 'enemy_001',
+    character_id: 'enemy_char_1',
+    name: 'Cardano',
+    avatar_url: 'https://s2.coinmarketcap.com/static/img/coins/64x64/2010.png',
+    rarity: 'rare',
+    team: 2,
+    position: 0,
+    max_hp: 90,
+    current_hp: 90,
+    atk: 35,
+    def: 18,
+    agi: 18,
+    crit_rate: 8,
+    crit_dmg: 140,
+    res: 6,
+    damage: 10,
+    mitigation: 4,
+    hit_rate: 90,
+    dodge: 12,
+    has_acted: false,
+    active_effects: [],
+    equipped_skills: ['skill_004']
+  },
+  {
+    id: 'enemy_002',
+    character_id: 'enemy_char_2',
+    name: 'Solana',
+    avatar_url: 'https://s2.coinmarketcap.com/static/img/coins/64x64/5426.png',
+    rarity: 'uncommon',
+    team: 2,
+    position: 1,
+    max_hp: 85,
+    current_hp: 85,
+    atk: 32,
+    def: 15,
+    agi: 22,
+    crit_rate: 14,
+    crit_dmg: 170,
+    res: 5,
+    damage: 8,
+    mitigation: 2,
+    hit_rate: 88,
+    dodge: 18,
+    has_acted: false,
+    active_effects: [],
+    equipped_skills: ['skill_005']
+  }
+];
+
+// Helper function to create deck cards from mockCards
+function createMockDeckCards(count: number = 30): CardInDeck[] {
+  const deckCards: CardInDeck[] = [];
+  for (let i = 0; i < count; i++) {
+    const cardIndex = i % mockCards.length;
+    deckCards.push({
+      card_id: `${mockCards[cardIndex].id}_deck_${i}`,
+      position: i + 1,
+      card: mockCards[cardIndex]
+    });
+  }
+  return deckCards;
+}
+
+function createMockHandCards(count: number = 5): CardInDeck[] {
+  const handCards: CardInDeck[] = [];
+  for (let i = 0; i < count; i++) {
+    const cardIndex = i % mockCards.length;
+    handCards.push({
+      card_id: `${mockCards[cardIndex].id}_hand_${i}`,
+      position: i + 1,
+      card: mockCards[cardIndex]
+    });
+  }
+  return handCards;
+}
+
+const mockPlayer1Deck: CardBattleDeck = {
+  id: 'deck_player_1',
+  player_team: 1,
+  deck_cards: createMockDeckCards(25),
+  hand_cards: createMockHandCards(5),
+  discard_cards: [],
+  current_energy: 3,
+  cards_drawn: 1
+};
+
+const mockPlayer2Deck: CardBattleDeck = {
+  id: 'deck_player_2',
+  player_team: 2,
+  deck_cards: createMockDeckCards(25),
+  hand_cards: createMockHandCards(5),
+  discard_cards: [],
+  current_energy: 3,
+  cards_drawn: 1
+};
+
+export const mockCardBattleState: CardBattleState = {
+  id: 'battle_mock_001',
+  battle_type: 'pve',
+  status: 'ongoing',
+  current_turn: 1,
+  current_player: 1,
+  player1: {
+    characters: mockBattleCharacters,
+    deck: mockPlayer1Deck
+  },
+  player2: {
+    characters: mockEnemyCharacters,
+    deck: mockPlayer2Deck
+  },
+  phase: 'main_phase'
+};
+
+export const mockBattleRewards: BattleRewards = {
+  gold: 150,
+  experience: 300,
+  items: [
+    { id: 'item_001', name: 'Health Potion', quantity: 2 },
+    { id: 'item_002', name: 'Energy Crystal', quantity: 1 }
+  ],
+  newLevel: false
+};
