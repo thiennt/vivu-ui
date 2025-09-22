@@ -250,9 +250,6 @@ export class CardBattleScene extends BaseScene {
     const tween = { alpha: 0 };
     
     return new Promise(async (resolve) => {
-      // Battle state is now loaded in prepare(), so we can directly refresh UI
-      this.refreshUI();
-      
       const animate = () => {
         tween.alpha += 0.05;
         this.container.alpha = tween.alpha;
@@ -1304,7 +1301,7 @@ export class CardBattleScene extends BaseScene {
 
   private checkBattleEnd(): boolean {
     if (!this.battleState) return false;
-    
+
     // Check if all characters of player 1 are defeated
     const player1Alive = this.battleState.player1.characters.some(char => char.current_hp > 0);
     const player2Alive = this.battleState.player2.characters.some(char => char.current_hp > 0);
