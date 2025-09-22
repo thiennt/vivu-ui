@@ -208,6 +208,12 @@ export const battleApi = {
         type: 'draw_phase',
         player_team: 1,
         description: 'Turn started, cards drawn'
+      }],
+      battle_logs: [{
+        type: 'draw_phase',
+        player_team: 1,
+        description: 'Turn started: Player draws cards and gains energy',
+        timestamp: new Date().toISOString()
       }]
     });
   },
@@ -228,8 +234,24 @@ export const battleApi = {
           card_id: moveData.card_id,
           target_ids: moveData.target_ids,
           description: `${moveData.action} executed`
+        }],
+        battle_logs: [{
+          type: moveData.action,
+          player_team: 1,
+          card_id: moveData.card_id,
+          target_ids: moveData.target_ids,
+          description: `Player performs ${moveData.action}${moveData.card_id ? ` with ${moveData.card_id}` : ''}`,
+          timestamp: new Date().toISOString()
         }]
-      }
+      },
+      battle_logs: [{
+        type: moveData.action,
+        player_team: 1,
+        card_id: moveData.card_id,
+        target_ids: moveData.target_ids,
+        description: `Player action: ${moveData.action}`,
+        timestamp: new Date().toISOString()
+      }]
     });
   },
 
@@ -257,6 +279,12 @@ export const battleApi = {
             type: 'draw_phase',
             player_team: 2,
             description: 'AI drew cards'
+          }],
+          battle_logs: [{
+            type: 'draw_phase',
+            player_team: 2,
+            description: 'AI draws cards and gains energy',
+            timestamp: new Date().toISOString()
           }]
         },
         {
@@ -275,6 +303,21 @@ export const battleApi = {
               card_id: 'card_003',
               target_ids: ['player_char_001'],
               description: 'AI played attack card'
+            }],
+            battle_logs: [{
+              type: 'play_card',
+              player_team: 2,
+              character_id: 'ai_char_001',
+              card_id: 'card_003',
+              target_ids: ['player_char_001'],
+              description: 'AI casts attack card dealing 30 damage',
+              timestamp: new Date().toISOString()
+            }, {
+              type: 'damage',
+              player_team: 2,
+              target_ids: ['player_char_001'],
+              description: 'Player character takes 30 damage from AI attack',
+              timestamp: new Date().toISOString()
             }]
           },
           actions_performed: [{
@@ -284,6 +327,15 @@ export const battleApi = {
             card_id: 'card_003',
             target_ids: ['player_char_001'],
             description: 'AI played attack card'
+          }],
+          battle_logs: [{
+            type: 'play_card',
+            player_team: 2,
+            character_id: 'ai_char_001',
+            card_id: 'card_003',
+            target_ids: ['player_char_001'],
+            description: 'AI plays card_003 targeting player character',
+            timestamp: new Date().toISOString()
           }]
         }
       ],
@@ -291,6 +343,12 @@ export const battleApi = {
         type: 'end_turn',
         player_team: 1,
         description: 'Player turn ended'
+      }],
+      battle_logs: [{
+        type: 'end_turn',
+        player_team: 1,
+        description: 'Player ends turn, AI begins their turn',
+        timestamp: new Date().toISOString()
       }]
     });
   },

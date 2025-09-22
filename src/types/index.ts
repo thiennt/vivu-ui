@@ -491,6 +491,7 @@ export interface BattleMoveResponse {
   result: BattleActionResult;
   updated_state?: Partial<CardBattleState>;
   error?: string;
+  battle_logs?: BattleLogEntry[]; // Enhanced battle logs for animation
 }
 
 export interface BattleEndData {
@@ -517,6 +518,7 @@ export interface BattleActionResult {
   energy_change?: number;
   cards_drawn?: Card[];
   actions_performed: BattleLogEntry[];
+  battle_logs?: BattleLogEntry[]; // Enhanced battle logs for animation
 }
 
 export interface BattleLogEntry {
@@ -537,6 +539,7 @@ export interface DrawPhaseResult {
   energy: number;
   status_effects: unknown[];
   actions_performed: BattleLogEntry[];
+  battle_logs?: BattleLogEntry[]; // Enhanced battle logs for animation
 }
 
 export interface BattlePhaseResult {
@@ -547,6 +550,7 @@ export interface BattlePhaseResult {
   ai_actions?: AIAction[];
   updated_state?: Partial<CardBattleState>;
   actions_performed: BattleLogEntry[];
+  battle_logs?: BattleLogEntry[]; // Enhanced battle logs for animation
 }
 
 export interface AIAction {
@@ -557,4 +561,5 @@ export interface AIAction {
   target_ids?: string[];
   result?: BattleActionResult;
   actions_performed: BattleLogEntry[];
+  battle_logs?: BattleLogEntry[]; // Enhanced battle logs for animation
 }
