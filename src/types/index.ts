@@ -488,16 +488,7 @@ export interface BattleMoveData {
   target_ids?: string[];
 }
 
-// Legacy interface that supports battle_logs for backward compatibility
-export interface BattleMoveResponse {
-  success: boolean;
-  result: BattleActionResult;
-  updated_state?: Partial<CardBattleState>;
-  error?: string;
-  battle_logs?: BattleLogEntry[]; // Legacy support
-}
-
-// New standardized API response format for CardBattle APIs
+// Standardized API response format for CardBattle APIs
 export interface CardBattleApiResponse<T = any> {
   success: boolean;                   // Boolean: was the request successful?
   code: number;                       // HTTP status code (repeated here for clarity)
@@ -507,10 +498,10 @@ export interface CardBattleApiResponse<T = any> {
   meta?: any;                         // (Optional) Extra info: pagination, server time, etc.
 }
 
-// Updated API response types using the new standardized format
-export type BattleMoveApiResponse = CardBattleApiResponse<CardBattleLog[]>;
-export type DrawPhaseResponse = CardBattleApiResponse<CardBattleLog[]>;
-export type BattlePhaseResponse = CardBattleApiResponse<CardBattleLog[]>;
+// Updated existing API response types to use the new standardized format
+export type BattleMoveResponse = CardBattleApiResponse<CardBattleLog[]>;
+export type DrawPhaseResult = CardBattleApiResponse<CardBattleLog[]>;
+export type BattlePhaseResult = CardBattleApiResponse<CardBattleLog[]>;
 
 export interface BattleEndData {
   winner: number; // 1 or 2
@@ -548,27 +539,6 @@ export interface BattleLogEntry {
   result?: unknown;
   timestamp?: string;
   description?: string;
-}
-
-export interface DrawPhaseResult {
-  success: boolean;
-  drawn_cards: Card[];
-  updated_hand: Card[];
-  energy: number;
-  status_effects: unknown[];
-  actions_performed: BattleLogEntry[];
-  battle_logs?: BattleLogEntry[]; // Legacy support for backward compatibility
-}
-
-export interface BattlePhaseResult {
-  success: boolean;
-  phase: 'draw' | 'main' | 'end' | 'ai_turn';
-  current_turn: number;
-  current_player: number;
-  ai_actions?: AIAction[];
-  updated_state?: Partial<CardBattleState>;
-  actions_performed: BattleLogEntry[];
-  battle_logs?: BattleLogEntry[]; // Legacy support for backward compatibility
 }
 
 export interface AIAction {
