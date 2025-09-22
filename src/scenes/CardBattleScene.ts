@@ -175,7 +175,7 @@ export class CardBattleScene extends BaseScene {
     if ('cardType' in card) {
       return card.cardType || 'special';
     } else {
-      return (card as Card).card_type;
+      return (card as Card).card_type || 'special';
     }
   }
   private dropZones: { area: Container, type: 'character' | 'discard', playerId: number, characterIndex?: number }[] = [];
