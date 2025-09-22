@@ -195,7 +195,8 @@ export const battleApi = {
 
   async startTurn(battleId: string): Promise<DrawPhaseResult> {
     console.log('🎯 startTurn API called for battle:', battleId);
-    return apiRequest(`/card-battle/${battleId}/start-turn`, {
+    const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
+    return apiRequest(`/players/${playerId}/card-battle/${battleId}/start-turn`, {
       method: 'POST',
     }, {
       success: true,
