@@ -17,7 +17,8 @@ import {
   DrawPhaseResult,
   BattlePhaseResult,
   BattleLogEntry,
-  CardBattleLog
+  CardBattleLog,
+  CardBattleApiResponse
 } from '@/types';
 import { createRandomDeck } from '@/utils/cardData';
 
@@ -238,34 +239,140 @@ export const skillsApi = {
 
 // Battle API methods
 export const battleApi = {
-  async getAvailableStages(): Promise<any[]> {
+  async getAvailableStages(): Promise<CardBattleApiResponse<any[]>> {
     const playerId = sessionStorage.getItem('playerId');
-    return apiRequest(`/players/${playerId}/card-battle/stages`, {}, mockStages);
+    try {
+      const stages = await apiRequest(`/players/${playerId}/card-battle/stages`, {}, mockStages);
+      return {
+        success: true,
+        code: 200,
+        message: "Stages retrieved successfully",
+        data: stages,
+        errors: null,
+        meta: {
+          playerId,
+          timestamp: new Date().toISOString()
+        }
+      };
+    } catch (error) {
+      return {
+        success: false,
+        code: 500,
+        message: "Failed to retrieve stages",
+        data: null,
+        errors: [error instanceof Error ? error.message : 'Unknown error'],
+        meta: {
+          playerId,
+          timestamp: new Date().toISOString()
+        }
+      };
+    }
   },
 
-  async createBattleStage(stage_id: string): Promise<BattleStageResponse> {
+  async createBattleStage(stage_id: string): Promise<CardBattleApiResponse<BattleStageResponse>> {
     const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
-    return apiRequest(`/players/${playerId}/card-battle/stages/${stage_id}`, {
-      method: 'POST'
-    }, {
-      battle_id: 'battle_mock_001',
-      stage_id: stage_id,
-      player1_id: playerId,
-      status: 'created',
-      cards: []
-    });
+    try {
+      const battleStage: BattleStageResponse = await apiRequest(`/players/${playerId}/card-battle/stages/${stage_id}`, {
+        method: 'POST'
+      }, {
+        battle_id: 'battle_mock_001',
+        stage_id: stage_id,
+        player1_id: playerId,
+        status: 'created' as const,
+        cards: []
+      });
+      return {
+        success: true,
+        code: 200,
+        message: "Battle stage created successfully",
+        data: battleStage,
+        errors: null,
+        meta: {
+          playerId,
+          stageId: stage_id,
+          timestamp: new Date().toISOString()
+        }
+      };
+    } catch (error) {
+      return {
+        success: false,
+        code: 500,
+        message: "Failed to create battle stage",
+        data: null,
+        errors: [error instanceof Error ? error.message : 'Unknown error'],
+        meta: {
+          playerId,
+          stageId: stage_id,
+          timestamp: new Date().toISOString()
+        }
+      };
+    }
   },
 
-  async startBattle(battleId: string): Promise<void> {
+  async startBattle(battleId: string): Promise<CardBattleApiResponse<void>> {
     const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
-    return apiRequest(`/players/${playerId}/card-battle/${battleId}/start`, {
-      method: 'POST',
-    }, undefined);
+    try {
+      await apiRequest(`/players/${playerId}/card-battle/${battleId}/start`, {
+        method: 'POST',
+      }, undefined);
+      return {
+        success: true,
+        code: 200,
+        message: "Battle started successfully",
+        data: null,
+        errors: null,
+        meta: {
+          playerId,
+          battleId,
+          timestamp: new Date().toISOString()
+        }
+      };
+    } catch (error) {
+      return {
+        success: false,
+        code: 500,
+        message: "Failed to start battle",
+        data: null,
+        errors: [error instanceof Error ? error.message : 'Unknown error'],
+        meta: {
+          playerId,
+          battleId,
+          timestamp: new Date().toISOString()
+        }
+      };
+    }
   },
 
-  async getBattleState(battleId: string): Promise<CardBattleState> {
+  async getBattleState(battleId: string): Promise<CardBattleApiResponse<CardBattleState>> {
     const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
-    return apiRequest(`/players/${playerId}/card-battle/${battleId}/state`, {}, mockCardBattleState);
+    try {
+      const battleState = await apiRequest(`/players/${playerId}/card-battle/${battleId}/state`, {}, mockCardBattleState);
+      return {
+        success: true,
+        code: 200,
+        message: "Battle state retrieved successfully",
+        data: battleState,
+        errors: null,
+        meta: {
+          playerId,
+          battleId,
+          timestamp: new Date().toISOString()
+        }
+      };
+    } catch (error) {
+      return {
+        success: false,
+        code: 500,
+        message: "Failed to retrieve battle state",
+        data: null,
+        errors: [error instanceof Error ? error.message : 'Unknown error'],
+        meta: {
+          playerId,
+          battleId,
+          timestamp: new Date().toISOString()
+        }
+      };
+    }
   },
 
   async startTurn(battleId: string): Promise<DrawPhaseResult> {

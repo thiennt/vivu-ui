@@ -30,9 +30,14 @@ export class BattleFlowExample {
       // Note: createBattle method doesn't exist in the new API spec
       // For demo purposes, we'll use createBattleStage instead
       const response = await battleApi.createBattleStage('stage_001');
-      this.battleId = response.battle_id;
-      console.log('✅ Battle created:', response);
-      return response;
+      if (response.success && response.data) {
+        this.battleId = response.data.battle_id;
+        console.log('✅ Battle created:', response);
+        return response.data;
+      } else {
+        console.error('❌ Failed to create battle:', response.message);
+        throw new Error(response.message || 'Failed to create battle');
+      }
     } catch (error) {
       console.error('❌ Failed to create battle:', error);
       throw error;
