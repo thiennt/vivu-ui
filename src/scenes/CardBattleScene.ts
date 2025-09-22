@@ -21,7 +21,8 @@ import {
   AIAction,
   CardBattleCharacter,
   BattleLogEntry,
-  CardBattleLog
+  CardBattleLog,
+  CardBattleApiResponse
 } from '@/types';
 import { 
   mockCardBattleState, 
@@ -85,6 +86,21 @@ export class CardBattleScene extends BaseScene {
     result.actions_performed.forEach(action => {
       console.log(`📝 Action: ${action.description}`);
     });
+  }
+
+  /**
+   * Helper method to process new API response format
+   */
+  private async processCardBattleApiResponse(response: CardBattleApiResponse<CardBattleLog[]>): Promise<void> {
+    if (response.success && response.data) {
+      console.log(`✅ API call successful: ${response.message}`);
+      await this.processCardBattleLogs(response.data);
+    } else {
+      console.error(`❌ API call failed (${response.code}): ${response.message}`);
+      if (response.errors) {
+        response.errors.forEach(error => console.error(`   Error: ${error}`));
+      }
+    }
   }
 
   /**

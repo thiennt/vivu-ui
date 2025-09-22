@@ -454,8 +454,9 @@ export const battleApi = {
     return apiRequest(`/battles/${battleId}/rewards`, {}, mockBattleRewards);
   },
 
-  // 🆕 NEW API METHODS - Return CardBattleLog[] directly if success (no battle_logs key)
-  // These methods implement the new specification: "for each action api return array of CardBattleLog if success, has no key battle_logs"
+  // 🆕 NEW API METHODS - Use new standardized response format
+  // Success: { success: true, code: 200, message: "Success", data: CardBattleLog[], errors: null, meta: {...} }
+  // Error:   { success: false, code: 4xx/5xx, message: "Error", data: null, errors: [...], meta: {...} }
   
   async playActionNew(battleId: string, moveData: BattleMoveData): Promise<BattleMoveApiResponse> {
     console.log('🎮 NEW playActionNew API called for battle:', battleId, 'with data:', moveData);
@@ -466,32 +467,55 @@ export const battleApi = {
         body: JSON.stringify(moveData),
       });
       
+      let cardBattleLogs: CardBattleLog[] = [];
+      
       // Check if API returned the new format (CardBattleLog array)
       if (Array.isArray(response)) {
-        return response;
+        cardBattleLogs = response;
       }
-      
       // If API returned legacy format, convert it
-      if ((response as any).battle_logs) {
-        return (response as any).battle_logs.map((entry: BattleLogEntry) => convertToCardBattleLog(entry));
+      else if ((response as any).battle_logs) {
+        cardBattleLogs = (response as any).battle_logs.map((entry: BattleLogEntry) => convertToCardBattleLog(entry));
+      }
+      // Fallback: convert mock data
+      else {
+        const mockBattleLogEntry: BattleLogEntry = {
+          type: moveData.action,
+          player_team: 1,
+          card_id: moveData.card_id,
+          target_ids: moveData.target_ids,
+          description: `Player action: ${moveData.action}`,
+          timestamp: new Date().toISOString()
+        };
+        cardBattleLogs = [convertToCardBattleLog(mockBattleLogEntry)];
       }
       
-      // Fallback: convert mock data
-      const mockBattleLogEntry: BattleLogEntry = {
-        type: moveData.action,
-        player_team: 1,
-        card_id: moveData.card_id,
-        target_ids: moveData.target_ids,
-        description: `Player action: ${moveData.action}`,
-        timestamp: new Date().toISOString()
+      // Return success response in new standardized format
+      return {
+        success: true,
+        code: 200,
+        message: "Action executed successfully",
+        data: cardBattleLogs,
+        errors: null,
+        meta: {
+          action: moveData.action,
+          battleId,
+          timestamp: new Date().toISOString()
+        }
       };
-      
-      return [convertToCardBattleLog(mockBattleLogEntry)];
     } catch (error) {
-      // Return error format for new API
+      // Return error response in new standardized format
       return {
         success: false,
-        error: `Failed to execute action: ${error instanceof Error ? error.message : 'Unknown error'}`
+        code: 500,
+        message: "Failed to execute action",
+        data: null,
+        errors: [error instanceof Error ? error.message : 'Unknown error'],
+        meta: {
+          action: moveData.action,
+          battleId,
+          timestamp: new Date().toISOString()
+        }
       };
     }
   },
@@ -505,37 +529,58 @@ export const battleApi = {
         method: 'POST',
       });
       
+      let cardBattleLogs: CardBattleLog[] = [];
+      
       // Check if API returned the new format (CardBattleLog array)
       if (Array.isArray(response)) {
-        return response;
+        cardBattleLogs = response;
       }
-      
       // If API returned legacy format, convert it
-      if ((response as any).battle_logs) {
-        return (response as any).battle_logs.map((entry: BattleLogEntry) => convertToCardBattleLog(entry));
+      else if ((response as any).battle_logs) {
+        cardBattleLogs = (response as any).battle_logs.map((entry: BattleLogEntry) => convertToCardBattleLog(entry));
+      }
+      // Fallback: convert mock data
+      else {
+        const mockBattleLogEntry: BattleLogEntry = {
+          type: 'draw_phase',
+          player_team: 1,
+          description: 'Turn started: Player draws cards and gains energy',
+          timestamp: new Date().toISOString()
+        };
+        cardBattleLogs = [convertToCardBattleLog(mockBattleLogEntry)];
       }
       
-      // Fallback: convert mock data
-      const mockBattleLogEntry: BattleLogEntry = {
-        type: 'draw_phase',
-        player_team: 1,
-        description: 'Turn started: Player draws cards and gains energy',
-        timestamp: new Date().toISOString()
+      // Return success response in new standardized format
+      return {
+        success: true,
+        code: 200,
+        message: "Turn started successfully",
+        data: cardBattleLogs,
+        errors: null,
+        meta: {
+          phase: 'draw_phase',
+          playerId,
+          battleId,
+          timestamp: new Date().toISOString()
+        }
       };
-      
-      return [convertToCardBattleLog(mockBattleLogEntry)];
     } catch (error) {
       console.warn('New API failed, falling back to mock data:', error);
       
-      // Return mock CardBattleLog
-      const mockBattleLogEntry: BattleLogEntry = {
-        type: 'draw_phase',
-        player_team: 1,
-        description: 'Turn started: Player draws cards and gains energy',
-        timestamp: new Date().toISOString()
+      // Return error response in new standardized format
+      return {
+        success: false,
+        code: 500,
+        message: "Failed to start turn",
+        data: null,
+        errors: [error instanceof Error ? error.message : 'Unknown error'],
+        meta: {
+          phase: 'draw_phase',
+          playerId,
+          battleId,
+          timestamp: new Date().toISOString()
+        }
       };
-      
-      return [convertToCardBattleLog(mockBattleLogEntry)];
     }
   },
 
@@ -548,82 +593,95 @@ export const battleApi = {
         body: JSON.stringify({ action: 'end_turn' }),
       });
       
+      let cardBattleLogs: CardBattleLog[] = [];
+      
       // Check if API returned the new format (CardBattleLog array)
       if (Array.isArray(response)) {
-        return response;
+        cardBattleLogs = response;
       }
-      
       // If API returned legacy format, convert it
-      const allLogs: BattleLogEntry[] = [];
-      
-      // Add main battle logs
-      if ((response as any).battle_logs) {
-        allLogs.push(...(response as any).battle_logs);
-      }
-      
-      // Add AI action battle logs
-      if ((response as any).ai_actions) {
-        (response as any).ai_actions.forEach((action: any) => {
-          if (action.battle_logs) {
-            allLogs.push(...action.battle_logs);
-          }
-          if (action.result && action.result.battle_logs) {
-            allLogs.push(...action.result.battle_logs);
-          }
-        });
-      }
-      
-      // Convert all collected logs
-      if (allLogs.length > 0) {
-        return allLogs.map((entry: BattleLogEntry) => convertToCardBattleLog(entry));
-      }
-      
-      // Fallback: create mock CardBattleLog entries
-      const mockBattleLogEntries: BattleLogEntry[] = [
-        {
-          type: 'end_turn',
-          player_team: 1,
-          description: 'Player ends turn, AI begins their turn',
-          timestamp: new Date().toISOString()
-        },
-        {
-          type: 'draw_phase',
-          player_team: 2,
-          description: 'AI draws cards and gains energy',
-          timestamp: new Date().toISOString()
-        },
-        {
-          type: 'play_card',
-          player_team: 2,
-          character_id: 'ai_char_001',
-          card_id: 'card_003',
-          target_ids: ['player_char_001'],
-          description: 'AI plays card_003 targeting player character',
-          timestamp: new Date().toISOString()
+      else {
+        const allLogs: BattleLogEntry[] = [];
+        
+        // Add main battle logs
+        if ((response as any).battle_logs) {
+          allLogs.push(...(response as any).battle_logs);
         }
-      ];
+        
+        // Add AI action battle logs
+        if ((response as any).ai_actions) {
+          (response as any).ai_actions.forEach((action: any) => {
+            if (action.battle_logs) {
+              allLogs.push(...action.battle_logs);
+            }
+            if (action.result && action.result.battle_logs) {
+              allLogs.push(...action.result.battle_logs);
+            }
+          });
+        }
+        
+        // Convert all collected logs
+        if (allLogs.length > 0) {
+          cardBattleLogs = allLogs.map((entry: BattleLogEntry) => convertToCardBattleLog(entry));
+        } else {
+          // Fallback: create mock CardBattleLog entries
+          const mockBattleLogEntries: BattleLogEntry[] = [
+            {
+              type: 'end_turn',
+              player_team: 1,
+              description: 'Player ends turn, AI begins their turn',
+              timestamp: new Date().toISOString()
+            },
+            {
+              type: 'draw_phase',
+              player_team: 2,
+              description: 'AI draws cards and gains energy',
+              timestamp: new Date().toISOString()
+            },
+            {
+              type: 'play_card',
+              player_team: 2,
+              character_id: 'ai_char_001',
+              card_id: 'card_003',
+              target_ids: ['player_char_001'],
+              description: 'AI plays card_003 targeting player character',
+              timestamp: new Date().toISOString()
+            }
+          ];
+          cardBattleLogs = mockBattleLogEntries.map((entry: BattleLogEntry) => convertToCardBattleLog(entry));
+        }
+      }
       
-      return mockBattleLogEntries.map((entry: BattleLogEntry) => convertToCardBattleLog(entry));
+      // Return success response in new standardized format
+      return {
+        success: true,
+        code: 200,
+        message: "Turn ended successfully",
+        data: cardBattleLogs,
+        errors: null,
+        meta: {
+          phase: 'end_turn',
+          battleId,
+          timestamp: new Date().toISOString(),
+          logCount: cardBattleLogs.length
+        }
+      };
     } catch (error) {
       console.warn('New API failed, falling back to mock data:', error);
       
-      // Return mock CardBattleLog entries
-      const mockBattleLogEntries: BattleLogEntry[] = [
-        {
-          type: 'end_turn',
-          player_team: 1,
-          description: 'Player ends turn, AI begins their turn',
-          timestamp: new Date().toISOString()
-        },
-        {
-          type: 'draw_phase',
-          player_team: 2,
-          description: 'AI draws cards and gains energy',
+      // Return error response in new standardized format
+      return {
+        success: false,
+        code: 500,
+        message: "Failed to end turn",
+        data: null,
+        errors: [error instanceof Error ? error.message : 'Unknown error'],
+        meta: {
+          phase: 'end_turn',
+          battleId,
           timestamp: new Date().toISOString()
         }
-      ];
-      
-      return mockBattleLogEntries.map((entry: BattleLogEntry) => convertToCardBattleLog(entry));
+      };
     }
   },
 };

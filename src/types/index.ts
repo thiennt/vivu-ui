@@ -497,18 +497,20 @@ export interface BattleMoveResponse {
   battle_logs?: BattleLogEntry[]; // Legacy support
 }
 
-// New API response format: CardBattleLog[] directly for success cases  
-export type BattleMoveApiResponse = CardBattleLog[] | BattleMoveErrorResponse;
-
-export interface BattleMoveErrorResponse {
-  success: false;
-  error: string;
-  updated_state?: Partial<CardBattleState>;
+// New standardized API response format for CardBattle APIs
+export interface CardBattleApiResponse<T = any> {
+  success: boolean;                   // Boolean: was the request successful?
+  code: number;                       // HTTP status code (repeated here for clarity)
+  message: string;                    // Human-readable message
+  data: T | null;                     // Main payload (object, array, or null)
+  errors: string[] | null;            // Array of errors, or null if no error
+  meta?: any;                         // (Optional) Extra info: pagination, server time, etc.
 }
 
-// Updated draw and battle phase responses
-export type DrawPhaseResponse = CardBattleLog[];
-export type BattlePhaseResponse = CardBattleLog[];
+// Updated API response types using the new standardized format
+export type BattleMoveApiResponse = CardBattleApiResponse<CardBattleLog[]>;
+export type DrawPhaseResponse = CardBattleApiResponse<CardBattleLog[]>;
+export type BattlePhaseResponse = CardBattleApiResponse<CardBattleLog[]>;
 
 export interface BattleEndData {
   winner: number; // 1 or 2
