@@ -1289,7 +1289,7 @@ export const mockStages = [
 ];
 
 // ---- Card Battle Mock Data ----
-import { CardBattleState, CardBattleCharacter, CardBattleDeck, CardInDeck, BattleRewards } from '../types';
+import { CardBattleState, CardBattleCharacter, CardBattleDeck, CardInDeck, BattleRewards, Card, BattleCard } from '../types';
 import { mockCards } from './cardData';
 
 // Mock characters for battle
@@ -1395,6 +1395,21 @@ const mockEnemyCharacters: CardBattleCharacter[] = [
   }
 ];
 
+// Helper function to convert BattleCard to Card
+function battleCardToCard(battleCard: BattleCard): Card {
+  return {
+    id: battleCard.id,
+    name: battleCard.name,
+    group: battleCard.group,
+    description: battleCard.description,
+    icon_url: undefined,
+    card_type: 'attack', // Default type
+    energy_cost: battleCard.energyCost,
+    rarity: battleCard.rarity,
+    actions: battleCard.effects
+  };
+}
+
 // Helper function to create deck cards from mockCards
 function createMockDeckCards(count: number = 30): CardInDeck[] {
   const deckCards: CardInDeck[] = [];
@@ -1403,7 +1418,7 @@ function createMockDeckCards(count: number = 30): CardInDeck[] {
     deckCards.push({
       card_id: `${mockCards[cardIndex].id}_deck_${i}`,
       position: i + 1,
-      card: mockCards[cardIndex]
+      card: battleCardToCard(mockCards[cardIndex])
     });
   }
   return deckCards;
@@ -1416,7 +1431,7 @@ function createMockHandCards(count: number = 5): CardInDeck[] {
     handCards.push({
       card_id: `${mockCards[cardIndex].id}_hand_${i}`,
       position: i + 1,
-      card: mockCards[cardIndex]
+      card: battleCardToCard(mockCards[cardIndex])
     });
   }
   return handCards;
@@ -1448,15 +1463,23 @@ export const mockCardBattleState: CardBattleState = {
   status: 'ongoing',
   current_turn: 1,
   current_player: 1,
-  player1: {
-    characters: mockBattleCharacters,
-    deck: mockPlayer1Deck
-  },
-  player2: {
-    characters: mockEnemyCharacters,
-    deck: mockPlayer2Deck
-  },
-  phase: 'main_phase'
+  phase: 'main_phase',
+  created_at: new Date().toISOString(),
+  updated_at: new Date().toISOString(),
+  players: [
+    {
+      team: 1,
+      player_id: 'player_fc_001',
+      characters: mockBattleCharacters,
+      deck: mockPlayer1Deck
+    },
+    {
+      team: 2,
+      player_id: null, // AI/NPC
+      characters: mockEnemyCharacters,
+      deck: mockPlayer2Deck
+    }
+  ]
 };
 
 export const mockBattleRewards: BattleRewards = {

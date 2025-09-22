@@ -167,7 +167,7 @@ export interface Card {
   card_type: string;
   energy_cost: number;
   rarity?: string;
-  actions?: any[]; // Define specific actions/effects of the card
+  actions?: unknown[]; // Define specific actions/effects of the card
 }
 
 export interface BattleCard {
@@ -279,14 +279,14 @@ export interface CardBattleCharacter {
   hit_rate: number;
   dodge: number;
   has_acted: boolean;
-  active_effects: any[];
+  active_effects: unknown[];
   equipped_skills: string[];
 }
 
 export interface CardInDeck {
   card_id?: string;
-  position: number; // 1-50, shuffled
-  card?: Card | BattleCard;
+  position?: number; // 1-50, shuffled
+  card?: Card;
 }
 
 export interface CardBattleDeck {
@@ -299,21 +299,129 @@ export interface CardBattleDeck {
   cards_drawn: number;
 }
 
+export interface CardBattlePlayerState {
+  team: number;                             // 1 or 2 (team number)
+  player_id?: string | null;                // Player ID (null for AI/NPC)
+  characters: CardBattleCharacter[];        // Characters for this player/team
+  deck: CardBattleDeck;                     // Deck state for this player/team
+}
+
 export interface CardBattleState {
-  id: string;
-  battle_type: 'pve' | 'pvp';
-  status: 'open' | 'ongoing' | 'completed' | 'abandoned';
-  current_turn: number;
-  current_player: number;
-  player1: {
-    characters: CardBattleCharacter[];
-    deck: CardBattleDeck;
-  },
-  player2: {
-    characters: CardBattleCharacter[];
-    deck: CardBattleDeck;
-  },
+  id: string;                               // Battle ID
+  status: "ongoing" | "completed" | "surrendered" | "timeout";
+  battle_type: "pvp" | "pve" | "training";
+  current_turn: number;                     // Current turn number
+  current_player: number;                   // 1 or 2 (team number)
   phase: 'start_turn' | 'draw_phase' | 'main_phase' | 'end_turn';
+  winner_team?: number;                     // 1 or 2 if finished
+  created_at: string;
+  updated_at: string;
+  completed_at?: string;
+
+  players: CardBattlePlayerState[];         // Array for each player/team
+}
+
+// Character state for logging and snapshots
+export interface CharacterState {
+  id: string;
+  team: number;
+  max_hp: number;
+  current_hp: number;
+  atk: number;
+  def: number;
+  agi: number;
+  crit_rate: number;
+  crit_dmg: number;
+  res: number;
+  damage: number;
+  mitigation: number;
+  hit_rate: number;
+  dodge: number;
+  has_acted: boolean;
+  active_effects: unknown[];
+  equipped_skills: string[];
+}
+
+export type BattlePhaseName =
+  | "start_turn"
+  | "draw_phase"
+  | "main_phase"
+  | "end_turn"
+  | "ai_turn";
+
+// Enhanced player/actor information
+export interface CardBattleLogPlayer {
+  team: number;
+  character_id?: string; // Null for player-wide actions
+  player_id?: string;
+}
+
+// Complete card information for animations and UI
+export interface CardBattleLogCard {
+  id: string;
+  name: string;
+  group: string;
+  description: string;
+  icon_url?: string;
+  card_type: string;
+  energy_cost: number;
+  rarity?: string;
+  actions?: unknown[]; // full detail of card
+}
+
+// Impact event for detailed tracking
+export interface LogImpact {
+  type: 'damage' | 'heal' | 'effect' | 'energy' | 'status';
+  value: number | string | object;
+  meta?: unknown; // E.g., crit, miss, resistance, etc.
+}
+
+// Target with comprehensive state tracking
+export interface CardBattleLogTarget {
+  id: string;
+  team: number;
+  before: CharacterState; // State before effect
+  after: CharacterState;  // State after effect
+  impacts: LogImpact[];
+}
+
+// Action result information
+export interface LogResult {
+  success: boolean;
+  reason?: string; // 'insufficient_energy', 'controlled', etc.
+}
+
+// Battle state snapshot for debugging/replay
+export interface CardBattleLogBattleSnapshot {
+  // For debugging/replay - can be a shallow snapshot
+  characters: CharacterState[];
+  turn: number;
+  phase: string;
+  current_player: number;
+}
+
+// Main CardBattleLog interface with enhanced structure
+export interface CardBattleLog {
+  id: string;
+  phase: BattlePhaseName;
+  action_type: string;                    // 'effect_trigger', 'draw_card', 'play_card', etc.
+  actor: CardBattleLogPlayer;
+  card?: CardBattleLogCard;
+  targets?: CardBattleLogTarget[];
+  drawn_cards?: CardBattleLogCard[];      // For draw actions - array of cards drawn
+  impacts?: LogImpact[];                  // Top-level impacts for non-target actions
+  result?: LogResult;
+  before_state?: Partial<CardBattleLogBattleSnapshot>;
+  after_state?: Partial<CardBattleLogBattleSnapshot>;
+  animation_hint?: string;
+  created_at: string;
+  updated_at?: string;
+}
+
+export interface CardBattlePhaseResponse {
+  phase: BattlePhaseName;
+  logs: CardBattleLog[];                  // Ordered array for step-by-step animation
+  after_state?: CardBattleLogBattleSnapshot; // (Optional) Partial/full battle state after all logs
 }
 
 export interface BattleStageResponse {
@@ -324,6 +432,7 @@ export interface BattleStageResponse {
   cards: Card[];
 }
 
+// Legacy interface for backward compatibility - deprecated in favor of CardBattleState
 export interface BattleStateResponse {
   id: string;
   battle_type: string;
@@ -348,7 +457,7 @@ export interface BattleStateResponse {
     hit_rate: number;
     dodge: number;
     has_acted: boolean;
-    active_effects: Array<any>;
+    active_effects: Array<unknown>;
     equipped_skills: Array<string>;
   }>;
   decks: Array<{
@@ -393,9 +502,9 @@ export interface BattleEndData {
 export interface BattleRewards {
   gold: number;
   experience: number;
-  items: any[];
+  items: unknown[];
   newLevel?: boolean;
-  levelUpRewards?: any[];
+  levelUpRewards?: unknown[];
 }
 
 // New interfaces for updated card battle API specification
@@ -404,7 +513,7 @@ export interface BattleActionResult {
   success: boolean;
   damage_dealt?: number;
   healing_done?: number;
-  status_effects_applied?: any[];
+  status_effects_applied?: unknown[];
   energy_change?: number;
   cards_drawn?: Card[];
   actions_performed: BattleLogEntry[];
@@ -416,7 +525,7 @@ export interface BattleLogEntry {
   character_id?: string;
   card_id?: string;
   target_ids?: string[];
-  result?: any;
+  result?: unknown;
   timestamp?: string;
   description?: string;
 }
@@ -426,7 +535,7 @@ export interface DrawPhaseResult {
   drawn_cards: Card[];
   updated_hand: Card[];
   energy: number;
-  status_effects: any[];
+  status_effects: unknown[];
   actions_performed: BattleLogEntry[];
 }
 

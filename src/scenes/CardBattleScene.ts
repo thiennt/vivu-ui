@@ -525,7 +525,7 @@ export class CardBattleScene extends BaseScene {
 
   private createEnergyArea(container: Container, playerNo: number): void {
     const padding = this.STANDARD_PADDING;
-    const player = this.battleState ? (playerNo === 1 ? this.battleState.player1 : this.battleState.player2) : null;
+    const player = this.battleState ? this.battleState.players.find(p => p.team === playerNo) : null;
 
     // Energy display - centered horizontally
     const energyBg = new Graphics();
@@ -557,7 +557,7 @@ export class CardBattleScene extends BaseScene {
     const characterWidth = 80;
     const characterSpacing = 10;
 
-    const player = this.battleState ? (playerNo === 1 ? this.battleState.player1 : this.battleState.player2) : null;
+    const player = this.battleState ? this.battleState.players.find(p => p.team === playerNo) : null;
     const totalCharacterWidth = (player?.characters.length || 0) * characterWidth + Math.max(0, (player?.characters.length || 0) - 1) * characterSpacing;
     const startX = (this.gameWidth - totalCharacterWidth) / 2;
 
@@ -599,7 +599,7 @@ export class CardBattleScene extends BaseScene {
   }
 
   private createHandArea(container: Container, playerNo: number, showCards: boolean): void {
-    const player = this.battleState ? (playerNo === 1 ? this.battleState.player1 : this.battleState.player2) : null;
+    const player = this.battleState ? this.battleState.players.find(p => p.team === playerNo) : null;
 
     if (!player) return;
 
@@ -1349,8 +1349,10 @@ export class CardBattleScene extends BaseScene {
     if (!this.battleState) return false;
 
     // Check if all characters of player 1 are defeated
-    const player1Alive = this.battleState.player1.characters.some(char => char.current_hp > 0);
-    const player2Alive = this.battleState.player2.characters.some(char => char.current_hp > 0);
+    const player1 = this.battleState.players.find(p => p.team === 1);
+    const player2 = this.battleState.players.find(p => p.team === 2);
+    const player1Alive = player1?.characters.some(char => char.current_hp > 0) || false;
+    const player2Alive = player2?.characters.some(char => char.current_hp > 0) || false;
     
     if (!player1Alive) {
       this.showBattleEnd(false);
@@ -1504,7 +1506,7 @@ export class CardBattleScene extends BaseScene {
   private async animateDrawCard(cardInDeck: CardInDeck, playerNo: number): Promise<void> {
     // Find the deck position (where the card should fly from)
     const isPlayer1 = playerNo === 1;
-    const player = this.battleState ? (isPlayer1 ? this.battleState.player1 : this.battleState.player2) : null;
+    const player = this.battleState ? this.battleState.players.find(p => p.team === playerNo) : null;
     const deckContainer = isPlayer1 ? this.player1Container : this.player2Container;
     const deckX = this.STANDARD_PADDING + 25; // Center of deck card
     const deckY = 35 + 35; // Y of deck + half height
