@@ -41,6 +41,8 @@ export class CardBattleScene extends BaseScene {
   private player2Container!: Container;
   private player1HandContainer!: Container;
   private player2HandContainer!: Container;
+  private player1EnergyContainer!: Container;
+  private player2EnergyContainer!: Container;
   private battleLogContainer!: Container;
   private uiContainer!: Container;
   
@@ -441,40 +443,74 @@ export class CardBattleScene extends BaseScene {
     this.player2Container = new Container();
     this.player1HandContainer = new Container();
     this.player2HandContainer = new Container();
+    this.player1EnergyContainer = new Container();
+    this.player2EnergyContainer = new Container();
     this.battleLogContainer = new Container();
     this.uiContainer = new Container();
 
-    // Layout calculations
+    // Layout calculations - fit all elements with proper spacing
     const availableHeight = this.getContentHeight();
     const padding = this.STANDARD_PADDING;
+    const spacing = this.STANDARD_SPACING;
+    
+    // Calculate heights for each section
     const handHeight = 80;
     const characterAreaHeight = 100;
+    const energyHeight = 35;
     const logHeight = 60;
     
-    // Player 2 hand at top (face down)
-    this.player2HandContainer.y = padding;
+    // Total required height
+    const totalRequiredHeight = handHeight + characterAreaHeight + energyHeight + logHeight + energyHeight + characterAreaHeight + handHeight + (spacing * 7) + (padding * 2);
+    
+    // Adjust spacing if needed to fit everything
+    let adjustedSpacing = spacing;
+    if (totalRequiredHeight > availableHeight) {
+      adjustedSpacing = Math.max(5, (availableHeight - (handHeight * 2 + characterAreaHeight * 2 + energyHeight * 2 + logHeight + padding * 2)) / 7);
+    }
+    
+    let currentY = padding;
+    
+    // Layout in order according to requirements:
+    // 1. Player 2 Hand Area
+    this.player2HandContainer.y = currentY;
     this.createHandArea(this.player2HandContainer, 2, false);
+    currentY += handHeight + adjustedSpacing;
     
-    // Player 2 (AI) characters
-    this.player2Container.y = this.player2HandContainer.y + handHeight + 10;
+    // 2. Player 2 character cards (with deck + discard pile)
+    this.player2Container.y = currentY;
     this.createPlayerArea(this.player2Container, 2, false);
+    currentY += characterAreaHeight + adjustedSpacing;
+    
+    // 3. Player 2 energy area
+    this.player2EnergyContainer.y = currentY;
+    this.createEnergyArea(this.player2EnergyContainer, 2);
+    currentY += energyHeight + adjustedSpacing;
 
-    // Battle log in middle
-    this.battleLogContainer.y = this.player2Container.y + characterAreaHeight + 10;
+    // 4. Battle log
+    this.battleLogContainer.y = currentY;
     this.createBattleLog();
+    currentY += logHeight + adjustedSpacing;
     
-    // Player 1 (human) characters - above hand cards
-    this.player1Container.y = this.battleLogContainer.y + logHeight + 10;
+    // 5. Player 1 energy area
+    this.player1EnergyContainer.y = currentY;
+    this.createEnergyArea(this.player1EnergyContainer, 1);
+    currentY += energyHeight + adjustedSpacing;
+    
+    // 6. Player 1 character cards
+    this.player1Container.y = currentY;
     this.createPlayerArea(this.player1Container, 1, true);
+    currentY += characterAreaHeight + adjustedSpacing;
     
-    // Player 1 hand at bottom
-    this.player1HandContainer.y = this.player1Container.y + characterAreaHeight + 10;
+    // 7. Player 1 hand area
+    this.player1HandContainer.y = currentY;
     this.createHandArea(this.player1HandContainer, 1, true);
 
     this.gameContainer.addChild(
       this.player2HandContainer,
       this.player2Container,
+      this.player2EnergyContainer,
       this.battleLogContainer,
+      this.player1EnergyContainer,
       this.player1Container,
       this.player1HandContainer
     );
@@ -487,38 +523,48 @@ export class CardBattleScene extends BaseScene {
     app.stage.hitArea = app.screen;
   }
 
+  private createEnergyArea(container: Container, playerNo: number): void {
+    const padding = this.STANDARD_PADDING;
+    const player = this.battleState ? (playerNo === 1 ? this.battleState.player1 : this.battleState.player2) : null;
+
+    // Energy display - centered horizontally
+    const energyBg = new Graphics();
+    energyBg.roundRect(0, 0, 140, 30, 8)
+      .fill(Colors.BACKGROUND_SECONDARY)
+      .stroke({ width: 2, color: Colors.CARD_BORDER });
+    
+    const energyText = new Text({
+      text: `Energy: ${player?.deck.current_energy || 0}`,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 14,
+        fontWeight: 'bold',
+        fill: Colors.TEXT_PRIMARY
+      }
+    });
+    energyText.anchor.set(0.5);
+    energyText.x = 70;
+    energyText.y = 15;
+
+    container.addChild(energyBg, energyText);
+    
+    // Center the energy display horizontally
+    container.x = (this.gameWidth - 140) / 2;
+  }
+
   private createPlayerArea(container: Container, playerNo: number, isBottomPlayer: boolean): void {
     const padding = this.STANDARD_PADDING;
     const characterWidth = 80;
     const characterSpacing = 10;
 
     const player = this.battleState ? (playerNo === 1 ? this.battleState.player1 : this.battleState.player2) : null;
-    const totalCharacterWidth = player?.characters.length! * characterWidth + (player?.characters.length! - 1) * characterSpacing;
+    const totalCharacterWidth = (player?.characters.length || 0) * characterWidth + Math.max(0, (player?.characters.length || 0) - 1) * characterSpacing;
     const startX = (this.gameWidth - totalCharacterWidth) / 2;
 
-    // Energy display
-    const energyBg = new Graphics();
-    energyBg.roundRect(padding, 5, 120, 25, 5)
-      .fill(Colors.BACKGROUND_SECONDARY)
-      .stroke({ width: 1, color: Colors.CARD_BORDER });
-    
-    const energyText = new Text({
-      text: `Energy: ${player?.deck.current_energy}`,
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 12,
-        fill: Colors.TEXT_PRIMARY
-      }
-    });
-    energyText.x = padding + 10;
-    energyText.y = 12;
-
-    container.addChild(energyBg, energyText);
-
-    // Create character cards
+    // Create character cards (energy is now handled separately)
     player?.characters.forEach((character, index) => {
       const x = startX + index * (characterWidth + characterSpacing);
-      const y = 35;
+      const y = 10; // Reduced Y offset since energy is separate
       const characterCard = this.createCharacterCard(character, x, y, characterWidth);
       
       this.dropZones.push({
@@ -534,7 +580,7 @@ export class CardBattleScene extends BaseScene {
     // Deck and discard pile
     const deckX = padding;
     const discardX = this.gameWidth - padding - 60;
-    const pileY = 35;
+    const pileY = 10; // Reduced Y offset since energy is separate
 
     // Deck
     const deckCard = this.createDeckCard(deckX, pileY, player?.deck.deck_cards.length ?? 0);
@@ -1528,22 +1574,28 @@ export class CardBattleScene extends BaseScene {
     this.gameContainer.removeChildren();
     this.dropZones = [];
 
-    // Clear hand containers before re-adding cards
+    // Clear all containers before re-adding content
     this.player1HandContainer.removeChildren();
     this.player2HandContainer.removeChildren();
+    this.player1EnergyContainer.removeChildren();
+    this.player2EnergyContainer.removeChildren();
+    this.battleLogContainer.removeChildren();
     
-    // Recreate player areas
+    // Recreate all areas
     this.createPlayerArea(this.player1Container, 1, true);
     this.createPlayerArea(this.player2Container, 2, false);
+    this.createEnergyArea(this.player1EnergyContainer, 1);
+    this.createEnergyArea(this.player2EnergyContainer, 2);
     this.createHandArea(this.player1HandContainer, 1, true);
     this.createHandArea(this.player2HandContainer, 2, false);
-    this.battleLogContainer.removeChildren();
     this.createBattleLog();
 
     this.gameContainer.addChild(
       this.player2HandContainer,
       this.player2Container,
+      this.player2EnergyContainer,
       this.battleLogContainer,
+      this.player1EnergyContainer,
       this.player1Container,
       this.player1HandContainer
     );
