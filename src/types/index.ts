@@ -486,13 +486,19 @@ export interface BattleMoveData {
   target_ids?: string[];
 }
 
-export interface BattleMoveResponse {
-  success: boolean;
-  result: BattleActionResult;
+// Action API responses: return CardBattleLog[] directly if success
+export type BattleMoveResponse = CardBattleLog[] | {
+  success: false;
+  error: string;
   updated_state?: Partial<CardBattleState>;
-  error?: string;
-  battle_logs?: BattleLogEntry[]; // Enhanced battle logs for animation
-}
+};
+
+export type DrawPhaseResponse = CardBattleLog[];
+
+export type BattlePhaseResponse = CardBattleLog[];
+
+// API action methods that return CardBattleLog arrays directly
+export type ActionApiResponse = CardBattleLog[];
 
 export interface BattleEndData {
   winner: number; // 1 or 2
@@ -518,7 +524,6 @@ export interface BattleActionResult {
   energy_change?: number;
   cards_drawn?: Card[];
   actions_performed: BattleLogEntry[];
-  battle_logs?: BattleLogEntry[]; // Enhanced battle logs for animation
 }
 
 export interface BattleLogEntry {
@@ -539,7 +544,6 @@ export interface DrawPhaseResult {
   energy: number;
   status_effects: unknown[];
   actions_performed: BattleLogEntry[];
-  battle_logs?: BattleLogEntry[]; // Enhanced battle logs for animation
 }
 
 export interface BattlePhaseResult {
@@ -550,7 +554,6 @@ export interface BattlePhaseResult {
   ai_actions?: AIAction[];
   updated_state?: Partial<CardBattleState>;
   actions_performed: BattleLogEntry[];
-  battle_logs?: BattleLogEntry[]; // Enhanced battle logs for animation
 }
 
 export interface AIAction {
@@ -561,5 +564,4 @@ export interface AIAction {
   target_ids?: string[];
   result?: BattleActionResult;
   actions_performed: BattleLogEntry[];
-  battle_logs?: BattleLogEntry[]; // Enhanced battle logs for animation
 }
