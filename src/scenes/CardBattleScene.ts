@@ -377,9 +377,18 @@ export class CardBattleScene extends BaseScene {
     
     try {
       console.log('🔄 Refreshing battle state from server...');
-      this.battleState = await battleApi.getBattleState(this.battleId);
+      const response = await battleApi.getBattleState(this.battleId);
+      if (response.success && response.data) {
+        this.battleState = response.data;
+        console.log(`✅ Battle state refreshed: ${response.message}`);
+      } else {
+        console.error(`❌ Failed to refresh battle state: ${response.message}`);
+        if (response.errors) {
+          response.errors.forEach(error => console.error(`   Error: ${error}`));
+        }
+        // Continue with existing state
+      }
       this.refreshUI();
-      console.log('✅ Battle state refreshed');
     } catch (error) {
       console.error('❌ Error refreshing battle state:', error);
       console.log('🔄 Continuing with mock data...');
@@ -467,9 +476,18 @@ export class CardBattleScene extends BaseScene {
       // Move getBattleState to prepare function to load battlestate data for ui to init
       try {
         console.log('🔄 Loading battle state from server...');
-        this.battleState = await battleApi.getBattleState(this.battleId);
-        console.log('✅ Battle state loaded:', this.battleState);
-        this.usingMockData = false;
+        const response = await battleApi.getBattleState(this.battleId);
+        if (response.success && response.data) {
+          this.battleState = response.data;
+          console.log(`✅ Battle state loaded: ${response.message}`, this.battleState);
+          this.usingMockData = false;
+        } else {
+          console.error(`❌ Failed to load battle state: ${response.message}`);
+          if (response.errors) {
+            response.errors.forEach(error => console.error(`   Error: ${error}`));
+          }
+          throw new Error('Failed to load battle state');
+        }
         
       } catch (error) {
         console.error('❌ Error loading battle state from API:', error);

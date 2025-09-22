@@ -43,7 +43,17 @@ export class PrepareScene extends BaseScene {
 
     this.player = JSON.parse(sessionStorage.getItem('player') || '{}');
 
-    this.battleStage = await battleApi.createBattleStage(this.stage.id);
+    const response = await battleApi.createBattleStage(this.stage.id);
+    if (response.success && response.data) {
+      this.battleStage = response.data;
+      console.log(`✅ Battle stage created successfully: ${response.message}`);
+    } else {
+      console.error(`❌ Failed to create battle stage: ${response.message}`);
+      if (response.errors) {
+        response.errors.forEach(error => console.error(`   Error: ${error}`));
+      }
+      this.battleStage = null; // Use null as fallback
+    }
 
     this.loadingManager.hideLoading();
     
@@ -399,12 +409,20 @@ export class PrepareScene extends BaseScene {
   }
 
   private async startBattle(): Promise<void> {
-    await battleApi.startBattle(this.battleStage?.battle_id || '');
-    
-    // Navigate to card battle scene with battle data
-    navigation.showScreen(CardBattleScene, {
-      battle_id: this.battleStage?.battle_id,
-    });
+    const response = await battleApi.startBattle(this.battleStage?.battle_id || '');
+    if (response.success) {
+      console.log(`✅ Battle started successfully: ${response.message}`);
+      // Navigate to card battle scene with battle data
+      navigation.showScreen(CardBattleScene, {
+        battle_id: this.battleStage?.battle_id,
+      });
+    } else {
+      console.error(`❌ Failed to start battle: ${response.message}`);
+      if (response.errors) {
+        response.errors.forEach(error => console.error(`   Error: ${error}`));
+      }
+      // Could show an error message to the user here
+    }
   }
 
   private showCardDetails(card: Card): void {

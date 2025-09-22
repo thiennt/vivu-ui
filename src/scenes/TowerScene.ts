@@ -48,7 +48,17 @@ export class TowerScene extends BaseScene {
   async prepare(): Promise<void> {
     this.loadingManager.showLoading();
     
-    this.stages = await battleApi.getAvailableStages();
+    const response = await battleApi.getAvailableStages();
+    if (response.success && response.data) {
+      this.stages = response.data;
+      console.log(`✅ Stages loaded successfully: ${response.message}`);
+    } else {
+      console.error(`❌ Failed to load stages: ${response.message}`);
+      if (response.errors) {
+        response.errors.forEach(error => console.error(`   Error: ${error}`));
+      }
+      this.stages = []; // Use empty array as fallback
+    }
     
     this.loadingManager.hideLoading();
 
