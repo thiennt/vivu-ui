@@ -23,7 +23,7 @@ import { createRandomDeck } from '@/utils/cardData';
 
 
 // Base API configuration
-const API_BASE_URL = (import.meta as any).env?.VITE_API_BASE_URL || 'https://api.vivu.game';
+const API_BASE_URL = ((import.meta as unknown) as { env?: { VITE_API_BASE_URL?: string } }).env?.VITE_API_BASE_URL || 'https://api.vivu.game';
 
 // API Response wrapper interface
 interface ApiResponse<T> {
@@ -44,7 +44,7 @@ class ApiError extends Error {
   constructor(
     message: string,
     public status?: number,
-    public response?: any
+    public response?: unknown
   ) {
     super(message);
     this.name = 'ApiError';
