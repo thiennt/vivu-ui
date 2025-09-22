@@ -433,6 +433,8 @@ export interface BattleStageResponse {
 }
 
 // Legacy interface for backward compatibility - deprecated in favor of CardBattleState
+// TODO: Remove this interface after migrating all code to use CardBattleState
+// @deprecated Use CardBattleState instead
 export interface BattleStateResponse {
   id: string;
   battle_type: string;
@@ -486,13 +488,20 @@ export interface BattleMoveData {
   target_ids?: string[];
 }
 
-export interface BattleMoveResponse {
-  success: boolean;
-  result: BattleActionResult;
-  updated_state?: Partial<CardBattleState>;
-  error?: string;
-  battle_logs?: BattleLogEntry[]; // Enhanced battle logs for animation
+// Standardized API response format for CardBattle APIs
+export interface CardBattleApiResponse<T = any> {
+  success: boolean;                   // Boolean: was the request successful?
+  code: number;                       // HTTP status code (repeated here for clarity)
+  message: string;                    // Human-readable message
+  data: T | null;                     // Main payload (object, array, or null)
+  errors: string[] | null;            // Array of errors, or null if no error
+  meta?: any;                         // (Optional) Extra info: pagination, server time, etc.
 }
+
+// Updated existing API response types to use the new standardized format
+export type BattleMoveResponse = CardBattleApiResponse<CardBattleLog[]>;
+export type DrawPhaseResult = CardBattleApiResponse<CardBattleLog[]>;
+export type BattlePhaseResult = CardBattleApiResponse<CardBattleLog[]>;
 
 export interface BattleEndData {
   winner: number; // 1 or 2
@@ -518,7 +527,7 @@ export interface BattleActionResult {
   energy_change?: number;
   cards_drawn?: Card[];
   actions_performed: BattleLogEntry[];
-  battle_logs?: BattleLogEntry[]; // Enhanced battle logs for animation
+  battle_logs?: BattleLogEntry[]; // Legacy support for backward compatibility
 }
 
 export interface BattleLogEntry {
@@ -532,27 +541,6 @@ export interface BattleLogEntry {
   description?: string;
 }
 
-export interface DrawPhaseResult {
-  success: boolean;
-  drawn_cards: Card[];
-  updated_hand: Card[];
-  energy: number;
-  status_effects: unknown[];
-  actions_performed: BattleLogEntry[];
-  battle_logs?: BattleLogEntry[]; // Enhanced battle logs for animation
-}
-
-export interface BattlePhaseResult {
-  success: boolean;
-  phase: 'draw' | 'main' | 'end' | 'ai_turn';
-  current_turn: number;
-  current_player: number;
-  ai_actions?: AIAction[];
-  updated_state?: Partial<CardBattleState>;
-  actions_performed: BattleLogEntry[];
-  battle_logs?: BattleLogEntry[]; // Enhanced battle logs for animation
-}
-
 export interface AIAction {
   type: 'draw_phase' | 'play_card' | 'discard_card' | 'end_turn';
   player_team: number;
@@ -561,5 +549,5 @@ export interface AIAction {
   target_ids?: string[];
   result?: BattleActionResult;
   actions_performed: BattleLogEntry[];
-  battle_logs?: BattleLogEntry[]; // Enhanced battle logs for animation
+  battle_logs?: BattleLogEntry[]; // Legacy support for backward compatibility
 }

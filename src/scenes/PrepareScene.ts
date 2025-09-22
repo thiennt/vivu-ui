@@ -4,7 +4,7 @@ import { BaseScene } from '@/utils/BaseScene';
 import { Colors, Gradients } from '@/utils/colors';
 import { CardBattleScene } from './CardBattleScene';
 import { StageScene } from './StageScene';
-import { BattleCard, BattleStageResponse, BattleStateResponse, Card, CardType, CardRarity, Character } from '@/types';
+import { BattleCard, BattleStageResponse, Card, CardType, CardRarity, Character } from '@/types';
 import { createRandomDeck } from '@/utils/cardData';
 import { battleApi } from '@/services/api';
 import { LoadingStateManager } from '@/utils/loadingStateManager';

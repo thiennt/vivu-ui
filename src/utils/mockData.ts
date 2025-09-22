@@ -1,3 +1,5 @@
+import { CardBattleLog } from '@/types';
+
 // ---- Skills ----
 // NOTE: mockSkills usage has been replaced with API calls for CharacterDetail component
 
@@ -1497,31 +1499,39 @@ import { DrawPhaseResult, BattlePhaseResult, BattleMoveResponse, AIAction, Battl
 
 export const mockDrawPhaseResult: DrawPhaseResult = {
   success: true,
-  drawn_cards: [
-    {
+  code: 200,
+  message: "Turn started successfully",
+  data: [{
+    id: `log_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+    phase: 'draw_phase' as const,
+    action_type: 'draw_card',
+    actor: {
+      team: 1,
+      character_id: 'player_char_1',
+      player_id: 'player_fc_001'
+    },
+    drawn_cards: [{
       id: 'fire_bolt_001',
       name: 'Fire Bolt',
       group: 'High Damage',
       description: 'Deal 25 fire damage to target enemy',
       card_type: 'attack',
-      energy_cost: 2,
-      rarity: 'common'
-    }
-  ],
-  updated_hand: [],
-  energy: 4,
-  status_effects: [],
-  actions_performed: [{
-    type: 'draw_phase',
-    player_team: 1,
-    description: 'Drew 1 card and gained 1 energy'
-  }],
-  battle_logs: [{
-    type: 'draw_phase',
-    player_team: 1,
-    description: 'Turn started: Player drew Fire Bolt and gained energy',
+      energy_cost: 2
+    }],
+    result: {
+      success: true,
+      reason: undefined
+    },
+    created_at: new Date().toISOString(),
+    animation_hint: 'Turn started: Player drew Fire Bolt and gained energy'
+  }] as CardBattleLog[],
+  errors: null,
+  meta: {
+    phase: 'draw_phase',
+    cardsDrawn: 1,
+    energyGained: 1,
     timestamp: new Date().toISOString()
-  }]
+  }
 };
 
 export const mockBattleActionResult: BattleActionResult = {
@@ -1552,15 +1562,85 @@ export const mockBattleActionResult: BattleActionResult = {
 
 export const mockPlayCardResponse: BattleMoveResponse = {
   success: true,
-  result: mockBattleActionResult,
-  battle_logs: [{
-    type: 'play_card',
-    player_team: 1,
-    card_id: 'fire_bolt_001',
-    target_ids: ['enemy_char_1'],
-    description: 'Player successfully played Fire Bolt card',
+  code: 200,
+  message: "Card played successfully",
+  data: [{
+    id: `log_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+    phase: 'main_phase' as const,
+    action_type: 'play_card',
+    actor: {
+      team: 1,
+      character_id: 'player_char_1',
+      player_id: 'player_fc_001'
+    },
+    card: {
+      id: 'fire_bolt_001',
+      name: 'Fire Bolt',
+      group: 'spell',
+      description: 'A basic fire spell',
+      card_type: 'action',
+      energy_cost: 2
+    },
+    targets: [{
+      id: 'enemy_char_1',
+      team: 2,
+      before: {
+        id: 'enemy_char_1',
+        team: 2,
+        max_hp: 100,
+        current_hp: 75,
+        atk: 50,
+        def: 30,
+        agi: 20,
+        crit_rate: 5,
+        crit_dmg: 150,
+        res: 10,
+        damage: 0,
+        mitigation: 0,
+        hit_rate: 95,
+        dodge: 5,
+        has_acted: false,
+        active_effects: [],
+        equipped_skills: []
+      },
+      after: {
+        id: 'enemy_char_1',
+        team: 2,
+        max_hp: 100,
+        current_hp: 50,
+        atk: 50,
+        def: 30,
+        agi: 20,
+        crit_rate: 5,
+        crit_dmg: 150,
+        res: 10,
+        damage: 0,
+        mitigation: 0,
+        hit_rate: 95,
+        dodge: 5,
+        has_acted: false,
+        active_effects: [],
+        equipped_skills: []
+      },
+      impacts: [{
+        type: 'damage',
+        value: 25,
+        meta: { isCritical: false }
+      }]
+    }],
+    result: {
+      success: true,
+      reason: undefined
+    },
+    created_at: new Date().toISOString(),
+    animation_hint: 'Player successfully played Fire Bolt card'
+  }] as CardBattleLog[],
+  errors: null,
+  meta: {
+    action: 'play_card',
+    battleId: 'battle_mock_001',
     timestamp: new Date().toISOString()
-  }]
+  }
 };
 
 export const mockAIActions: AIAction[] = [
@@ -1634,21 +1714,119 @@ export const mockAIActions: AIAction[] = [
 
 export const mockEndTurnResult: BattlePhaseResult = {
   success: true,
-  phase: 'ai_turn',
-  current_turn: 2,
-  current_player: 2,
-  ai_actions: mockAIActions,
-  actions_performed: [{
-    type: 'end_turn',
-    player_team: 1,
-    description: 'Player ended turn'
-  }],
-  battle_logs: [{
-    type: 'end_turn',
-    player_team: 1,
-    description: 'Player ends their turn, AI turn begins',
+  code: 200,
+  message: "Turn ended successfully",
+  data: [
+    {
+      id: `log_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      phase: 'end_turn' as const,
+      action_type: 'end_turn',
+      actor: {
+        team: 1,
+        character_id: 'player_char_1',
+        player_id: 'player_fc_001'
+      },
+      result: {
+        success: true,
+        reason: undefined
+      },
+      created_at: new Date().toISOString(),
+      animation_hint: 'Player ends their turn, AI turn begins'
+    },
+    {
+      id: `log_${Date.now() + 1}_${Math.random().toString(36).substr(2, 9)}`,
+      phase: 'ai_turn' as const,
+      action_type: 'draw_card',
+      actor: {
+        team: 2,
+        character_id: 'ai_char_001',
+        player_id: 'ai_player'
+      },
+      result: {
+        success: true,
+        reason: undefined
+      },
+      created_at: new Date().toISOString(),
+      animation_hint: 'AI draws cards and gains energy for their turn'
+    },
+    {
+      id: `log_${Date.now() + 2}_${Math.random().toString(36).substr(2, 9)}`,
+      phase: 'ai_turn' as const,
+      action_type: 'play_card',
+      actor: {
+        team: 2,
+        character_id: 'ai_char_001',
+        player_id: 'ai_player'
+      },
+      card: {
+        id: 'shadow_strike',
+        name: 'Shadow Strike',
+        group: 'Dark Magic',
+        description: 'Deal shadow damage to target',
+        card_type: 'attack',
+        energy_cost: 2
+      },
+      targets: [{
+        id: 'player_char_1',
+        team: 1,
+        before: {
+          id: 'player_char_1',
+          team: 1,
+          max_hp: 100,
+          current_hp: 75,
+          atk: 50,
+          def: 30,
+          agi: 20,
+          crit_rate: 5,
+          crit_dmg: 150,
+          res: 10,
+          damage: 0,
+          mitigation: 0,
+          hit_rate: 95,
+          dodge: 5,
+          has_acted: false,
+          active_effects: [],
+          equipped_skills: []
+        },
+        after: {
+          id: 'player_char_1',
+          team: 1,
+          max_hp: 100,
+          current_hp: 55,
+          atk: 50,
+          def: 30,
+          agi: 20,
+          crit_rate: 5,
+          crit_dmg: 150,
+          res: 10,
+          damage: 0,
+          mitigation: 0,
+          hit_rate: 95,
+          dodge: 5,
+          has_acted: false,
+          active_effects: [],
+          equipped_skills: []
+        },
+        impacts: [{
+          type: 'damage',
+          value: 20,
+          meta: { isCritical: false }
+        }]
+      }],
+      result: {
+        success: true,
+        reason: undefined
+      },
+      created_at: new Date().toISOString(),
+      animation_hint: 'AI plays Shadow Strike targeting player character'
+    }
+  ] as CardBattleLog[],
+  errors: null,
+  meta: {
+    phase: 'ai_turn',
+    aiActionsCount: 2,
     timestamp: new Date().toISOString()
-  }]
+  }
 };
 
 export const mockBattleLogs: BattleLogEntry[] = [

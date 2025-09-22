@@ -10,6 +10,7 @@ import { battleApi } from '@/services/api';
 import { 
   CardBattleState, 
   BattleMoveData,
+  BattleMoveResponse,
   BattleEndData,
   BattleRewards,
   Card,
@@ -20,7 +21,9 @@ import {
   BattleActionResult,
   AIAction,
   CardBattleCharacter,
-  BattleLogEntry
+  BattleLogEntry,
+  CardBattleLog,
+  CardBattleApiResponse
 } from '@/types';
 import { 
   mockCardBattleState, 
@@ -87,10 +90,95 @@ export class CardBattleScene extends BaseScene {
   }
 
   /**
-   * Centralized method to process battle_logs for animations
+   * Helper method to process new API response format
+   */
+  private async processCardBattleApiResponse(response: CardBattleApiResponse<CardBattleLog[]>): Promise<void> {
+    if (response.success && response.data) {
+      console.log(`✅ API call successful: ${response.message}`);
+      await this.processCardBattleLogs(response.data);
+    } else {
+      console.error(`❌ API call failed (${response.code}): ${response.message}`);
+      if (response.errors) {
+        response.errors.forEach(error => console.error(`   Error: ${error}`));
+      }
+    }
+  }
+
+  /**
+   * Helper to create a properly typed mock response for discard actions
+   */
+  private createMockDiscardResponse(cardId: string): BattleMoveResponse {
+    const mockLog: CardBattleLog = {
+      id: `log_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      phase: 'main_phase' as const,
+      action_type: 'discard_card',
+      actor: {
+        team: 1,
+        character_id: 'player_char_1',
+        player_id: 'player_fc_001'
+      },
+      card: {
+        id: cardId || 'unknown',
+        name: 'Unknown Card',
+        group: 'spell',
+        description: 'A discarded card',
+        card_type: 'action',
+        energy_cost: 1
+      },
+      result: {
+        success: true,
+        reason: undefined
+      },
+      created_at: new Date().toISOString(),
+      animation_hint: 'Card discarded successfully'
+    };
+    
+    return {
+      success: true,
+      code: 200,
+      message: "Card discarded successfully",
+      data: [mockLog],
+      errors: null,
+      meta: {
+        action: 'discard_card',
+        battleId: 'battle_mock_001',
+        timestamp: new Date().toISOString()
+      }
+    };
+  }
+
+  /**
+   * Helper method to process API response that could be legacy or new format
+   */
+  private async processApiResponse(response: BattleMoveResponse): Promise<void> {
+    // Check if it's the new format
+    if ((response as any).data && Array.isArray((response as any).data)) {
+      await this.processCardBattleApiResponse(response as CardBattleApiResponse<CardBattleLog[]>);
+    } else if ((response as any).battle_logs) {
+      // Legacy format
+      await this.processBattleLogs((response as any).battle_logs);
+    }
+  }
+
+  /**
+   * Centralized method to process CardBattleLogs for animations
+   */
+  private async processCardBattleLogs(battleLogs: CardBattleLog[]): Promise<void> {
+    console.log('🎬 Processing CardBattle logs for animation:', battleLogs);
+    
+    for (const log of battleLogs) {
+      await this.animateCardBattleLogEntry(log);
+      
+      // Small delay between log animations for better visual flow
+      await new Promise(resolve => setTimeout(resolve, 300));
+    }
+  }
+
+  /**
+   * Legacy method for backward compatibility - converts CardBattleLog to BattleLogEntry format
    */
   private async processBattleLogs(battleLogs: BattleLogEntry[]): Promise<void> {
-    console.log('🎬 Processing battle logs for animation:', battleLogs);
+    console.log('🎬 Processing legacy battle logs for animation:', battleLogs);
     
     for (const log of battleLogs) {
       await this.animateBattleLogEntry(log);
@@ -101,7 +189,44 @@ export class CardBattleScene extends BaseScene {
   }
 
   /**
-   * Animate a single battle log entry
+   * Animate a single CardBattleLog entry
+   */
+  private async animateCardBattleLogEntry(logEntry: CardBattleLog): Promise<void> {
+    console.log(`🎭 Animating CardBattle log entry: ${logEntry.action_type} - ${logEntry.animation_hint}`);
+    
+    switch (logEntry.action_type) {
+      case 'draw_card':
+      case 'draw_phase':
+        await this.animateCardBattleDrawPhase(logEntry);
+        break;
+      case 'play_card':
+        await this.animateCardBattlePlayCard(logEntry);
+        break;
+      case 'discard_card':
+        await this.animateCardBattleDiscardCard(logEntry);
+        break;
+      case 'damage':
+        await this.animateCardBattleDamage(logEntry);
+        break;
+      case 'heal':
+        await this.animateCardBattleHeal(logEntry);
+        break;
+      case 'effect_trigger':
+      case 'status_effect':
+        await this.animateCardBattleStatusEffect(logEntry);
+        break;
+      case 'end_turn':
+        await this.animateCardBattleEndTurn(logEntry);
+        break;
+      default:
+        console.log(`⚠️ Unknown CardBattle log entry type: ${logEntry.action_type}`);
+        // Show generic message for unknown types
+        await this.showTurnMessage(logEntry.animation_hint || 'Unknown action');
+    }
+  }
+
+  /**
+   * Legacy: Animate a single battle log entry
    */
   private async animateBattleLogEntry(logEntry: BattleLogEntry): Promise<void> {
     console.log(`🎭 Animating log entry: ${logEntry.type} - ${logEntry.description}`);
@@ -169,6 +294,45 @@ export class CardBattleScene extends BaseScene {
 
   private async animateEndTurn(logEntry: BattleLogEntry): Promise<void> {
     await this.showTurnMessage(`⏭️ ${logEntry.description}`);
+  }
+
+  /**
+   * Animation methods for CardBattleLog entries
+   */
+  private async animateCardBattleDrawPhase(logEntry: CardBattleLog): Promise<void> {
+    const playerText = logEntry.actor.team === 1 ? 'Player' : 'AI';
+    await this.showTurnMessage(`${playerText}: ${logEntry.animation_hint || 'Drawing cards'}`);
+  }
+
+  private async animateCardBattlePlayCard(logEntry: CardBattleLog): Promise<void> {
+    const playerText = logEntry.actor.team === 1 ? 'Player' : 'AI';
+    const cardName = logEntry.card?.name || 'a card';
+    await this.showTurnMessage(`${playerText}: Played ${cardName}`);
+  }
+
+  private async animateCardBattleDiscardCard(logEntry: CardBattleLog): Promise<void> {
+    const playerText = logEntry.actor.team === 1 ? 'Player' : 'AI';
+    const cardName = logEntry.card?.name || 'a card';
+    await this.showTurnMessage(`${playerText}: Discarded ${cardName}`);
+  }
+
+  private async animateCardBattleDamage(logEntry: CardBattleLog): Promise<void> {
+    await this.showTurnMessage(`💥 ${logEntry.animation_hint || 'Damage dealt'}`);
+    // Here you could add more visual effects like screen shake, damage numbers, etc.
+  }
+
+  private async animateCardBattleHeal(logEntry: CardBattleLog): Promise<void> {
+    await this.showTurnMessage(`💚 ${logEntry.animation_hint || 'Healing applied'}`);
+    // Here you could add healing visual effects
+  }
+
+  private async animateCardBattleStatusEffect(logEntry: CardBattleLog): Promise<void> {
+    await this.showTurnMessage(`✨ ${logEntry.animation_hint || 'Status effect triggered'}`);
+    // Here you could add status effect particles or icons
+  }
+
+  private async animateCardBattleEndTurn(logEntry: CardBattleLog): Promise<void> {
+    await this.showTurnMessage(`⏭️ ${logEntry.animation_hint || 'Turn ended'}`);
   }
 
   private async animateAIActions(aiActions: AIAction[]): Promise<void> {
@@ -441,26 +605,11 @@ export class CardBattleScene extends BaseScene {
 
     console.log('📥 Processing turn start result:', turnStartResult);
     
-    // Process battle_logs first if available
-    if (turnStartResult.battle_logs && turnStartResult.battle_logs.length > 0) {
-      await this.processBattleLogs(turnStartResult.battle_logs);
-    }
+    // Process new API response format
+    await this.processApiResponse(turnStartResult);
     
     // Show "Your Turn" message
     await this.showTurnMessage('Your Turn!');
-    
-    // Animate drawn cards if any
-    if (turnStartResult.drawn_cards.length > 0) {
-      await this.animateCardDraw(turnStartResult.drawn_cards);
-    }
-    
-    // Update energy display
-    await this.animateEnergyUpdate(turnStartResult.energy);
-    
-    // Apply any status effects
-    if (turnStartResult.status_effects.length > 0) {
-      await this.animateStatusEffects(turnStartResult.status_effects);
-    }
     
     // Refresh battle state from server (or skip if using mock data)
     await this.refreshBattleState();
@@ -1284,13 +1433,8 @@ export class CardBattleScene extends BaseScene {
       }
     }
 
-    // Process battle_logs first if available
-    if (moveResponse.battle_logs && moveResponse.battle_logs.length > 0) {
-      await this.processBattleLogs(moveResponse.battle_logs);
-    }
-
-    // Animate the action result
-    await this.animateActionResult(moveResponse.result);
+    // Process new API response format
+    await this.processApiResponse(moveResponse);
     
     // Refresh battle state from server (or skip if using mock data)
     await this.refreshBattleState();
@@ -1313,18 +1457,7 @@ export class CardBattleScene extends BaseScene {
     if (this.usingMockData) {
       console.log('🗑️ Using mock data for card discard...');
       // Create a simple mock response for discard
-      moveResponse = {
-        success: true,
-        result: {
-          success: true,
-          actions_performed: [{
-            type: 'discard_card' as const,
-            player_team: 1,
-            card_id: moveData.card_id,
-            description: 'Card discarded successfully'
-          }]
-        }
-      };
+      moveResponse = this.createMockDiscardResponse(moveData.card_id || 'unknown');
     } else {
       try {
         // Call the new playAction API
@@ -1332,46 +1465,19 @@ export class CardBattleScene extends BaseScene {
         
         if (!moveResponse.success) {
           console.log('🔄 API returned failure, using mock response...');
-          moveResponse = {
-            success: true,
-            result: {
-              success: true,
-              actions_performed: [{
-                type: 'discard_card' as const,
-                player_team: 1,
-                card_id: moveData.card_id,
-                description: 'Card discarded successfully'
-              }]
-            }
-          };
+          moveResponse = this.createMockDiscardResponse(moveData.card_id || 'unknown');
           this.usingMockData = true;
         }
       } catch (error) {
         console.error('❌ Error discarding card via API:', error);
         console.log('🔄 Using mock response for card discard...');
-        moveResponse = {
-          success: true,
-          result: {
-            success: true,
-            actions_performed: [{
-              type: 'discard_card' as const,
-              player_team: 1,
-              card_id: moveData.card_id,
-              description: 'Card discarded successfully'
-            }]
-          }
-        };
+        moveResponse = this.createMockDiscardResponse(moveData.card_id || 'unknown');
         this.usingMockData = true;
       }
     }
 
-    // Process battle_logs first if available
-    if (moveResponse.battle_logs && moveResponse.battle_logs.length > 0) {
-      await this.processBattleLogs(moveResponse.battle_logs);
-    }
-
-    // Animate the action result
-    await this.animateActionResult(moveResponse.result);
+    // Process new API response format
+    await this.processApiResponse(moveResponse);
     
     // Refresh battle state from server (or skip if using mock data)
     await this.refreshBattleState();
@@ -1428,18 +1534,11 @@ export class CardBattleScene extends BaseScene {
 
     console.log('📥 Processing turn end response:', turnResponse);
     
-    // Process battle_logs first if available
-    if (turnResponse.battle_logs && turnResponse.battle_logs.length > 0) {
-      await this.processBattleLogs(turnResponse.battle_logs);
-    }
+    // Process new API response format
+    await this.processCardBattleApiResponse(turnResponse);
     
     // Show turn ending message
     await this.showTurnMessage('Turn Ending...');
-    
-    // Check if we have AI actions to animate
-    if (turnResponse.ai_actions && turnResponse.ai_actions.length > 0) {
-      await this.animateAIActions(turnResponse.ai_actions);
-    }
     
     // Refresh battle state from server (or skip if using mock data)
     await this.refreshBattleState();
