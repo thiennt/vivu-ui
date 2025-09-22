@@ -532,30 +532,21 @@ export class CardBattleScene extends BaseScene {
 
     console.log('📥 Processing turn start result:', turnStartResult);
     
-    // Handle new API response format (CardBattleLog[] directly) or legacy format
-    if (Array.isArray(turnStartResult)) {
-      // New format: response is CardBattleLog[] directly
-      console.log('🆕 Processing new turn start API format - CardBattleLog array');
-      await this.processCardBattleLogs(turnStartResult);
-    } else {
-      // Legacy format: response has battle_logs property
-      if (turnStartResult.battle_logs && turnStartResult.battle_logs.length > 0) {
-        await this.processBattleLogs(turnStartResult.battle_logs);
-      }
-      
-      // Animate drawn cards if any (legacy format)
-      if (turnStartResult.drawn_cards && turnStartResult.drawn_cards.length > 0) {
-        await this.animateCardDraw(turnStartResult.drawn_cards);
-      }
-      
-      // Update energy display (legacy format) 
-      if (turnStartResult.energy !== undefined) {
-        await this.animateEnergyUpdate(turnStartResult.energy);
-      }
+    // Process battle_logs first if available
+    if (turnStartResult.battle_logs && turnStartResult.battle_logs.length > 0) {
+      await this.processBattleLogs(turnStartResult.battle_logs);
     }
     
     // Show "Your Turn" message
     await this.showTurnMessage('Your Turn!');
+    
+    // Animate drawn cards if any
+    if (turnStartResult.drawn_cards.length > 0) {
+      await this.animateCardDraw(turnStartResult.drawn_cards);
+    }
+    
+    // Update energy display
+    await this.animateEnergyUpdate(turnStartResult.energy);
     
     // Apply any status effects
     if (turnStartResult.status_effects.length > 0) {
@@ -1384,22 +1375,13 @@ export class CardBattleScene extends BaseScene {
       }
     }
 
-    // Handle new API response format (CardBattleLog[] directly) or legacy format
-    if (Array.isArray(moveResponse)) {
-      // New format: response is CardBattleLog[] directly
-      console.log('🆕 Processing new API format - CardBattleLog array');
-      await this.processCardBattleLogs(moveResponse);
-    } else {
-      // Legacy format: response has battle_logs property
-      if (moveResponse.battle_logs && moveResponse.battle_logs.length > 0) {
-        await this.processBattleLogs(moveResponse.battle_logs);
-      }
-      
-      // Animate the action result (legacy format)
-      if (moveResponse.result) {
-        await this.animateActionResult(moveResponse.result);
-      }
+    // Process battle_logs first if available
+    if (moveResponse.battle_logs && moveResponse.battle_logs.length > 0) {
+      await this.processBattleLogs(moveResponse.battle_logs);
     }
+
+    // Animate the action result
+    await this.animateActionResult(moveResponse.result);
     
     // Refresh battle state from server (or skip if using mock data)
     await this.refreshBattleState();
@@ -1474,22 +1456,13 @@ export class CardBattleScene extends BaseScene {
       }
     }
 
-    // Handle new API response format (CardBattleLog[] directly) or legacy format
-    if (Array.isArray(moveResponse)) {
-      // New format: response is CardBattleLog[] directly
-      console.log('🆕 Processing new API format - CardBattleLog array');
-      await this.processCardBattleLogs(moveResponse);
-    } else {
-      // Legacy format: response has battle_logs property
-      if (moveResponse.battle_logs && moveResponse.battle_logs.length > 0) {
-        await this.processBattleLogs(moveResponse.battle_logs);
-      }
-      
-      // Animate the action result (legacy format)
-      if (moveResponse.result) {
-        await this.animateActionResult(moveResponse.result);
-      }
+    // Process battle_logs first if available
+    if (moveResponse.battle_logs && moveResponse.battle_logs.length > 0) {
+      await this.processBattleLogs(moveResponse.battle_logs);
     }
+
+    // Animate the action result
+    await this.animateActionResult(moveResponse.result);
     
     // Refresh battle state from server (or skip if using mock data)
     await this.refreshBattleState();
@@ -1546,25 +1519,18 @@ export class CardBattleScene extends BaseScene {
 
     console.log('📥 Processing turn end response:', turnResponse);
     
-    // Handle new API response format (CardBattleLog[] directly) or legacy format
-    if (Array.isArray(turnResponse)) {
-      // New format: response is CardBattleLog[] directly
-      console.log('🆕 Processing new turn end API format - CardBattleLog array');
-      await this.processCardBattleLogs(turnResponse);
-    } else {
-      // Legacy format: response has battle_logs property
-      if (turnResponse.battle_logs && turnResponse.battle_logs.length > 0) {
-        await this.processBattleLogs(turnResponse.battle_logs);
-      }
-      
-      // Process AI actions (legacy format)
-      if (turnResponse.ai_actions && turnResponse.ai_actions.length > 0) {
-        await this.animateAIActions(turnResponse.ai_actions);
-      }
+    // Process battle_logs first if available
+    if (turnResponse.battle_logs && turnResponse.battle_logs.length > 0) {
+      await this.processBattleLogs(turnResponse.battle_logs);
     }
     
     // Show turn ending message
     await this.showTurnMessage('Turn Ending...');
+    
+    // Process AI actions if any
+    if (turnResponse.ai_actions && turnResponse.ai_actions.length > 0) {
+      await this.animateAIActions(turnResponse.ai_actions);
+    }
     
     // Check if we have AI actions to animate
     if (turnResponse.ai_actions && turnResponse.ai_actions.length > 0) {

@@ -433,6 +433,8 @@ export interface BattleStageResponse {
 }
 
 // Legacy interface for backward compatibility - deprecated in favor of CardBattleState
+// TODO: Remove this interface after migrating all code to use CardBattleState
+// @deprecated Use CardBattleState instead
 export interface BattleStateResponse {
   id: string;
   battle_type: string;
@@ -486,19 +488,27 @@ export interface BattleMoveData {
   target_ids?: string[];
 }
 
-// Action API responses: return CardBattleLog[] directly if success
-export type BattleMoveResponse = CardBattleLog[] | {
+// Legacy interface that supports battle_logs for backward compatibility
+export interface BattleMoveResponse {
+  success: boolean;
+  result: BattleActionResult;
+  updated_state?: Partial<CardBattleState>;
+  error?: string;
+  battle_logs?: BattleLogEntry[]; // Legacy support
+}
+
+// New API response format: CardBattleLog[] directly for success cases  
+export type BattleMoveApiResponse = CardBattleLog[] | BattleMoveErrorResponse;
+
+export interface BattleMoveErrorResponse {
   success: false;
   error: string;
   updated_state?: Partial<CardBattleState>;
-};
+}
 
+// Updated draw and battle phase responses
 export type DrawPhaseResponse = CardBattleLog[];
-
 export type BattlePhaseResponse = CardBattleLog[];
-
-// API action methods that return CardBattleLog arrays directly
-export type ActionApiResponse = CardBattleLog[];
 
 export interface BattleEndData {
   winner: number; // 1 or 2
@@ -524,6 +534,7 @@ export interface BattleActionResult {
   energy_change?: number;
   cards_drawn?: Card[];
   actions_performed: BattleLogEntry[];
+  battle_logs?: BattleLogEntry[]; // Legacy support for backward compatibility
 }
 
 export interface BattleLogEntry {
@@ -544,6 +555,7 @@ export interface DrawPhaseResult {
   energy: number;
   status_effects: unknown[];
   actions_performed: BattleLogEntry[];
+  battle_logs?: BattleLogEntry[]; // Legacy support for backward compatibility
 }
 
 export interface BattlePhaseResult {
@@ -554,6 +566,7 @@ export interface BattlePhaseResult {
   ai_actions?: AIAction[];
   updated_state?: Partial<CardBattleState>;
   actions_performed: BattleLogEntry[];
+  battle_logs?: BattleLogEntry[]; // Legacy support for backward compatibility
 }
 
 export interface AIAction {
@@ -564,4 +577,5 @@ export interface AIAction {
   target_ids?: string[];
   result?: BattleActionResult;
   actions_performed: BattleLogEntry[];
+  battle_logs?: BattleLogEntry[]; // Legacy support for backward compatibility
 }
