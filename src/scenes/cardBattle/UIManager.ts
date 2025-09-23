@@ -45,32 +45,32 @@ export class CardBattleUIManager {
     const battleLogHeight = Math.min(100, battleAreaHeight * 0.3);
     const characterAreaHeight = (battleAreaHeight - battleLogHeight - padding) / 2;
 
-    // Position containers
+    // Position containers to match original layout
     // Player 2 (top)
     player2HandContainer.x = 0;
     player2HandContainer.y = padding;
-    player2EnergyContainer.x = 0;
-    player2EnergyContainer.y = player2HandContainer.y + handHeight + padding;
     player2Container.x = 0;
-    player2Container.y = player2EnergyContainer.y + energyAreaHeight + padding;
+    player2Container.y = player2HandContainer.y + handHeight + padding;
+    player2EnergyContainer.x = 0;
+    player2EnergyContainer.y = player2Container.y + characterAreaHeight + padding;
 
     // Battle log (center)
     battleLogContainer.x = 0;
-    battleLogContainer.y = player2Container.y + characterAreaHeight + padding;
+    battleLogContainer.y = player2EnergyContainer.y + energyAreaHeight + padding;
 
     // Player 1 (bottom)
-    player1Container.x = 0;
-    player1Container.y = battleLogContainer.y + battleLogHeight + padding;
     player1EnergyContainer.x = 0;
-    player1EnergyContainer.y = player1Container.y + characterAreaHeight + padding;
+    player1EnergyContainer.y = battleLogContainer.y + battleLogHeight + padding;
+    player1Container.x = 0;
+    player1Container.y = player1EnergyContainer.y + energyAreaHeight + padding;
     player1HandContainer.x = 0;
-    player1HandContainer.y = player1EnergyContainer.y + energyAreaHeight + padding;
+    player1HandContainer.y = player1Container.y + characterAreaHeight + padding;
 
     // Effects container overlays everything
     effectsContainer.x = 0;
     effectsContainer.y = 0;
 
-    // Add containers to game container
+    // Add containers to game container in proper order
     gameContainer.addChild(
       player2HandContainer,
       player2Container,
@@ -83,7 +83,7 @@ export class CardBattleUIManager {
     );
   }
 
-  createEnergyArea(container: Container, playerNo: number): void {
+  createEnergyArea(container: Container, playerNo: number, gameWidth: number): void {
     container.removeChildren();
 
     const energyValue = playerNo === 1 ? 3 : 2; // Mock values

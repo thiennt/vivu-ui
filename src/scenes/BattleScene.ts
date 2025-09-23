@@ -54,7 +54,7 @@ export class BattleScene extends BaseScene {
       this.team2.push({
         ...char,
         id: `${char.id}_copy`,
-        current_hp: char.hp,
+        current_hp: char.current_hp,
         current_energy: 50,
         team: 2
       });
