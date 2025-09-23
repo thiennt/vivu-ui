@@ -111,6 +111,9 @@ export class CardBattleScene extends BaseScene {
     console.log(`🎭 Animating CardBattle log entry: ${logEntry.action_type} - ${logEntry.animation_hint}`);
     
     switch (logEntry.action_type) {
+      case 'start_turn':
+        await this.animateCardBattleStartTurn(logEntry);
+        break;
       case 'draw_card':
       case 'draw_phase':
         await this.animateCardBattleDrawPhase(logEntry);
@@ -130,6 +133,10 @@ export class CardBattleScene extends BaseScene {
       case 'effect_trigger':
       case 'status_effect':
         await this.animateCardBattleStatusEffect(logEntry);
+        break;
+      case 'energy':
+      case 'energy_update':
+        await this.animateCardBattleEnergyUpdate(logEntry);
         break;
       case 'end_turn':
         await this.animateCardBattleEndTurn(logEntry);
@@ -507,6 +514,67 @@ export class CardBattleScene extends BaseScene {
 
   private async animateCardBattleEndTurn(logEntry: CardBattleLog): Promise<void> {
     await this.showTurnMessage(`⏭️ ${logEntry.animation_hint || 'Turn ended'}`);
+  }
+
+  private async animateCardBattleStartTurn(logEntry: CardBattleLog): Promise<void> {
+    const playerText = logEntry.actor.team === 1 ? 'Player' : 'AI';
+    await this.showTurnMessage(`🎯 ${playerText} Turn Started`);
+  }
+
+  private async animateCardBattleEnergyUpdate(logEntry: CardBattleLog): Promise<void> {
+    // Find energy impacts in the log entry
+    if (logEntry.impacts) {
+      const energyImpacts = logEntry.impacts.filter(impact => impact.type === 'energy');
+      if (energyImpacts.length > 0) {
+        for (const impact of energyImpacts) {
+          await this.animateEnergyChangeVisual(logEntry.actor.team, impact.value);
+        }
+      }
+    }
+    
+    await this.showTurnMessage(`⚡ ${logEntry.animation_hint || 'Energy updated'}`);
+  }
+
+  private async animateEnergyChangeVisual(team: number, energyChange: number | string | object): Promise<void> {
+    const energyContainer = team === 1 ? this.player1EnergyContainer : this.player2EnergyContainer;
+    
+    if (typeof energyChange === 'number' && energyChange !== 0) {
+      // Create energy change indicator
+      const changeText = new Text({
+        text: energyChange > 0 ? `+${energyChange}` : `${energyChange}`,
+        style: {
+          fontFamily: 'Kalam',
+          fontSize: 16,
+          fontWeight: 'bold',
+          fill: energyChange > 0 ? 0x44FF44 : 0xFF4444,
+          stroke: { color: 0xFFFFFF, width: 1 }
+        }
+      });
+      
+      changeText.anchor.set(0.5);
+      changeText.x = energyContainer.x + 70; // Center of energy display
+      changeText.y = energyContainer.y + 15;
+      changeText.alpha = 0;
+      
+      this.effectsContainer.addChild(changeText);
+      
+      // Animate the energy change floating up
+      await gsap.to(changeText, {
+        y: changeText.y - 30,
+        alpha: 1,
+        duration: 0.3,
+        ease: 'power2.out'
+      });
+      
+      await gsap.to(changeText, {
+        y: changeText.y - 20,
+        alpha: 0,
+        duration: 0.5,
+        ease: 'power2.in'
+      });
+      
+      this.effectsContainer.removeChild(changeText);
+    }
   }
 
   private async animateAIActions(aiActions: AIAction[]): Promise<void> {
