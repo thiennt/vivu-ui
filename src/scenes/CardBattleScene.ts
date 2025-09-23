@@ -3,7 +3,7 @@ import { navigation } from '@/utils/navigation';
 import { BaseScene } from '@/utils/BaseScene';
 import { HomeScene } from './HomeScene';
 import { battleApi } from '@/services/api';
-import { CardBattleState, CardBattleCharacter, CardInDeck } from '@/types';
+import { CardBattleState, CardInDeck } from '@/types';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
 import { Colors, Gradients } from '@/utils/colors';
 
@@ -434,8 +434,8 @@ export class CardBattleScene extends BaseScene {
     cardContainer.eventMode = 'static';
     cardContainer.cursor = 'pointer';
     
-    cardContainer.on('pointerdown', (event) => {
-      this.onDragStart(event, cardContainer);
+    cardContainer.on('pointerdown', () => {
+      this.onDragStart();
     });
   }
 
@@ -461,10 +461,9 @@ export class CardBattleScene extends BaseScene {
   }
 
   // Drag and drop handlers (simplified for now)
-  private onDragStart(_event: unknown, _cardContainer: Container): void {
+  private onDragStart(): void {
     // Simplified drag start - just log for now
     console.log('Card drag started');
     // TODO: Implement full drag and drop functionality
-    // Currently simplified to avoid unused parameter warnings
   }
 }
