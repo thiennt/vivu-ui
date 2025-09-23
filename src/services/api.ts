@@ -12,99 +12,15 @@ import {
   BattleMoveResponse, 
   BattleEndData, 
   BattleRewards,
-  TurnPhase, 
   BattleStageResponse,
   CardBattleState,
   DrawPhaseResult,
   BattlePhaseResult,
   BattleLogEntry,
-  CardBattleLog,
-  CardBattleApiResponse,
-  BattleActionResult
+  CardBattleApiResponse
 } from '@/types';
-import { createRandomDeck } from '@/utils/cardData';
 
-// Helper function to convert BattleLogEntry to CardBattleLog
-function convertToCardBattleLog(entry: BattleLogEntry, id?: string): CardBattleLog {
-  return {
-    id: id || `log_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-    phase: 'main_phase', // Default phase
-    action_type: entry.type,
-    actor: {
-      team: entry.player_team,
-      character_id: entry.character_id,
-      player_id: entry.player_team === 1 ? 'player_fc_001' : 'ai_player'
-    },
-    card: entry.card_id ? {
-      id: entry.card_id,
-      name: `Card ${entry.card_id}`,
-      group: 'unknown',
-      description: entry.description || '',
-      card_type: 'action',
-      energy_cost: 1
-    } : undefined,
-    targets: entry.target_ids?.map(targetId => ({
-      id: targetId,
-      team: entry.player_team === 1 ? 2 : 1, // Target is usually on the opposite team
-      before: {
-        id: targetId,
-        team: entry.player_team === 1 ? 2 : 1,
-        max_hp: 100,
-        current_hp: 75,
-        atk: 50,
-        def: 30,
-        agi: 20,
-        crit_rate: 5,
-        crit_dmg: 150,
-        res: 10,
-        damage: 0,
-        mitigation: 0,
-        hit_rate: 95,
-        dodge: 5,
-        has_acted: false,
-        active_effects: [],
-        equipped_skills: []
-      },
-      after: {
-        id: targetId,
-        team: entry.player_team === 1 ? 2 : 1,
-        max_hp: 100,
-        current_hp: 50, // Reduced health after action
-        atk: 50,
-        def: 30,
-        agi: 20,
-        crit_rate: 5,
-        crit_dmg: 150,
-        res: 10,
-        damage: 0,
-        mitigation: 0,
-        hit_rate: 95,
-        dodge: 5,
-        has_acted: false,
-        active_effects: [],
-        equipped_skills: []
-      },
-      impacts: [{
-        type: 'damage',
-        value: 25,
-        meta: { isCritical: false }
-      }]
-    })),
-    result: {
-      success: true,
-      reason: undefined
-    },
-    created_at: entry.timestamp || new Date().toISOString(),
-    animation_hint: entry.description
-  };
-}
 
-// API Response wrapper interface
-interface ApiResponse<T> {
-  data: T;
-  success: boolean;
-  message?: string;
-}
 
 // Loading state interface
 interface LoadingState {
@@ -351,7 +267,6 @@ export const battleApi = {
 
   async endBattle(battleId: string, battleResult: BattleEndData): Promise<BattleApiResponse & { rewards?: BattleRewards }> {
     console.log('🏁 endBattle API called for battle:', battleId, 'with result:', battleResult);
-    const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
     return apiRequest(`/battles/${battleId}/end`, {
       method: 'POST',
       body: JSON.stringify(battleResult),

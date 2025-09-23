@@ -4,7 +4,7 @@ import { navigation } from '@/utils/navigation';
 import { HomeScene } from './HomeScene';
 import { StageScene } from './StageScene';
 import { Colors, Gradients } from '@/utils/colors';
-import { dungeonsApi, ApiError, isLikelyUsingMockData } from '@/services/api';
+import { dungeonsApi, isLikelyUsingMockData } from '@/services/api';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
 
 export class DungeonScene extends BaseScene {

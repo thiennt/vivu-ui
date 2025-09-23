@@ -1,7 +1,7 @@
 import { Assets, Container, Graphics, Sprite, Text } from 'pixi.js';
 import { navigation } from '@/utils/navigation';
 import { Colors } from '@/utils/colors';
-import { Stage, Enemy, Character } from '@/types';
+import { Stage, Character } from '@/types';
 import { CardBattleScene } from '@/scenes/CardBattleScene';
 import { PrepareScene } from '@/scenes/PrepareScene';
 

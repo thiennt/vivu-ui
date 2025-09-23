@@ -1,4 +1,4 @@
-import { Container, Graphics, Text, Ticker } from 'pixi.js';
+import { Container, Graphics, Text } from 'pixi.js';
 import { navigation } from '@/utils/navigation';
 import { BaseScene } from '@/utils/BaseScene';
 import { HomeScene } from './HomeScene';
@@ -538,7 +538,7 @@ export class CardBattleScene extends BaseScene {
     
     // 2. Player 2 character cards (with deck + discard pile)
     this.player2Container.y = currentY;
-    this.createPlayerArea(this.player2Container, 2, false);
+    this.createPlayerArea(this.player2Container, 2);
     currentY += characterAreaHeight + adjustedSpacing;
     
     // 3. Player 2 energy area
@@ -558,7 +558,7 @@ export class CardBattleScene extends BaseScene {
     
     // 6. Player 1 character cards
     this.player1Container.y = currentY;
-    this.createPlayerArea(this.player1Container, 1, true);
+    this.createPlayerArea(this.player1Container, 1);
     currentY += characterAreaHeight + adjustedSpacing;
     
     // 7. Player 1 hand area
@@ -584,7 +584,6 @@ export class CardBattleScene extends BaseScene {
   }
 
   private createEnergyArea(container: Container, playerNo: number): void {
-    const padding = this.STANDARD_PADDING;
     const player = this.battleState ? this.battleState.players.find(p => p.team === playerNo) : null;
 
     // Energy display - centered horizontally
@@ -612,10 +611,10 @@ export class CardBattleScene extends BaseScene {
     container.x = (this.gameWidth - 140) / 2;
   }
 
-  private createPlayerArea(container: Container, playerNo: number, isBottomPlayer: boolean): void {
-    const padding = this.STANDARD_PADDING;
+  private createPlayerArea(container: Container, playerNo: number): void {
     const characterWidth = 80;
     const characterSpacing = 10;
+    const padding = this.STANDARD_PADDING;
 
     const player = this.battleState ? this.battleState.players.find(p => p.team === playerNo) : null;
     const totalCharacterWidth = (player?.characters.length || 0) * characterWidth + Math.max(0, (player?.characters.length || 0) - 1) * characterSpacing;
@@ -695,7 +694,7 @@ export class CardBattleScene extends BaseScene {
 
       // Make player 1 cards draggable
       if (showCards && playerNo === 1) {
-        this.makeCardDraggable(cardContainer,  card);
+        this.makeCardDraggable(cardContainer);
       }
 
       container.addChild(cardContainer);
@@ -1091,12 +1090,12 @@ export class CardBattleScene extends BaseScene {
     this.container.addChild(buttonContainer);
   }
 
-  private makeCardDraggable(cardContainer: Container, card: CardInDeck): void {
+  private makeCardDraggable(cardContainer: Container): void {
     cardContainer.interactive = true;
     cardContainer.cursor = 'pointer';
 
     cardContainer.on('pointerdown', (event) => {
-      this.onDragStart(event, cardContainer, card);
+      this.onDragStart(event, cardContainer);
     });
   }
 
@@ -1120,7 +1119,7 @@ export class CardBattleScene extends BaseScene {
     });
   }
 
-  private onDragStart(event: any, cardContainer: Container, card: CardInDeck): void {
+  private onDragStart(event: any, cardContainer: Container): void {
     cardContainer.alpha = 0.8;
     this.dragTarget = cardContainer;
 
@@ -1480,7 +1479,6 @@ export class CardBattleScene extends BaseScene {
     // Find the deck position (where the card should fly from)
     const isPlayer1 = playerNo === 1;
     const player = this.battleState ? this.battleState.players.find(p => p.team === playerNo) : null;
-    const deckContainer = isPlayer1 ? this.player1Container : this.player2Container;
     const deckX = this.STANDARD_PADDING + 25; // Center of deck card
     const deckY = 35 + 35; // Y of deck + half height
 
@@ -1557,8 +1555,8 @@ export class CardBattleScene extends BaseScene {
     this.battleLogContainer.removeChildren();
     
     // Recreate all areas
-    this.createPlayerArea(this.player1Container, 1, true);
-    this.createPlayerArea(this.player2Container, 2, false);
+    this.createPlayerArea(this.player1Container, 1);
+    this.createPlayerArea(this.player2Container, 2);
     this.createEnergyArea(this.player1EnergyContainer, 1);
     this.createEnergyArea(this.player2EnergyContainer, 2);
     this.createHandArea(this.player1HandContainer, 1, true);
@@ -1578,7 +1576,7 @@ export class CardBattleScene extends BaseScene {
     this.createActionButtons();
   }
 
-  public update(_time: Ticker): void {
+  public update(): void {
     // Update animations or game state if needed
   }
 }

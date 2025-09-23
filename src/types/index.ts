@@ -432,49 +432,6 @@ export interface BattleStageResponse {
   cards: Card[];
 }
 
-// Legacy interface for backward compatibility - deprecated in favor of CardBattleState
-// TODO: Remove this interface after migrating all code to use CardBattleState
-// @deprecated Use CardBattleState instead
-export interface BattleStateResponse {
-  id: string;
-  battle_type: string;
-  status: string;
-  current_turn: number;
-  current_player: number;
-  characters: Array<{
-    id: string;
-    character_id: string;
-    team: string;
-    position: string;
-    max_hp: number;
-    current_hp: number;
-    atk: number;
-    def: number;
-    agi: number;
-    crit_rate: number;
-    crit_dmg: number;
-    res: number;
-    damage: number;
-    mitigation: number;
-    hit_rate: number;
-    dodge: number;
-    has_acted: boolean;
-    active_effects: Array<unknown>;
-    equipped_skills: Array<string>;
-  }>;
-  decks: Array<{
-    id: string;
-    player_team: string;
-    deck_cards: Array<{
-      card_id: string;
-      position: number;
-    }>;
-    hand_cards: Array<string>;
-    current_energy: number;
-    cards_drawn: number;
-   }>;
-  phase: string;
-};
 
 export interface BattleApiResponse {
   battleId: string;

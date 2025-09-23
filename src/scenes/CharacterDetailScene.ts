@@ -1,4 +1,4 @@
-import { Assets, Container, Graphics, Sprite, Text, Ticker } from 'pixi.js';
+import { Assets, Container, Graphics, Sprite, Text } from 'pixi.js';
 import { navigation } from '@/utils/navigation';
 import { HomeScene } from './HomeScene';
 import { BaseScene } from '@/utils/BaseScene';
@@ -695,7 +695,7 @@ export class CharacterDetailScene extends BaseScene {
     this.buttonContainer.addChild(backButton);
   }
 
-  update(_time: Ticker): void {
+  update(): void {
     // No specific animations needed
   }
 }
