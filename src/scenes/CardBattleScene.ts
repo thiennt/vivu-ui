@@ -112,7 +112,7 @@ export class CardBattleScene extends BaseScene {
   }
 
   private initializeUI(): void {
-    this.uiManager.createBackground(this.container, this.gameWidth, this.getContentHeight());
+    this.uiManager.createBackground(this.container, this.gameWidth, this.gameHeight);
     this.createGameLayout();
     this.createActionButtons();
     this.updateBottomNavigation();
@@ -130,7 +130,7 @@ export class CardBattleScene extends BaseScene {
       this.battleLogContainer,
       this.effectsContainer,
       this.gameWidth,
-      this.getContentHeight()
+      this.gameHeight
     );
 
     this.container.addChild(this.gameContainer);
@@ -217,8 +217,8 @@ export class CardBattleScene extends BaseScene {
       this.playerStateManager.getPlayerCharacters(2), 
       this.gameWidth
     );
-    this.uiManager.createEnergyArea(this.player1EnergyContainer, 1);
-    this.uiManager.createEnergyArea(this.player2EnergyContainer, 2);
+    this.uiManager.createEnergyArea(this.player1EnergyContainer, 1, this.gameWidth);
+    this.uiManager.createEnergyArea(this.player2EnergyContainer, 2, this.gameWidth);
     
     // Create hand areas with proper data
     this.uiManager.createHandArea(
