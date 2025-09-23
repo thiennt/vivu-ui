@@ -100,6 +100,12 @@ export const charactersApi = {
     return apiRequest(`/players/${playerId}/characters`, {}, mockPlayer1Characters);
   },
 
+  async getCharacter(characterId: string): Promise<any> {
+    const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
+    const characters = await this.getAllCharacters();
+    return characters.find(char => char.id === characterId) || null;
+  },
+
   async getCharacterSkills(characterId: string): Promise<any[]> {
     const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
     return apiRequest(`/players/${playerId}/characters/${characterId}/skills`, {}, mockSkills);

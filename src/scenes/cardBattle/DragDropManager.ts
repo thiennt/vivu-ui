@@ -74,7 +74,7 @@ export class CardBattleDragDropManager {
     this.scene.container.on('pointerup', this.onDragEnd, this);
     this.scene.container.on('pointerupoutside', this.onDragEnd, this);
 
-    console.log('🎯 Started dragging card:', cardData.card.name);
+    console.log('🎯 Started dragging card:', cardData.card?.name || 'Unknown Card');
   }
 
   /**

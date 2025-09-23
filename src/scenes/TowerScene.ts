@@ -55,7 +55,7 @@ export class TowerScene extends BaseScene {
     } else {
       console.error(`❌ Failed to load stages: ${response.message}`);
       if (response.errors) {
-        response.errors.forEach(error => console.error(`   Error: ${error}`));
+        response.errors.forEach((error: any) => console.error(`   Error: ${error}`));
       }
       this.stages = []; // Use empty array as fallback
     }
