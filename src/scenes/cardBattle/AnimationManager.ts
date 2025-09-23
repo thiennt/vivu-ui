@@ -90,28 +90,6 @@ export class CardBattleAnimationManager {
   }
 
   private async animateDrawPhase(logEntry: CardBattleLog): Promise<void> {
-    const drawnCards = logEntry.drawn_cards || [];
-
-    // Animate each drawn card individually
-    for (const drawnCard of drawnCards) {
-      // Convert CardBattleLogCard to CardInDeck format for animation
-      const cardInDeck: CardInDeck = {
-        card_id: drawnCard.id,
-        card: {
-          id: drawnCard.id,
-          name: drawnCard.name,
-          description: drawnCard.description,
-          icon_url: drawnCard.icon_url,
-          card_type: drawnCard.card_type,
-          energy_cost: drawnCard.energy_cost,
-          rarity: drawnCard.rarity,
-          group: drawnCard.group,
-          actions: drawnCard.actions || []
-        }
-      };
-
-      await this.animateDrawCard(cardInDeck, logEntry.actor.team);
-    }
   }
 
   private async animatePlayCard(logEntry: CardBattleLog): Promise<void> {
@@ -404,45 +382,6 @@ export class CardBattleAnimationManager {
   private async animateEnergyUpdate(logEntry: CardBattleLog): Promise<void> {
     const energy = logEntry.animation_hint || 'Energy updated';
     await this.showTurnMessage(energy);
-  }
-
-  async animateDrawCard(cardInDeck: CardInDeck, playerNo: number): Promise<void> {
-    // Create temporary card visual
-    const tempCard = new Graphics();
-    tempCard.roundRect(0, 0, 60, 84, 5)
-      .fill(Colors.CARD_BACKGROUND)
-      .stroke({ width: 2, color: Colors.CARD_BORDER });
-    
-    // Start from deck position
-    const deckX = 10;
-    const deckY = playerNo === 1 ? this.gameHeight - 250 : 150;
-    
-    tempCard.x = deckX;
-    tempCard.y = deckY;
-    tempCard.alpha = 0.8;
-    
-    this.effectsContainer.addChild(tempCard);
-    
-    // Animate to hand area
-    const handX = this.gameWidth / 2;
-    const handY = playerNo === 1 ? this.gameHeight - 120 : 50;
-    
-    await gsap.to(tempCard, {
-      x: handX,
-      y: handY,
-      scale: 1.2,
-      duration: 0.5,
-      ease: 'power2.out'
-    });
-    
-    await gsap.to(tempCard, {
-      alpha: 0,
-      scale: 1,
-      duration: 0.2,
-      ease: 'power2.in'
-    });
-    
-    this.effectsContainer.removeChild(tempCard);
   }
 
   async showTurnMessage(message: string): Promise<void> {

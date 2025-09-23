@@ -7,7 +7,6 @@ import { CardBattleState, CardBattleCharacter, CardInDeck } from '@/types';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
 import { Colors, Gradients } from '@/utils/colors';
 
-// Import the new managers (excluding UIManager)
 import { CardBattleAnimationManager } from './cardBattle/AnimationManager';
 import { CardBattlePlayerStateManager } from './cardBattle/PlayerStateManager';
 import { CardBattleDragDropManager } from './cardBattle/DragDropManager';
@@ -32,7 +31,6 @@ export class CardBattleScene extends BaseScene {
   private loadingManager: LoadingStateManager;
   private battleState?: CardBattleState;
 
-  // Manager instances (excluding UIManager)
   private animationManager!: CardBattleAnimationManager;
   private playerStateManager!: CardBattlePlayerStateManager;
   private dragDropManager!: CardBattleDragDropManager;
@@ -80,7 +78,6 @@ export class CardBattleScene extends BaseScene {
     this.battleLogContainer = new Container();
     this.effectsContainer = new Container();
 
-    // Initialize managers (excluding UIManager)
     this.animationManager = new CardBattleAnimationManager(this.effectsContainer, this.gameWidth, this.gameHeight);
     this.playerStateManager = new CardBattlePlayerStateManager();
     this.dragDropManager = new CardBattleDragDropManager({
