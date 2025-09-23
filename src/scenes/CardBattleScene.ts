@@ -55,7 +55,94 @@ export class CardBattleScene extends BaseScene {
   private player2DeckCards: CardInDeck[] = [];
   private player2DiscardedCards: CardInDeck[] = [];
   
-  // Helper functions for card property access
+  private dropZones: { area: Container, type: 'character' | 'discard', playerId: number, characterIndex?: number }[] = [];
+
+  private battleId: string;
+
+  private loadingManager: LoadingStateManager;
+
+  constructor(params?: {  battle_id?: string }) {
+    super();
+
+    this.container = new Container();
+    this.addChild(this.container);
+
+    this.battleId = params?.battle_id || '';
+
+    this.loadingManager = new LoadingStateManager(this.container, this.gameWidth, this.gameHeight);
+  }
+
+  async prepare(): Promise<void> {
+    this.loadingManager.showLoading();
+
+    try {
+      console.log('🔄 Preparing CardBattleScene...');
+      
+      // Load battle state from API (will use mock data if configured)
+      console.log('🔄 Loading battle state...');
+      const response = await battleApi.getBattleState(this.battleId);
+      if (response.success && response.data) {
+        this.battleState = response.data;
+        this.updateFixedVariables(); // Initialize fixed variables on first load
+        console.log(`✅ Battle state loaded: ${response.message}`, this.battleState);
+      } else {
+        console.error(`❌ Failed to load battle state: ${response.message}`);
+        if (response.errors) {
+          response.errors.forEach((error: any) => console.error(`   Error: ${error}`));
+        }
+        throw new Error('Failed to load battle state');
+      }
+      
+      this.loadingManager.hideLoading();
+      this.initializeUI();
+      
+    } catch (error) {
+      console.error('❌ Error preparing battle scene:', error);
+      this.loadingManager.hideLoading();
+      alert('Failed to prepare battle. Please try again.');
+      navigation.showScreen(HomeScene);
+    }
+  }
+
+  private initializeUI(): void {
+    this.createBackground();
+    this.createGameLayout();
+    this.createActionButtons();
+    this.updateBottomNavigation();
+  }
+
+  resize(width: number, height: number): void {
+    this.gameWidth = width;
+    this.gameHeight = height;
+  }
+
+  /** Show the screen with animation */
+  async show(): Promise<void> {
+    this.startBattleSequence();
+  }
+
+  private findCharacterCard(characterId: string, team: number): Container | null {
+    const playerContainer = team === 1 ? this.player1Container : this.player2Container;
+    const characters = this.getPlayerCharacters(team);
+    
+    if (!playerContainer) return null;
+    
+    const characterIndex = characters.findIndex(char => char.character_id === characterId);
+    if (characterIndex >= 0 && characterIndex < playerContainer.children.length) {
+      return playerContainer.children[characterIndex] as Container;
+    }
+    return null;
+  }
+
+  private findCharacterByTeam(team: number, characterIndex: number = 0): Container | null {
+    const playerContainer = team === 1 ? this.player1Container : this.player2Container;
+    
+    if (!playerContainer || characterIndex >= playerContainer.children.length) return null;
+    
+    return playerContainer.children[characterIndex] as Container;
+  }
+
+    // Helper functions for card property access
   private getCurrentPlayer(): number {
     return this.battleState?.current_player || 1;
   }
@@ -761,92 +848,6 @@ export class CardBattleScene extends BaseScene {
     } else {
       return (card as Card).card_type || 'special';
     }
-  }
-  private dropZones: { area: Container, type: 'character' | 'discard', playerId: number, characterIndex?: number }[] = [];
-
-  private battleId: string;
-
-  private loadingManager: LoadingStateManager;
-
-  constructor(params?: {  battle_id?: string }) {
-    super();
-
-    this.container = new Container();
-    this.addChild(this.container);
-
-    this.battleId = params?.battle_id || '';
-
-    this.loadingManager = new LoadingStateManager(this.container, this.gameWidth, this.gameHeight);
-  }
-
-  async prepare(): Promise<void> {
-    this.loadingManager.showLoading();
-
-    try {
-      console.log('🔄 Preparing CardBattleScene...');
-      
-      // Load battle state from API (will use mock data if configured)
-      console.log('🔄 Loading battle state...');
-      const response = await battleApi.getBattleState(this.battleId);
-      if (response.success && response.data) {
-        this.battleState = response.data;
-        this.updateFixedVariables(); // Initialize fixed variables on first load
-        console.log(`✅ Battle state loaded: ${response.message}`, this.battleState);
-      } else {
-        console.error(`❌ Failed to load battle state: ${response.message}`);
-        if (response.errors) {
-          response.errors.forEach((error: any) => console.error(`   Error: ${error}`));
-        }
-        throw new Error('Failed to load battle state');
-      }
-      
-      this.loadingManager.hideLoading();
-      this.initializeUI();
-      
-    } catch (error) {
-      console.error('❌ Error preparing battle scene:', error);
-      this.loadingManager.hideLoading();
-      alert('Failed to prepare battle. Please try again.');
-      navigation.showScreen(HomeScene);
-    }
-  }
-
-  private initializeUI(): void {
-    this.createBackground();
-    this.createGameLayout();
-    this.createActionButtons();
-    this.updateBottomNavigation();
-  }
-
-  private findCharacterCard(characterId: string, team: number): Container | null {
-    const playerContainer = team === 1 ? this.player1Container : this.player2Container;
-    const characters = this.getPlayerCharacters(team);
-    
-    if (!playerContainer) return null;
-    
-    const characterIndex = characters.findIndex(char => char.character_id === characterId);
-    if (characterIndex >= 0 && characterIndex < playerContainer.children.length) {
-      return playerContainer.children[characterIndex] as Container;
-    }
-    return null;
-  }
-
-  private findCharacterByTeam(team: number, characterIndex: number = 0): Container | null {
-    const playerContainer = team === 1 ? this.player1Container : this.player2Container;
-    
-    if (!playerContainer || characterIndex >= playerContainer.children.length) return null;
-    
-    return playerContainer.children[characterIndex] as Container;
-  }
-
-  resize(width: number, height: number): void {
-    this.gameWidth = width;
-    this.gameHeight = height;
-  }
-
-  /** Show the screen with animation */
-  async show(): Promise<void> {
-    this.startBattleSequence();
   }
 
   private async startBattleSequence(): Promise<void> {
@@ -2037,7 +2038,4 @@ export class CardBattleScene extends BaseScene {
     this.createActionButtons();
   }
 
-  public update(): void {
-    // Update animations or game state if needed
-  }
 }
