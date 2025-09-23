@@ -876,6 +876,18 @@ export class CardBattleScene extends BaseScene {
         discard: this.player2DiscardedCards.length
       }
     });
+
+    // Update PlayerStateManager with the current state variables
+    this.playerStateManager.updatePlayerState(
+      this.player1Characters,
+      this.player1HandCards,
+      this.player1DeckCards,
+      this.player1DiscardedCards,
+      this.player2Characters,
+      this.player2HandCards,
+      this.player2DeckCards,
+      this.player2DiscardedCards
+    );
   }
 
   /**
