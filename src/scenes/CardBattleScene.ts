@@ -148,9 +148,28 @@ export class CardBattleScene extends BaseScene {
    * Animation methods for CardBattleLog entries
    */
   private async animateCardBattleDrawPhase(logEntry: CardBattleLog): Promise<void> {
-    const playerText = logEntry.actor.team === 1 ? 'Player' : 'AI';
-    this.animateDrawCard(logEntry.drawn_cards || []);
-    
+    const drawnCards = logEntry.drawn_cards || [];
+
+    // Animate each drawn card individually
+    for (const drawnCard of drawnCards) {
+      // Convert CardBattleLogCard to CardInDeck format for animation
+      const cardInDeck: CardInDeck = {
+        card_id: drawnCard.id,
+        card: {
+          id: drawnCard.id,
+          name: drawnCard.name,
+          description: drawnCard.description,
+          icon_url: drawnCard.icon_url,
+          card_type: drawnCard.card_type,
+          energy_cost: drawnCard.energy_cost,
+          rarity: drawnCard.rarity,
+          group: drawnCard.group,
+          actions: drawnCard.actions || []
+        }
+      };
+
+      await this.animateDrawCard(cardInDeck, logEntry.actor.team);
+    }
   }
 
   private async animateCardBattlePlayCard(logEntry: CardBattleLog): Promise<void> {
