@@ -19,8 +19,8 @@ updateConfig({ useMockData: false });
 console.log('Now using real API calls');
 
 // Example 4: In a real scenario, you might want to configure this based on environment
-const isProduction = process.env.NODE_ENV === 'production';
-const hasApiKey = !!process.env.VITE_API_KEY;
+const isProduction = false; // Simplified for demo
+const hasApiKey = false; // Simplified for demo
 
 updateConfig({ 
   useMockData: !isProduction || !hasApiKey 
