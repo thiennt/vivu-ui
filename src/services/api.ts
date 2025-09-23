@@ -1,10 +1,11 @@
 /**
  * API Service Layer for vivu-api integration
  * Provides TypeScript interfaces and service methods for all game data
- * Includes fallback to mock data when API calls fail
+ * Uses configuration to determine whether to use mock data or real API calls
  */
 
-import { mockPlayer, mockCharacters, mockSkills, mockDungeons, mockStages, mockCardBattleState, mockBattleRewards } from '@/utils/mockData';
+import { config } from '@/config';
+import { mockPlayer, mockCharacters, mockSkills, mockDungeons, mockStages, mockCardBattleState, mockBattleRewards, mockDrawPhaseResult, mockPlayCardResponse, mockEndTurnResult } from '@/utils/mockData';
 import { 
   BattleApiResponse, 
   BattleMoveData, 
@@ -18,13 +19,10 @@ import {
   BattlePhaseResult,
   BattleLogEntry,
   CardBattleLog,
-  CardBattleApiResponse
+  CardBattleApiResponse,
+  BattleActionResult
 } from '@/types';
 import { createRandomDeck } from '@/utils/cardData';
-
-
-// Base API configuration
-const API_BASE_URL = ((import.meta as unknown) as { env?: { VITE_API_BASE_URL?: string } }).env?.VITE_API_BASE_URL || 'https://api.vivu.game';
 
 // Helper function to convert BattleLogEntry to CardBattleLog
 function convertToCardBattleLog(entry: BattleLogEntry, id?: string): CardBattleLog {
@@ -127,13 +125,23 @@ class ApiError extends Error {
   }
 }
 
-// Generic API request helper with fallback support
+// Generic API request helper with configuration-based mock support
 async function apiRequest<T>(
   endpoint: string,
   options: RequestInit = {},
   fallbackData?: T
 ): Promise<T> {
-  const url = `${API_BASE_URL}${endpoint}`;
+  // If using mock data, return fallback data immediately without making API calls
+  if (config.useMockData) {
+    if (fallbackData !== undefined) {
+      console.log(`🎭 Using mock data for ${endpoint}`);
+      return fallbackData;
+    }
+    throw new ApiError(`Mock data not available for endpoint: ${endpoint}`);
+  }
+
+  // Make real API call
+  const url = `${config.apiBaseUrl}${endpoint}`;
   
   const defaultOptions: RequestInit = {
     headers: {
@@ -144,6 +152,7 @@ async function apiRequest<T>(
   };
 
   try {
+    console.log(`🌐 Making real API call to ${endpoint}`);
     const response = await fetch(url, defaultOptions);
     
     if (!response.ok) {
@@ -156,12 +165,6 @@ async function apiRequest<T>(
     const data = await response.json();
     return data;
   } catch (error) {
-    // If fallback data is provided, use it instead of throwing an error
-    if (fallbackData !== undefined) {
-      console.warn(`API call to ${endpoint} failed, using fallback data:`, error);
-      return fallbackData;
-    }
-    
     if (error instanceof ApiError) {
       throw error;
     }
@@ -316,60 +319,19 @@ export const battleApi = {
     console.log('🎯 startTurn API called for battle:', battleId);
     const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
     
-    const mockBattleLogEntry: BattleLogEntry = {
-      type: 'draw_phase',
-      player_team: 1,
-      description: 'Turn started: Player draws cards and gains energy',
-      timestamp: new Date().toISOString()
-    };
-    const mockCardBattleLogs = [convertToCardBattleLog(mockBattleLogEntry)];
-    
     return apiRequest(`/players/${playerId}/card-battle/${battleId}/start-turn`, {
       method: 'POST',
-    }, {
-      success: true,
-      code: 200,
-      message: "Turn started successfully",
-      data: mockCardBattleLogs,
-      errors: null,
-      meta: {
-        phase: 'draw_phase',
-        playerId,
-        battleId,
-        timestamp: new Date().toISOString()
-      }
-    });
+    }, mockDrawPhaseResult);
   },
 
   async playAction(battleId: string, moveData: BattleMoveData): Promise<BattleMoveResponse> {
     console.log('🎮 playAction API called for battle:', battleId, 'with data:', moveData);
     
-    const mockBattleLogEntry: BattleLogEntry = {
-      type: moveData.action,
-      player_team: 1,
-      card_id: moveData.card_id,
-      target_ids: moveData.target_ids,
-      description: `Player action: ${moveData.action}`,
-      timestamp: new Date().toISOString()
-    };
-    const mockCardBattleLogs = [convertToCardBattleLog(mockBattleLogEntry)];
-
     const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
     return apiRequest(`/players/${playerId}/card-battle/${battleId}/action`, {
       method: 'POST',
       body: JSON.stringify(moveData),
-    }, {
-      success: true,
-      code: 200,
-      message: "Action executed successfully",
-      data: mockCardBattleLogs,
-      errors: null,
-      meta: {
-        action: moveData.action,
-        battleId,
-        timestamp: new Date().toISOString()
-      }
-    });
+    }, mockPlayCardResponse);
   },
 
   async getBattleLogs(battleId: string, turn?: number): Promise<BattleLogEntry[]> {
@@ -381,47 +343,10 @@ export const battleApi = {
   async endTurn(battleId: string): Promise<BattlePhaseResult> {
     console.log('⏭️ endTurn API called for battle:', battleId);
     
-    const mockBattleLogEntries: BattleLogEntry[] = [
-      {
-        type: 'end_turn',
-        player_team: 1,
-        description: 'Player ends turn, AI begins their turn',
-        timestamp: new Date().toISOString()
-      },
-      {
-        type: 'draw_phase',
-        player_team: 2,
-        description: 'AI draws cards and gains energy',
-        timestamp: new Date().toISOString()
-      },
-      {
-        type: 'play_card',
-        player_team: 2,
-        character_id: 'ai_char_001',
-        card_id: 'card_003',
-        target_ids: ['player_char_001'],
-        description: 'AI plays card_003 targeting player character',
-        timestamp: new Date().toISOString()
-      }
-    ];
-    const mockCardBattleLogs = mockBattleLogEntries.map((entry: BattleLogEntry) => convertToCardBattleLog(entry));
-    
     return apiRequest(`/card-battle/${battleId}/action`, {
       method: 'POST',
       body: JSON.stringify({ action: 'end_turn' }),
-    }, {
-      success: true,
-      code: 200,
-      message: "Turn ended successfully",
-      data: mockCardBattleLogs,
-      errors: null,
-      meta: {
-        phase: 'end_turn',
-        battleId,
-        timestamp: new Date().toISOString(),
-        logCount: mockCardBattleLogs.length
-      }
-    });
+    }, mockEndTurnResult);
   },
 
   async endBattle(battleId: string, battleResult: BattleEndData): Promise<BattleApiResponse & { rewards?: BattleRewards }> {
@@ -449,11 +374,7 @@ export const battleApi = {
 export { ApiError };
 export type { LoadingState };
 
-// Export API base URL for potential configuration needs
-export { API_BASE_URL };
-
-// Utility function to check if we're likely using mock data
-// This is a heuristic based on whether the API base URL is the default one
+// Utility function to check if we're using mock data (now based on configuration)
 export function isLikelyUsingMockData(): boolean {
-  return API_BASE_URL === 'https://api.vivu.game';
+  return config.useMockData;
 }

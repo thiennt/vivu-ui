@@ -1,5 +1,3 @@
-import { CardBattleLog } from '@/types';
-
 // ---- Skills ----
 // NOTE: mockSkills usage has been replaced with API calls for CharacterDetail component
 
@@ -1494,9 +1492,10 @@ export const mockBattleRewards: BattleRewards = {
   newLevel: false
 };
 
-// ---- Extended Mock Data for Complete Battle Flow ----
-import { DrawPhaseResult, BattlePhaseResult, BattleMoveResponse, AIAction, BattleActionResult, BattleLogEntry } from '../types';
+// ---- Battle Response Data ----
+import { BattleLogEntry, DrawPhaseResult, BattlePhaseResult, BattleMoveResponse, BattleActionResult, CardBattleLog } from '../types';
 
+// Mock responses for battle actions - these are used by the API layer
 export const mockDrawPhaseResult: DrawPhaseResult = {
   success: true,
   code: 200,
@@ -1633,84 +1632,15 @@ export const mockPlayCardResponse: BattleMoveResponse = {
       reason: undefined
     },
     created_at: new Date().toISOString(),
-    animation_hint: 'Player successfully played Fire Bolt card'
-  }] as CardBattleLog[],
+    animation_hint: 'Fire Bolt hits enemy for 25 damage'
+  }],
   errors: null,
   meta: {
-    action: 'play_card',
-    battleId: 'battle_mock_001',
+    cardPlayed: 'fire_bolt_001',
+    damageDealt: 25,
     timestamp: new Date().toISOString()
   }
 };
-
-export const mockAIActions: AIAction[] = [
-  {
-    type: 'draw_phase',
-    player_team: 2,
-    actions_performed: [{
-      type: 'draw_phase',
-      player_team: 2,
-      description: 'AI drew cards and gained energy'
-    }],
-    battle_logs: [{
-      type: 'draw_phase',
-      player_team: 2,
-      description: 'AI draws cards and gains energy for their turn',
-      timestamp: new Date().toISOString()
-    }]
-  },
-  {
-    type: 'play_card',
-    player_team: 2,
-    character_id: 'enemy_char_1',
-    card_id: 'shadow_strike',
-    target_ids: ['player_char_1'],
-    result: {
-      success: true,
-      damage_dealt: 20,
-      actions_performed: [{
-        type: 'play_card',
-        player_team: 2,
-        character_id: 'enemy_char_1',
-        card_id: 'shadow_strike',
-        target_ids: ['player_char_1'],
-        description: 'Enemy cast Shadow Strike for 20 damage'
-      }],
-      battle_logs: [{
-        type: 'play_card',
-        player_team: 2,
-        character_id: 'enemy_char_1',
-        card_id: 'shadow_strike',
-        target_ids: ['player_char_1'],
-        description: 'Enemy casts Shadow Strike, dealing 20 shadow damage',
-        timestamp: new Date().toISOString()
-      }, {
-        type: 'damage',
-        player_team: 2,
-        target_ids: ['player_char_1'],
-        description: 'Player character takes 20 shadow damage',
-        timestamp: new Date().toISOString()
-      }]
-    },
-    actions_performed: [{
-      type: 'play_card',
-      player_team: 2,
-      character_id: 'enemy_char_1',
-      card_id: 'shadow_strike',
-      target_ids: ['player_char_1'],
-      description: 'Enemy cast Shadow Strike for 20 damage'
-    }],
-    battle_logs: [{
-      type: 'play_card',
-      player_team: 2,
-      character_id: 'enemy_char_1',
-      card_id: 'shadow_strike',
-      target_ids: ['player_char_1'],
-      description: 'AI plays Shadow Strike targeting player character',
-      timestamp: new Date().toISOString()
-    }]
-  }
-];
 
 export const mockEndTurnResult: BattlePhaseResult = {
   success: true,
@@ -1829,6 +1759,7 @@ export const mockEndTurnResult: BattlePhaseResult = {
   }
 };
 
+// ---- Battle Log Data ----
 export const mockBattleLogs: BattleLogEntry[] = [
   {
     type: 'draw_phase',
