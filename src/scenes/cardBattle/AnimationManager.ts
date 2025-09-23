@@ -3,7 +3,6 @@ import { gsap } from 'gsap';
 import { Colors } from '@/utils/colors';
 import { 
   CardBattleLog, 
-  CardInDeck, 
   BattleActionResult
 } from '@/types';
 
@@ -90,6 +89,37 @@ export class CardBattleAnimationManager {
   }
 
   private async animateDrawPhase(logEntry: CardBattleLog): Promise<void> {
+    const playerTeam = logEntry.actor.team;
+    const drawnCards = logEntry.drawn_cards || [];
+    
+    if (drawnCards.length === 0) {
+      // Show a generic draw message if no specific cards are provided
+      const playerText = playerTeam === 1 ? 'Player' : 'AI';
+      await this.showTurnMessage(`${playerText}: Draw phase`);
+      return;
+    }
+
+    // Calculate deck and hand positions based on player team
+    const deckPosition = this.getDeckPosition(playerTeam);
+    const handBasePosition = this.getHandBasePosition(playerTeam);
+    
+    // Animate each card being drawn from deck to hand in sequence
+    for (let i = 0; i < drawnCards.length; i++) {
+      const card = drawnCards[i];
+      const handPosition = this.calculateHandCardPosition(handBasePosition, i, drawnCards.length);
+      
+      await this.animateCardFromDeckToHand(card, deckPosition, handPosition);
+      
+      // Small delay between card draws to make the sequence visible
+      if (i < drawnCards.length - 1) {
+        await new Promise(resolve => setTimeout(resolve, 200));
+      }
+    }
+    
+    // Show completion message
+    const playerText = playerTeam === 1 ? 'Player' : 'AI';
+    const cardText = drawnCards.length === 1 ? 'card' : 'cards';
+    await this.showTurnMessage(`${playerText}: Drew ${drawnCards.length} ${cardText}`);
   }
 
   private async animatePlayCard(logEntry: CardBattleLog): Promise<void> {
@@ -440,5 +470,129 @@ export class CardBattleAnimationManager {
     for (const effect of effects) {
       await this.showTurnMessage(`${effect.type || 'Effect'} applied!`);
     }
+  }
+
+  // Helper methods for draw phase animation
+  private getDeckPosition(playerTeam: number): { x: number; y: number } {
+    const padding = 20; // Standard padding from edges
+    
+    if (playerTeam === 1) {
+      // Player 1 deck is at bottom left
+      return {
+        x: padding,
+        y: this.gameHeight - 250 // Bottom area
+      };
+    } else {
+      // Player 2 deck is at top left
+      return {
+        x: padding,
+        y: 150 // Top area
+      };
+    }
+  }
+
+  private getHandBasePosition(playerTeam: number): { x: number; y: number } {
+    if (playerTeam === 1) {
+      // Player 1 hand is at bottom center
+      return {
+        x: this.gameWidth / 2,
+        y: this.gameHeight - 150
+      };
+    } else {
+      // Player 2 hand is at top center
+      return {
+        x: this.gameWidth / 2,
+        y: 50
+      };
+    }
+  }
+
+  private calculateHandCardPosition(basePosition: { x: number; y: number }, cardIndex: number, totalCards: number): { x: number; y: number } {
+    const cardWidth = 60;
+    const maxSpacing = cardWidth + 12; // 12px gap between cards
+    const maxVisible = 5;
+    
+    let cardSpacing: number;
+    let startX: number;
+    
+    if (totalCards <= maxVisible) {
+      // Fixed spacing, center the hand
+      cardSpacing = maxSpacing;
+      const totalWidth = cardWidth + (totalCards - 1) * cardSpacing;
+      startX = basePosition.x - totalWidth / 2;
+    } else {
+      // Overlap cards to fit in available space
+      const padding = 20;
+      cardSpacing = (this.gameWidth - 2 * padding - cardWidth) / (totalCards - 1);
+      cardSpacing = Math.min(cardSpacing, cardWidth); // Prevent negative overlap
+      startX = padding;
+    }
+    
+    return {
+      x: startX + cardIndex * cardSpacing,
+      y: basePosition.y
+    };
+  }
+
+  private async animateCardFromDeckToHand(
+    card: { name: string; id: string },
+    deckPosition: { x: number; y: number },
+    handPosition: { x: number; y: number }
+  ): Promise<void> {
+    // Create temporary card visual
+    const tempCard = new Graphics();
+    const cardWidth = 50;
+    const cardHeight = 70;
+    
+    tempCard.roundRect(0, 0, cardWidth, cardHeight, 5)
+      .fill({ color: Colors.CARD_BACKGROUND, alpha: 0.9 })
+      .stroke({ width: 2, color: Colors.CARD_BORDER });
+    
+    // Add card name text
+    const nameText = new Text({
+      text: card.name,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 8,
+        fill: Colors.TEXT_PRIMARY,
+        align: 'center',
+        wordWrap: true,
+        wordWrapWidth: cardWidth - 8
+      }
+    });
+    nameText.anchor.set(0.5);
+    nameText.x = cardWidth / 2;
+    nameText.y = cardHeight / 2;
+    tempCard.addChild(nameText);
+    
+    // Start from deck position
+    tempCard.x = deckPosition.x;
+    tempCard.y = deckPosition.y;
+    tempCard.alpha = 0.8;
+    tempCard.scale.set(0.8); // Start smaller
+    
+    this.effectsContainer.addChild(tempCard);
+    
+    // Animate card flying from deck to hand position
+    await gsap.to(tempCard, {
+      x: handPosition.x,
+      y: handPosition.y,
+      alpha: 1,
+      scale: 1,
+      duration: 0.6,
+      ease: 'power2.out'
+    });
+    
+    // Brief pause to show the card in hand position
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
+    // Fade out the temporary card
+    await gsap.to(tempCard, {
+      alpha: 0,
+      duration: 0.2,
+      ease: 'power2.in'
+    });
+    
+    this.effectsContainer.removeChild(tempCard);
   }
 }
