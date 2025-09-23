@@ -9,9 +9,7 @@ import { CardDetailPopup } from '@/popups/CardDetailPopup';
 import { battleApi } from '@/services/api';
 import { 
   CardBattleState, 
-  BattleMoveData,
-  BattleEndData,
-  BattleRewards,
+  TurnAction,
   Card,
   CardInDeck,
   BattleCard,
@@ -21,11 +19,8 @@ import {
   AIAction,
   CardBattleCharacter,
   CardBattleLog,
-  CardBattleApiResponse
+  CardBattleApiResponse,
 } from '@/types';
-import { 
-  mockBattleRewards 
-} from '@/utils/mockData';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
 
 export class CardBattleScene extends BaseScene {
@@ -88,7 +83,7 @@ export class CardBattleScene extends BaseScene {
     } else {
       console.error(`❌ API call failed (${response.code}): ${response.message}`);
       if (response.errors) {
-        response.errors.forEach(error => console.error(`   Error: ${error}`));
+        response.errors.forEach((error: unknown) => console.error(`   Error: ${error}`));
       }
     }
   }
@@ -230,7 +225,7 @@ export class CardBattleScene extends BaseScene {
       } else {
         console.error(`❌ Failed to refresh battle state: ${response.message}`);
         if (response.errors) {
-          response.errors.forEach(error => console.error(`   Error: ${error}`));
+          response.errors.forEach((error: any) => console.error(`   Error: ${error}`));
         }
         throw new Error('Failed to refresh battle state');
       }
@@ -321,7 +316,7 @@ export class CardBattleScene extends BaseScene {
       } else {
         console.error(`❌ Failed to load battle state: ${response.message}`);
         if (response.errors) {
-          response.errors.forEach(error => console.error(`   Error: ${error}`));
+          response.errors.forEach((error: any) => console.error(`   Error: ${error}`));
         }
         throw new Error('Failed to load battle state');
       }
@@ -1210,17 +1205,18 @@ export class CardBattleScene extends BaseScene {
 
   private async playCardOnCharacter(card: CardInDeck, targetPlayerId: number, characterIndex: number): Promise<void> {
     // Prepare move data for new API
-    const moveData: BattleMoveData = {
-      action: 'play_card',
+    const turnAction: TurnAction = {
+      type: 'play_card',
+      player_team: this.getCurrentPlayer(),
       card_id: card.card_id || 'unknown',
       character_id: `player_char_${this.getCurrentPlayer()}`,
       target_ids: [`${targetPlayerId === 1 ? 'player' : 'enemy'}_char_${characterIndex}`]
     };
 
-    console.log('🎮 Playing card...', moveData);
+    console.log('🎮 Playing card...', turnAction);
     
     // Call the API (will use mock data if configured)
-    const moveResponse = await battleApi.playAction(this.battleId, moveData);
+    const moveResponse = await battleApi.playAction(this.battleId, turnAction);
     
     if (!moveResponse.success) {
       console.error('❌ Failed to play card:', moveResponse.message);
@@ -1238,16 +1234,17 @@ export class CardBattleScene extends BaseScene {
 
   private async discardCard(card: CardInDeck): Promise<void> {
     // Prepare move data for new API
-    const moveData: BattleMoveData = {
-      action: 'discard_card',
+    const turnAction: TurnAction = {
+      type: 'discard_card',
+      player_team: this.getCurrentPlayer(),
       card_id: card.card_id || 'unknown',
       character_id: `player_char_${this.getCurrentPlayer()}`
     };
 
-    console.log('🗑️ Discarding card...', moveData);
+    console.log('🗑️ Discarding card...', turnAction);
     
     // Call the API (will use mock data if configured)
-    const moveResponse = await battleApi.playAction(this.battleId, moveData);
+    const moveResponse = await battleApi.playAction(this.battleId, turnAction);
     
     if (!moveResponse.success) {
       console.error('❌ Failed to discard card:', moveResponse.message);
@@ -1287,8 +1284,13 @@ export class CardBattleScene extends BaseScene {
   private async endTurn(): Promise<void> {
     console.log('🎯 Ending player turn...');
     
-    // Call the API (will use mock data if configured)
-    const turnResponse = await battleApi.endTurn(this.battleId);
+    const turnAction: TurnAction = {
+      type: 'end_turn',
+      player_team: this.getCurrentPlayer(),
+      character_id: `player_char_${this.getCurrentPlayer()}`
+    };
+
+    const turnResponse = await battleApi.playAction(this.battleId, turnAction);
     
     if (!turnResponse.success) {
       console.error('❌ Failed to end turn:', turnResponse.message);
@@ -1348,42 +1350,7 @@ export class CardBattleScene extends BaseScene {
   private async showBattleEnd(playerWon: boolean): Promise<void> {
     console.log('🎯 Battle ended!', playerWon ? 'Player wins!' : 'Player loses!');
     
-    // Prepare battle end data
-    const battleEndData: BattleEndData = {
-      winner: playerWon ? 1 : 2,
-      reason: 'defeat',
-      finalState: this.battleState!
-    };
-
-    let rewards: BattleRewards | null = null;
-
-    try {
-      // Report battle end to backend and get rewards
-      if (this.battleId) {
-        console.log('🔄 Reporting battle end to backend...', battleEndData);
-        const battleEndResponse = await battleApi.endBattle(this.battleId, battleEndData);
-        
-        // Get rewards from the response
-        if (battleEndResponse.rewards) {
-          rewards = battleEndResponse.rewards;
-          console.log('🎁 Battle rewards received:', rewards);
-        } else if (playerWon) {
-          // Fallback: try to fetch rewards separately
-          try {
-            rewards = await battleApi.getBattleRewards(this.battleId);
-          } catch (rewardError) {
-            console.warn('⚠️ Could not fetch rewards:', rewardError);
-          }
-        }
-      } else {
-        console.log('⚠️ No battleId - using default rewards');
-        rewards = playerWon ? mockBattleRewards : null;
-      }
-    } catch (error) {
-      console.error('❌ Error reporting battle end via API:', error);
-      throw error;
-    }
-
+   
     // Step 2: Display battle end UI
     const message = playerWon ? 'Victory!' : 'Defeat!';
     const color = playerWon ? Colors.RARITY_LEGENDARY : Colors.ELEMENT_FIRE;
@@ -1407,38 +1374,7 @@ export class CardBattleScene extends BaseScene {
     titleText.anchor.set(0.5);
     titleText.x = 200;
     titleText.y = 60;
-    
-    // Display rewards from backend or use fallback
-    let rewardsTextContent: string;
-    if (playerWon) {
-      if (rewards) {
-        rewardsTextContent = `You earned rewards!\n+${rewards.gold} Gold\n+${rewards.experience} EXP`;
-        if (rewards.newLevel) {
-          rewardsTextContent += '\n🎉 LEVEL UP!';
-        }
-        if (rewards.items && rewards.items.length > 0) {
-          rewardsTextContent += `\n+${rewards.items.length} items`;
-        }
-      } else {
-        rewardsTextContent = 'You earned rewards!\n+100 Gold\n+50 EXP';
-      }
-    } else {
-      rewardsTextContent = 'Better luck next time!';
-    }
-    
-    const rewardsText = new Text({
-      text: rewardsTextContent,
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 16,
-        fill: Colors.TEXT_SECONDARY,
-        align: 'center'
-      }
-    });
-    rewardsText.anchor.set(0.5);
-    rewardsText.x = 200;
-    rewardsText.y = 120;
-    
+       
     const continueButton = this.createButton(
       'Continue',
       150,
@@ -1450,7 +1386,7 @@ export class CardBattleScene extends BaseScene {
       }
     );
     
-    endContainer.addChild(bg, titleText, rewardsText, continueButton);
+    endContainer.addChild(bg, titleText, continueButton);
     endContainer.x = (this.gameWidth - 400) / 2;
     endContainer.y = (this.gameHeight - 200) / 2;
     endContainer.alpha = 0;

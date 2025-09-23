@@ -1,7 +1,7 @@
 import { Graphics, Text, Container } from 'pixi.js';
 import { ScrollBox } from '@pixi/ui';
 import { BaseScene } from '@/utils/BaseScene';
-import { mockPlayer, mockCharacters } from '@/utils/mockData';
+import { mockPlayer } from '@/utils/mockData';
 import { navigation } from '@/utils/navigation';
 import { HomeScene } from './HomeScene';
 import { Colors, Gradients } from '@/utils/colors';
@@ -28,17 +28,10 @@ export class LineupScene extends BaseScene {
 
   constructor() {
     super();
-    
-    // Convert string IDs to Character objects
-    this.lineupPositions = mockPlayer.lineup.positions.map(id => 
-      id ? mockCharacters.find(c => c.id === id) || null : null
-    );
+    this.lineupPositions = mockPlayer.lineup;
 
     // Get available characters (all characters not in lineup)
-    const lineupCharacterIds = mockPlayer.lineup.positions.filter(id => id !== null);
-    this.availableCharacters = mockCharacters.filter(
-      char => !lineupCharacterIds.includes(char.id)
-    );
+    this.availableCharacters = mockPlayer.characters;
     
     // Create containers once
     this.container = new Container();
@@ -483,7 +476,6 @@ export class LineupScene extends BaseScene {
       buttonHeight,
       () => {
         // Convert Character objects back to string IDs for saving
-        mockPlayer.lineup.positions = this.lineupPositions.map(char => char ? char.id : null);
         alert('Lineup saved successfully!');
       },
       14 // Added base font size
@@ -503,10 +495,7 @@ export class LineupScene extends BaseScene {
           if (pos) return pos;
           return available.shift() || null;
         });
-        // Remove filled characters from pool
-        this.availableCharacters = mockCharacters.filter(
-          char => !this.lineupPositions.some(pos => pos && pos.id === char.id)
-        );
+        
         this.refreshLineup();
       }
     );

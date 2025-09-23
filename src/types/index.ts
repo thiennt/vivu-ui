@@ -340,6 +340,8 @@ export interface CharacterState {
   has_acted: boolean;
   active_effects: unknown[];
   equipped_skills: string[];
+  shields: { [type: string]: number };
+  immunities: string[];
 }
 
 export type BattlePhaseName =
@@ -438,11 +440,13 @@ export interface BattleApiResponse {
   status: string;
 }
 
-export interface BattleMoveData {
-  action: 'play_card' | 'discard_card' | 'end_turn';
+export interface TurnAction {
+  type: 'draw_card' | 'discard_card' | 'play_card' | 'character_action' | 'end_turn';
+  player_team: number;
   card_id?: string;
   character_id?: string;
   target_ids?: string[];
+  action_data?: any;
 }
 
 // Standardized API response format for CardBattle APIs
@@ -454,27 +458,6 @@ export interface CardBattleApiResponse<T = any> {
   errors: string[] | null;            // Array of errors, or null if no error
   meta?: any;                         // (Optional) Extra info: pagination, server time, etc.
 }
-
-// Updated existing API response types to use the new standardized format
-export type BattleMoveResponse = CardBattleApiResponse<CardBattleLog[]>;
-export type DrawPhaseResult = CardBattleApiResponse<CardBattleLog[]>;
-export type BattlePhaseResult = CardBattleApiResponse<CardBattleLog[]>;
-
-export interface BattleEndData {
-  winner: number; // 1 or 2
-  reason: 'defeat' | 'surrender' | 'timeout';
-  finalState: CardBattleState;
-}
-
-export interface BattleRewards {
-  gold: number;
-  experience: number;
-  items: unknown[];
-  newLevel?: boolean;
-  levelUpRewards?: unknown[];
-}
-
-// New interfaces for updated card battle API specification
 
 export interface BattleActionResult {
   success: boolean;

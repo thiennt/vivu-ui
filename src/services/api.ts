@@ -5,19 +5,9 @@
  */
 
 import { config } from '@/config';
-import { mockPlayer, mockCharacters, mockSkills, mockDungeons, mockStages, mockCardBattleState, mockBattleRewards, mockDrawPhaseResult, mockPlayCardResponse, mockEndTurnResult, mockBattleStage } from '@/utils/mockData';
+import { mockPlayer, mockSkills, mockDungeons, mockStages, mockCardBattleState,  mockBattleStage, mockPlayer1Characters, mockActionResult } from '@/utils/mockData';
 import { 
-  BattleApiResponse, 
-  BattleMoveData, 
-  BattleMoveResponse, 
-  BattleEndData, 
-  BattleRewards,
-  BattleStageResponse,
-  CardBattleState,
-  DrawPhaseResult,
-  BattlePhaseResult,
-  BattleLogEntry,
-  CardBattleApiResponse
+  TurnAction, 
 } from '@/types';
 
 
@@ -100,28 +90,13 @@ export const playerApi = {
       body: JSON.stringify(stats),
     }, { ...mockPlayer, ...stats });
   },
-
-  async getPlayerCharacters(playerId: string): Promise<any[]> {
-    // Return character objects based on mockPlayer's character IDs
-    const playerCharacterIds = mockPlayer.characters || [];
-    const playerCharacters = mockCharacters.filter(char => 
-      playerCharacterIds.includes(char.id)
-    );
-    return apiRequest(`/players/${playerId}/characters`, {}, playerCharacters);
-  },
 };
 
 // Characters API methods
 export const charactersApi = {
   async getAllCharacters(): Promise<any[]> {
     const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
-    return apiRequest(`/players/${playerId}/characters`, {}, mockCharacters);
-  },
-
-  async getCharacter(characterId: string): Promise<any> {
-    const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
-    const character = mockCharacters.find(char => char.id === characterId);
-    return apiRequest(`/players/${playerId}/characters/${characterId}`, {}, character);
+    return apiRequest(`/players/${playerId}/characters`, {}, mockPlayer1Characters);
   },
 
   async getCharacterSkills(characterId: string): Promise<any[]> {
@@ -158,7 +133,7 @@ export const skillsApi = {
 
 // Battle API methods
 export const battleApi = {
-  async getAvailableStages(): Promise<CardBattleApiResponse<any[]>> {
+  async getAvailableStages(): Promise<any> {
     const playerId = sessionStorage.getItem('playerId');
     return apiRequest(`/players/${playerId}/card-battle/stages`, {}, {
       success: true,
@@ -173,7 +148,7 @@ export const battleApi = {
     });
   },
 
-  async createBattleStage(stage_id: string): Promise<CardBattleApiResponse<any>> {
+  async createBattleStage(stage_id: string): Promise<any> {
     const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
     return apiRequest(`/players/${playerId}/card-battle/stages/${stage_id}`, {
       method: 'POST'
@@ -187,7 +162,7 @@ export const battleApi = {
     });
   },
 
-  async startBattle(battleId: string): Promise<CardBattleApiResponse<void>> {
+  async startBattle(battleId: string): Promise<any> {
     const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
     return apiRequest(`/players/${playerId}/card-battle/${battleId}/start`, {
       method: 'POST',
@@ -205,7 +180,7 @@ export const battleApi = {
     });
   },
 
-  async getBattleState(battleId: string): Promise<CardBattleApiResponse<CardBattleState>> {
+  async getBattleState(battleId: string): Promise<any> {
     const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
     return apiRequest(`/players/${playerId}/card-battle/${battleId}/state`, {}, {
       success: true,
@@ -221,56 +196,31 @@ export const battleApi = {
     });
   },
 
-  async startTurn(battleId: string): Promise<DrawPhaseResult> {
+  async startTurn(battleId: string): Promise<any> {
     console.log('🎯 startTurn API called for battle:', battleId);
     const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
     
     return apiRequest(`/players/${playerId}/card-battle/${battleId}/start-turn`, {
       method: 'POST',
-    }, mockDrawPhaseResult);
+    }, mockActionResult);
   },
 
-  async playAction(battleId: string, moveData: BattleMoveData): Promise<BattleMoveResponse> {
-    console.log('🎮 playAction API called for battle:', battleId, 'with data:', moveData);
+  async playAction(battleId: string, turnAction: TurnAction): Promise<any> {
+    console.log('🎮 playAction API called for battle:', battleId, 'with data:', turnAction);
     
     const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
     return apiRequest(`/players/${playerId}/card-battle/${battleId}/action`, {
       method: 'POST',
-      body: JSON.stringify(moveData),
-    }, mockPlayCardResponse);
+      body: JSON.stringify(turnAction),
+    }, mockActionResult);
   },
 
-  async getBattleLogs(battleId: string, turn?: number): Promise<BattleLogEntry[]> {
+  async getBattleLogs(battleId: string, turn?: number): Promise<any> {
     console.log('📋 getBattleLogs API called for battle:', battleId, 'turn:', turn);
     const endpoint = turn ? `/card-battle/${battleId}/logs?turn=${turn}` : `/card-battle/${battleId}/logs`;
     return apiRequest(endpoint, {}, []);
   },
 
-  async endTurn(battleId: string): Promise<BattlePhaseResult> {
-    console.log('⏭️ endTurn API called for battle:', battleId);
-    
-    return apiRequest(`/card-battle/${battleId}/action`, {
-      method: 'POST',
-      body: JSON.stringify({ action: 'end_turn' }),
-    }, mockEndTurnResult);
-  },
-
-  async endBattle(battleId: string, battleResult: BattleEndData): Promise<BattleApiResponse & { rewards?: BattleRewards }> {
-    console.log('🏁 endBattle API called for battle:', battleId, 'with result:', battleResult);
-    return apiRequest(`/battles/${battleId}/end`, {
-      method: 'POST',
-      body: JSON.stringify(battleResult),
-    }, {
-      battleId,
-      status: 'completed',
-      rewards: battleResult.winner === 1 ? mockBattleRewards : undefined
-    });
-  },
-
-  async getBattleRewards(battleId: string): Promise<BattleRewards> {
-    console.log('🎁 getBattleRewards API called for battle:', battleId);
-    return apiRequest(`/battles/${battleId}/rewards`, {}, mockBattleRewards);
-  },
 
 };
 

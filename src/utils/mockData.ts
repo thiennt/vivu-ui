@@ -1,7 +1,4 @@
 // ---- Skills ----
-// NOTE: mockSkills usage has been replaced with API calls for CharacterDetail component
-
-// This data is kept for other components that haven't been migrated yet
 export const mockSkills = [
   {
     name: "Normal Attack",
@@ -68,10 +65,6 @@ export const mockSkills = [
 ];
 
 // ---- Characters (Crypto Inspired) ----
-// NOTE: mockCharacters usage has been replaced with API calls for Characters and CharacterDetail components
-// This data is kept for other components that haven't been migrated yet
-export const mockCharacters = [];
-
 export const mockPlayer1Characters = [
   {
     "id": "885f2e07-085a-421c-be16-bfd3f041fa50",
@@ -234,9 +227,9 @@ export const mockPlayer2Characters = [
   }
 ];
 
+export const mockCharacters = mockPlayer1Characters.concat(mockPlayer2Characters);
+
 // ---- Player ----
-// NOTE: mockPlayer usage has been replaced with API calls for PlayerDetail component
-// This data is kept for other components that haven't been migrated yet
 export const mockPlayer = {
   "id": "140b7bcd-9487-449d-a4b4-a9370d955651",
   "username": "PlayerOne",
@@ -1888,174 +1881,10 @@ export const mockBattleStage = {
 }
 
 
+import { mock } from 'node:test';
 // ---- Card Battle Mock Data ----
 import { CardBattleState, CardBattleCharacter, CardBattleDeck, CardInDeck, BattleRewards, Card, BattleCard } from '../types';
-import { mockCards } from './cardData';
 
-// Mock characters for battle
-const mockBattleCharacters: CardBattleCharacter[] = [
-  {
-    id: 'char_001',
-    character_id: 'player_char_1',
-    name: 'Bitcoin',
-    avatar_url: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1.png',
-    rarity: 'legendary',
-    team: 1,
-    position: 0,
-    max_hp: 120,
-    current_hp: 120,
-    atk: 45,
-    def: 25,
-    agi: 15,
-    crit_rate: 10,
-    crit_dmg: 150,
-    res: 8,
-    damage: 15,
-    mitigation: 5,
-    hit_rate: 95,
-    dodge: 10,
-    has_acted: false,
-    active_effects: [],
-    equipped_skills: ['skill_001', 'skill_002']
-  },
-  {
-    id: 'char_002',
-    character_id: 'player_char_2',
-    name: 'Ethereum',
-    avatar_url: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png',
-    rarity: 'epic',
-    team: 1,
-    position: 1,
-    max_hp: 100,
-    current_hp: 100,
-    atk: 40,
-    def: 20,
-    agi: 20,
-    crit_rate: 12,
-    crit_dmg: 160,
-    res: 10,
-    damage: 12,
-    mitigation: 3,
-    hit_rate: 92,
-    dodge: 15,
-    has_acted: false,
-    active_effects: [],
-    equipped_skills: ['skill_003']
-  }
-];
-
-const mockEnemyCharacters: CardBattleCharacter[] = [
-  {
-    id: 'enemy_001',
-    character_id: 'enemy_char_1',
-    name: 'Cardano',
-    avatar_url: 'https://s2.coinmarketcap.com/static/img/coins/64x64/2010.png',
-    rarity: 'rare',
-    team: 2,
-    position: 0,
-    max_hp: 90,
-    current_hp: 90,
-    atk: 35,
-    def: 18,
-    agi: 18,
-    crit_rate: 8,
-    crit_dmg: 140,
-    res: 6,
-    damage: 10,
-    mitigation: 4,
-    hit_rate: 90,
-    dodge: 12,
-    has_acted: false,
-    active_effects: [],
-    equipped_skills: ['skill_004']
-  },
-  {
-    id: 'enemy_002',
-    character_id: 'enemy_char_2',
-    name: 'Solana',
-    avatar_url: 'https://s2.coinmarketcap.com/static/img/coins/64x64/5426.png',
-    rarity: 'uncommon',
-    team: 2,
-    position: 1,
-    max_hp: 85,
-    current_hp: 85,
-    atk: 32,
-    def: 15,
-    agi: 22,
-    crit_rate: 14,
-    crit_dmg: 170,
-    res: 5,
-    damage: 8,
-    mitigation: 2,
-    hit_rate: 88,
-    dodge: 18,
-    has_acted: false,
-    active_effects: [],
-    equipped_skills: ['skill_005']
-  }
-];
-
-// Helper function to convert BattleCard to Card
-function battleCardToCard(battleCard: BattleCard): Card {
-  return {
-    id: battleCard.id,
-    name: battleCard.name,
-    group: battleCard.group,
-    description: battleCard.description,
-    icon_url: undefined,
-    card_type: 'attack', // Default type
-    energy_cost: battleCard.energyCost,
-    rarity: battleCard.rarity,
-    actions: battleCard.effects
-  };
-}
-
-// Helper function to create deck cards from mockCards
-function createMockDeckCards(count: number = 30): CardInDeck[] {
-  const deckCards: CardInDeck[] = [];
-  for (let i = 0; i < count; i++) {
-    const cardIndex = i % mockCards.length;
-    deckCards.push({
-      card_id: `${mockCards[cardIndex].id}_deck_${i}`,
-      position: i + 1,
-      card: battleCardToCard(mockCards[cardIndex])
-    });
-  }
-  return deckCards;
-}
-
-function createMockHandCards(count: number = 5): CardInDeck[] {
-  const handCards: CardInDeck[] = [];
-  for (let i = 0; i < count; i++) {
-    const cardIndex = i % mockCards.length;
-    handCards.push({
-      card_id: `${mockCards[cardIndex].id}_hand_${i}`,
-      position: i + 1,
-      card: battleCardToCard(mockCards[cardIndex])
-    });
-  }
-  return handCards;
-}
-
-const mockPlayer1Deck: CardBattleDeck = {
-  id: 'deck_player_1',
-  player_team: 1,
-  deck_cards: createMockDeckCards(25),
-  hand_cards: createMockHandCards(5),
-  discard_cards: [],
-  current_energy: 3,
-  cards_drawn: 1
-};
-
-const mockPlayer2Deck: CardBattleDeck = {
-  id: 'deck_player_2',
-  player_team: 2,
-  deck_cards: createMockDeckCards(25),
-  hand_cards: createMockHandCards(5),
-  discard_cards: [],
-  current_energy: 3,
-  cards_drawn: 1
-};
 
 export const mockCardBattleState: CardBattleState = {
   "id": "79c2bcc3-9d38-469f-96ea-208e37cacac4",
@@ -2065,7 +1894,7 @@ export const mockCardBattleState: CardBattleState = {
   "current_player": 1,
   "phase": "start_turn",
   "created_at": "2025-09-22T07:42:55.170Z",
-  "updated_at": "2025-09-23T03:42:36.349Z",
+  "updated_at": "2025-09-23T06:21:59.768Z",
   "players": [
     {
       "team": 1,
@@ -2157,7 +1986,7 @@ export const mockCardBattleState: CardBattleState = {
         "hand_cards": [],
         "discard_cards": [],
         "current_energy": 0,
-        "cards_drawn": 9
+        "cards_drawn": 11
       }
     },
     {
@@ -2256,864 +2085,716 @@ export const mockCardBattleState: CardBattleState = {
   ]
 }
 
-export const mockBattleRewards: BattleRewards = {
-  gold: 150,
-  experience: 300,
-  items: [
-    { id: 'item_001', name: 'Health Potion', quantity: 2 },
-    { id: 'item_002', name: 'Energy Crystal', quantity: 1 }
-  ],
-  newLevel: false
-};
 
 // ---- Battle Response Data ----
-import { BattleLogEntry, DrawPhaseResult, BattlePhaseResult, BattleMoveResponse, BattleActionResult, CardBattleLog } from '../types';
+import { BattleLogEntry } from '../types';
 
 // Mock responses for battle actions - these are used by the API layer
-export const mockDrawPhaseResult: DrawPhaseResult = {
-    "success": true,
-    "code": 200,
-    "message": "Turn started successfully",
-    "data": [
-        {
-            "id": "1e5195ec-860c-4656-bb32-f0ec478bb861",
-            "phase": "start_turn",
-            "action_type": "start_turn",
-            "actor": {
-                "team": 1
-            },
-            "targets": [],
-            "drawn_cards": [],
-            "impacts": [],
-            "result": {
-                "success": true,
-                "reason": "Turn 1 started for player 1"
-            },
-            "before_state": {
-                "characters": [
-                    {
-                        "characterId": "885f2e07-085a-421c-be16-bfd3f041fa50",
-                        "health": 6079,
-                        "energy": 50,
-                        "activeEffects": [],
-                        "stats": {
-                            "atk": 2717,
-                            "def": 1536,
-                            "agi": 801,
-                            "crit_rate": 19,
-                            "crit_dmg": 330,
-                            "res": 25,
-                            "damage": 0,
-                            "mitigation": 12,
-                            "hit_rate": 102,
-                            "dodge": 17,
-                            "turnOrder": 1
-                        },
-                        "shields": {},
-                        "immunities": []
-                    },
-                    {
-                        "characterId": "624da9bb-5ac3-48b2-a557-51f233f925d3",
-                        "health": 5892,
-                        "energy": 50,
-                        "activeEffects": [],
-                        "stats": {
-                            "atk": 2627,
-                            "def": 1490,
-                            "agi": 772,
-                            "crit_rate": 18,
-                            "crit_dmg": 323,
-                            "res": 24,
-                            "damage": 0,
-                            "mitigation": 12,
-                            "hit_rate": 102,
-                            "dodge": 16,
-                            "turnOrder": 2
-                        },
-                        "shields": {},
-                        "immunities": []
-                    },
-                    {
-                        "characterId": "08fcbeff-2583-4c71-a894-d4254cc4d2e7",
-                        "health": 5895,
-                        "energy": 50,
-                        "activeEffects": [],
-                        "stats": {
-                            "atk": 2627,
-                            "def": 1486,
-                            "agi": 774,
-                            "crit_rate": 18,
-                            "crit_dmg": 323,
-                            "res": 24,
-                            "damage": 0,
-                            "mitigation": 12,
-                            "hit_rate": 102,
-                            "dodge": 16,
-                            "turnOrder": 3
-                        },
-                        "shields": {},
-                        "immunities": []
-                    },
-                    {
-                        "characterId": "26c32f59-619d-4c98-b56d-54836f2a0f9a",
-                        "health": 370,
-                        "energy": 50,
-                        "activeEffects": [],
-                        "stats": {
-                            "atk": 135,
-                            "def": 74,
-                            "agi": 44,
-                            "crit_rate": 6,
-                            "crit_dmg": 155,
-                            "res": 8,
-                            "damage": 0,
-                            "mitigation": 6,
-                            "hit_rate": 96,
-                            "dodge": 8,
-                            "turnOrder": 1
-                        },
-                        "shields": {},
-                        "immunities": []
-                    },
-                    {
-                        "characterId": "3a3c6da1-2a55-4bcf-ab6d-760892d507e3",
-                        "health": 370,
-                        "energy": 50,
-                        "activeEffects": [],
-                        "stats": {
-                            "atk": 135,
-                            "def": 71,
-                            "agi": 45,
-                            "crit_rate": 6,
-                            "crit_dmg": 155,
-                            "res": 8,
-                            "damage": 0,
-                            "mitigation": 6,
-                            "hit_rate": 96,
-                            "dodge": 8,
-                            "turnOrder": 2
-                        },
-                        "shields": {},
-                        "immunities": []
-                    },
-                    {
-                        "characterId": "217ebccf-b467-4ecc-9bb5-441165345d4a",
-                        "health": 371,
-                        "energy": 50,
-                        "activeEffects": [],
-                        "stats": {
-                            "atk": 131,
-                            "def": 73,
-                            "agi": 43,
-                            "crit_rate": 6,
-                            "crit_dmg": 155,
-                            "res": 8,
-                            "damage": 0,
-                            "mitigation": 6,
-                            "hit_rate": 96,
-                            "dodge": 8,
-                            "turnOrder": 3
-                        },
-                        "shields": {},
-                        "immunities": []
-                    }
-                ],
-                "turn": 1,
-                "phase": "start_turn",
-                "current_player": 1
-            },
-            "after_state": {
-                "characters": [
-                    {
-                        "characterId": "885f2e07-085a-421c-be16-bfd3f041fa50",
-                        "health": 6079,
-                        "energy": 50,
-                        "activeEffects": [],
-                        "stats": {
-                            "atk": 2717,
-                            "def": 1536,
-                            "agi": 801,
-                            "crit_rate": 19,
-                            "crit_dmg": 330,
-                            "res": 25,
-                            "damage": 0,
-                            "mitigation": 12,
-                            "hit_rate": 102,
-                            "dodge": 17,
-                            "turnOrder": 1
-                        },
-                        "shields": {},
-                        "immunities": []
-                    },
-                    {
-                        "characterId": "624da9bb-5ac3-48b2-a557-51f233f925d3",
-                        "health": 5892,
-                        "energy": 50,
-                        "activeEffects": [],
-                        "stats": {
-                            "atk": 2627,
-                            "def": 1490,
-                            "agi": 772,
-                            "crit_rate": 18,
-                            "crit_dmg": 323,
-                            "res": 24,
-                            "damage": 0,
-                            "mitigation": 12,
-                            "hit_rate": 102,
-                            "dodge": 16,
-                            "turnOrder": 2
-                        },
-                        "shields": {},
-                        "immunities": []
-                    },
-                    {
-                        "characterId": "08fcbeff-2583-4c71-a894-d4254cc4d2e7",
-                        "health": 5895,
-                        "energy": 50,
-                        "activeEffects": [],
-                        "stats": {
-                            "atk": 2627,
-                            "def": 1486,
-                            "agi": 774,
-                            "crit_rate": 18,
-                            "crit_dmg": 323,
-                            "res": 24,
-                            "damage": 0,
-                            "mitigation": 12,
-                            "hit_rate": 102,
-                            "dodge": 16,
-                            "turnOrder": 3
-                        },
-                        "shields": {},
-                        "immunities": []
-                    },
-                    {
-                        "characterId": "26c32f59-619d-4c98-b56d-54836f2a0f9a",
-                        "health": 370,
-                        "energy": 50,
-                        "activeEffects": [],
-                        "stats": {
-                            "atk": 135,
-                            "def": 74,
-                            "agi": 44,
-                            "crit_rate": 6,
-                            "crit_dmg": 155,
-                            "res": 8,
-                            "damage": 0,
-                            "mitigation": 6,
-                            "hit_rate": 96,
-                            "dodge": 8,
-                            "turnOrder": 1
-                        },
-                        "shields": {},
-                        "immunities": []
-                    },
-                    {
-                        "characterId": "3a3c6da1-2a55-4bcf-ab6d-760892d507e3",
-                        "health": 370,
-                        "energy": 50,
-                        "activeEffects": [],
-                        "stats": {
-                            "atk": 135,
-                            "def": 71,
-                            "agi": 45,
-                            "crit_rate": 6,
-                            "crit_dmg": 155,
-                            "res": 8,
-                            "damage": 0,
-                            "mitigation": 6,
-                            "hit_rate": 96,
-                            "dodge": 8,
-                            "turnOrder": 2
-                        },
-                        "shields": {},
-                        "immunities": []
-                    },
-                    {
-                        "characterId": "217ebccf-b467-4ecc-9bb5-441165345d4a",
-                        "health": 371,
-                        "energy": 50,
-                        "activeEffects": [],
-                        "stats": {
-                            "atk": 131,
-                            "def": 73,
-                            "agi": 43,
-                            "crit_rate": 6,
-                            "crit_dmg": 155,
-                            "res": 8,
-                            "damage": 0,
-                            "mitigation": 6,
-                            "hit_rate": 96,
-                            "dodge": 8,
-                            "turnOrder": 3
-                        },
-                        "shields": {},
-                        "immunities": []
-                    }
-                ],
-                "turn": 1,
-                "phase": "start_turn",
-                "current_player": 1
-            },
-            "animation_hint": "turn_start",
-            "created_at": "2025-09-23T03:42:37.527Z",
-            "updated_at": "2025-09-23T03:42:37.527Z"
-        },
-        {
-            "id": "3133d872-3b8b-4fa2-9373-a7aabcbe66ff",
-            "phase": "draw_phase",
-            "action_type": "draw_card",
-            "actor": {
-                "team": 1,
-                "player_id": "885f2e07-085a-421c-be16-bfd3f041fa50"
-            },
-            "card": {
-                "id": "9c88adc2-91a8-42e3-8663-b9a58eca0dbc",
-                "name": "Empowerment Heal",
-                "group": "Healing & Support",
-                "description": "Heals all allies for 150% of the caster's Attack and applies [Attack Buff] to them.",
-                "icon_url": "",
-                "card_type": "active",
-                "energy_cost": 2,
-                "rarity": "common",
-                "actions": [
-                    {
-                        "type": "heal",
-                        "amount_max": 150,
-                        "amount_min": 150,
-                        "effect_name": "Attack Buff",
-                        "target_type": "all_allies",
-                        "effect_chance": 100
-                    }
-                ]
-            },
-            "targets": [],
-            "drawn_cards": [
-                {
-                    "id": "9c88adc2-91a8-42e3-8663-b9a58eca0dbc",
-                    "name": "Empowerment Heal",
-                    "group": "Healing & Support",
-                    "description": "Heals all allies for 150% of the caster's Attack and applies [Attack Buff] to them.",
-                    "icon_url": "",
-                    "card_type": "active",
-                    "energy_cost": 2,
-                    "rarity": "common",
-                    "actions": [
-                        {
-                            "type": "heal",
-                            "amount_max": 150,
-                            "amount_min": 150,
-                            "effect_name": "Attack Buff",
-                            "target_type": "all_allies",
-                            "effect_chance": 100
-                        }
-                    ]
-                }
+export const mockActionResult = {
+  "success": true,
+  "code": 200,
+  "message": "Turn started successfully",
+  "data": [
+    {
+      "id": "b387b6f1-5deb-4084-a242-d3721d09e408",
+      "phase": "start_turn",
+      "action_type": "start_turn",
+      "actor": {
+        "team": 1
+      },
+      "targets": [],
+      "drawn_cards": [],
+      "impacts": [],
+      "result": {
+        "success": true,
+        "reason": "Turn 1 started for player 1"
+      },
+      "before_state": {
+        "characters": [
+          {
+            "characterId": "885f2e07-085a-421c-be16-bfd3f041fa50",
+            "team": 1,
+            "max_hp": 6079,
+            "current_hp": 6079,
+            "atk": 2717,
+            "def": 1536,
+            "agi": 801,
+            "crit_rate": 19,
+            "crit_dmg": 330,
+            "res": 25,
+            "damage": 0,
+            "mitigation": 12,
+            "hit_rate": 102,
+            "dodge": 17,
+            "has_acted": false,
+            "active_effects": [],
+            "equipped_skills": [
+              "bcce57f4-5b26-49ff-8950-bee1b0a9336d",
+              "a2520721-c08b-46a7-90d4-6f9cbc099418"
             ],
-            "impacts": [],
-            "result": {
-                "success": true,
-                "reason": "Drew 1 cards"
+            "shields": {},
+            "immunities": []
+          },
+          {
+            "characterId": "624da9bb-5ac3-48b2-a557-51f233f925d3",
+            "team": 1,
+            "max_hp": 5892,
+            "current_hp": 5892,
+            "atk": 2627,
+            "def": 1490,
+            "agi": 772,
+            "crit_rate": 18,
+            "crit_dmg": 323,
+            "res": 24,
+            "damage": 0,
+            "mitigation": 12,
+            "hit_rate": 102,
+            "dodge": 16,
+            "has_acted": false,
+            "active_effects": [],
+            "equipped_skills": [
+              "bcce57f4-5b26-49ff-8950-bee1b0a9336d",
+              "750fb360-fde6-4cc8-901b-fa786dcb3d44"
+            ],
+            "shields": {},
+            "immunities": []
+          },
+          {
+            "characterId": "08fcbeff-2583-4c71-a894-d4254cc4d2e7",
+            "team": 1,
+            "max_hp": 5895,
+            "current_hp": 5895,
+            "atk": 2627,
+            "def": 1486,
+            "agi": 774,
+            "crit_rate": 18,
+            "crit_dmg": 323,
+            "res": 24,
+            "damage": 0,
+            "mitigation": 12,
+            "hit_rate": 102,
+            "dodge": 16,
+            "has_acted": false,
+            "active_effects": [],
+            "equipped_skills": [
+              "bcce57f4-5b26-49ff-8950-bee1b0a9336d",
+              "986f94de-7be1-47cf-bea0-c5dcbe947705"
+            ],
+            "shields": {},
+            "immunities": []
+          },
+          {
+            "characterId": "26c32f59-619d-4c98-b56d-54836f2a0f9a",
+            "team": 2,
+            "max_hp": 370,
+            "current_hp": 370,
+            "atk": 135,
+            "def": 74,
+            "agi": 44,
+            "crit_rate": 6,
+            "crit_dmg": 155,
+            "res": 8,
+            "damage": 0,
+            "mitigation": 6,
+            "hit_rate": 96,
+            "dodge": 8,
+            "has_acted": false,
+            "active_effects": [],
+            "equipped_skills": [
+              "bcce57f4-5b26-49ff-8950-bee1b0a9336d",
+              "f3fd80b1-15d1-4c21-87ca-09e98938ec5b"
+            ],
+            "shields": {},
+            "immunities": []
+          },
+          {
+            "characterId": "3a3c6da1-2a55-4bcf-ab6d-760892d507e3",
+            "team": 2,
+            "max_hp": 370,
+            "current_hp": 370,
+            "atk": 135,
+            "def": 71,
+            "agi": 45,
+            "crit_rate": 6,
+            "crit_dmg": 155,
+            "res": 8,
+            "damage": 0,
+            "mitigation": 6,
+            "hit_rate": 96,
+            "dodge": 8,
+            "has_acted": false,
+            "active_effects": [],
+            "equipped_skills": [
+              "bcce57f4-5b26-49ff-8950-bee1b0a9336d",
+              "c0cf1536-3355-4250-92c6-c77acef7e5b2"
+            ],
+            "shields": {},
+            "immunities": []
+          },
+          {
+            "characterId": "217ebccf-b467-4ecc-9bb5-441165345d4a",
+            "team": 2,
+            "max_hp": 371,
+            "current_hp": 371,
+            "atk": 131,
+            "def": 73,
+            "agi": 43,
+            "crit_rate": 6,
+            "crit_dmg": 155,
+            "res": 8,
+            "damage": 0,
+            "mitigation": 6,
+            "hit_rate": 96,
+            "dodge": 8,
+            "has_acted": false,
+            "active_effects": [],
+            "equipped_skills": [
+              "bcce57f4-5b26-49ff-8950-bee1b0a9336d",
+              "62cf745c-ac43-4817-88fe-8a5cbe7d9196"
+            ],
+            "shields": {},
+            "immunities": []
+          }
+        ],
+        "turn": 1,
+        "phase": "start_turn",
+        "current_player": 1
+      },
+      "after_state": {
+        "characters": [
+          {
+            "characterId": "885f2e07-085a-421c-be16-bfd3f041fa50",
+            "team": 1,
+            "max_hp": 6079,
+            "current_hp": 6079,
+            "atk": 2717,
+            "def": 1536,
+            "agi": 801,
+            "crit_rate": 19,
+            "crit_dmg": 330,
+            "res": 25,
+            "damage": 0,
+            "mitigation": 12,
+            "hit_rate": 102,
+            "dodge": 17,
+            "has_acted": false,
+            "active_effects": [],
+            "equipped_skills": [
+              "bcce57f4-5b26-49ff-8950-bee1b0a9336d",
+              "a2520721-c08b-46a7-90d4-6f9cbc099418"
+            ],
+            "shields": {},
+            "immunities": []
+          },
+          {
+            "characterId": "624da9bb-5ac3-48b2-a557-51f233f925d3",
+            "team": 1,
+            "max_hp": 5892,
+            "current_hp": 5892,
+            "atk": 2627,
+            "def": 1490,
+            "agi": 772,
+            "crit_rate": 18,
+            "crit_dmg": 323,
+            "res": 24,
+            "damage": 0,
+            "mitigation": 12,
+            "hit_rate": 102,
+            "dodge": 16,
+            "has_acted": false,
+            "active_effects": [],
+            "equipped_skills": [
+              "bcce57f4-5b26-49ff-8950-bee1b0a9336d",
+              "750fb360-fde6-4cc8-901b-fa786dcb3d44"
+            ],
+            "shields": {},
+            "immunities": []
+          },
+          {
+            "characterId": "08fcbeff-2583-4c71-a894-d4254cc4d2e7",
+            "team": 1,
+            "max_hp": 5895,
+            "current_hp": 5895,
+            "atk": 2627,
+            "def": 1486,
+            "agi": 774,
+            "crit_rate": 18,
+            "crit_dmg": 323,
+            "res": 24,
+            "damage": 0,
+            "mitigation": 12,
+            "hit_rate": 102,
+            "dodge": 16,
+            "has_acted": false,
+            "active_effects": [],
+            "equipped_skills": [
+              "bcce57f4-5b26-49ff-8950-bee1b0a9336d",
+              "986f94de-7be1-47cf-bea0-c5dcbe947705"
+            ],
+            "shields": {},
+            "immunities": []
+          },
+          {
+            "characterId": "26c32f59-619d-4c98-b56d-54836f2a0f9a",
+            "team": 2,
+            "max_hp": 370,
+            "current_hp": 370,
+            "atk": 135,
+            "def": 74,
+            "agi": 44,
+            "crit_rate": 6,
+            "crit_dmg": 155,
+            "res": 8,
+            "damage": 0,
+            "mitigation": 6,
+            "hit_rate": 96,
+            "dodge": 8,
+            "has_acted": false,
+            "active_effects": [],
+            "equipped_skills": [
+              "bcce57f4-5b26-49ff-8950-bee1b0a9336d",
+              "f3fd80b1-15d1-4c21-87ca-09e98938ec5b"
+            ],
+            "shields": {},
+            "immunities": []
+          },
+          {
+            "characterId": "3a3c6da1-2a55-4bcf-ab6d-760892d507e3",
+            "team": 2,
+            "max_hp": 370,
+            "current_hp": 370,
+            "atk": 135,
+            "def": 71,
+            "agi": 45,
+            "crit_rate": 6,
+            "crit_dmg": 155,
+            "res": 8,
+            "damage": 0,
+            "mitigation": 6,
+            "hit_rate": 96,
+            "dodge": 8,
+            "has_acted": false,
+            "active_effects": [],
+            "equipped_skills": [
+              "bcce57f4-5b26-49ff-8950-bee1b0a9336d",
+              "c0cf1536-3355-4250-92c6-c77acef7e5b2"
+            ],
+            "shields": {},
+            "immunities": []
+          },
+          {
+            "characterId": "217ebccf-b467-4ecc-9bb5-441165345d4a",
+            "team": 2,
+            "max_hp": 371,
+            "current_hp": 371,
+            "atk": 131,
+            "def": 73,
+            "agi": 43,
+            "crit_rate": 6,
+            "crit_dmg": 155,
+            "res": 8,
+            "damage": 0,
+            "mitigation": 6,
+            "hit_rate": 96,
+            "dodge": 8,
+            "has_acted": false,
+            "active_effects": [],
+            "equipped_skills": [
+              "bcce57f4-5b26-49ff-8950-bee1b0a9336d",
+              "62cf745c-ac43-4817-88fe-8a5cbe7d9196"
+            ],
+            "shields": {},
+            "immunities": []
+          }
+        ],
+        "turn": 1,
+        "phase": "start_turn",
+        "current_player": 1
+      },
+      "animation_hint": "turn_start",
+      "created_at": "2025-09-23T06:22:00.808Z",
+      "updated_at": "2025-09-23T06:22:00.808Z"
+    },
+    {
+      "id": "e73024ad-bbd7-4794-9d4c-92ad2c12843f",
+      "phase": "draw_phase",
+      "action_type": "draw_card",
+      "actor": {
+        "team": 1,
+        "player_id": "885f2e07-085a-421c-be16-bfd3f041fa50"
+      },
+      "card": {
+        "id": "22c97746-c1de-4967-ad1f-9ddc0e250489",
+        "name": "Purifying Curse",
+        "group": "Control & Debuff",
+        "description": "Deals 150-200% damage to all enemies and applies [Curse] to them. The caster also cleanses all debuffs on themselves after casting this spell.",
+        "icon_url": "",
+        "card_type": "active",
+        "energy_cost": 3,
+        "rarity": "common",
+        "actions": [
+          {
+            "type": "damage",
+            "can_crit": true,
+            "amount_max": 200,
+            "amount_min": 150,
+            "effect_name": "Curse",
+            "target_type": "all_enemies",
+            "effect_chance": 100
+          },
+          {
+            "type": "buff",
+            "effect_name": "Cleanse",
+            "target_type": "self",
+            "effect_chance": 100
+          }
+        ]
+      },
+      "targets": [],
+      "drawn_cards": [
+        {
+          "id": "22c97746-c1de-4967-ad1f-9ddc0e250489",
+          "name": "Purifying Curse",
+          "group": "Control & Debuff",
+          "description": "Deals 150-200% damage to all enemies and applies [Curse] to them. The caster also cleanses all debuffs on themselves after casting this spell.",
+          "icon_url": "",
+          "card_type": "active",
+          "energy_cost": 3,
+          "rarity": "common",
+          "actions": [
+            {
+              "type": "damage",
+              "can_crit": true,
+              "amount_max": 200,
+              "amount_min": 150,
+              "effect_name": "Curse",
+              "target_type": "all_enemies",
+              "effect_chance": 100
             },
-            "before_state": {
-                "characters": [
-                    {
-                        "characterId": "885f2e07-085a-421c-be16-bfd3f041fa50",
-                        "health": 6079,
-                        "energy": 50,
-                        "activeEffects": [],
-                        "stats": {
-                            "atk": 2717,
-                            "def": 1536,
-                            "agi": 801,
-                            "crit_rate": 19,
-                            "crit_dmg": 330,
-                            "res": 25,
-                            "damage": 0,
-                            "mitigation": 12,
-                            "hit_rate": 102,
-                            "dodge": 17,
-                            "turnOrder": 1
-                        },
-                        "shields": {},
-                        "immunities": []
-                    },
-                    {
-                        "characterId": "624da9bb-5ac3-48b2-a557-51f233f925d3",
-                        "health": 5892,
-                        "energy": 50,
-                        "activeEffects": [],
-                        "stats": {
-                            "atk": 2627,
-                            "def": 1490,
-                            "agi": 772,
-                            "crit_rate": 18,
-                            "crit_dmg": 323,
-                            "res": 24,
-                            "damage": 0,
-                            "mitigation": 12,
-                            "hit_rate": 102,
-                            "dodge": 16,
-                            "turnOrder": 2
-                        },
-                        "shields": {},
-                        "immunities": []
-                    },
-                    {
-                        "characterId": "08fcbeff-2583-4c71-a894-d4254cc4d2e7",
-                        "health": 5895,
-                        "energy": 50,
-                        "activeEffects": [],
-                        "stats": {
-                            "atk": 2627,
-                            "def": 1486,
-                            "agi": 774,
-                            "crit_rate": 18,
-                            "crit_dmg": 323,
-                            "res": 24,
-                            "damage": 0,
-                            "mitigation": 12,
-                            "hit_rate": 102,
-                            "dodge": 16,
-                            "turnOrder": 3
-                        },
-                        "shields": {},
-                        "immunities": []
-                    },
-                    {
-                        "characterId": "26c32f59-619d-4c98-b56d-54836f2a0f9a",
-                        "health": 370,
-                        "energy": 50,
-                        "activeEffects": [],
-                        "stats": {
-                            "atk": 135,
-                            "def": 74,
-                            "agi": 44,
-                            "crit_rate": 6,
-                            "crit_dmg": 155,
-                            "res": 8,
-                            "damage": 0,
-                            "mitigation": 6,
-                            "hit_rate": 96,
-                            "dodge": 8,
-                            "turnOrder": 1
-                        },
-                        "shields": {},
-                        "immunities": []
-                    },
-                    {
-                        "characterId": "3a3c6da1-2a55-4bcf-ab6d-760892d507e3",
-                        "health": 370,
-                        "energy": 50,
-                        "activeEffects": [],
-                        "stats": {
-                            "atk": 135,
-                            "def": 71,
-                            "agi": 45,
-                            "crit_rate": 6,
-                            "crit_dmg": 155,
-                            "res": 8,
-                            "damage": 0,
-                            "mitigation": 6,
-                            "hit_rate": 96,
-                            "dodge": 8,
-                            "turnOrder": 2
-                        },
-                        "shields": {},
-                        "immunities": []
-                    },
-                    {
-                        "characterId": "217ebccf-b467-4ecc-9bb5-441165345d4a",
-                        "health": 371,
-                        "energy": 50,
-                        "activeEffects": [],
-                        "stats": {
-                            "atk": 131,
-                            "def": 73,
-                            "agi": 43,
-                            "crit_rate": 6,
-                            "crit_dmg": 155,
-                            "res": 8,
-                            "damage": 0,
-                            "mitigation": 6,
-                            "hit_rate": 96,
-                            "dodge": 8,
-                            "turnOrder": 3
-                        },
-                        "shields": {},
-                        "immunities": []
-                    }
-                ],
-                "turn": 1,
-                "phase": "start_turn",
-                "current_player": 1
-            },
-            "after_state": {
-                "characters": [
-                    {
-                        "characterId": "885f2e07-085a-421c-be16-bfd3f041fa50",
-                        "health": 6079,
-                        "energy": 50,
-                        "activeEffects": [],
-                        "stats": {
-                            "atk": 2717,
-                            "def": 1536,
-                            "agi": 801,
-                            "crit_rate": 19,
-                            "crit_dmg": 330,
-                            "res": 25,
-                            "damage": 0,
-                            "mitigation": 12,
-                            "hit_rate": 102,
-                            "dodge": 17,
-                            "turnOrder": 1
-                        },
-                        "shields": {},
-                        "immunities": []
-                    },
-                    {
-                        "characterId": "624da9bb-5ac3-48b2-a557-51f233f925d3",
-                        "health": 5892,
-                        "energy": 50,
-                        "activeEffects": [],
-                        "stats": {
-                            "atk": 2627,
-                            "def": 1490,
-                            "agi": 772,
-                            "crit_rate": 18,
-                            "crit_dmg": 323,
-                            "res": 24,
-                            "damage": 0,
-                            "mitigation": 12,
-                            "hit_rate": 102,
-                            "dodge": 16,
-                            "turnOrder": 2
-                        },
-                        "shields": {},
-                        "immunities": []
-                    },
-                    {
-                        "characterId": "08fcbeff-2583-4c71-a894-d4254cc4d2e7",
-                        "health": 5895,
-                        "energy": 50,
-                        "activeEffects": [],
-                        "stats": {
-                            "atk": 2627,
-                            "def": 1486,
-                            "agi": 774,
-                            "crit_rate": 18,
-                            "crit_dmg": 323,
-                            "res": 24,
-                            "damage": 0,
-                            "mitigation": 12,
-                            "hit_rate": 102,
-                            "dodge": 16,
-                            "turnOrder": 3
-                        },
-                        "shields": {},
-                        "immunities": []
-                    },
-                    {
-                        "characterId": "26c32f59-619d-4c98-b56d-54836f2a0f9a",
-                        "health": 370,
-                        "energy": 50,
-                        "activeEffects": [],
-                        "stats": {
-                            "atk": 135,
-                            "def": 74,
-                            "agi": 44,
-                            "crit_rate": 6,
-                            "crit_dmg": 155,
-                            "res": 8,
-                            "damage": 0,
-                            "mitigation": 6,
-                            "hit_rate": 96,
-                            "dodge": 8,
-                            "turnOrder": 1
-                        },
-                        "shields": {},
-                        "immunities": []
-                    },
-                    {
-                        "characterId": "3a3c6da1-2a55-4bcf-ab6d-760892d507e3",
-                        "health": 370,
-                        "energy": 50,
-                        "activeEffects": [],
-                        "stats": {
-                            "atk": 135,
-                            "def": 71,
-                            "agi": 45,
-                            "crit_rate": 6,
-                            "crit_dmg": 155,
-                            "res": 8,
-                            "damage": 0,
-                            "mitigation": 6,
-                            "hit_rate": 96,
-                            "dodge": 8,
-                            "turnOrder": 2
-                        },
-                        "shields": {},
-                        "immunities": []
-                    },
-                    {
-                        "characterId": "217ebccf-b467-4ecc-9bb5-441165345d4a",
-                        "health": 371,
-                        "energy": 50,
-                        "activeEffects": [],
-                        "stats": {
-                            "atk": 131,
-                            "def": 73,
-                            "agi": 43,
-                            "crit_rate": 6,
-                            "crit_dmg": 155,
-                            "res": 8,
-                            "damage": 0,
-                            "mitigation": 6,
-                            "hit_rate": 96,
-                            "dodge": 8,
-                            "turnOrder": 3
-                        },
-                        "shields": {},
-                        "immunities": []
-                    }
-                ],
-                "turn": 1,
-                "phase": "start_turn",
-                "current_player": 1
-            },
-            "animation_hint": "card_draw",
-            "created_at": "2025-09-23T03:42:37.659Z",
-            "updated_at": "2025-09-23T03:42:37.659Z"
+            {
+              "type": "buff",
+              "effect_name": "Cleanse",
+              "target_type": "self",
+              "effect_chance": 100
+            }
+          ]
         }
-    ],
-    "errors": null
-};
-
-export const mockBattleActionResult: BattleActionResult = {
-  success: true,
-  damage_dealt: 25,
-  actions_performed: [{
-    type: 'play_card',
-    player_team: 1,
-    card_id: 'fire_bolt_001',
-    target_ids: ['enemy_char_1'],
-    description: 'Fire Bolt dealt 25 damage to enemy'
-  }],
-  battle_logs: [{
-    type: 'play_card',
-    player_team: 1,
-    card_id: 'fire_bolt_001',
-    target_ids: ['enemy_char_1'],
-    description: 'Player cast Fire Bolt, dealing 25 fire damage to enemy',
-    timestamp: new Date().toISOString()
-  }, {
-    type: 'damage',
-    player_team: 1,
-    target_ids: ['enemy_char_1'],
-    description: 'Enemy takes 25 fire damage',
-    timestamp: new Date().toISOString()
-  }]
-};
-
-export const mockPlayCardResponse: BattleMoveResponse = {
-  success: true,
-  code: 200,
-  message: "Card played successfully",
-  data: [{
-    id: `log_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-    phase: 'main_phase' as const,
-    action_type: 'play_card',
-    actor: {
-      team: 1,
-      character_id: 'player_char_1',
-      player_id: 'player_fc_001'
-    },
-    card: {
-      id: 'fire_bolt_001',
-      name: 'Fire Bolt',
-      group: 'spell',
-      description: 'A basic fire spell',
-      card_type: 'action',
-      energy_cost: 2
-    },
-    targets: [{
-      id: 'enemy_char_1',
-      team: 2,
-      before: {
-        id: 'enemy_char_1',
-        team: 2,
-        max_hp: 100,
-        current_hp: 75,
-        atk: 50,
-        def: 30,
-        agi: 20,
-        crit_rate: 5,
-        crit_dmg: 150,
-        res: 10,
-        damage: 0,
-        mitigation: 0,
-        hit_rate: 95,
-        dodge: 5,
-        has_acted: false,
-        active_effects: [],
-        equipped_skills: []
+      ],
+      "impacts": [],
+      "result": {
+        "success": true,
+        "reason": "Drew 1 cards"
       },
-      after: {
-        id: 'enemy_char_1',
-        team: 2,
-        max_hp: 100,
-        current_hp: 50,
-        atk: 50,
-        def: 30,
-        agi: 20,
-        crit_rate: 5,
-        crit_dmg: 150,
-        res: 10,
-        damage: 0,
-        mitigation: 0,
-        hit_rate: 95,
-        dodge: 5,
-        has_acted: false,
-        active_effects: [],
-        equipped_skills: []
+      "before_state": {
+        "characters": [
+          {
+            "characterId": "885f2e07-085a-421c-be16-bfd3f041fa50",
+            "team": 1,
+            "max_hp": 6079,
+            "current_hp": 6079,
+            "atk": 2717,
+            "def": 1536,
+            "agi": 801,
+            "crit_rate": 19,
+            "crit_dmg": 330,
+            "res": 25,
+            "damage": 0,
+            "mitigation": 12,
+            "hit_rate": 102,
+            "dodge": 17,
+            "has_acted": false,
+            "active_effects": [],
+            "equipped_skills": [
+              "bcce57f4-5b26-49ff-8950-bee1b0a9336d",
+              "a2520721-c08b-46a7-90d4-6f9cbc099418"
+            ],
+            "shields": {},
+            "immunities": []
+          },
+          {
+            "characterId": "624da9bb-5ac3-48b2-a557-51f233f925d3",
+            "team": 1,
+            "max_hp": 5892,
+            "current_hp": 5892,
+            "atk": 2627,
+            "def": 1490,
+            "agi": 772,
+            "crit_rate": 18,
+            "crit_dmg": 323,
+            "res": 24,
+            "damage": 0,
+            "mitigation": 12,
+            "hit_rate": 102,
+            "dodge": 16,
+            "has_acted": false,
+            "active_effects": [],
+            "equipped_skills": [
+              "bcce57f4-5b26-49ff-8950-bee1b0a9336d",
+              "750fb360-fde6-4cc8-901b-fa786dcb3d44"
+            ],
+            "shields": {},
+            "immunities": []
+          },
+          {
+            "characterId": "08fcbeff-2583-4c71-a894-d4254cc4d2e7",
+            "team": 1,
+            "max_hp": 5895,
+            "current_hp": 5895,
+            "atk": 2627,
+            "def": 1486,
+            "agi": 774,
+            "crit_rate": 18,
+            "crit_dmg": 323,
+            "res": 24,
+            "damage": 0,
+            "mitigation": 12,
+            "hit_rate": 102,
+            "dodge": 16,
+            "has_acted": false,
+            "active_effects": [],
+            "equipped_skills": [
+              "bcce57f4-5b26-49ff-8950-bee1b0a9336d",
+              "986f94de-7be1-47cf-bea0-c5dcbe947705"
+            ],
+            "shields": {},
+            "immunities": []
+          },
+          {
+            "characterId": "26c32f59-619d-4c98-b56d-54836f2a0f9a",
+            "team": 2,
+            "max_hp": 370,
+            "current_hp": 370,
+            "atk": 135,
+            "def": 74,
+            "agi": 44,
+            "crit_rate": 6,
+            "crit_dmg": 155,
+            "res": 8,
+            "damage": 0,
+            "mitigation": 6,
+            "hit_rate": 96,
+            "dodge": 8,
+            "has_acted": false,
+            "active_effects": [],
+            "equipped_skills": [
+              "bcce57f4-5b26-49ff-8950-bee1b0a9336d",
+              "f3fd80b1-15d1-4c21-87ca-09e98938ec5b"
+            ],
+            "shields": {},
+            "immunities": []
+          },
+          {
+            "characterId": "3a3c6da1-2a55-4bcf-ab6d-760892d507e3",
+            "team": 2,
+            "max_hp": 370,
+            "current_hp": 370,
+            "atk": 135,
+            "def": 71,
+            "agi": 45,
+            "crit_rate": 6,
+            "crit_dmg": 155,
+            "res": 8,
+            "damage": 0,
+            "mitigation": 6,
+            "hit_rate": 96,
+            "dodge": 8,
+            "has_acted": false,
+            "active_effects": [],
+            "equipped_skills": [
+              "bcce57f4-5b26-49ff-8950-bee1b0a9336d",
+              "c0cf1536-3355-4250-92c6-c77acef7e5b2"
+            ],
+            "shields": {},
+            "immunities": []
+          },
+          {
+            "characterId": "217ebccf-b467-4ecc-9bb5-441165345d4a",
+            "team": 2,
+            "max_hp": 371,
+            "current_hp": 371,
+            "atk": 131,
+            "def": 73,
+            "agi": 43,
+            "crit_rate": 6,
+            "crit_dmg": 155,
+            "res": 8,
+            "damage": 0,
+            "mitigation": 6,
+            "hit_rate": 96,
+            "dodge": 8,
+            "has_acted": false,
+            "active_effects": [],
+            "equipped_skills": [
+              "bcce57f4-5b26-49ff-8950-bee1b0a9336d",
+              "62cf745c-ac43-4817-88fe-8a5cbe7d9196"
+            ],
+            "shields": {},
+            "immunities": []
+          }
+        ],
+        "turn": 1,
+        "phase": "start_turn",
+        "current_player": 1
       },
-      impacts: [{
-        type: 'damage',
-        value: 25,
-        meta: { isCritical: false }
-      }]
-    }],
-    result: {
-      success: true,
-      reason: undefined
-    },
-    created_at: new Date().toISOString(),
-    animation_hint: 'Fire Bolt hits enemy for 25 damage'
-  }],
-  errors: null,
-  meta: {
-    cardPlayed: 'fire_bolt_001',
-    damageDealt: 25,
-    timestamp: new Date().toISOString()
-  }
-};
-
-export const mockEndTurnResult: BattlePhaseResult = {
-  success: true,
-  code: 200,
-  message: "Turn ended successfully",
-  data: [
-    {
-      id: `log_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      phase: 'end_turn' as const,
-      action_type: 'end_turn',
-      actor: {
-        team: 1,
-        character_id: 'player_char_1',
-        player_id: 'player_fc_001'
+      "after_state": {
+        "characters": [
+          {
+            "characterId": "885f2e07-085a-421c-be16-bfd3f041fa50",
+            "team": 1,
+            "max_hp": 6079,
+            "current_hp": 6079,
+            "atk": 2717,
+            "def": 1536,
+            "agi": 801,
+            "crit_rate": 19,
+            "crit_dmg": 330,
+            "res": 25,
+            "damage": 0,
+            "mitigation": 12,
+            "hit_rate": 102,
+            "dodge": 17,
+            "has_acted": false,
+            "active_effects": [],
+            "equipped_skills": [
+              "bcce57f4-5b26-49ff-8950-bee1b0a9336d",
+              "a2520721-c08b-46a7-90d4-6f9cbc099418"
+            ],
+            "shields": {},
+            "immunities": []
+          },
+          {
+            "characterId": "624da9bb-5ac3-48b2-a557-51f233f925d3",
+            "team": 1,
+            "max_hp": 5892,
+            "current_hp": 5892,
+            "atk": 2627,
+            "def": 1490,
+            "agi": 772,
+            "crit_rate": 18,
+            "crit_dmg": 323,
+            "res": 24,
+            "damage": 0,
+            "mitigation": 12,
+            "hit_rate": 102,
+            "dodge": 16,
+            "has_acted": false,
+            "active_effects": [],
+            "equipped_skills": [
+              "bcce57f4-5b26-49ff-8950-bee1b0a9336d",
+              "750fb360-fde6-4cc8-901b-fa786dcb3d44"
+            ],
+            "shields": {},
+            "immunities": []
+          },
+          {
+            "characterId": "08fcbeff-2583-4c71-a894-d4254cc4d2e7",
+            "team": 1,
+            "max_hp": 5895,
+            "current_hp": 5895,
+            "atk": 2627,
+            "def": 1486,
+            "agi": 774,
+            "crit_rate": 18,
+            "crit_dmg": 323,
+            "res": 24,
+            "damage": 0,
+            "mitigation": 12,
+            "hit_rate": 102,
+            "dodge": 16,
+            "has_acted": false,
+            "active_effects": [],
+            "equipped_skills": [
+              "bcce57f4-5b26-49ff-8950-bee1b0a9336d",
+              "986f94de-7be1-47cf-bea0-c5dcbe947705"
+            ],
+            "shields": {},
+            "immunities": []
+          },
+          {
+            "characterId": "26c32f59-619d-4c98-b56d-54836f2a0f9a",
+            "team": 2,
+            "max_hp": 370,
+            "current_hp": 370,
+            "atk": 135,
+            "def": 74,
+            "agi": 44,
+            "crit_rate": 6,
+            "crit_dmg": 155,
+            "res": 8,
+            "damage": 0,
+            "mitigation": 6,
+            "hit_rate": 96,
+            "dodge": 8,
+            "has_acted": false,
+            "active_effects": [],
+            "equipped_skills": [
+              "bcce57f4-5b26-49ff-8950-bee1b0a9336d",
+              "f3fd80b1-15d1-4c21-87ca-09e98938ec5b"
+            ],
+            "shields": {},
+            "immunities": []
+          },
+          {
+            "characterId": "3a3c6da1-2a55-4bcf-ab6d-760892d507e3",
+            "team": 2,
+            "max_hp": 370,
+            "current_hp": 370,
+            "atk": 135,
+            "def": 71,
+            "agi": 45,
+            "crit_rate": 6,
+            "crit_dmg": 155,
+            "res": 8,
+            "damage": 0,
+            "mitigation": 6,
+            "hit_rate": 96,
+            "dodge": 8,
+            "has_acted": false,
+            "active_effects": [],
+            "equipped_skills": [
+              "bcce57f4-5b26-49ff-8950-bee1b0a9336d",
+              "c0cf1536-3355-4250-92c6-c77acef7e5b2"
+            ],
+            "shields": {},
+            "immunities": []
+          },
+          {
+            "characterId": "217ebccf-b467-4ecc-9bb5-441165345d4a",
+            "team": 2,
+            "max_hp": 371,
+            "current_hp": 371,
+            "atk": 131,
+            "def": 73,
+            "agi": 43,
+            "crit_rate": 6,
+            "crit_dmg": 155,
+            "res": 8,
+            "damage": 0,
+            "mitigation": 6,
+            "hit_rate": 96,
+            "dodge": 8,
+            "has_acted": false,
+            "active_effects": [],
+            "equipped_skills": [
+              "bcce57f4-5b26-49ff-8950-bee1b0a9336d",
+              "62cf745c-ac43-4817-88fe-8a5cbe7d9196"
+            ],
+            "shields": {},
+            "immunities": []
+          }
+        ],
+        "turn": 1,
+        "phase": "start_turn",
+        "current_player": 1
       },
-      result: {
-        success: true,
-        reason: undefined
-      },
-      created_at: new Date().toISOString(),
-      animation_hint: 'Player ends their turn, AI turn begins'
-    },
-    {
-      id: `log_${Date.now() + 1}_${Math.random().toString(36).substr(2, 9)}`,
-      phase: 'ai_turn' as const,
-      action_type: 'draw_card',
-      actor: {
-        team: 2,
-        character_id: 'ai_char_001',
-        player_id: 'ai_player'
-      },
-      result: {
-        success: true,
-        reason: undefined
-      },
-      created_at: new Date().toISOString(),
-      animation_hint: 'AI draws cards and gains energy for their turn'
-    },
-    {
-      id: `log_${Date.now() + 2}_${Math.random().toString(36).substr(2, 9)}`,
-      phase: 'ai_turn' as const,
-      action_type: 'play_card',
-      actor: {
-        team: 2,
-        character_id: 'ai_char_001',
-        player_id: 'ai_player'
-      },
-      card: {
-        id: 'shadow_strike',
-        name: 'Shadow Strike',
-        group: 'Dark Magic',
-        description: 'Deal shadow damage to target',
-        card_type: 'attack',
-        energy_cost: 2
-      },
-      targets: [{
-        id: 'player_char_1',
-        team: 1,
-        before: {
-          id: 'player_char_1',
-          team: 1,
-          max_hp: 100,
-          current_hp: 75,
-          atk: 50,
-          def: 30,
-          agi: 20,
-          crit_rate: 5,
-          crit_dmg: 150,
-          res: 10,
-          damage: 0,
-          mitigation: 0,
-          hit_rate: 95,
-          dodge: 5,
-          has_acted: false,
-          active_effects: [],
-          equipped_skills: []
-        },
-        after: {
-          id: 'player_char_1',
-          team: 1,
-          max_hp: 100,
-          current_hp: 55,
-          atk: 50,
-          def: 30,
-          agi: 20,
-          crit_rate: 5,
-          crit_dmg: 150,
-          res: 10,
-          damage: 0,
-          mitigation: 0,
-          hit_rate: 95,
-          dodge: 5,
-          has_acted: false,
-          active_effects: [],
-          equipped_skills: []
-        },
-        impacts: [{
-          type: 'damage',
-          value: 20,
-          meta: { isCritical: false }
-        }]
-      }],
-      result: {
-        success: true,
-        reason: undefined
-      },
-      created_at: new Date().toISOString(),
-      animation_hint: 'AI plays Shadow Strike targeting player character'
+      "animation_hint": "card_draw",
+      "created_at": "2025-09-23T06:22:00.821Z",
+      "updated_at": "2025-09-23T06:22:00.821Z"
     }
-  ] as CardBattleLog[],
-  errors: null,
-  meta: {
-    phase: 'ai_turn',
-    aiActionsCount: 2,
-    timestamp: new Date().toISOString()
-  }
+  ],
+  "errors": null
 };
+
 
 // ---- Battle Log Data ----
 export const mockBattleLogs: BattleLogEntry[] = [
