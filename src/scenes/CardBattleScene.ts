@@ -21,7 +21,6 @@ import {
   BattleActionResult,
   AIAction,
   CardBattleCharacter,
-  BattleLogEntry,
   CardBattleLog,
   CardBattleApiResponse
 } from '@/types';
@@ -62,11 +61,6 @@ export class CardBattleScene extends BaseScene {
 
   private async animateActionResult(result: BattleActionResult): Promise<void> {
     console.log('🎨 Animating action result:', result);
-    
-    // Process battle_logs first if available
-    if (result.battle_logs && result.battle_logs.length > 0) {
-      await this.processBattleLogs(result.battle_logs);
-    }
     
     // Animate damage if any
     if (result.damage_dealt && result.damage_dealt > 0) {
@@ -147,18 +141,7 @@ export class CardBattleScene extends BaseScene {
     };
   }
 
-  /**
-   * Helper method to process API response that could be legacy or new format
-   */
-  private async processApiResponse(response: BattleMoveResponse): Promise<void> {
-    // Check if it's the new format
-    if ((response as any).data && Array.isArray((response as any).data)) {
-      await this.processCardBattleApiResponse(response as CardBattleApiResponse<CardBattleLog[]>);
-    } else if ((response as any).battle_logs) {
-      // Legacy format
-      await this.processBattleLogs((response as any).battle_logs);
-    }
-  }
+
 
   /**
    * Centralized method to process CardBattleLogs for animations
@@ -174,19 +157,7 @@ export class CardBattleScene extends BaseScene {
     }
   }
 
-  /**
-   * Legacy method for backward compatibility - converts CardBattleLog to BattleLogEntry format
-   */
-  private async processBattleLogs(battleLogs: BattleLogEntry[]): Promise<void> {
-    console.log('🎬 Processing legacy battle logs for animation:', battleLogs);
-    
-    for (const log of battleLogs) {
-      await this.animateBattleLogEntry(log);
-      
-      // Small delay between log animations for better visual flow
-      await new Promise(resolve => setTimeout(resolve, 300));
-    }
-  }
+
 
   /**
    * Animate a single CardBattleLog entry
@@ -225,76 +196,9 @@ export class CardBattleScene extends BaseScene {
     }
   }
 
-  /**
-   * Legacy: Animate a single battle log entry
-   */
-  private async animateBattleLogEntry(logEntry: BattleLogEntry): Promise<void> {
-    console.log(`🎭 Animating log entry: ${logEntry.type} - ${logEntry.description}`);
-    
-    switch (logEntry.type) {
-      case 'draw_phase':
-        await this.animateDrawPhase(logEntry);
-        break;
-      case 'play_card':
-        await this.animatePlayCard(logEntry);
-        break;
-      case 'discard_card':
-        await this.animateDiscardCard(logEntry);
-        break;
-      case 'damage':
-        await this.animateDamageLog(logEntry);
-        break;
-      case 'heal':
-        await this.animateHealLog(logEntry);
-        break;
-      case 'status_effect':
-        await this.animateStatusEffectLog(logEntry);
-        break;
-      case 'end_turn':
-        await this.animateEndTurn(logEntry);
-        break;
-      default:
-        console.log(`⚠️ Unknown log entry type: ${logEntry.type}`);
-        // Show generic message for unknown types
-        await this.showTurnMessage(logEntry.description || 'Unknown action');
-    }
-  }
 
-  /**
-   * Animation methods for specific log entry types
-   */
-  private async animateDrawPhase(logEntry: BattleLogEntry): Promise<void> {
-    await this.showTurnMessage(`Player ${logEntry.player_team}: ${logEntry.description}`);
-  }
 
-  private async animatePlayCard(logEntry: BattleLogEntry): Promise<void> {
-    const playerText = logEntry.player_team === 1 ? 'Player' : 'AI';
-    await this.showTurnMessage(`${playerText}: ${logEntry.description}`);
-  }
 
-  private async animateDiscardCard(logEntry: BattleLogEntry): Promise<void> {
-    const playerText = logEntry.player_team === 1 ? 'Player' : 'AI';
-    await this.showTurnMessage(`${playerText}: ${logEntry.description}`);
-  }
-
-  private async animateDamageLog(logEntry: BattleLogEntry): Promise<void> {
-    await this.showTurnMessage(`💥 ${logEntry.description}`);
-    // Here you could add more visual effects like screen shake, damage numbers, etc.
-  }
-
-  private async animateHealLog(logEntry: BattleLogEntry): Promise<void> {
-    await this.showTurnMessage(`💚 ${logEntry.description}`);
-    // Here you could add healing visual effects
-  }
-
-  private async animateStatusEffectLog(logEntry: BattleLogEntry): Promise<void> {
-    await this.showTurnMessage(`✨ ${logEntry.description}`);
-    // Here you could add status effect particles or icons
-  }
-
-  private async animateEndTurn(logEntry: BattleLogEntry): Promise<void> {
-    await this.showTurnMessage(`⏭️ ${logEntry.description}`);
-  }
 
   /**
    * Animation methods for CardBattleLog entries
@@ -339,11 +243,6 @@ export class CardBattleScene extends BaseScene {
     console.log('🤖 Animating AI actions:', aiActions);
     
     for (const action of aiActions) {
-      // Process battle_logs first if available
-      if (action.battle_logs && action.battle_logs.length > 0) {
-        await this.processBattleLogs(action.battle_logs);
-      }
-      
       await this.showTurnMessage(`AI: ${action.type.replace('_', ' ')}`);
       
       switch (action.type) {
@@ -606,7 +505,7 @@ export class CardBattleScene extends BaseScene {
     console.log('📥 Processing turn start result:', turnStartResult);
     
     // Process new API response format
-    await this.processApiResponse(turnStartResult);
+    await this.processCardBattleApiResponse(turnStartResult);
     
     // Show "Your Turn" message
     await this.showTurnMessage('Your Turn!');
@@ -1434,7 +1333,7 @@ export class CardBattleScene extends BaseScene {
     }
 
     // Process new API response format
-    await this.processApiResponse(moveResponse);
+    await this.processCardBattleApiResponse(moveResponse);
     
     // Refresh battle state from server (or skip if using mock data)
     await this.refreshBattleState();
@@ -1477,7 +1376,7 @@ export class CardBattleScene extends BaseScene {
     }
 
     // Process new API response format
-    await this.processApiResponse(moveResponse);
+    await this.processCardBattleApiResponse(moveResponse);
     
     // Refresh battle state from server (or skip if using mock data)
     await this.refreshBattleState();
