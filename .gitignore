@@ -6,6 +6,9 @@ node_modules/
 dist/
 build/
 
+# Compiled JavaScript files (TypeScript project)
+src/**/*.js
+
 # Development
 .vite/
 .env

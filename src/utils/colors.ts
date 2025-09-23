@@ -45,10 +45,19 @@ export const Colors = {
 
   // Card borders - Orange theme
   CARD_BORDER: '#6b2e17',            // Dark orange
+  CARD_BACKGROUND: '#d2691e',        // Card background
+  CARD_BACK: '#8b4513',             // Card back color
 
   // Panel and container backgrounds - Orange theme
   PANEL_BACKGROUND: '#8b4513',       // Saddle brown
   CONTAINER_BACKGROUND: '#a0522d',    // Sienna
+
+  // UI elements
+  ENERGY_ACTIVE: '#ffa500',          // Active energy color
+  ENERGY_INACTIVE: '#808080',        // Inactive energy color
+  HP_BAR_BACKGROUND: '#666666',      // HP bar background
+  HP_BAR_FILL: '#ff4500',           // HP bar fill
+  TEXT_ON_DARK: '#ffffff',          // Text on dark backgrounds
 
   // Decorative elements - Orange theme
   DECORATION_MAGIC: '#ff8c00',       // Dark orange for magical elements
