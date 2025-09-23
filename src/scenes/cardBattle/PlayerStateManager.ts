@@ -8,7 +8,9 @@ import {
  * Manages player state data for the CardBattleScene
  */
 export class CardBattlePlayerStateManager {
-  // Fixed variables for each player's game state
+  private battleState: CardBattleState | null = null;
+
+  // References to CardBattleScene's state arrays (passed from CardBattleScene)
   private player1Characters: CardBattleCharacter[] = [];
   private player1HandCards: CardInDeck[] = [];
   private player1DeckCards: CardInDeck[] = [];
@@ -19,61 +21,34 @@ export class CardBattlePlayerStateManager {
   private player2DeckCards: CardInDeck[] = [];
   private player2DiscardedCards: CardInDeck[] = [];
 
-  private battleState: CardBattleState | null = null;
-
   /**
    * Initialize state from battle data
    */
   setBattleState(battleState: CardBattleState): void {
     this.battleState = battleState;
-    this.updateFixedVariables();
   }
 
   /**
-   * Update fixed variables from the current battle state
+   * Update player state arrays (called from CardBattleScene)
    */
-  private updateFixedVariables(): void {
-    if (!this.battleState) return;
-
-    // Clear existing state
-    this.player1Characters = [];
-    this.player1HandCards = [];
-    this.player1DeckCards = [];
-    this.player1DiscardedCards = [];
-    this.player2Characters = [];
-    this.player2HandCards = [];
-    this.player2DeckCards = [];
-    this.player2DiscardedCards = [];
-
-    // Update from battle state players
-    this.battleState.players.forEach(player => {
-      if (player.team === 1) {
-        this.player1Characters = [...player.characters];
-        this.player1HandCards = [...player.deck.hand_cards];
-        this.player1DeckCards = [...player.deck.deck_cards];
-        this.player1DiscardedCards = [...player.deck.discard_cards];
-      } else if (player.team === 2) {
-        this.player2Characters = [...player.characters];
-        this.player2HandCards = [...player.deck.hand_cards];
-        this.player2DeckCards = [...player.deck.deck_cards];
-        this.player2DiscardedCards = [...player.deck.discard_cards];
-      }
-    });
-
-    console.log('🔄 Fixed variables updated:', {
-      player1: {
-        characters: this.player1Characters.length,
-        hand: this.player1HandCards.length,
-        deck: this.player1DeckCards.length,
-        discard: this.player1DiscardedCards.length
-      },
-      player2: {
-        characters: this.player2Characters.length,
-        hand: this.player2HandCards.length,
-        deck: this.player2DeckCards.length,
-        discard: this.player2DiscardedCards.length
-      }
-    });
+  updatePlayerState(
+    player1Characters: CardBattleCharacter[],
+    player1HandCards: CardInDeck[],
+    player1DeckCards: CardInDeck[],
+    player1DiscardedCards: CardInDeck[],
+    player2Characters: CardBattleCharacter[],
+    player2HandCards: CardInDeck[],
+    player2DeckCards: CardInDeck[],
+    player2DiscardedCards: CardInDeck[]
+  ): void {
+    this.player1Characters = player1Characters;
+    this.player1HandCards = player1HandCards;
+    this.player1DeckCards = player1DeckCards;
+    this.player1DiscardedCards = player1DiscardedCards;
+    this.player2Characters = player2Characters;
+    this.player2HandCards = player2HandCards;
+    this.player2DeckCards = player2DeckCards;
+    this.player2DiscardedCards = player2DiscardedCards;
   }
 
   /**
