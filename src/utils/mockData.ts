@@ -1584,15 +1584,7 @@ export const mockDrawCardResult = {
                 "team": 1,
                 "player_id": "885f2e07-085a-421c-be16-bfd3f041fa50"
             },
-            "card": {
-                "id": "cc448bf3-7a88-4526-a5d2-e70c7a0d654f",
-                "name": "Cleanse Wave",
-                "group": "Healing & Support",
-                "description": "Cleanses one debuff from the two allies with the highest Attack, then heals all allies for 110% of the caster's Attack.",
-                "icon_url": "",
-                "card_type": "active",
-                "energy_cost": 3
-            },
+            "card": null,
             "targets": [],
             "drawn_cards": mockCards.slice(0, 5),
             "impacts": [],
