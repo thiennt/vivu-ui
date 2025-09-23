@@ -135,7 +135,7 @@ export class CardBattleScene extends BaseScene {
   private createGameLayout(): void {
     this.gameContainer = new Container();
     
-    // Create main containers
+    // Create main containers (effectsContainer already created in initializeManagers)
     this.player1Container = new Container();
     this.player2Container = new Container();
     this.player1HandContainer = new Container();
@@ -143,7 +143,6 @@ export class CardBattleScene extends BaseScene {
     this.player1EnergyContainer = new Container();
     this.player2EnergyContainer = new Container();
     this.battleLogContainer = new Container();
-    this.effectsContainer = new Container();
 
     // Layout calculations - fit all elements with proper spacing
     const availableHeight = this.getContentHeight();
