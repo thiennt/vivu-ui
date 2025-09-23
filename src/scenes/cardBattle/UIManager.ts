@@ -164,7 +164,7 @@ export class CardBattleUIManager {
 
     // Character name
     const nameText = new Text({
-      text: character.character_name || character.name || 'Unknown',
+      text: character.name || 'Unknown',
       style: {
         fontFamily: 'Kalam',
         fontSize: Math.max(10, width * 0.1),
@@ -268,7 +268,7 @@ export class CardBattleUIManager {
 
     // Card name
     const nameText = new Text({
-      text: card.card.name,
+      text: card.card?.name || 'Unknown Card',
       style: {
         fontFamily: 'Kalam',
         fontSize: Math.max(8, width * 0.12),
@@ -289,7 +289,7 @@ export class CardBattleUIManager {
       .stroke({ width: 1, color: Colors.CARD_BORDER });
 
     const energyText = new Text({
-      text: card.card.energy_cost.toString(),
+      text: card.card?.energy_cost?.toString() || '0',
       style: {
         fontFamily: 'Kalam',
         fontSize: Math.max(8, width * 0.1),
@@ -306,7 +306,7 @@ export class CardBattleUIManager {
 
     // Card type/group
     const groupText = new Text({
-      text: card.card.group,
+      text: card.card?.group || 'Unknown',
       style: {
         fontFamily: 'Kalam',
         fontSize: Math.max(6, width * 0.08),

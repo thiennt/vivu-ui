@@ -57,8 +57,8 @@ export class CardBattleCardOperationsManager {
       return;
     }
 
-    if (!this.playerStateManager.canPlayCard(currentPlayer, card)) {
-      console.log('🚫 Not enough energy to play card');
+    if (!card.card || !this.playerStateManager.canPlayCard(currentPlayer, card)) {
+      console.log('🚫 Not enough energy to play card or invalid card');
       return;
     }
 
@@ -68,7 +68,7 @@ export class CardBattleCardOperationsManager {
       const action: TurnAction = {
         type: 'play_card',
         player_team: currentPlayer,
-        card_id: card.card_id,
+        card_id: card.card_id || '',
         target_ids: [this.getTargetCharacterId(targetPlayerId, characterIndex)]
       };
 
@@ -76,7 +76,7 @@ export class CardBattleCardOperationsManager {
       await this.processCardBattleApiResponse(response);
 
       // Remove card from hand locally
-      this.playerStateManager.removeCardFromHand(currentPlayer, card.card_id);
+      this.playerStateManager.removeCardFromHand(currentPlayer, card.card_id || '');
       
       // Deduct energy locally
       const currentEnergy = this.playerStateManager.getPlayerEnergy(currentPlayer);
@@ -99,20 +99,20 @@ export class CardBattleCardOperationsManager {
       return;
     }
 
-    console.log(`🗑️ Discarding card: ${card.card.name}`);
+    console.log(`🗑️ Discarding card: ${card.card?.name || 'Unknown card'}`);
 
     try {
       const action: TurnAction = {
         type: 'discard_card',
         player_team: currentPlayer,
-        card_id: card.card_id
+        card_id: card.card_id || ''
       };
 
       const response = await battleApi.playAction(this.battleId, action);
       await this.processCardBattleApiResponse(response);
 
       // Move card from hand to discard locally
-      this.playerStateManager.removeCardFromHand(currentPlayer, card.card_id);
+      this.playerStateManager.removeCardFromHand(currentPlayer, card.card_id || '');
       this.playerStateManager.addCardToDiscard(currentPlayer, card);
 
     } catch (error) {

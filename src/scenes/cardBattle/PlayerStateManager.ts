@@ -196,17 +196,16 @@ export class CardBattlePlayerStateManager {
     if (!this.battleState) return 0;
     
     const player = this.battleState.players.find(p => p.team === playerTeam);
-    return player?.current_energy || 0;
+    // Use deck's current_energy as fallback since PlayerState doesn't have it
+    return player?.deck?.current_energy || 0;
   }
 
   /**
    * Get player max energy
    */
   getPlayerMaxEnergy(playerTeam: number): number {
-    if (!this.battleState) return 5;
-    
-    const player = this.battleState.players.find(p => p.team === playerTeam);
-    return player?.max_energy || 5;
+    // Return a default max energy since it's not in the standard interface
+    return 5;
   }
 
   /**
@@ -216,8 +215,8 @@ export class CardBattlePlayerStateManager {
     if (!this.battleState) return;
     
     const player = this.battleState.players.find(p => p.team === playerTeam);
-    if (player) {
-      player.current_energy = Math.max(0, Math.min(newEnergy, player.max_energy));
+    if (player && player.deck) {
+      player.deck.current_energy = Math.max(0, Math.min(newEnergy, this.getPlayerMaxEnergy(playerTeam)));
     }
   }
 
@@ -226,7 +225,7 @@ export class CardBattlePlayerStateManager {
    */
   canPlayCard(playerTeam: number, card: CardInDeck): boolean {
     const playerEnergy = this.getPlayerEnergy(playerTeam);
-    return playerEnergy >= card.card.energy_cost;
+    return card.card ? playerEnergy >= card.card.energy_cost : false;
   }
 
   /**

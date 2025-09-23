@@ -1503,8 +1503,6 @@ export const mockCardBattleState: CardBattleState = {
       "team": 1,
       "player_id": "140b7bcd-9487-449d-a4b4-a9370d955651",
       "characters": mockPlayer1Characters,
-      "current_energy": 3,
-      "max_energy": 5,
       "deck": {
         "id": "f8266161-72a2-48a9-b232-82907b03b37e",
         "player_team": 1,
@@ -1519,8 +1517,6 @@ export const mockCardBattleState: CardBattleState = {
       "team": 2,
       "player_id": "bd1bb71f-03a4-4d9b-a431-88a8b3a3e056",
       "characters": mockPlayer2Characters,
-      "current_energy": 2,
-      "max_energy": 5,
       "deck": {
         "id": "b9e86a2b-f861-4608-bb6c-e25fd49916fa",
         "player_team": 2,

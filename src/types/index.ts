@@ -262,7 +262,6 @@ export interface CardBattleCharacter {
   id: string;
   character_id: string;
   name?: string;
-  character_name?: string; // Add this for UI display
   avatar_url?: string;
   rarity?: string;
   team: number;
@@ -285,9 +284,9 @@ export interface CardBattleCharacter {
 }
 
 export interface CardInDeck {
-  card_id: string;
+  card_id?: string;
   position?: number; // 1-50, shuffled
-  card: Card; // Make required for consistency
+  card?: Card;
 }
 
 export interface CardBattleDeck {
@@ -305,8 +304,6 @@ export interface CardBattlePlayerState {
   player_id?: string | null;                // Player ID (null for AI/NPC)
   characters: CardBattleCharacter[];        // Characters for this player/team
   deck: CardBattleDeck;                     // Deck state for this player/team
-  current_energy: number;                   // Current energy points
-  max_energy: number;                       // Maximum energy points
 }
 
 export interface CardBattleState {
