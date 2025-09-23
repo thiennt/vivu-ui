@@ -37,6 +37,7 @@ export class CardBattleScene extends BaseScene {
   private player1EnergyContainer!: Container;
   private player2EnergyContainer!: Container;
   private battleLogContainer!: Container;
+  private effectsContainer!: Container;
   
   // Drag and drop
   private dragTarget: Container | null = null;
@@ -110,6 +111,9 @@ export class CardBattleScene extends BaseScene {
     console.log(`🎭 Animating CardBattle log entry: ${logEntry.action_type} - ${logEntry.animation_hint}`);
     
     switch (logEntry.action_type) {
+      case 'start_turn':
+        await this.animateCardBattleStartTurn(logEntry);
+        break;
       case 'draw_card':
       case 'draw_phase':
         await this.animateCardBattleDrawPhase(logEntry);
@@ -129,6 +133,10 @@ export class CardBattleScene extends BaseScene {
       case 'effect_trigger':
       case 'status_effect':
         await this.animateCardBattleStatusEffect(logEntry);
+        break;
+      case 'energy':
+      case 'energy_update':
+        await this.animateCardBattleEnergyUpdate(logEntry);
         break;
       case 'end_turn':
         await this.animateCardBattleEndTurn(logEntry);
@@ -175,32 +183,398 @@ export class CardBattleScene extends BaseScene {
   private async animateCardBattlePlayCard(logEntry: CardBattleLog): Promise<void> {
     const playerText = logEntry.actor.team === 1 ? 'Player' : 'AI';
     const cardName = logEntry.card?.name || 'a card';
+    
+    // Find the actor character if specified
+    if (logEntry.actor.character_id) {
+      const actorCard = this.findCharacterCard(logEntry.actor.character_id, logEntry.actor.team);
+      if (actorCard && logEntry.card) {
+        await this.animateCharacterCardPlay(actorCard, logEntry.card.card_type);
+      }
+    }
+    
+    // Show card play message
     await this.showTurnMessage(`${playerText}: Played ${cardName}`);
+  }
+
+  private async animateCharacterCardPlay(characterCard: Container, cardType: string): Promise<void> {
+    const originalX = characterCard.x;
+    const originalY = characterCard.y;
+    
+    // Different animations based on card type
+    switch (cardType.toLowerCase()) {
+      case 'attack':
+      case 'offensive':
+        // Quick forward dash animation
+        await gsap.to(characterCard, { 
+          x: originalX + 20, 
+          duration: 0.1, 
+          ease: 'power2.out' 
+        });
+        await gsap.to(characterCard, { 
+          x: originalX, 
+          duration: 0.2, 
+          ease: 'power2.inOut' 
+        });
+        break;
+      case 'magic':
+      case 'spell':
+        // Glow and scale effect
+        await gsap.to(characterCard.scale, { 
+          x: 1.1, 
+          y: 1.1, 
+          duration: 0.15, 
+          ease: 'power2.inOut' 
+        });
+        await gsap.to(characterCard, { 
+          rotation: 0.1, 
+          duration: 0.15, 
+          yoyo: true, 
+          repeat: 1,
+          ease: 'power2.inOut' 
+        });
+        await gsap.to(characterCard.scale, { 
+          x: 1, 
+          y: 1, 
+          duration: 0.15, 
+          ease: 'power2.inOut' 
+        });
+        break;
+      case 'support':
+      case 'heal':
+        // Vertical bob effect
+        await gsap.to(characterCard, { 
+          y: originalY - 10, 
+          duration: 0.2, 
+          yoyo: true, 
+          repeat: 1,
+          ease: 'power2.inOut' 
+        });
+        break;
+      default:
+        // Default card play animation
+        await gsap.to(characterCard.scale, { 
+          x: 1.05, 
+          y: 1.05, 
+          duration: 0.075, 
+          yoyo: true, 
+          repeat: 1,
+          ease: 'power2.inOut' 
+        });
+    }
+
+    // Reset position in case of any drift
+    characterCard.x = originalX;
+    characterCard.y = originalY;
   }
 
   private async animateCardBattleDiscardCard(logEntry: CardBattleLog): Promise<void> {
     const playerText = logEntry.actor.team === 1 ? 'Player' : 'AI';
     const cardName = logEntry.card?.name || 'a card';
+    
+    // If we have the card details, animate it flying to discard pile
+    if (logEntry.card) {
+      await this.animateCardToDiscardPile(logEntry.card, logEntry.actor.team);
+    }
+    
     await this.showTurnMessage(`${playerText}: Discarded ${cardName}`);
   }
 
+  private async animateCardToDiscardPile(card: any, team: number): Promise<void> {
+    // Create temporary card visual
+    const tempCard = new Graphics();
+    tempCard.roundRect(0, 0, 50, 70, 5)
+      .fill({ color: Colors.BACKGROUND_SECONDARY, alpha: 0.8 })
+      .stroke({ width: 2, color: Colors.CARD_BORDER });
+    
+    // Start from hand area
+    const handContainer = team === 1 ? this.player1HandContainer : this.player2HandContainer;
+    tempCard.x = handContainer.x + handContainer.width / 2;
+    tempCard.y = handContainer.y + 10;
+    tempCard.alpha = 0.8;
+    
+    this.effectsContainer.addChild(tempCard);
+    
+    // Calculate discard pile position (next to deck)
+    const discardX = this.STANDARD_PADDING + 80; // Next to deck
+    const discardY = team === 1 ? 
+      this.player1EnergyContainer.y + 50 : 
+      this.player2EnergyContainer.y - 50;
+    
+    // Animate card flying to discard pile
+    await gsap.to(tempCard, {
+      x: discardX,
+      y: discardY,
+      alpha: 0.5,
+      scale: 0.8,
+      duration: 0.5,
+      ease: 'power2.out'
+    });
+    
+    this.effectsContainer.removeChild(tempCard);
+  }
+
   private async animateCardBattleDamage(logEntry: CardBattleLog): Promise<void> {
+    // Find target characters to animate
+    if (logEntry.targets && logEntry.targets.length > 0) {
+      for (const target of logEntry.targets) {
+        const targetCard = this.findCharacterCard(target.id, target.team);
+        if (targetCard) {
+          // Calculate total damage from impacts
+          const damageImpacts = target.impacts.filter(impact => impact.type === 'damage');
+          const totalDamage = damageImpacts.reduce((sum, impact) => {
+            return sum + (typeof impact.value === 'number' ? impact.value : 0);
+          }, 0);
+          
+          if (totalDamage > 0) {
+            await this.animateTargetHit(targetCard, totalDamage);
+          }
+        }
+      }
+    }
+    
+    // Show animation hint as well
     await this.showTurnMessage(`💥 ${logEntry.animation_hint || 'Damage dealt'}`);
-    // Here you could add more visual effects like screen shake, damage numbers, etc.
   }
 
   private async animateCardBattleHeal(logEntry: CardBattleLog): Promise<void> {
+    // Find target characters to animate
+    if (logEntry.targets && logEntry.targets.length > 0) {
+      for (const target of logEntry.targets) {
+        const targetCard = this.findCharacterCard(target.id, target.team);
+        if (targetCard) {
+          // Calculate total healing from impacts
+          const healImpacts = target.impacts.filter(impact => impact.type === 'heal');
+          const totalHealing = healImpacts.reduce((sum, impact) => {
+            return sum + (typeof impact.value === 'number' ? impact.value : 0);
+          }, 0);
+          
+          if (totalHealing > 0) {
+            await this.animateTargetHeal(targetCard, totalHealing);
+          }
+        }
+      }
+    }
+    
+    // Show animation hint as well
     await this.showTurnMessage(`💚 ${logEntry.animation_hint || 'Healing applied'}`);
-    // Here you could add healing visual effects
+  }
+
+  private async animateTargetHit(targetCard: Container, damage: number): Promise<void> {
+    // Shake effect for target
+    const originalX = targetCard.x;
+    await gsap.to(targetCard, { 
+      x: originalX - 5, 
+      duration: 0.05 
+    });
+    await gsap.to(targetCard, { 
+      x: originalX + 5, 
+      duration: 0.05 
+    });
+    await gsap.to(targetCard, { 
+      x: originalX, 
+      duration: 0.05 
+    });
+    
+    // Damage number animation
+    await this.showDamageNumber(targetCard, damage);
+  }
+
+  private async animateTargetHeal(targetCard: Container, healing: number): Promise<void> {
+    // Gentle glow effect for healing
+    const originalScale = { x: targetCard.scale.x, y: targetCard.scale.y };
+    await gsap.to(targetCard.scale, { 
+      x: originalScale.x * 1.1, 
+      y: originalScale.y * 1.1, 
+      duration: 0.2,
+      ease: 'power2.out'
+    });
+    await gsap.to(targetCard.scale, { 
+      x: originalScale.x, 
+      y: originalScale.y, 
+      duration: 0.2,
+      ease: 'power2.in'
+    });
+    
+    // Healing number animation
+    await this.showHealingNumber(targetCard, healing);
+  }
+
+  private async showDamageNumber(targetCard: Container, damage: number): Promise<void> {
+    const damageText = new Text({
+      text: `-${damage}`,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 20,
+        fontWeight: 'bold',
+        fill: 0xFF4444,
+        stroke: { color: 0xFFFFFF, width: 2 }
+      }
+    });
+    
+    damageText.anchor.set(0.5);
+    damageText.x = targetCard.x + (targetCard.parent?.x || 0) + 50;
+    damageText.y = targetCard.y + (targetCard.parent?.y || 0) + 30;
+    
+    this.effectsContainer.addChild(damageText);
+    
+    // Animate damage number floating up and fading
+    await gsap.to(damageText, { 
+      y: damageText.y - 50, 
+      alpha: 0, 
+      scale: 1.5,
+      duration: 1, 
+      ease: 'power2.out' 
+    });
+    
+    this.effectsContainer.removeChild(damageText);
+  }
+
+  private async showHealingNumber(targetCard: Container, healing: number): Promise<void> {
+    const healText = new Text({
+      text: `+${healing}`,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 20,
+        fontWeight: 'bold',
+        fill: 0x44FF44,
+        stroke: { color: 0xFFFFFF, width: 2 }
+      }
+    });
+    
+    healText.anchor.set(0.5);
+    healText.x = targetCard.x + (targetCard.parent?.x || 0) + 50;
+    healText.y = targetCard.y + (targetCard.parent?.y || 0) + 30;
+    
+    this.effectsContainer.addChild(healText);
+    
+    // Animate heal number floating up and fading
+    await gsap.to(healText, { 
+      y: healText.y - 50, 
+      alpha: 0, 
+      scale: 1.5,
+      duration: 1, 
+      ease: 'power2.out' 
+    });
+    
+    this.effectsContainer.removeChild(healText);
   }
 
   private async animateCardBattleStatusEffect(logEntry: CardBattleLog): Promise<void> {
+    // Find target characters to animate
+    if (logEntry.targets && logEntry.targets.length > 0) {
+      for (const target of logEntry.targets) {
+        const targetCard = this.findCharacterCard(target.id, target.team);
+        if (targetCard) {
+          // Find status effects from impacts
+          const statusImpacts = target.impacts.filter(impact => impact.type === 'status' || impact.type === 'effect');
+          if (statusImpacts.length > 0) {
+            await this.animateStatusEffectOnTarget(targetCard, statusImpacts);
+          }
+        }
+      }
+    }
+    
+    // Show animation hint as well
     await this.showTurnMessage(`✨ ${logEntry.animation_hint || 'Status effect triggered'}`);
-    // Here you could add status effect particles or icons
+  }
+
+  private async animateStatusEffectOnTarget(targetCard: Container, impacts: any[]): Promise<void> {
+    // Create a particle effect for status
+    const effect = new Graphics();
+    effect.zIndex = 1000; // Ensure effect is on top
+    const targetX = targetCard.x + (targetCard.parent?.x || 0) + 50;
+    const targetY = targetCard.y + (targetCard.parent?.y || 0) + 60;
+    
+    // Create sparkle effect for status
+    effect.circle(0, 0, 15).fill(0xFFDD44);
+    effect.circle(0, 0, 10).fill(0xFFFF88);
+    effect.x = targetX;
+    effect.y = targetY;
+    effect.alpha = 0;
+    effect.scale.set(0.5);
+    
+    this.effectsContainer.addChild(effect);
+
+    // Animate effect
+    await gsap.to(effect, { 
+      alpha: 1, 
+      scale: 1.2, 
+      duration: 0.2, 
+      ease: 'power2.out' 
+    });
+    await gsap.to(effect, { 
+      alpha: 0, 
+      scale: 0.8, 
+      duration: 0.3, 
+      ease: 'power2.in' 
+    });
+    
+    this.effectsContainer.removeChild(effect);
   }
 
   private async animateCardBattleEndTurn(logEntry: CardBattleLog): Promise<void> {
     await this.showTurnMessage(`⏭️ ${logEntry.animation_hint || 'Turn ended'}`);
+  }
+
+  private async animateCardBattleStartTurn(logEntry: CardBattleLog): Promise<void> {
+    const playerText = logEntry.actor.team === 1 ? 'Player' : 'AI';
+    await this.showTurnMessage(`🎯 ${playerText} Turn Started`);
+  }
+
+  private async animateCardBattleEnergyUpdate(logEntry: CardBattleLog): Promise<void> {
+    // Find energy impacts in the log entry
+    if (logEntry.impacts) {
+      const energyImpacts = logEntry.impacts.filter(impact => impact.type === 'energy');
+      if (energyImpacts.length > 0) {
+        for (const impact of energyImpacts) {
+          await this.animateEnergyChangeVisual(logEntry.actor.team, impact.value);
+        }
+      }
+    }
+    
+    await this.showTurnMessage(`⚡ ${logEntry.animation_hint || 'Energy updated'}`);
+  }
+
+  private async animateEnergyChangeVisual(team: number, energyChange: number | string | object): Promise<void> {
+    const energyContainer = team === 1 ? this.player1EnergyContainer : this.player2EnergyContainer;
+    
+    if (typeof energyChange === 'number' && energyChange !== 0) {
+      // Create energy change indicator
+      const changeText = new Text({
+        text: energyChange > 0 ? `+${energyChange}` : `${energyChange}`,
+        style: {
+          fontFamily: 'Kalam',
+          fontSize: 16,
+          fontWeight: 'bold',
+          fill: energyChange > 0 ? 0x44FF44 : 0xFF4444,
+          stroke: { color: 0xFFFFFF, width: 1 }
+        }
+      });
+      
+      changeText.anchor.set(0.5);
+      changeText.x = energyContainer.x + 70; // Center of energy display
+      changeText.y = energyContainer.y + 15;
+      changeText.alpha = 0;
+      
+      this.effectsContainer.addChild(changeText);
+      
+      // Animate the energy change floating up
+      await gsap.to(changeText, {
+        y: changeText.y - 30,
+        alpha: 1,
+        duration: 0.3,
+        ease: 'power2.out'
+      });
+      
+      await gsap.to(changeText, {
+        y: changeText.y - 20,
+        alpha: 0,
+        duration: 0.5,
+        ease: 'power2.in'
+      });
+      
+      this.effectsContainer.removeChild(changeText);
+    }
   }
 
   private async animateAIActions(aiActions: AIAction[]): Promise<void> {
@@ -354,6 +728,27 @@ export class CardBattleScene extends BaseScene {
     this.createGameLayout();
     this.createActionButtons();
     this.updateBottomNavigation();
+  }
+
+  private findCharacterCard(characterId: string, team: number): Container | null {
+    const playerContainer = team === 1 ? this.player1Container : this.player2Container;
+    const player = this.battleState?.players.find(p => p.team === team);
+    
+    if (!player || !playerContainer) return null;
+    
+    const characterIndex = player.characters.findIndex(char => char.character_id === characterId);
+    if (characterIndex >= 0 && characterIndex < playerContainer.children.length) {
+      return playerContainer.children[characterIndex] as Container;
+    }
+    return null;
+  }
+
+  private findCharacterByTeam(team: number, characterIndex: number = 0): Container | null {
+    const playerContainer = team === 1 ? this.player1Container : this.player2Container;
+    
+    if (!playerContainer || characterIndex >= playerContainer.children.length) return null;
+    
+    return playerContainer.children[characterIndex] as Container;
   }
 
   resize(width: number, height: number): void {
@@ -537,6 +932,7 @@ export class CardBattleScene extends BaseScene {
     this.player1EnergyContainer = new Container();
     this.player2EnergyContainer = new Container();
     this.battleLogContainer = new Container();
+    this.effectsContainer = new Container();
 
     // Layout calculations - fit all elements with proper spacing
     const availableHeight = this.getContentHeight();
@@ -602,7 +998,8 @@ export class CardBattleScene extends BaseScene {
       this.battleLogContainer,
       this.player1EnergyContainer,
       this.player1Container,
-      this.player1HandContainer
+      this.player1HandContainer,
+      this.effectsContainer
     );
 
     this.container.addChild(this.gameContainer);
@@ -1541,7 +1938,8 @@ export class CardBattleScene extends BaseScene {
       this.battleLogContainer,
       this.player1EnergyContainer,
       this.player1Container,
-      this.player1HandContainer
+      this.player1HandContainer,
+      this.effectsContainer
     );
 
     this.createActionButtons();
