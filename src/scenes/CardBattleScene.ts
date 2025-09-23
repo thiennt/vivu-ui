@@ -645,7 +645,7 @@ export class CardBattleScene extends BaseScene {
     container.y = y;
     
     // Store card reference for drag operations
-    (container as any).cardData = card;
+    (container as Container & { cardData: CardInDeck }).cardData = card;
     
     return container;
   }
@@ -914,25 +914,27 @@ export class CardBattleScene extends BaseScene {
     return this.battleState?.current_player || 1;
   }
 
-  private getEnergyCost(card: any): number {
-    if ('energyCost' in card) {
+  private getEnergyCost(card: { energyCost?: number; energy_cost?: number }): number {
+    if ('energyCost' in card && card.energyCost !== undefined) {
       return card.energyCost;
     } else {
-      return card.energy_cost;
+      return card.energy_cost || 0;
     }
   }
   
-  private getCardType(card: any): string {
-    if ('cardType' in card) {
-      return card.cardType || 'special';
+  private getCardType(card: { cardType?: string; card_type?: string }): string {
+    if ('cardType' in card && card.cardType) {
+      return card.cardType;
     } else {
       return card.card_type || 'special';
     }
   }
 
   // Drag and drop handlers (simplified for now)
-  private onDragStart(event: any, cardContainer: Container): void {
+  private onDragStart(_event: unknown, _cardContainer: Container): void {
     // Simplified drag start - just log for now
     console.log('Card drag started');
+    // TODO: Implement full drag and drop functionality
+    // Currently simplified to avoid unused parameter warnings
   }
 }
