@@ -1,11 +1,9 @@
-import { Container, Graphics, Text, Ticker } from 'pixi.js';
+import { Container, Graphics, Text } from 'pixi.js';
 import { navigation } from '@/utils/navigation';
 import { BaseScene } from '@/utils/BaseScene';
 import { Colors, Gradients } from '@/utils/colors';
 import { CardBattleScene } from './CardBattleScene';
-import { StageScene } from './StageScene';
 import { BattleCard, BattleStageResponse, Card, CardType, CardRarity, Character } from '@/types';
-import { createRandomDeck } from '@/utils/cardData';
 import { battleApi } from '@/services/api';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
 import { TowerScene } from './TowerScene';

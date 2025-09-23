@@ -19,7 +19,6 @@ import {
   BattleLogEntry,
   CardBattleApiResponse
 } from '@/types';
-import { createRandomDeck } from '@/utils/cardData';
 
 
 
@@ -268,7 +267,6 @@ export const battleApi = {
 
   async endBattle(battleId: string, battleResult: BattleEndData): Promise<BattleApiResponse & { rewards?: BattleRewards }> {
     console.log('🏁 endBattle API called for battle:', battleId, 'with result:', battleResult);
-    const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
     return apiRequest(`/battles/${battleId}/end`, {
       method: 'POST',
       body: JSON.stringify(battleResult),

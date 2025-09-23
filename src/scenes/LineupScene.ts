@@ -1,7 +1,6 @@
-import { Graphics, Text, Container, Ticker } from 'pixi.js';
+import { Graphics, Text, Container } from 'pixi.js';
 import { ScrollBox } from '@pixi/ui';
 import { BaseScene } from '@/utils/BaseScene';
-import { Character } from '@/types';
 import { mockPlayer, mockCharacters } from '@/utils/mockData';
 import { navigation } from '@/utils/navigation';
 import { HomeScene } from './HomeScene';
@@ -164,7 +163,6 @@ export class LineupScene extends BaseScene {
 
     // Lineup positions (single row of 3) with standard spacing
     const cols = 3;
-    const rows = 1;
     const availableWidth = this.gameWidth - 2 * this.STANDARD_PADDING;
     const layout = this.calculateThreeCardsLayout(availableWidth, this.STANDARD_SPACING);
     const slotSize = Math.min(layout.itemWidth, 120); // Cap at 120px to maintain reasonable size
