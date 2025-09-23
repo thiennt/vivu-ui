@@ -5,7 +5,6 @@ import { BaseScene } from '@/utils/BaseScene';
 import { HomeScene } from './HomeScene';
 import { Colors, Gradients } from '@/utils/colors';
 import { gsap } from 'gsap';
-import { battleApi } from '@/services/api';
 
 export class BattleScene extends BaseScene {
   /** Assets bundles required by this screen */
@@ -854,7 +853,7 @@ export class BattleScene extends BaseScene {
     });
   }
 
-  public update(_time: Ticker): void {
+  public update(): void {
     // Animation updates can be added here
   }
 }

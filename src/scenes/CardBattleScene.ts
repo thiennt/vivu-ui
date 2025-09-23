@@ -538,7 +538,7 @@ export class CardBattleScene extends BaseScene {
     
     // 2. Player 2 character cards (with deck + discard pile)
     this.player2Container.y = currentY;
-    this.createPlayerArea(this.player2Container, 2, false);
+    this.createPlayerArea(this.player2Container, 2);
     currentY += characterAreaHeight + adjustedSpacing;
     
     // 3. Player 2 energy area
@@ -558,7 +558,7 @@ export class CardBattleScene extends BaseScene {
     
     // 6. Player 1 character cards
     this.player1Container.y = currentY;
-    this.createPlayerArea(this.player1Container, 1, true);
+    this.createPlayerArea(this.player1Container, 1);
     currentY += characterAreaHeight + adjustedSpacing;
     
     // 7. Player 1 hand area
@@ -584,7 +584,6 @@ export class CardBattleScene extends BaseScene {
   }
 
   private createEnergyArea(container: Container, playerNo: number): void {
-    const padding = this.STANDARD_PADDING;
     const player = this.battleState ? this.battleState.players.find(p => p.team === playerNo) : null;
 
     // Energy display - centered horizontally
@@ -612,8 +611,7 @@ export class CardBattleScene extends BaseScene {
     container.x = (this.gameWidth - 140) / 2;
   }
 
-  private createPlayerArea(container: Container, playerNo: number, isBottomPlayer: boolean): void {
-    const padding = this.STANDARD_PADDING;
+  private createPlayerArea(container: Container, playerNo: number): void {
     const characterWidth = 80;
     const characterSpacing = 10;
 
@@ -1557,8 +1555,8 @@ export class CardBattleScene extends BaseScene {
     this.battleLogContainer.removeChildren();
     
     // Recreate all areas
-    this.createPlayerArea(this.player1Container, 1, true);
-    this.createPlayerArea(this.player2Container, 2, false);
+    this.createPlayerArea(this.player1Container, 1);
+    this.createPlayerArea(this.player2Container, 2);
     this.createEnergyArea(this.player1EnergyContainer, 1);
     this.createEnergyArea(this.player2EnergyContainer, 2);
     this.createHandArea(this.player1HandContainer, 1, true);
@@ -1578,7 +1576,7 @@ export class CardBattleScene extends BaseScene {
     this.createActionButtons();
   }
 
-  public update(_time: Ticker): void {
+  public update(): void {
     // Update animations or game state if needed
   }
 }
