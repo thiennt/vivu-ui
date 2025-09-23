@@ -508,7 +508,12 @@ export class CardBattleAnimationManager {
   }
 
   private calculateHandCardPosition(basePosition: { x: number; y: number }, cardIndex: number, totalCards: number): { x: number; y: number } {
-    const cardWidth = 60;
+    // Calculate card width using same logic as UIManager for consistency
+    const maxCardWidth = 100;
+    const padding = 20;
+    let cardWidth = Math.min(maxCardWidth, (this.gameWidth - 2 * padding) / Math.max(totalCards, 4));
+    cardWidth = Math.max(60, cardWidth);
+    
     const maxSpacing = cardWidth + 12; // 12px gap between cards
     const maxVisible = 5;
     
@@ -539,11 +544,20 @@ export class CardBattleAnimationManager {
     deckPosition: { x: number; y: number },
     handPosition: { x: number; y: number }
   ): Promise<void> {
+    // Calculate proper card size to match hand cards
+    // Using same logic as UIManager for consistency
+    const maxCardWidth = 100;
+    const gameWidth = this.gameWidth;
+    const padding = 20;
+    const handCardCount = 5; // estimate for sizing calculation
+    
+    let cardWidth = Math.min(maxCardWidth, (gameWidth - 2 * padding) / Math.max(handCardCount, 4));
+    cardWidth = Math.max(60, cardWidth);
+    const cardHeight = cardWidth * 1.4;
+
     // Create temporary card visual
     const tempCardContainer = new Container();
     const tempCard = new Graphics();
-    const cardWidth = 50;
-    const cardHeight = 70;
 
     tempCard.roundRect(0, 0, cardWidth, cardHeight, 5)
       .fill({ color: Colors.RARITY_COMMON, alpha: 0.9 })
