@@ -1,5 +1,3 @@
-import { CardBattleLog } from '@/types';
-
 // ---- Skills ----
 // NOTE: mockSkills usage has been replaced with API calls for CharacterDetail component
 

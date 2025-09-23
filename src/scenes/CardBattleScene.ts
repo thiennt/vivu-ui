@@ -10,7 +10,6 @@ import { battleApi } from '@/services/api';
 import { 
   CardBattleState, 
   BattleMoveData,
-  BattleMoveResponse,
   BattleEndData,
   BattleRewards,
   Card,
@@ -25,7 +24,6 @@ import {
   CardBattleApiResponse
 } from '@/types';
 import { 
-  mockCardBattleState, 
   mockBattleRewards 
 } from '@/utils/mockData';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
