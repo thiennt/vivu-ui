@@ -323,7 +323,7 @@ export interface CardBattleState {
 
 // Character state for logging and snapshots
 export interface CharacterState {
-  id: string;
+  characterId: string;
   team: number;
   max_hp: number;
   current_hp: number;

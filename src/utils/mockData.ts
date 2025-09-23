@@ -70,306 +70,167 @@ export const mockSkills = [
 // ---- Characters (Crypto Inspired) ----
 // NOTE: mockCharacters usage has been replaced with API calls for Characters and CharacterDetail components
 // This data is kept for other components that haven't been migrated yet
-export const mockCharacters = [
+export const mockCharacters = [];
+
+export const mockPlayer1Characters = [
   {
-    id: "9b4df68d-92cc-48b9-a574-7ee45b571b79",
-    name: "Cardano",
-    avatar_url: "https://s2.coinmarketcap.com/static/img/coins/64x64/2010.png",
-    description: "Cardano (ADA) is a cryptocurrency launched in 2017. Cardano has a current supply of 44,994,785,666.317157 with 35,767,053,299.79184 in circulation. The last known price of Cardano is 0.89396995 USD and is up 1.08 over the last 24 hours. It is currently trading on 1578 active market(s) with $1,326,074,753.34 traded over the last 24 hours. More information can be found at https://www.cardano.org.",
-    c_type: "player",
-    c_class: "support",
-    rarity: "legendary",
-    hp: 130,
-    atk: 25,
-    def: 18,
-    agi: 16,
-    crit_rate: 6,
-    crit_dmg: 140,
-    res: 15,
-    damage: 0,
-    mitigation: 8,
-    hit_rate: 97,
-    dodge: 9,
-    level: 1,
-    exp: 450,
-    created_at: "2025-09-10T14:24:32.751Z",
-    updated_at: "2025-09-10T14:24:32.751Z",
-    skills: mockSkills
+    "id": "885f2e07-085a-421c-be16-bfd3f041fa50",
+    "character_id": "888be80b-0d34-459d-8337-125c3183d4d7",
+    "name": "Bitcoin",
+    "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/1.png",
+    "team": 1,
+    "position": 1,
+    "max_hp": 6079,
+    "current_hp": 6079,
+    "atk": 2717,
+    "def": 1536,
+    "agi": 801,
+    "crit_rate": 19,
+    "crit_dmg": 330,
+    "res": 25,
+    "damage": 0,
+    "mitigation": 12,
+    "hit_rate": 102,
+    "dodge": 17,
+    "has_acted": false,
+    "active_effects": [],
+    "equipped_skills": [
+      "bcce57f4-5b26-49ff-8950-bee1b0a9336d",
+      "a2520721-c08b-46a7-90d4-6f9cbc099418"
+    ]
   },
   {
-    id: "f5c67bf8-ee85-4943-a155-ef856dc922a0",
-    name: "Avalanche",
-    avatar_url: "https://s2.coinmarketcap.com/static/img/coins/64x64/5805.png",
-    description: "Avalanche (AVAX) is a cryptocurrency launched in 2020. Avalanche has a current supply of 457,277,985.48916084 with 422,275,285.48916084 in circulation. The last known price of Avalanche is 28.35960523 USD and is up 8.49 over the last 24 hours. It is currently trading on 971 active market(s) with $1,372,638,367.94 traded over the last 24 hours. More information can be found at https://avax.network/.",
-    c_type: "player",
-    c_class: "ranger",
-    rarity: "epic",
-    hp: 110,
-    atk: 30,
-    def: 12,
-    agi: 22,
-    crit_rate: 12,
-    crit_dmg: 160,
-    res: 8,
-    damage: 10,
-    mitigation: 4,
-    hit_rate: 95,
-    dodge: 15,
-    level: 1,
-    exp: 300,
-    created_at: "2025-09-10T14:24:32.887Z",
-    updated_at: "2025-09-10T14:24:32.887Z",
-    skills: mockSkills
+    "id": "624da9bb-5ac3-48b2-a557-51f233f925d3",
+    "character_id": "d14fa036-c0fb-4d4c-8060-709c7b7ff034",
+    "name": "Ethereum",
+    "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png",
+    "team": 1,
+    "position": 2,
+    "max_hp": 5892,
+    "current_hp": 5892,
+    "atk": 2627,
+    "def": 1490,
+    "agi": 772,
+    "crit_rate": 18,
+    "crit_dmg": 323,
+    "res": 24,
+    "damage": 0,
+    "mitigation": 12,
+    "hit_rate": 102,
+    "dodge": 16,
+    "has_acted": false,
+    "active_effects": [],
+    "equipped_skills": [
+      "bcce57f4-5b26-49ff-8950-bee1b0a9336d",
+      "750fb360-fde6-4cc8-901b-fa786dcb3d44"
+    ]
   },
   {
-    id: "6e281e2b-7956-4a64-b056-c25c8f9e5f17",
-    name: "Bitcoin Cash",
-    avatar_url: "https://s2.coinmarketcap.com/static/img/coins/64x64/1831.png",
-    description: "Bitcoin Cash (BCH) is a cryptocurrency . Users are able to generate BCH through the process of mining. Bitcoin Cash has a current supply of 19,923,546.875. The last known price of Bitcoin Cash is 587.42264175 USD and is up 0.34 over the last 24 hours. It is currently trading on 1062 active market(s) with $431,763,378.98 traded over the last 24 hours. More information can be found at http://bch.info.",
-    c_type: "player",
-    c_class: "warrior",
-    rarity: "rare",
-    hp: 150,
-    atk: 35,
-    def: 20,
-    agi: 10,
-    crit_rate: 5,
-    crit_dmg: 130,
-    res: 10,
-    damage: 5,
-    mitigation: 6,
-    hit_rate: 93,
-    dodge: 7,
-    level: 1,
-    exp: 200,
-    created_at: "2025-09-10T14:24:32.902Z",
-    updated_at: "2025-09-10T14:24:32.902Z",
-    skills: mockSkills
+    "id": "08fcbeff-2583-4c71-a894-d4254cc4d2e7",
+    "character_id": "9fe1866f-00c9-4293-8b7f-cf20c1051a17",
+    "name": "BNB",
+    "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/1839.png",
+    "team": 1,
+    "position": 3,
+    "max_hp": 5895,
+    "current_hp": 5895,
+    "atk": 2627,
+    "def": 1486,
+    "agi": 774,
+    "crit_rate": 18,
+    "crit_dmg": 323,
+    "res": 24,
+    "damage": 0,
+    "mitigation": 12,
+    "hit_rate": 102,
+    "dodge": 16,
+    "has_acted": false,
+    "active_effects": [],
+    "equipped_skills": [
+      "bcce57f4-5b26-49ff-8950-bee1b0a9336d",
+      "986f94de-7be1-47cf-bea0-c5dcbe947705"
+    ]
+  }
+];
+
+export const mockPlayer2Characters = [
+  {
+    "id": "26c32f59-619d-4c98-b56d-54836f2a0f9a",
+    "character_id": "8105fa5a-be33-4444-8243-53a5436d4a15",
+    "name": "Celer Network",
+    "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/3814.png",
+    "team": 2,
+    "position": 1,
+    "max_hp": 370,
+    "current_hp": 370,
+    "atk": 135,
+    "def": 74,
+    "agi": 44,
+    "crit_rate": 6,
+    "crit_dmg": 155,
+    "res": 8,
+    "damage": 0,
+    "mitigation": 6,
+    "hit_rate": 96,
+    "dodge": 8,
+    "has_acted": false,
+    "active_effects": [],
+    "equipped_skills": [
+      "bcce57f4-5b26-49ff-8950-bee1b0a9336d",
+      "f3fd80b1-15d1-4c21-87ca-09e98938ec5b"
+    ]
   },
   {
-    id: "9c150bb9-20c0-4cee-95e4-a5f82f754318",
-    name: "Bitcoin",
-    avatar_url: "https://s2.coinmarketcap.com/static/img/coins/64x64/1.png",
-    description: "Bitcoin (BTC) is a cryptocurrency launched in 2009. Users are able to generate BTC through the process of mining. Bitcoin has a current supply of 19,923,587.5. The last known price of Bitcoin is 103387.35131749 USD and is up 2.30 over the last 24 hours. It is currently trading on 12161 active market(s) with $65,283,347,628.44 traded over the last 24 hours. More information can be found at https://bitcoin.org/en/.",
-    c_type: "player",
-    c_class: "mage",
-    rarity: "epic",
-    hp: 100,
-    atk: 28,
-    def: 10,
-    agi: 18,
-    crit_rate: 10,
-    crit_dmg: 150,
-    res: 12,
-    damage: 15,
-    mitigation: 3,
-    hit_rate: 96,
-    dodge: 12,
-    level: 1,
-    exp: 320,
-    created_at: "2025-09-10T14:24:32.904Z",
-    updated_at: "2025-09-10T14:24:32.904Z",
-    skills: mockSkills
+    "id": "3a3c6da1-2a55-4bcf-ab6d-760892d507e3",
+    "character_id": "1cac15a3-3abe-4f0d-a504-2f8bdc42926c",
+    "name": "Telcoin",
+    "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/2394.png",
+    "team": 2,
+    "position": 2,
+    "max_hp": 370,
+    "current_hp": 370,
+    "atk": 135,
+    "def": 71,
+    "agi": 45,
+    "crit_rate": 6,
+    "crit_dmg": 155,
+    "res": 8,
+    "damage": 0,
+    "mitigation": 6,
+    "hit_rate": 96,
+    "dodge": 8,
+    "has_acted": false,
+    "active_effects": [],
+    "equipped_skills": [
+      "bcce57f4-5b26-49ff-8950-bee1b0a9336d",
+      "c0cf1536-3355-4250-92c6-c77acef7e5b2"
+    ]
   },
   {
-    id: "88641372-3f51-4109-91f0-37011cf3b6a9",
-    name: "Dai",
-    avatar_url: "https://s2.coinmarketcap.com/static/img/coins/64x64/4943.png",
-    description: "Dai (DAI) is a cryptocurrency and operates on the Ethereum platform. Dai has a current supply of 5,441,128,697.333167 with 5,441,128,697.333167 in circulation. The last known price of Dai is 0.99994576 USD and is down -0.01 over the last 24 hours. It is currently trading on 3907 active market(s) with $189,806,687.62 traded over the last 24 hours. More information can be found at https://makerdao.com/.",
-    c_type: "player",
-    c_class: "assassin",
-    rarity: "legendary",
-    hp: 105,
-    atk: 32,
-    def: 11,
-    agi: 25,
-    crit_rate: 15,
-    crit_dmg: 140,
-    res: 12,
-    damage: 0,
-    mitigation: 8,
-    hit_rate: 97,
-    dodge: 9,
-    level: 1,
-    exp: 0,
-    created_at: "2025-09-10T14:24:32.907Z",
-    updated_at: "2025-09-10T14:24:32.907Z",
-    skills: mockSkills
-  },
-  {
-    id: "c34ac478-c204-4c90-ba64-feace6a00f24",
-    name: "Dogecoin",
-    avatar_url: "https://s2.coinmarketcap.com/static/img/coins/64x64/74.png",
-    description: "Dogecoin (DOGE) is a cryptocurrency . Users are able to generate DOGE through the process of mining. Dogecoin has a current supply of 148,177,926,383.70517. The last known price of Dogecoin is 0.24546876 USD and is up 2.67 over the last 24 hours. It is currently trading on 1240 active market(s) with $2,897,149,192.06 traded over the last 24 hours. More information can be found at http://dogecoin.com/.",
-    c_type: "player",
-    c_class: "tank",
-    rarity: "rare",
-    hp: 160,
-    atk: 20,
-    def: 25,
-    agi: 8,
-    crit_rate: 4,
-    crit_dmg: 120,
-    res: 18,
-    damage: 3,
-    mitigation: 10,
-    hit_rate: 92,
-    dodge: 5,
-    level: 1,
-    exp: 150,
-    created_at: "2025-09-10T14:24:32.910Z",
-    updated_at: "2025-09-10T14:24:32.910Z",
-    skills: mockSkills
-  },
-  {
-    id: "3f2d36ec-394f-4150-8e6c-c9f4f673b6c2",
-    name: "Ethereum",
-    avatar_url: "https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png",
-    description: "Ethereum (ETH) is a cryptocurrency . Ethereum has a current supply of 120,923,737.48125075. The last known price of Ethereum is 3410.78408511 USD and is down -0.41 over the last 24 hours. It is currently trading on 10023 active market(s) with $23,468,212,108.09 traded over the last 24 hours. More information can be found at https://www.ethereum.org/.",
-    c_type: "player",
-    c_class: "illusionist",
-    rarity: "epic",
-    hp: 115,
-    atk: 26,
-    def: 14,
-    agi: 20,
-    crit_rate: 11,
-    crit_dmg: 155,
-    res: 10,
-    damage: 12,
-    mitigation: 4,
-    hit_rate: 95,
-    dodge: 14,
-    level: 1,
-    exp: 280,
-    created_at: "2025-09-10T14:24:32.912Z",
-    updated_at: "2025-09-10T14:24:32.912Z",
-    skills: mockSkills
-  },
-  {
-    id: "ef946366-56ef-4126-a2e0-15ff683aa732",
-    name: "Chainlink",
-    avatar_url: "https://s2.coinmarketcap.com/static/img/coins/64x64/1975.png",
-    description: "Chainlink (LINK) is a cryptocurrency and operates on the Ethereum platform. Chainlink has a current supply of 1,000,000,000 with 626,849,971.3083414 in circulation. The last known price of Chainlink is 18.35194482 USD and is down -0.62 over the last 24 hours. It is currently trading on 2339 active market(s) with $463,250,149.46 traded over the last 24 hours. More information can be found at https://chain.link/.",
-    c_type: "player",
-    c_class: "battlemage",
-    rarity: "rare",
-    hp: 125,
-    atk: 29,
-    def: 16,
-    agi: 15,
-    crit_rate: 7,
-    crit_dmg: 135,
-    res: 14,
-    damage: 7,
-    mitigation: 5,
-    hit_rate: 94,
-    dodge: 8,
-    level: 1,
-    exp: 220,
-    created_at: "2025-09-10T14:24:32.933Z",
-    updated_at: "2025-09-10T14:24:32.933Z",
-    skills: mockSkills
-  },
-  {
-    id: "8c058eb5-8c2a-40fc-8778-f1d25697ce4a",
-    name: "Shiba Inu",
-    avatar_url: "https://s2.coinmarketcap.com/static/img/coins/64x64/5994.png",
-    description: "Shiba Inu (SHIB) is a cryptocurrency and operates on the Ethereum platform. Shiba Inu has a current supply of 589,260,548,167,974.6 with 589,260,548,167,974.6 in circulation. The last known price of Shiba Inu is 0.00002939 USD and is up 2.32 over the last 24 hours. It is currently trading on 1075 active market(s) with $1,093,413,058.99 traded over the last 24 hours. More information can be found at https://shibatoken.com/.",
-    c_type: "player",
-    c_class: "battlemage",
-    rarity: "rare",
-    hp: 125,
-    atk: 29,
-    def: 16,
-    agi: 15,
-    crit_rate: 7,
-    crit_dmg: 135,
-    res: 14,
-    damage: 7,
-    mitigation: 5,
-    hit_rate: 94,
-    dodge: 8,
-    level: 1,
-    exp: 220,
-    created_at: "2025-09-10T14:24:32.935Z",
-    updated_at: "2025-09-10T14:24:32.935Z",
-    skills: mockSkills
-  },
-  {
-    id: "c8223274-1261-4549-be66-d777dbd128d7",
-    name: "Solana",
-    avatar_url: "https://s2.coinmarketcap.com/static/img/coins/64x64/5426.png",
-    description: "Solana (SOL) is a cryptocurrency launched in 2020. Solana has a current supply of 592,606,276.1118444 with 480,361,413.89088845 in circulation. The last known price of Solana is 216.38489557 USD and is up 0.94 over the last 24 hours. It is currently trading on 985 active market(s) with $4,865,216,820.98 traded over the last 24 hours. More information can be found at https://solana.com.",
-    c_type: "player",
-    c_class: "illusionist",
-    rarity: "epic",
-    hp: 115,
-    atk: 26,
-    def: 14,
-    agi: 20,
-    crit_rate: 11,
-    crit_dmg: 155,
-    res: 10,
-    damage: 12,
-    mitigation: 4,
-    hit_rate: 95,
-    dodge: 14,
-    level: 1,
-    exp: 280,
-    created_at: "2025-09-10T14:24:32.936Z",
-    updated_at: "2025-09-10T14:24:32.936Z",
-    skills: mockSkills
-  },
-  {
-    id: "77ce3f89-3701-4999-bd59-709c0c8559a6",
-    name: "Toncoin",
-    avatar_url: "https://s2.coinmarketcap.com/static/img/coins/64x64/11419.png",
-    description: "Toncoin (TON) is a cryptocurrency . Toncoin has a current supply of 5,124,714,726.990672 with 2,708,936,297.9441123 in circulation. The last known price of Toncoin is 7.20114992 USD and is down -0.73 over the last 24 hours. It is currently trading on 670 active market(s) with $349,677,540.64 traded over the last 24 hours. More information can be found at https://ton.org/.",
-    c_type: "player",
-    c_class: "illusionist",
-    rarity: "epic",
-    hp: 115,
-    atk: 26,
-    def: 14,
-    agi: 20,
-    crit_rate: 11,
-    crit_dmg: 155,
-    res: 10,
-    damage: 12,
-    mitigation: 4,
-    hit_rate: 95,
-    dodge: 14,
-    level: 1,
-    exp: 280,
-    created_at: "2025-09-10T14:24:32.938Z",
-    updated_at: "2025-09-10T14:24:32.938Z",
-    skills: mockSkills
-  },
-  {
-    id: "cbf39f6c-fddb-4450-8e12-b3b207f6d3ba",
-    name: "TRON",
-    avatar_url: "https://s2.coinmarketcap.com/static/img/coins/64x64/1958.png",
-    description: "TRON (TRX) is a cryptocurrency launched in 2017. TRON has a current supply of 86,028,727,105.10579 with 86,028,726,764.1948 in circulation. The last known price of TRON is 0.19005473 USD and is down -0.22 over the last 24 hours. It is currently trading on 1150 active market(s) with $494,001,824.23 traded over the last 24 hours. More information can be found at https://tron.network/.",
-    c_type: "player",
-    c_class: "ranger",
-    rarity: "epic",
-    hp: 110,
-    atk: 30,
-    def: 12,
-    agi: 22,
-    crit_rate: 12,
-    crit_dmg: 160,
-    res: 8,
-    damage: 10,
-    mitigation: 4,
-    hit_rate: 95,
-    dodge: 15,
-    level: 1,
-    exp: 300,
-    created_at: "2025-09-10T14:24:32.940Z",
-    updated_at: "2025-09-10T14:24:32.940Z",
-    skills: mockSkills
+    "id": "217ebccf-b467-4ecc-9bb5-441165345d4a",
+    "character_id": "21c4967f-6fa3-4f05-b900-599f100eab0c",
+    "name": "Ontology Gas",
+    "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/3217.png",
+    "team": 2,
+    "position": 3,
+    "max_hp": 371,
+    "current_hp": 371,
+    "atk": 131,
+    "def": 73,
+    "agi": 43,
+    "crit_rate": 6,
+    "crit_dmg": 155,
+    "res": 8,
+    "damage": 0,
+    "mitigation": 6,
+    "hit_rate": 96,
+    "dodge": 8,
+    "has_acted": false,
+    "active_effects": [],
+    "equipped_skills": [
+      "bcce57f4-5b26-49ff-8950-bee1b0a9336d",
+      "62cf745c-ac43-4817-88fe-8a5cbe7d9196"
+    ]
   }
 ];
 
@@ -377,27 +238,149 @@ export const mockCharacters = [
 // NOTE: mockPlayer usage has been replaced with API calls for PlayerDetail component
 // This data is kept for other components that haven't been migrated yet
 export const mockPlayer = {
-  id: "P1",
-  username: "Satoshi",
-  farcaster_id: "player_fc_001",
-  level: 15,
-  exp: 3500,
-  awaking: 2,
-  star: 2,
-  points: 5,
-  created_at: "2025-09-01T00:00:00.000Z",
-  updated_at: "2025-09-08T06:00:00.000Z",
-  sta: 12,
-  str: 18,
-  agi: 14,
-  luck: 9,
-  characters: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
-  lineup: {
-    positions: ["1", "2", null, null]
-  },
-  inventory: [
-    { id: "I1", name: "Healing Potion", quantity: 5 },
-    { id: "I2", name: "Mana Potion", quantity: 3 }
+  "id": "140b7bcd-9487-449d-a4b4-a9370d955651",
+  "username": "PlayerOne",
+  "farcaster_id": "player_fc_001",
+  "lineup": [
+    {
+      "id": "888be80b-0d34-459d-8337-125c3183d4d7",
+      "name": "Bitcoin",
+      "code": "BTC",
+      "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/1.png",
+      "hp": 6079,
+      "atk": 2717,
+      "def": 1536,
+      "agi": 801
+    },
+    {
+      "id": "d14fa036-c0fb-4d4c-8060-709c7b7ff034",
+      "name": "Ethereum",
+      "code": "ETH",
+      "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png",
+      "hp": 5892,
+      "atk": 2627,
+      "def": 1490,
+      "agi": 772
+    },
+    {
+      "id": "9fe1866f-00c9-4293-8b7f-cf20c1051a17",
+      "name": "BNB",
+      "code": "BNB",
+      "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/1839.png",
+      "hp": 5895,
+      "atk": 2627,
+      "def": 1486,
+      "agi": 774
+    }
+  ],
+  "sta": 5,
+  "str": 5,
+  "agi": 5,
+  "luck": 5,
+  "level": 1,
+  "exp": 0,
+  "points": 0,
+  "characters": [
+    {
+      "id": "888be80b-0d34-459d-8337-125c3183d4d7",
+      "name": "Bitcoin",
+      "code": "BTC",
+      "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/1.png",
+      "hp": 6079,
+      "atk": 2717,
+      "def": 1536,
+      "agi": 801
+    },
+    {
+      "id": "d14fa036-c0fb-4d4c-8060-709c7b7ff034",
+      "name": "Ethereum",
+      "code": "ETH",
+      "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png",
+      "hp": 5892,
+      "atk": 2627,
+      "def": 1490,
+      "agi": 772
+    },
+    {
+      "id": "9fe1866f-00c9-4293-8b7f-cf20c1051a17",
+      "name": "BNB",
+      "code": "BNB",
+      "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/1839.png",
+      "hp": 5895,
+      "atk": 2627,
+      "def": 1486,
+      "agi": 774
+    },
+    {
+      "id": "8bfcad67-fbc7-43bb-8219-992843f38f66",
+      "name": "Solana",
+      "code": "SOL",
+      "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/5426.png",
+      "hp": 5892,
+      "atk": 2631,
+      "def": 1488,
+      "agi": 775
+    },
+    {
+      "id": "b16d4678-d825-4e68-85d3-37eca62c6507",
+      "name": "XRP",
+      "code": "XRP",
+      "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/52.png",
+      "hp": 5704,
+      "atk": 2546,
+      "def": 1441,
+      "agi": 748
+    },
+    {
+      "id": "3987ba30-4233-4f6e-ae1e-52fc1ac63a30",
+      "name": "Toncoin",
+      "code": "TON",
+      "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/11419.png",
+      "hp": 5711,
+      "atk": 2546,
+      "def": 1441,
+      "agi": 751
+    },
+    {
+      "id": "d1f9d537-af01-44d8-b9f3-b01cdc317a36",
+      "name": "Dogecoin",
+      "code": "DOGE",
+      "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/74.png",
+      "hp": 5708,
+      "atk": 2546,
+      "def": 1439,
+      "agi": 750
+    },
+    {
+      "id": "127e8aa1-c507-4524-a05f-7c40abae0650",
+      "name": "Cardano",
+      "code": "ADA",
+      "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/2010.png",
+      "hp": 5521,
+      "atk": 2461,
+      "def": 1392,
+      "agi": 727
+    },
+    {
+      "id": "eba6b9df-4309-4648-8daa-f82dbdb5f5ba",
+      "name": "Shiba Inu",
+      "code": "SHIB",
+      "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/5994.png",
+      "hp": 5521,
+      "atk": 2459,
+      "def": 1392,
+      "agi": 725
+    },
+    {
+      "id": "1404bc14-c76c-4a66-bcc4-fa129e6e4c73",
+      "name": "Avalanche",
+      "code": "AVAX",
+      "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/5805.png",
+      "hp": 5526,
+      "atk": 2460,
+      "def": 1391,
+      "agi": 726
+    }
   ]
 };
 
@@ -534,759 +517,1376 @@ export const mockDungeons = [
 
 export const mockStages = [
   {
-    "id": "87a3290c-7c24-4f77-bbfd-c09fb2b33d06",
+    "id": "ea176bf6-7273-4c73-91ef-b1de2df9d026",
     "name": "Floor 1",
-    "player_id": "e412b2fe-1118-4bee-9726-f5a683bdd5c3",
+    "player_id": "0cd5c1ec-dfea-4d8b-bb6f-ebcc471b6cd1",
     "rewards": "{\"chest\":1}",
-    "is_completed": false,
+    "stage_index": 1,
+    "is_completed": true,
+    "is_current": false,
     "characters": [
       {
-        "name": "Avalanche",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/5805.png",
-        "hp": 88,
-        "atk": 17,
+        "name": "Function X",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/3930.png",
+        "hp": 97,
+        "atk": 18,
         "def": 9
       },
       {
-        "name": "Cardano",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/2010.png",
-        "hp": 86,
-        "atk": 18,
+        "name": "Vulcan Forged PYR",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/9308.png",
+        "hp": 96,
+        "atk": 19,
+        "def": 7
+      },
+      {
+        "name": "Radicle",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/9463.png",
+        "hp": 94,
+        "atk": 17,
         "def": 7
       }
     ]
   },
   {
-    "id": "140c88cf-682d-46a5-af2b-1975b5cbae64",
+    "id": "e03a155a-39cf-40f1-b69a-f16edbbb2381",
     "name": "Floor 2",
-    "player_id": "61d5c219-5292-431c-bd44-bea65022a6b8",
+    "player_id": "5b74a5e8-e823-45c2-a7e8-1a54e8ebfe9c",
     "rewards": "{\"chest\":1}",
-    "is_completed": false,
+    "stage_index": 2,
+    "is_completed": true,
+    "is_current": false,
     "characters": [
       {
-        "name": "Bitcoin Cash",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/1831.png",
-        "hp": 98,
-        "atk": 18,
-        "def": 9
-      },
-      {
-        "name": "BNB",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/1839.png",
-        "hp": 93,
-        "atk": 19,
-        "def": 9
-      }
-    ]
-  },
-  {
-    "id": "ec425c62-83b7-4f29-be27-3bdf7d20ea94",
-    "name": "Floor 3",
-    "player_id": "567f1b28-d26e-48fb-a57a-573140270afe",
-    "rewards": "{\"chest\":1}",
-    "is_completed": false,
-    "characters": [
-      {
-        "name": "Bitcoin",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/1.png",
-        "hp": 106,
-        "atk": 21,
-        "def": 9
-      }
-    ]
-  },
-  {
-    "id": "ef12edcd-da24-44d1-bbfd-3f5d45c7ba0d",
-    "name": "Floor 4",
-    "player_id": "8bab427a-d8c7-4338-84a6-bf4502255c2e",
-    "rewards": "{\"chest\":1}",
-    "is_completed": false,
-    "characters": [
-      {
-        "name": "Cronos",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/3635.png",
-        "hp": 111,
-        "atk": 22,
-        "def": 10
-      },
-      {
-        "name": "Dogecoin",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/74.png",
-        "hp": 114,
-        "atk": 24,
-        "def": 11
-      }
-    ]
-  },
-  {
-    "id": "091acd13-ac50-46e1-8186-60bcef26983a",
-    "name": "Floor 5",
-    "player_id": "1dbb9194-5b38-4c2c-bd2b-0b6c68e01f02",
-    "rewards": "{\"chest\":1}",
-    "is_completed": false,
-    "characters": [
-      {
-        "name": "Ethena",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/30171.png",
-        "hp": 122,
-        "atk": 24,
-        "def": 13
-      },
-      {
-        "name": "Polkadot",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/6636.png",
-        "hp": 117,
-        "atk": 24,
+        "name": "Mango",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/15595.png",
+        "hp": 103,
+        "atk": 25,
         "def": 14
+      },
+      {
+        "name": "Ren",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/2539.png",
+        "hp": 108,
+        "atk": 22,
+        "def": 12
+      },
+      {
+        "name": "MediBloc",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/2303.png",
+        "hp": 104,
+        "atk": 26,
+        "def": 10
       }
     ]
   },
   {
-    "id": "1978f20a-4b08-4620-89f0-6e2477187d46",
-    "name": "Floor 6",
-    "player_id": "bc88ffea-07d3-4f4e-b5aa-26e485863453",
+    "id": "5fac2f1e-2682-493d-8b28-fdbf8584c1a6",
+    "name": "Floor 3",
+    "player_id": "acca24ea-b4fa-488a-abb2-acacdae6f5c4",
     "rewards": "{\"chest\":1}",
-    "is_completed": false,
+    "stage_index": 3,
+    "is_completed": true,
+    "is_current": false,
     "characters": [
       {
-        "name": "Ethereum",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png",
-        "hp": 128,
-        "atk": 27,
-        "def": 13
-      }
-    ]
-  },
-  {
-    "id": "16c8dee0-0743-4452-a7da-432c77231fbd",
-    "name": "Floor 7",
-    "player_id": "3188f8ab-0e20-4da0-aa99-144c0c8c16b5",
-    "rewards": "{\"chest\":1}",
-    "is_completed": false,
-    "characters": [
+        "name": "Vega Protocol",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/7276.png",
+        "hp": 121,
+        "atk": 28,
+        "def": 15
+      },
       {
-        "name": "Hedera",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/4642.png",
-        "hp": 134,
-        "atk": 30,
+        "name": "Orbs",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/3835.png",
+        "hp": 121,
+        "atk": 32,
         "def": 16
       },
       {
-        "name": "Hyperliquid",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/32196.png",
-        "hp": 139,
-        "atk": 28,
+        "name": "Augur",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/1104.png",
+        "hp": 125,
+        "atk": 31,
         "def": 15
       }
     ]
   },
   {
-    "id": "e0b8883b-50b8-44a4-aeb7-7cc51f4d4ab2",
-    "name": "Floor 8",
-    "player_id": "2aa20a6f-fa37-49ba-9097-556afce480d6",
+    "id": "c45ba63a-cb9b-42fe-ba77-6990b213f279",
+    "name": "Floor 4",
+    "player_id": "9c6a5cef-65fc-4596-bdf3-e1de0e971db5",
     "rewards": "{\"chest\":1}",
-    "is_completed": false,
+    "stage_index": 4,
+    "is_completed": true,
+    "is_current": false,
     "characters": [
       {
-        "name": "Chainlink",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/1975.png",
-        "hp": 143,
-        "atk": 31,
-        "def": 17
-      }
-    ]
-  },
-  {
-    "id": "561b79b6-08fc-4386-8d36-f3681020bbf2",
-    "name": "Floor 9",
-    "player_id": "114920fc-ca6c-4818-8802-db3526bc522a",
-    "rewards": "{\"chest\":1}",
-    "is_completed": false,
-    "characters": [
-      {
-        "name": "Litecoin",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/2.png",
-        "hp": 149,
-        "atk": 32,
-        "def": 16
+        "name": "Audius",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/7455.png",
+        "hp": 142,
+        "atk": 40,
+        "def": 19
       },
       {
-        "name": "Mantle",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/27075.png",
-        "hp": 153,
-        "atk": 32,
-        "def": 18
-      }
-    ]
-  },
-  {
-    "id": "7a9bd214-d12e-4278-bdf4-3274d5f84585",
-    "name": "Floor 10",
-    "player_id": "1011b252-59d9-419d-bda1-a8a666d2209d",
-    "rewards": "{\"chest\":1}",
-    "is_completed": false,
-    "characters": [
-      {
-        "name": "Solana",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/5426.png",
-        "hp": 162,
-        "atk": 35,
-        "def": 20
-      },
-      {
-        "name": "Shiba Inu",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/5994.png",
-        "hp": 158,
-        "atk": 36,
-        "def": 20
-      }
-    ]
-  },
-  {
-    "id": "d52c5b5a-fbd5-4588-ab07-8837705bcbed",
-    "name": "Floor 11",
-    "player_id": "04af6365-965e-4327-8583-975232c0de9a",
-    "rewards": "{\"chest\":1}",
-    "is_completed": false,
-    "characters": [
-      {
-        "name": "Sui",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/20947.png",
-        "hp": 167,
-        "atk": 38,
-        "def": 20
-      }
-    ]
-  },
-  {
-    "id": "263e7ef0-618f-4392-9207-fc6683f33680",
-    "name": "Floor 12",
-    "player_id": "25ae6a70-6aa0-4a16-8431-a850a993788f",
-    "rewards": "{\"chest\":1}",
-    "is_completed": false,
-    "characters": [
-      {
-        "name": "Toncoin",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/11419.png",
-        "hp": 175,
+        "name": "Alien Worlds",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/9119.png",
+        "hp": 148,
         "atk": 39,
-        "def": 21
+        "def": 17
       },
       {
-        "name": "TRON",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/1958.png",
-        "hp": 178,
-        "atk": 40,
+        "name": "Raydium",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/8526.png",
+        "hp": 146,
+        "atk": 38,
         "def": 21
       }
     ]
   },
   {
-    "id": "02b9068e-fb8d-4ce3-aca4-f48d3ab71837",
-    "name": "Floor 13",
-    "player_id": "6cb559dc-e8c1-4ce5-b21c-831bc6af07fe",
+    "id": "9749c646-3dc4-4e65-a8ae-47274a848dae",
+    "name": "Floor 5",
+    "player_id": "f8dd79d7-b90f-48ae-bc37-6f0f842d4935",
     "rewards": "{\"chest\":1}",
-    "is_completed": false,
+    "stage_index": 5,
+    "is_completed": true,
+    "is_current": false,
     "characters": [
       {
-        "name": "World Liberty Financial",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/33251.png",
-        "hp": 183,
-        "atk": 40,
-        "def": 21
-      },
-      {
-        "name": "Uniswap",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/7083.png",
-        "hp": 182,
-        "atk": 40,
-        "def": 21
-      }
-    ]
-  },
-  {
-    "id": "12ffb1b3-257c-4f7e-833f-8c55214b1516",
-    "name": "Floor 14",
-    "player_id": "2cda0cbc-4d88-4954-8eff-066b52548ad5",
-    "rewards": "{\"chest\":1}",
-    "is_completed": false,
-    "characters": [
-      {
-        "name": "Stellar",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/512.png",
-        "hp": 194,
-        "atk": 43,
-        "def": 22
-      }
-    ]
-  },
-  {
-    "id": "93740f02-586b-4bb9-ae0c-6912d7d6f549",
-    "name": "Floor 15",
-    "player_id": "a772e00c-2d6e-4aa0-a35c-b1008b1f8565",
-    "rewards": "{\"chest\":1}",
-    "is_completed": false,
-    "characters": [
-      {
-        "name": "Monero",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/328.png",
-        "hp": 198,
+        "name": "Metis",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/9640.png",
+        "hp": 170,
         "atk": 46,
-        "def": 24
+        "def": 26
       },
       {
-        "name": "XRP",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/52.png",
-        "hp": 197,
-        "atk": 44,
-        "def": 26
-      }
-    ]
-  },
-  {
-    "id": "eb10ac6a-d409-4c8b-8930-49f6b56f4899",
-    "name": "Floor 16",
-    "player_id": "3e41a420-0444-4f63-942d-8d2e98b5f199",
-    "rewards": "{\"chest\":1}",
-    "is_completed": false,
-    "characters": [
-      {
-        "name": "Cardano",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/2010.png",
-        "hp": 208,
+        "name": "Astar",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/12885.png",
+        "hp": 168,
         "atk": 48,
         "def": 25
       },
       {
-        "name": "Avalanche",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/5805.png",
-        "hp": 209,
-        "atk": 48,
-        "def": 27
-      },
-      {
-        "name": "Aave",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/7278.png",
-        "hp": 211,
-        "atk": 47,
+        "name": "BitShares",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/463.png",
+        "hp": 165,
+        "atk": 49,
         "def": 26
       }
     ]
   },
   {
-    "id": "8e160960-90b4-49dd-b043-dd7e40324e68",
-    "name": "Floor 17",
-    "player_id": "1307f21f-5cc7-4728-89cf-8899aa56d532",
+    "id": "2e3136f2-dcc1-4444-95ff-02b0b6dd8e9c",
+    "name": "Floor 6",
+    "player_id": "1f4c535e-97e6-475d-ae00-d823ec7b5dd4",
     "rewards": "{\"chest\":1}",
-    "is_completed": false,
+    "stage_index": 6,
+    "is_completed": true,
+    "is_current": false,
     "characters": [
       {
-        "name": "Algorand",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/4030.png",
-        "hp": 216,
-        "atk": 49,
+        "name": "Orion Protocol",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/5639.png",
+        "hp": 192,
+        "atk": 56,
+        "def": 31
+      },
+      {
+        "name": "Rarible",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/5647.png",
+        "hp": 193,
+        "atk": 56,
         "def": 28
       },
       {
-        "name": "Aptos",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/21794.png",
-        "hp": 219,
-        "atk": 49,
-        "def": 28
-      },
-      {
-        "name": "Bitcoin Cash",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/1831.png",
-        "hp": 218,
-        "atk": 50,
-        "def": 26
+        "name": "DODO",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/7224.png",
+        "hp": 194,
+        "atk": 60,
+        "def": 30
       }
     ]
   },
   {
-    "id": "bc8b15b9-26a5-4d2d-80b2-ad4a415f705c",
-    "name": "Floor 18",
-    "player_id": "585dd91f-442c-4a3f-8f35-e5763c6b39a1",
+    "id": "3935b6f1-fa75-4ebc-8143-f71d0bead58e",
+    "name": "Floor 7",
+    "player_id": "b1a4c83a-7374-4cef-be49-6d36a3fada2b",
     "rewards": "{\"chest\":1}",
-    "is_completed": false,
+    "stage_index": 7,
+    "is_completed": true,
+    "is_current": false,
     "characters": [
       {
-        "name": "Cosmos",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/3794.png",
+        "name": "RSK Infrastructure Framework",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/3701.png",
         "hp": 221,
-        "atk": 51,
-        "def": 29
+        "atk": 68,
+        "def": 38
       },
       {
-        "name": "Bitcoin",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/1.png",
-        "hp": 223,
-        "atk": 51,
-        "def": 28
-      },
-      {
-        "name": "Arbitrum",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/11841.png",
+        "name": "Bancor Network",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/1727.png",
         "hp": 224,
-        "atk": 52,
-        "def": 28
-      }
-    ]
-  },
-  {
-    "id": "c8318b74-1b3a-4d14-9119-8f0114503d90",
-    "name": "Floor 19",
-    "player_id": "18b93edd-58f4-4995-a4e3-26ccf5016821",
-    "rewards": "{\"chest\":1}",
-    "is_completed": false,
-    "characters": [
-      {
-        "name": "Dogecoin",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/74.png",
-        "hp": 234,
-        "atk": 52,
-        "def": 28
-      },
-      {
-        "name": "Cronos",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/3635.png",
-        "hp": 232,
-        "atk": 54,
-        "def": 28
-      },
-      {
-        "name": "Ethereum Classic",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/1321.png",
-        "hp": 234,
-        "atk": 54,
-        "def": 30
-      }
-    ]
-  },
-  {
-    "id": "ac455659-fe6a-4617-a557-cbfc7b2c6456",
-    "name": "Floor 20",
-    "player_id": "9e1015ae-44cc-4938-ad8a-627be776c8fa",
-    "rewards": "{\"chest\":1}",
-    "is_completed": false,
-    "characters": [
-      {
-        "name": "Internet Computer",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/8916.png",
-        "hp": 243,
-        "atk": 55,
-        "def": 31
-      },
-      {
-        "name": "Ethena",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/30171.png",
-        "hp": 239,
-        "atk": 54,
-        "def": 32
-      },
-      {
-        "name": "Story",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/35626.png",
-        "hp": 241,
-        "atk": 55,
-        "def": 30
-      }
-    ]
-  },
-  {
-    "id": "b7b5edb2-0492-4fc4-835a-0079cb0e93d7",
-    "name": "Floor 21",
-    "player_id": "0d4bc6d4-a851-44c2-b027-50ca199c628b",
-    "rewards": "{\"chest\":1}",
-    "is_completed": false,
-    "characters": [
-      {
-        "name": "MYX Finance",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/36410.png",
-        "hp": 248,
-        "atk": 56,
-        "def": 32
-      },
-      {
-        "name": "Kaspa",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/20396.png",
-        "hp": 251,
-        "atk": 56,
-        "def": 31
-      },
-      {
-        "name": "Ethereum",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png",
-        "hp": 249,
-        "atk": 56,
-        "def": 31
-      }
-    ]
-  },
-  {
-    "id": "d7c77ec6-01a2-4b70-85bb-a46751ef8e75",
-    "name": "Floor 22",
-    "player_id": "6381ccce-3274-4e82-8aa3-13dfa84ae5ec",
-    "rewards": "{\"chest\":1}",
-    "is_completed": false,
-    "characters": [
-      {
-        "name": "NEAR Protocol",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/6535.png",
-        "hp": 255,
-        "atk": 59,
-        "def": 34
-      },
-      {
-        "name": "Hedera",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/4642.png",
-        "hp": 253,
-        "atk": 59,
-        "def": 33
-      },
-      {
-        "name": "Hyperliquid",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/32196.png",
-        "hp": 258,
-        "atk": 59,
-        "def": 34
-      }
-    ]
-  },
-  {
-    "id": "837549fd-32c0-469b-9eb2-594892dbd2ac",
-    "name": "Floor 23",
-    "player_id": "6d050746-f368-40ec-a6da-03f53c3fa93b",
-    "rewards": "{\"chest\":1}",
-    "is_completed": false,
-    "characters": [
-      {
-        "name": "OKB",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/3897.png",
-        "hp": 261,
-        "atk": 62,
-        "def": 35
-      },
-      {
-        "name": "Ondo",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/21159.png",
-        "hp": 261,
-        "atk": 61,
-        "def": 34
-      },
-      {
-        "name": "Chainlink",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/1975.png",
-        "hp": 263,
-        "atk": 61,
-        "def": 34
-      }
-    ]
-  },
-  {
-    "id": "376978f7-e26c-4e5d-a1cd-e962c6930fde",
-    "name": "Floor 24",
-    "player_id": "86fcd43a-c1ba-413b-af8f-2317f379fcbe",
-    "rewards": "{\"chest\":1}",
-    "is_completed": false,
-    "characters": [
-      {
-        "name": "Mantle",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/27075.png",
-        "hp": 270,
-        "atk": 62,
-        "def": 35
-      },
-      {
-        "name": "Litecoin",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/2.png",
-        "hp": 274,
-        "atk": 64,
-        "def": 34
-      },
-      {
-        "name": "Pudgy Penguins",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/34466.png",
-        "hp": 272,
-        "atk": 62,
-        "def": 34
-      }
-    ]
-  },
-  {
-    "id": "98e999c1-e1ca-45ac-b9a8-9f878873c9cd",
-    "name": "Floor 25",
-    "player_id": "cc9911ae-e6fb-4053-a475-dd5e11a318a5",
-    "rewards": "{\"chest\":1}",
-    "is_completed": false,
-    "characters": [
-      {
-        "name": "Pepe",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/24478.png",
-        "hp": 282,
-        "atk": 66,
-        "def": 37
-      },
-      {
-        "name": "Solana",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/5426.png",
-        "hp": 282,
-        "atk": 65,
-        "def": 36
-      },
-      {
-        "name": "Pi",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/35697.png",
-        "hp": 279,
-        "atk": 66,
-        "def": 38
-      }
-    ]
-  },
-  {
-    "id": "8f7b8c64-ec11-40e4-8fdb-347d006055b2",
-    "name": "Floor 26",
-    "player_id": "e7875282-9b8d-4b38-a691-a55ce2a85a92",
-    "rewards": "{\"chest\":1}",
-    "is_completed": false,
-    "characters": [
-      {
-        "name": "Sui",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/20947.png",
-        "hp": 291,
         "atk": 68,
-        "def": 37
-      },
-      {
-        "name": "POL (prev. MATIC)",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/28321.png",
-        "hp": 290,
-        "atk": 66,
-        "def": 38
-      },
-      {
-        "name": "Pump.fun",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/36507.png",
-        "hp": 290,
-        "atk": 66,
-        "def": 37
-      }
-    ]
-  },
-  {
-    "id": "16d789d9-a5c4-4439-b014-b1b1a6f00da0",
-    "name": "Floor 27",
-    "player_id": "39296d65-1eb1-4388-a8f4-060f65fead50",
-    "rewards": "{\"chest\":1}",
-    "is_completed": false,
-    "characters": [
-      {
-        "name": "Toncoin",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/11419.png",
-        "hp": 296,
-        "atk": 70,
-        "def": 38
-      },
-      {
-        "name": "TRON",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/1958.png",
-        "hp": 293,
-        "atk": 68,
-        "def": 40
-      },
-      {
-        "name": "Render",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/5690.png",
-        "hp": 299,
-        "atk": 70,
-        "def": 40
-      }
-    ]
-  },
-  {
-    "id": "c8b3108d-7251-4175-82be-317f4cc93ec4",
-    "name": "Floor 28",
-    "player_id": "0ad73893-9312-4597-8f44-c874b13c8627",
-    "rewards": "{\"chest\":1}",
-    "is_completed": false,
-    "characters": [
-      {
-        "name": "Uniswap",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/7083.png",
-        "hp": 305,
-        "atk": 70,
         "def": 39
       },
       {
-        "name": "World Liberty Financial",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/33251.png",
-        "hp": 303,
-        "atk": 72,
-        "def": 41
-      },
-      {
-        "name": "Bittensor",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/22974.png",
-        "hp": 301,
-        "atk": 71,
-        "def": 41
+        "name": "Origin Protocol",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/5117.png",
+        "hp": 228,
+        "atk": 68,
+        "def": 38
       }
     ]
   },
   {
-    "id": "e026c821-5536-40c2-bcc1-fb1e5b303257",
-    "name": "Floor 29",
-    "player_id": "8a0b9ecf-dd50-432f-8df8-2bdedffe2226",
+    "id": "6d056b66-0b0f-48a0-a056-d62e6d14e609",
+    "name": "Floor 8",
+    "player_id": "d9df7c44-5528-4cc8-92fe-3346531812db",
     "rewards": "{\"chest\":1}",
-    "is_completed": false,
+    "stage_index": 8,
+    "is_completed": true,
+    "is_current": false,
     "characters": [
       {
-        "name": "Worldcoin",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/13502.png",
-        "hp": 311,
-        "atk": 74,
-        "def": 40
+        "name": "OriginTrail",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/2467.png",
+        "hp": 261,
+        "atk": 85,
+        "def": 44
       },
       {
-        "name": "Stellar",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/512.png",
-        "hp": 313,
-        "atk": 74,
-        "def": 42
-      }
-    ]
-  },
-  {
-    "id": "956a25d3-b70d-45c8-a7d6-9752cad11ea5",
-    "name": "Floor 30",
-    "player_id": "940a9a5b-9919-4166-bd6a-1b59699bc066",
-    "rewards": "{\"chest\":1}",
-    "is_completed": false,
-    "characters": [
-      {
-        "name": "Arbitrum",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/11841.png",
-        "hp": 319,
-        "atk": 76,
+        "name": "Numeraire",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/1732.png",
+        "hp": 254,
+        "atk": 83,
         "def": 43
       },
       {
-        "name": "Internet Computer",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/8916.png",
-        "hp": 318,
-        "atk": 75,
-        "def": 42
+        "name": "Energy Web Token",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/5268.png",
+        "hp": 257,
+        "atk": 83,
+        "def": 43
+      }
+    ]
+  },
+  {
+    "id": "66de9ec9-2f63-421a-8621-d518d0789ced",
+    "name": "Floor 9",
+    "player_id": "2041497a-67fb-4d37-b4de-932a7b8d70b8",
+    "rewards": "{\"chest\":1}",
+    "stage_index": 9,
+    "is_completed": true,
+    "is_current": false,
+    "characters": [
+      {
+        "name": "WazirX",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/5169.png",
+        "hp": 294,
+        "atk": 101,
+        "def": 52
       },
       {
-        "name": "Pepe",
-        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/24478.png",
-        "hp": 317,
-        "atk": 76,
-        "def": 42
+        "name": "Centrifuge",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/7461.png",
+        "hp": 289,
+        "atk": 101,
+        "def": 53
+      },
+      {
+        "name": "Everscale",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/7505.png",
+        "hp": 291,
+        "atk": 97,
+        "def": 55
+      }
+    ]
+  },
+  {
+    "id": "18621256-b652-4fa5-9ad6-32d9f5e97c32",
+    "name": "Floor 10",
+    "player_id": "769545a9-ff84-47da-8e0d-3be50a8489b5",
+    "rewards": "{\"chest\":1}",
+    "stage_index": 10,
+    "is_completed": true,
+    "is_current": false,
+    "characters": [
+      {
+        "name": "MX TOKEN",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/1808.png",
+        "hp": 327,
+        "atk": 114,
+        "def": 60
+      },
+      {
+        "name": "Civic",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/1816.png",
+        "hp": 332,
+        "atk": 116,
+        "def": 60
+      },
+      {
+        "name": "Radix",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/7692.png",
+        "hp": 331,
+        "atk": 114,
+        "def": 60
+      }
+    ]
+  },
+  {
+    "id": "7b78ac28-d884-41db-8db7-f59781b4feaa",
+    "name": "Floor 11",
+    "player_id": "bd1bb71f-03a4-4d9b-a431-88a8b3a3e056",
+    "rewards": "{\"chest\":1}",
+    "stage_index": 11,
+    "is_completed": false,
+    "is_current": true,
+    "characters": [
+      {
+        "name": "Celer Network",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/3814.png",
+        "hp": 370,
+        "atk": 135,
+        "def": 74
+      },
+      {
+        "name": "Telcoin",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/2394.png",
+        "hp": 370,
+        "atk": 135,
+        "def": 71
+      },
+      {
+        "name": "Ontology Gas",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/3217.png",
+        "hp": 371,
+        "atk": 131,
+        "def": 73
+      }
+    ]
+  },
+  {
+    "id": "d33acf7e-048c-41ca-88bb-e524bf8d505a",
+    "name": "Floor 12",
+    "player_id": "92549a26-cc0d-447b-993f-96969add5733",
+    "rewards": "{\"chest\":1}",
+    "stage_index": 12,
+    "is_completed": false,
+    "is_current": false,
+    "characters": [
+      {
+        "name": "Fetch.ai",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/3773.png",
+        "hp": 414,
+        "atk": 154,
+        "def": 81
+      },
+      {
+        "name": "COTI",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/3992.png",
+        "hp": 412,
+        "atk": 154,
+        "def": 82
+      },
+      {
+        "name": "Mask Network",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/8536.png",
+        "hp": 421,
+        "atk": 151,
+        "def": 85
+      }
+    ]
+  },
+  {
+    "id": "463d5d1d-af29-45b2-9ae5-5d6fd2f741da",
+    "name": "Floor 13",
+    "player_id": "715ee0a0-11fa-4656-bb89-28fde3a7f127",
+    "rewards": "{\"chest\":1}",
+    "stage_index": 13,
+    "is_completed": false,
+    "is_current": false,
+    "characters": [
+      {
+        "name": "Band Protocol",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/4679.png",
+        "hp": 468,
+        "atk": 171,
+        "def": 95
+      },
+      {
+        "name": "Dent",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/1886.png",
+        "hp": 459,
+        "atk": 170,
+        "def": 92
+      },
+      {
+        "name": "Biconomy",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/11371.png",
+        "hp": 460,
+        "atk": 173,
+        "def": 95
+      }
+    ]
+  },
+  {
+    "id": "62a78882-be40-4c13-a697-704d7f75ee5c",
+    "name": "Floor 14",
+    "player_id": "292ffe99-454b-4bae-b34f-d3e668a9c69d",
+    "rewards": "{\"chest\":1}",
+    "stage_index": 14,
+    "is_completed": false,
+    "is_current": false,
+    "characters": [
+      {
+        "name": "Injective",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/7226.png",
+        "hp": 516,
+        "atk": 194,
+        "def": 104
+      },
+      {
+        "name": "Aragon",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/1680.png",
+        "hp": 516,
+        "atk": 192,
+        "def": 106
+      },
+      {
+        "name": "Polymesh",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/7654.png",
+        "hp": 516,
+        "atk": 196,
+        "def": 104
+      }
+    ]
+  },
+  {
+    "id": "4f20846f-873c-4328-80a1-e1609b793ebe",
+    "name": "Floor 15",
+    "player_id": "f2fc9336-a4ae-4e22-8a6f-7cb6a09e0a0a",
+    "rewards": "{\"chest\":1}",
+    "stage_index": 15,
+    "is_completed": false,
+    "is_current": false,
+    "characters": [
+      {
+        "name": "UMA",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/5617.png",
+        "hp": 569,
+        "atk": 220,
+        "def": 119
+      },
+      {
+        "name": "Ankr",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/3783.png",
+        "hp": 566,
+        "atk": 217,
+        "def": 122
+      },
+      {
+        "name": "Decred",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/1168.png",
+        "hp": 567,
+        "atk": 217,
+        "def": 122
+      }
+    ]
+  },
+  {
+    "id": "677761c7-7e17-492d-b231-659e4b7d2ca2",
+    "name": "Floor 16",
+    "player_id": "fc4e3ed2-530a-4a7f-aa30-c80c3269273e",
+    "rewards": "{\"chest\":1}",
+    "stage_index": 16,
+    "is_completed": false,
+    "is_current": false,
+    "characters": [
+      {
+        "name": "Reserve Rights",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/3964.png",
+        "hp": 620,
+        "atk": 242,
+        "def": 133
+      },
+      {
+        "name": "SushiSwap",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/6758.png",
+        "hp": 629,
+        "atk": 243,
+        "def": 132
+      },
+      {
+        "name": "Celo",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/5567.png",
+        "hp": 629,
+        "atk": 240,
+        "def": 134
+      }
+    ]
+  },
+  {
+    "id": "c85d2e66-6ee9-450f-837d-b19166527444",
+    "name": "Floor 17",
+    "player_id": "c6e93b91-a32d-4e3e-a6d6-75e688f05efc",
+    "rewards": "{\"chest\":1}",
+    "stage_index": 17,
+    "is_completed": false,
+    "is_current": false,
+    "characters": [
+      {
+        "name": "ICON",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/2099.png",
+        "hp": 689,
+        "atk": 270,
+        "def": 146
+      },
+      {
+        "name": "SKALE",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/5691.png",
+        "hp": 684,
+        "atk": 266,
+        "def": 147
+      },
+      {
+        "name": "Storj",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/1772.png",
+        "hp": 679,
+        "atk": 266,
+        "def": 147
+      }
+    ]
+  },
+  {
+    "id": "cf49f986-62e4-4902-9fbc-d074d5dfcd09",
+    "name": "Floor 18",
+    "player_id": "8c0b5ded-30dd-480d-9046-e63fd3f76ac0",
+    "rewards": "{\"chest\":1}",
+    "stage_index": 18,
+    "is_completed": false,
+    "is_current": false,
+    "characters": [
+      {
+        "name": "Ontology",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/2566.png",
+        "hp": 751,
+        "atk": 298,
+        "def": 164
+      },
+      {
+        "name": "Balancer",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/5728.png",
+        "hp": 750,
+        "atk": 297,
+        "def": 162
+      },
+      {
+        "name": "0x Protocol",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/1896.png",
+        "hp": 744,
+        "atk": 294,
+        "def": 166
+      }
+    ]
+  },
+  {
+    "id": "4884e52d-4967-49c6-bfd0-2f0efcd917aa",
+    "name": "Floor 19",
+    "player_id": "87a55113-0ce5-44de-9af5-daa7baf62c7a",
+    "rewards": "{\"chest\":1}",
+    "stage_index": 19,
+    "is_completed": false,
+    "is_current": false,
+    "characters": [
+      {
+        "name": "Ocean Protocol",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/3911.png",
+        "hp": 811,
+        "atk": 325,
+        "def": 178
+      },
+      {
+        "name": "Lisk",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/1214.png",
+        "hp": 809,
+        "atk": 324,
+        "def": 178
+      },
+      {
+        "name": "Render Token",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/5690.png",
+        "hp": 810,
+        "atk": 327,
+        "def": 181
+      }
+    ]
+  },
+  {
+    "id": "a02402d3-b9c4-4149-94f1-c249d53ca1d2",
+    "name": "Floor 20",
+    "player_id": "877445f0-5397-41b7-a4d9-dac7dd10c879",
+    "rewards": "{\"chest\":1}",
+    "stage_index": 20,
+    "is_completed": false,
+    "is_current": false,
+    "characters": [
+      {
+        "name": "Songbird",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/10775.png",
+        "hp": 879,
+        "atk": 356,
+        "def": 199
+      },
+      {
+        "name": "DigiByte",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/109.png",
+        "hp": 876,
+        "atk": 355,
+        "def": 198
+      },
+      {
+        "name": "Holo",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/2682.png",
+        "hp": 884,
+        "atk": 354,
+        "def": 196
+      }
+    ]
+  },
+  {
+    "id": "5070feb6-c947-4acb-95d1-6420b63435e3",
+    "name": "Floor 21",
+    "player_id": "dc300bee-fb9e-4f54-9d0e-84ded19a3538",
+    "rewards": "{\"chest\":1}",
+    "stage_index": 21,
+    "is_completed": false,
+    "is_current": false,
+    "characters": [
+      {
+        "name": "Illuvium",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/8719.png",
+        "hp": 949,
+        "atk": 389,
+        "def": 216
+      },
+      {
+        "name": "Chia",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/9258.png",
+        "hp": 955,
+        "atk": 385,
+        "def": 213
+      },
+      {
+        "name": "JasmyCoin",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/8425.png",
+        "hp": 956,
+        "atk": 387,
+        "def": 215
+      }
+    ]
+  },
+  {
+    "id": "e9d07b5f-b1e5-47db-b349-95c52c9bb98a",
+    "name": "Floor 22",
+    "player_id": "a73ace1c-a0ac-4997-8089-4d261f947d6b",
+    "rewards": "{\"chest\":1}",
+    "stage_index": 22,
+    "is_completed": false,
+    "is_current": false,
+    "characters": [
+      {
+        "name": "Convex Finance",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/9903.png",
+        "hp": 1030,
+        "atk": 421,
+        "def": 234
+      },
+      {
+        "name": "Axelar",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/12885.png",
+        "hp": 1031,
+        "atk": 420,
+        "def": 233
+      },
+      {
+        "name": "Staked Frax Ether",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/26108.png",
+        "hp": 1030,
+        "atk": 421,
+        "def": 234
+      }
+    ]
+  },
+  {
+    "id": "ddf5ab56-7577-44ee-b528-68b91b98e91f",
+    "name": "Floor 23",
+    "player_id": "c16da495-8130-4b6f-90a8-03351aa90951",
+    "rewards": "{\"chest\":1}",
+    "stage_index": 23,
+    "is_completed": false,
+    "is_current": false,
+    "characters": [
+      {
+        "name": "Compound",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/5692.png",
+        "hp": 1107,
+        "atk": 453,
+        "def": 254
+      },
+      {
+        "name": "Chiliz",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/4066.png",
+        "hp": 1104,
+        "atk": 453,
+        "def": 255
+      },
+      {
+        "name": "Siacoin",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/1042.png",
+        "hp": 1107,
+        "atk": 456,
+        "def": 252
+      }
+    ]
+  },
+  {
+    "id": "6e6b85ca-beab-4fdc-9f60-bc5971355cc3",
+    "name": "Floor 24",
+    "player_id": "2a86eb3a-2500-4e1a-9c23-1a1470445bed",
+    "rewards": "{\"chest\":1}",
+    "stage_index": 24,
+    "is_completed": false,
+    "is_current": false,
+    "characters": [
+      {
+        "name": "SafePal",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/9721.png",
+        "hp": 1180,
+        "atk": 491,
+        "def": 275
+      },
+      {
+        "name": "Akash Network",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/7431.png",
+        "hp": 1182,
+        "atk": 491,
+        "def": 271
+      },
+      {
+        "name": "Jito",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/27804.png",
+        "hp": 1189,
+        "atk": 489,
+        "def": 271
+      }
+    ]
+  },
+  {
+    "id": "424b6a94-361f-4d6e-b350-3872cca3fea1",
+    "name": "Floor 25",
+    "player_id": "99abd05d-e8ec-4f5f-bcf0-27b1f6a495c7",
+    "rewards": "{\"chest\":1}",
+    "stage_index": 25,
+    "is_completed": false,
+    "is_current": false,
+    "characters": [
+      {
+        "name": "Nervos Network",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/4948.png",
+        "hp": 1272,
+        "atk": 530,
+        "def": 293
+      },
+      {
+        "name": "Trust Wallet",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/5964.png",
+        "hp": 1269,
+        "atk": 527,
+        "def": 294
+      },
+      {
+        "name": "Gala",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/7080.png",
+        "hp": 1263,
+        "atk": 527,
+        "def": 297
+      }
+    ]
+  },
+  {
+    "id": "751ca060-46f0-443f-935f-29ab278245bb",
+    "name": "Floor 26",
+    "player_id": "38064314-26f0-4974-a6f9-64f0fccf7a1d",
+    "rewards": "{\"chest\":1}",
+    "stage_index": 26,
+    "is_completed": false,
+    "is_current": false,
+    "characters": [
+      {
+        "name": "SATS (Ordinals)",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/30957.png",
+        "hp": 1356,
+        "atk": 565,
+        "def": 316
+      },
+      {
+        "name": "Zcash",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/1437.png",
+        "hp": 1349,
+        "atk": 564,
+        "def": 315
+      },
+      {
+        "name": "Frax",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/6952.png",
+        "hp": 1358,
+        "atk": 566,
+        "def": 314
+      }
+    ]
+  },
+  {
+    "id": "2eb6e2a0-ba74-4b0b-b1cc-e8502380a3e3",
+    "name": "Floor 27",
+    "player_id": "5014f039-c146-4051-b7f3-267dfce227e9",
+    "rewards": "{\"chest\":1}",
+    "stage_index": 27,
+    "is_completed": false,
+    "is_current": false,
+    "characters": [
+      {
+        "name": "Helium",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/5665.png",
+        "hp": 1449,
+        "atk": 605,
+        "def": 340
+      },
+      {
+        "name": "Marinade Staked SOL",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/11079.png",
+        "hp": 1444,
+        "atk": 605,
+        "def": 339
+      },
+      {
+        "name": "Dymension",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/28296.png",
+        "hp": 1449,
+        "atk": 606,
+        "def": 338
+      }
+    ]
+  },
+  {
+    "id": "e58b6deb-12d0-494e-8a31-af45f12fa269",
+    "name": "Floor 28",
+    "player_id": "a5a55203-bef6-4cd9-8d31-73652eadc50f",
+    "rewards": "{\"chest\":1}",
+    "stage_index": 28,
+    "is_completed": false,
+    "is_current": false,
+    "characters": [
+      {
+        "name": "Klaytn",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/4256.png",
+        "hp": 1535,
+        "atk": 650,
+        "def": 363
+      },
+      {
+        "name": "WOO",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/7501.png",
+        "hp": 1539,
+        "atk": 646,
+        "def": 363
+      },
+      {
+        "name": "ORDI",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/23254.png",
+        "hp": 1541,
+        "atk": 647,
+        "def": 362
+      }
+    ]
+  },
+  {
+    "id": "43d05c81-cd26-442d-9158-af391ffed0f8",
+    "name": "Floor 29",
+    "player_id": "fd35273b-66ad-4ef4-9989-aaf470ed1c8f",
+    "rewards": "{\"chest\":1}",
+    "stage_index": 29,
+    "is_completed": false,
+    "is_current": false,
+    "characters": [
+      {
+        "name": "EOS",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/1765.png",
+        "hp": 1630,
+        "atk": 689,
+        "def": 388
+      },
+      {
+        "name": "Flare",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/6950.png",
+        "hp": 1637,
+        "atk": 693,
+        "def": 387
+      },
+      {
+        "name": "PAX Gold",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/4705.png",
+        "hp": 1636,
+        "atk": 692,
+        "def": 385
+      }
+    ]
+  },
+  {
+    "id": "b7ed8d4c-4de7-4612-863c-db1f835bbc26",
+    "name": "Floor 30",
+    "player_id": "fcc66f2a-3ffc-48a8-a2de-a7957439aad5",
+    "rewards": "{\"chest\":1}",
+    "stage_index": 30,
+    "is_completed": false,
+    "is_current": false,
+    "characters": [
+      {
+        "name": "Basic Attention Token",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/1697.png",
+        "hp": 1729,
+        "atk": 734,
+        "def": 411
+      },
+      {
+        "name": "1inch",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/8104.png",
+        "hp": 1726,
+        "atk": 735,
+        "def": 410
+      },
+      {
+        "name": "Bitcoin SV",
+        "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/3602.png",
+        "hp": 1727,
+        "atk": 735,
+        "def": 410
       }
     ]
   }
 ];
+
+export const mockBattleStage = {
+  "battle_id": "79c2bcc3-9d38-469f-96ea-208e37cacac4",
+  "stage_id": "7b78ac28-d884-41db-8db7-f59781b4feaa",
+  "player1_id": "140b7bcd-9487-449d-a4b4-a9370d955651",
+  "status": "ongoing",
+  "cards": [
+    {
+      "id": "5d95bf5a-e460-4db4-a075-8f3a0dbe40e6",
+      "name": "Firestorm Wave",
+      "group": "Control & Debuff",
+      "description": "Deals 150-200% damage to all enemies, with a 100% chance to apply [Burning] to them.",
+      "card_type": "active",
+      "energy_cost": 2
+    },
+    {
+      "id": "9c88adc2-91a8-42e3-8663-b9a58eca0dbc",
+      "name": "Empowerment Heal",
+      "group": "Healing & Support",
+      "description": "Heals all allies for 150% of the caster's Attack and applies [Attack Buff] to them.",
+      "card_type": "active",
+      "energy_cost": 2
+    },
+    {
+      "id": "5d95bf5a-e460-4db4-a075-8f3a0dbe40e6",
+      "name": "Firestorm Wave",
+      "group": "Control & Debuff",
+      "description": "Deals 150-200% damage to all enemies, with a 100% chance to apply [Burning] to them.",
+      "card_type": "active",
+      "energy_cost": 2
+    },
+    {
+      "id": "42279d86-7e89-4add-b905-9b46029f4cb4",
+      "name": "Crippling Blow",
+      "group": "Control & Debuff",
+      "description": "Deals 200-250% damage to all enemies. There is an 80% chance to reduce the targets' critical rate by 25%.",
+      "card_type": "active",
+      "energy_cost": 3
+    },
+    {
+      "id": "81d27411-c526-4f1c-a17b-41c3e5793df5",
+      "name": "Cleansing Pair",
+      "group": "Healing & Support",
+      "description": "Heals the two allies with the lowest HP for 150% of the caster's Attack, with a 60% chance to cleanse all debuffs on them.",
+      "card_type": "active",
+      "energy_cost": 1
+    },
+    {
+      "id": "81d27411-c526-4f1c-a17b-41c3e5793df5",
+      "name": "Cleansing Pair",
+      "group": "Healing & Support",
+      "description": "Heals the two allies with the lowest HP for 150% of the caster's Attack, with a 60% chance to cleanse all debuffs on them.",
+      "card_type": "active",
+      "energy_cost": 1
+    },
+    {
+      "id": "0fbb9d34-ac57-4d9e-a541-097e962eba04",
+      "name": "Vampiric Strike",
+      "group": "High Damage",
+      "description": "Deals 150-200% damage to the enemy with the lowest HP. The caster restores HP equal to 50% of the damage dealt.",
+      "card_type": "active",
+      "energy_cost": 2
+    },
+    {
+      "id": "c3cf622d-3892-4190-9e31-dcfe96eacfa3",
+      "name": "Stunning Hit",
+      "group": "High Damage",
+      "description": "Deals 150-200% damage to one random enemy. There is a 30% chance to [Stun] the target.",
+      "card_type": "active",
+      "energy_cost": 1
+    },
+    {
+      "id": "33a98f34-40e0-4d16-a978-0a0f687cdeb4",
+      "name": "Ignited Crit",
+      "group": "High Damage",
+      "description": "Deals 150-200% damage to one random enemy. This attack is a guaranteed critical hit if the target is under [Burning].",
+      "card_type": "active",
+      "energy_cost": 2
+    },
+    {
+      "id": "99dd249d-f9d7-47b1-b3ef-7cf921b9666a",
+      "name": "Force Strike",
+      "group": "High Damage",
+      "description": "Deals 200-250% damage to a single enemy.",
+      "card_type": "active",
+      "energy_cost": 1
+    },
+    {
+      "id": "cf02304a-69c4-4ba4-a7c0-bbe150ba7594",
+      "name": "Grave Strike",
+      "group": "Control & Debuff",
+      "description": "Deals 100-150% damage to all enemies. Has a 65% chance to apply [Anti-Revive] and a 40% reduction to the targets' healing effects.",
+      "card_type": "active",
+      "energy_cost": 2
+    },
+    {
+      "id": "35ad8321-02cb-4b8e-b0cc-95b2c36f4e81",
+      "name": "Shielding Balm",
+      "group": "Healing & Support",
+      "description": "Heals all allies for 110% of the caster's Attack, and applies both [Blocking Shield] and a 30% [Attack Buff] to them.",
+      "card_type": "active",
+      "energy_cost": 2
+    },
+    {
+      "id": "f9674d91-d8ff-48e7-ac9d-8d3d4fbe8ab3",
+      "name": "Frostbite Wave",
+      "group": "Control & Debuff",
+      "description": "Deals 200-250% damage to all enemies. Has an 80% chance to apply [Frozen] for 2 rounds, with a 100% chance if the target is under [Slow Down].",
+      "card_type": "active",
+      "energy_cost": 4
+    },
+    {
+      "id": "1c90eaed-6235-42f8-a8a3-6a2ec487a0f1",
+      "name": "Dual Mend",
+      "group": "Healing & Support",
+      "description": "Restores the HP of the two allies with the lowest HP for 230% of the caster's Attack and applies [Attack Buff] to them.",
+      "card_type": "active",
+      "energy_cost": 2
+    },
+    {
+      "id": "b7993110-cb2a-4f5b-9eaf-2362173bfa19",
+      "name": "Hexing Stun",
+      "group": "Control & Debuff",
+      "description": "Deals 150-200% damage to all enemies. There is a 26% chance to [Stun] the targets. There is a 50% chance to dispel a buff on the targets and apply [Curse].",
+      "card_type": "active",
+      "energy_cost": 3
+    },
+    {
+      "id": "9e54e52c-696f-4792-bfe9-13e14f8d74e7",
+      "name": "Quick Regen",
+      "group": "Healing & Support",
+      "description": "Heals one random ally for 110% of the caster's Attack and applies [Sustain Healing].",
+      "card_type": "active",
+      "energy_cost": 1
+    },
+    {
+      "id": "0ed9739e-bc43-46d2-889f-59b2cbe96194",
+      "name": "Toxic Cloud",
+      "group": "Control & Debuff",
+      "description": "Deals 150-200% damage to all enemies. There is a 60% chance to [Poison] the targets.",
+      "card_type": "active",
+      "energy_cost": 2
+    },
+    {
+      "id": "33a98f34-40e0-4d16-a978-0a0f687cdeb4",
+      "name": "Ignited Crit",
+      "group": "High Damage",
+      "description": "Deals 150-200% damage to one random enemy. This attack is a guaranteed critical hit if the target is under [Burning].",
+      "card_type": "active",
+      "energy_cost": 2
+    },
+    {
+      "id": "c3cf622d-3892-4190-9e31-dcfe96eacfa3",
+      "name": "Stunning Hit",
+      "group": "High Damage",
+      "description": "Deals 150-200% damage to one random enemy. There is a 30% chance to [Stun] the target.",
+      "card_type": "active",
+      "energy_cost": 1
+    },
+    {
+      "id": "da42e473-bdbe-4539-b602-c04014bd576e",
+      "name": "Break Armor",
+      "group": "High Damage",
+      "description": "Deals 300-350% damage to the enemy with the highest Attack. This attack ignores 40% of the target's armor. If the target is under [Armor Break], the damage increases by 25%.",
+      "card_type": "active",
+      "energy_cost": 3
+    },
+    {
+      "id": "22c97746-c1de-4967-ad1f-9ddc0e250489",
+      "name": "Purifying Curse",
+      "group": "Control & Debuff",
+      "description": "Deals 150-200% damage to all enemies and applies [Curse] to them. The caster also cleanses all debuffs on themselves after casting this spell.",
+      "card_type": "active",
+      "energy_cost": 3
+    },
+    {
+      "id": "cc448bf3-7a88-4526-a5d2-e70c7a0d654f",
+      "name": "Cleanse Wave",
+      "group": "Healing & Support",
+      "description": "Cleanses one debuff from the two allies with the highest Attack, then heals all allies for 110% of the caster's Attack.",
+      "card_type": "active",
+      "energy_cost": 3
+    },
+    {
+      "id": "99dd249d-f9d7-47b1-b3ef-7cf921b9666a",
+      "name": "Force Strike",
+      "group": "High Damage",
+      "description": "Deals 200-250% damage to a single enemy.",
+      "card_type": "active",
+      "energy_cost": 1
+    },
+    {
+      "id": "35ad8321-02cb-4b8e-b0cc-95b2c36f4e81",
+      "name": "Shielding Balm",
+      "group": "Healing & Support",
+      "description": "Heals all allies for 110% of the caster's Attack, and applies both [Blocking Shield] and a 30% [Attack Buff] to them.",
+      "card_type": "active",
+      "energy_cost": 2
+    },
+    {
+      "id": "384123d1-f281-4bc3-98e1-388c9835c895",
+      "name": "Leech Wound",
+      "group": "High Damage",
+      "description": "Deals 300-350% damage to the enemy with the lowest HP. Damage increases by 50% if the target is under the [Bleeding] effect. Restores 25% of the caster's maximum HP if this ability kills an enemy.",
+      "card_type": "active",
+      "energy_cost": 4
+    },
+    {
+      "id": "eb78b2eb-fae8-4af5-ab57-87b26fea7bf9",
+      "name": "Rapid Slash",
+      "group": "High Damage",
+      "description": "Deals 150-200% damage to a single enemy.",
+      "card_type": "active",
+      "energy_cost": 1
+    },
+    {
+      "id": "99dd249d-f9d7-47b1-b3ef-7cf921b9666a",
+      "name": "Force Strike",
+      "group": "High Damage",
+      "description": "Deals 200-250% damage to a single enemy.",
+      "card_type": "active",
+      "energy_cost": 1
+    },
+    {
+      "id": "b7993110-cb2a-4f5b-9eaf-2362173bfa19",
+      "name": "Hexing Stun",
+      "group": "Control & Debuff",
+      "description": "Deals 150-200% damage to all enemies. There is a 26% chance to [Stun] the targets. There is a 50% chance to dispel a buff on the targets and apply [Curse].",
+      "card_type": "active",
+      "energy_cost": 3
+    },
+    {
+      "id": "c3cf622d-3892-4190-9e31-dcfe96eacfa3",
+      "name": "Stunning Hit",
+      "group": "High Damage",
+      "description": "Deals 150-200% damage to one random enemy. There is a 30% chance to [Stun] the target.",
+      "card_type": "active",
+      "energy_cost": 1
+    },
+    {
+      "id": "9c88adc2-91a8-42e3-8663-b9a58eca0dbc",
+      "name": "Empowerment Heal",
+      "group": "Healing & Support",
+      "description": "Heals all allies for 150% of the caster's Attack and applies [Attack Buff] to them.",
+      "card_type": "active",
+      "energy_cost": 2
+    },
+    {
+      "id": "cba1ba16-2011-4a07-bb3f-ca4646641fa4",
+      "name": "Swift Revive",
+      "group": "Healing & Support",
+      "description": "Revives one ally and heals them for 400% of the caster's Attack. If all allies are alive, heals the ally with the lowest HP for 400% of the caster's Attack instead.",
+      "card_type": "active",
+      "energy_cost": 4
+    },
+    {
+      "id": "9e54e52c-696f-4792-bfe9-13e14f8d74e7",
+      "name": "Quick Regen",
+      "group": "Healing & Support",
+      "description": "Heals one random ally for 110% of the caster's Attack and applies [Sustain Healing].",
+      "card_type": "active",
+      "energy_cost": 1
+    },
+    {
+      "id": "5d95bf5a-e460-4db4-a075-8f3a0dbe40e6",
+      "name": "Firestorm Wave",
+      "group": "Control & Debuff",
+      "description": "Deals 150-200% damage to all enemies, with a 100% chance to apply [Burning] to them.",
+      "card_type": "active",
+      "energy_cost": 2
+    },
+    {
+      "id": "a9a3fa9c-b3bc-4531-9404-502725864e0f",
+      "name": "Blinding Blaze",
+      "group": "Control & Debuff",
+      "description": "Deals 100-150% damage to all enemies. Has a 60% chance to apply [Blind], with a 100% chance if the target is under [Burning] or [Ignited].",
+      "card_type": "active",
+      "energy_cost": 2
+    },
+    {
+      "id": "22c97746-c1de-4967-ad1f-9ddc0e250489",
+      "name": "Purifying Curse",
+      "group": "Control & Debuff",
+      "description": "Deals 150-200% damage to all enemies and applies [Curse] to them. The caster also cleanses all debuffs on themselves after casting this spell.",
+      "card_type": "active",
+      "energy_cost": 3
+    },
+    {
+      "id": "81d27411-c526-4f1c-a17b-41c3e5793df5",
+      "name": "Cleansing Pair",
+      "group": "Healing & Support",
+      "description": "Heals the two allies with the lowest HP for 150% of the caster's Attack, with a 60% chance to cleanse all debuffs on them.",
+      "card_type": "active",
+      "energy_cost": 1
+    },
+    {
+      "id": "cc448bf3-7a88-4526-a5d2-e70c7a0d654f",
+      "name": "Cleanse Wave",
+      "group": "Healing & Support",
+      "description": "Cleanses one debuff from the two allies with the highest Attack, then heals all allies for 110% of the caster's Attack.",
+      "card_type": "active",
+      "energy_cost": 3
+    },
+    {
+      "id": "5883f163-43a1-45c4-87d3-20f932a00448",
+      "name": "Sustain Heal",
+      "group": "Healing & Support",
+      "description": "Heals all allies for 130% of the caster's Attack. This healing has a 100% chance to apply [Sustain Healing] to the targets.",
+      "card_type": "active",
+      "energy_cost": 2
+    },
+    {
+      "id": "da42e473-bdbe-4539-b602-c04014bd576e",
+      "name": "Break Armor",
+      "group": "High Damage",
+      "description": "Deals 300-350% damage to the enemy with the highest Attack. This attack ignores 40% of the target's armor. If the target is under [Armor Break], the damage increases by 25%.",
+      "card_type": "active",
+      "energy_cost": 3
+    },
+    {
+      "id": "22c97746-c1de-4967-ad1f-9ddc0e250489",
+      "name": "Purifying Curse",
+      "group": "Control & Debuff",
+      "description": "Deals 150-200% damage to all enemies and applies [Curse] to them. The caster also cleanses all debuffs on themselves after casting this spell.",
+      "card_type": "active",
+      "energy_cost": 3
+    },
+    {
+      "id": "1c90eaed-6235-42f8-a8a3-6a2ec487a0f1",
+      "name": "Dual Mend",
+      "group": "Healing & Support",
+      "description": "Restores the HP of the two allies with the lowest HP for 230% of the caster's Attack and applies [Attack Buff] to them.",
+      "card_type": "active",
+      "energy_cost": 2
+    },
+    {
+      "id": "9e54e52c-696f-4792-bfe9-13e14f8d74e7",
+      "name": "Quick Regen",
+      "group": "Healing & Support",
+      "description": "Heals one random ally for 110% of the caster's Attack and applies [Sustain Healing].",
+      "card_type": "active",
+      "energy_cost": 1
+    },
+    {
+      "id": "eb78b2eb-fae8-4af5-ab57-87b26fea7bf9",
+      "name": "Rapid Slash",
+      "group": "High Damage",
+      "description": "Deals 150-200% damage to a single enemy.",
+      "card_type": "active",
+      "energy_cost": 1
+    },
+    {
+      "id": "f9674d91-d8ff-48e7-ac9d-8d3d4fbe8ab3",
+      "name": "Frostbite Wave",
+      "group": "Control & Debuff",
+      "description": "Deals 200-250% damage to all enemies. Has an 80% chance to apply [Frozen] for 2 rounds, with a 100% chance if the target is under [Slow Down].",
+      "card_type": "active",
+      "energy_cost": 4
+    },
+    {
+      "id": "f9674d91-d8ff-48e7-ac9d-8d3d4fbe8ab3",
+      "name": "Frostbite Wave",
+      "group": "Control & Debuff",
+      "description": "Deals 200-250% damage to all enemies. Has an 80% chance to apply [Frozen] for 2 rounds, with a 100% chance if the target is under [Slow Down].",
+      "card_type": "active",
+      "energy_cost": 4
+    },
+    {
+      "id": "222e43a5-144a-4b03-9e85-e2fcd01837c5",
+      "name": "Ignite Strike",
+      "group": "High Damage",
+      "description": "Deals 250-300% damage to a single enemy. Damage increases by 50% if the target is under [Burning].",
+      "card_type": "active",
+      "energy_cost": 2
+    },
+    {
+      "id": "b7fa61b9-5054-4dd6-bf7e-b0e9774f0808",
+      "name": "Cursed Blow",
+      "group": "High Damage",
+      "description": "Deals 300-350% damage to the enemy with the lowest HP and applies [Curse] effect.",
+      "card_type": "active",
+      "energy_cost": 3
+    },
+    {
+      "id": "46bc6d7d-b248-4824-8985-0d7a340f18f9",
+      "name": "Frozen Nova",
+      "group": "High Damage",
+      "description": "Deals 120-170% damage to all enemies. Damage increases by 100% if the target is under [Frozen].",
+      "card_type": "active",
+      "energy_cost": 2
+    },
+    {
+      "id": "b7fa61b9-5054-4dd6-bf7e-b0e9774f0808",
+      "name": "Cursed Blow",
+      "group": "High Damage",
+      "description": "Deals 300-350% damage to the enemy with the lowest HP and applies [Curse] effect.",
+      "card_type": "active",
+      "energy_cost": 3
+    },
+    {
+      "id": "eb78b2eb-fae8-4af5-ab57-87b26fea7bf9",
+      "name": "Rapid Slash",
+      "group": "High Damage",
+      "description": "Deals 150-200% damage to a single enemy.",
+      "card_type": "active",
+      "energy_cost": 1
+    }
+  ]
+}
+
 
 // ---- Card Battle Mock Data ----
 import { CardBattleState, CardBattleCharacter, CardBattleDeck, CardInDeck, BattleRewards, Card, BattleCard } from '../types';
@@ -1458,29 +2058,203 @@ const mockPlayer2Deck: CardBattleDeck = {
 };
 
 export const mockCardBattleState: CardBattleState = {
-  id: 'battle_mock_001',
-  battle_type: 'pve',
-  status: 'ongoing',
-  current_turn: 1,
-  current_player: 1,
-  phase: 'main_phase',
-  created_at: new Date().toISOString(),
-  updated_at: new Date().toISOString(),
-  players: [
+  "id": "79c2bcc3-9d38-469f-96ea-208e37cacac4",
+  "battle_type": "pve",
+  "status": "ongoing",
+  "current_turn": 1,
+  "current_player": 1,
+  "phase": "start_turn",
+  "created_at": "2025-09-22T07:42:55.170Z",
+  "updated_at": "2025-09-23T03:42:36.349Z",
+  "players": [
     {
-      team: 1,
-      player_id: 'player_fc_001',
-      characters: mockBattleCharacters,
-      deck: mockPlayer1Deck
+      "team": 1,
+      "player_id": "140b7bcd-9487-449d-a4b4-a9370d955651",
+      "characters": [
+        {
+          "id": "885f2e07-085a-421c-be16-bfd3f041fa50",
+          "character_id": "888be80b-0d34-459d-8337-125c3183d4d7",
+          "name": "Bitcoin",
+          "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/1.png",
+          "team": 1,
+          "position": 1,
+          "max_hp": 6079,
+          "current_hp": 6079,
+          "atk": 2717,
+          "def": 1536,
+          "agi": 801,
+          "crit_rate": 19,
+          "crit_dmg": 330,
+          "res": 25,
+          "damage": 0,
+          "mitigation": 12,
+          "hit_rate": 102,
+          "dodge": 17,
+          "has_acted": false,
+          "active_effects": [],
+          "equipped_skills": [
+            "bcce57f4-5b26-49ff-8950-bee1b0a9336d",
+            "a2520721-c08b-46a7-90d4-6f9cbc099418"
+          ]
+        },
+        {
+          "id": "624da9bb-5ac3-48b2-a557-51f233f925d3",
+          "character_id": "d14fa036-c0fb-4d4c-8060-709c7b7ff034",
+          "name": "Ethereum",
+          "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png",
+          "team": 1,
+          "position": 2,
+          "max_hp": 5892,
+          "current_hp": 5892,
+          "atk": 2627,
+          "def": 1490,
+          "agi": 772,
+          "crit_rate": 18,
+          "crit_dmg": 323,
+          "res": 24,
+          "damage": 0,
+          "mitigation": 12,
+          "hit_rate": 102,
+          "dodge": 16,
+          "has_acted": false,
+          "active_effects": [],
+          "equipped_skills": [
+            "bcce57f4-5b26-49ff-8950-bee1b0a9336d",
+            "750fb360-fde6-4cc8-901b-fa786dcb3d44"
+          ]
+        },
+        {
+          "id": "08fcbeff-2583-4c71-a894-d4254cc4d2e7",
+          "character_id": "9fe1866f-00c9-4293-8b7f-cf20c1051a17",
+          "name": "BNB",
+          "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/1839.png",
+          "team": 1,
+          "position": 3,
+          "max_hp": 5895,
+          "current_hp": 5895,
+          "atk": 2627,
+          "def": 1486,
+          "agi": 774,
+          "crit_rate": 18,
+          "crit_dmg": 323,
+          "res": 24,
+          "damage": 0,
+          "mitigation": 12,
+          "hit_rate": 102,
+          "dodge": 16,
+          "has_acted": false,
+          "active_effects": [],
+          "equipped_skills": [
+            "bcce57f4-5b26-49ff-8950-bee1b0a9336d",
+            "986f94de-7be1-47cf-bea0-c5dcbe947705"
+          ]
+        }
+      ],
+      "deck": {
+        "id": "f8266161-72a2-48a9-b232-82907b03b37e",
+        "player_team": 1,
+        "deck_cards": [],
+        "hand_cards": [],
+        "discard_cards": [],
+        "current_energy": 0,
+        "cards_drawn": 9
+      }
     },
     {
-      team: 2,
-      player_id: null, // AI/NPC
-      characters: mockEnemyCharacters,
-      deck: mockPlayer2Deck
+      "team": 2,
+      "player_id": "bd1bb71f-03a4-4d9b-a431-88a8b3a3e056",
+      "characters": [
+        {
+          "id": "26c32f59-619d-4c98-b56d-54836f2a0f9a",
+          "character_id": "8105fa5a-be33-4444-8243-53a5436d4a15",
+          "name": "Celer Network",
+          "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/3814.png",
+          "team": 2,
+          "position": 1,
+          "max_hp": 370,
+          "current_hp": 370,
+          "atk": 135,
+          "def": 74,
+          "agi": 44,
+          "crit_rate": 6,
+          "crit_dmg": 155,
+          "res": 8,
+          "damage": 0,
+          "mitigation": 6,
+          "hit_rate": 96,
+          "dodge": 8,
+          "has_acted": false,
+          "active_effects": [],
+          "equipped_skills": [
+            "bcce57f4-5b26-49ff-8950-bee1b0a9336d",
+            "f3fd80b1-15d1-4c21-87ca-09e98938ec5b"
+          ]
+        },
+        {
+          "id": "3a3c6da1-2a55-4bcf-ab6d-760892d507e3",
+          "character_id": "1cac15a3-3abe-4f0d-a504-2f8bdc42926c",
+          "name": "Telcoin",
+          "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/2394.png",
+          "team": 2,
+          "position": 2,
+          "max_hp": 370,
+          "current_hp": 370,
+          "atk": 135,
+          "def": 71,
+          "agi": 45,
+          "crit_rate": 6,
+          "crit_dmg": 155,
+          "res": 8,
+          "damage": 0,
+          "mitigation": 6,
+          "hit_rate": 96,
+          "dodge": 8,
+          "has_acted": false,
+          "active_effects": [],
+          "equipped_skills": [
+            "bcce57f4-5b26-49ff-8950-bee1b0a9336d",
+            "c0cf1536-3355-4250-92c6-c77acef7e5b2"
+          ]
+        },
+        {
+          "id": "217ebccf-b467-4ecc-9bb5-441165345d4a",
+          "character_id": "21c4967f-6fa3-4f05-b900-599f100eab0c",
+          "name": "Ontology Gas",
+          "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/3217.png",
+          "team": 2,
+          "position": 3,
+          "max_hp": 371,
+          "current_hp": 371,
+          "atk": 131,
+          "def": 73,
+          "agi": 43,
+          "crit_rate": 6,
+          "crit_dmg": 155,
+          "res": 8,
+          "damage": 0,
+          "mitigation": 6,
+          "hit_rate": 96,
+          "dodge": 8,
+          "has_acted": false,
+          "active_effects": [],
+          "equipped_skills": [
+            "bcce57f4-5b26-49ff-8950-bee1b0a9336d",
+            "62cf745c-ac43-4817-88fe-8a5cbe7d9196"
+          ]
+        }
+      ],
+      "deck": {
+        "id": "b9e86a2b-f861-4608-bb6c-e25fd49916fa",
+        "player_team": 2,
+        "deck_cards": [],
+        "hand_cards": [],
+        "discard_cards": [],
+        "current_energy": 0,
+        "cards_drawn": 0
+      }
     }
   ]
-};
+}
 
 export const mockBattleRewards: BattleRewards = {
   gold: 150,
@@ -1497,40 +2271,622 @@ import { BattleLogEntry, DrawPhaseResult, BattlePhaseResult, BattleMoveResponse,
 
 // Mock responses for battle actions - these are used by the API layer
 export const mockDrawPhaseResult: DrawPhaseResult = {
-  success: true,
-  code: 200,
-  message: "Turn started successfully",
-  data: [{
-    id: `log_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-    phase: 'draw_phase' as const,
-    action_type: 'draw_card',
-    actor: {
-      team: 1,
-      character_id: 'player_char_1',
-      player_id: 'player_fc_001'
-    },
-    drawn_cards: [{
-      id: 'fire_bolt_001',
-      name: 'Fire Bolt',
-      group: 'High Damage',
-      description: 'Deal 25 fire damage to target enemy',
-      card_type: 'attack',
-      energy_cost: 2
-    }],
-    result: {
-      success: true,
-      reason: undefined
-    },
-    created_at: new Date().toISOString(),
-    animation_hint: 'Turn started: Player drew Fire Bolt and gained energy'
-  }] as CardBattleLog[],
-  errors: null,
-  meta: {
-    phase: 'draw_phase',
-    cardsDrawn: 1,
-    energyGained: 1,
-    timestamp: new Date().toISOString()
-  }
+    "success": true,
+    "code": 200,
+    "message": "Turn started successfully",
+    "data": [
+        {
+            "id": "1e5195ec-860c-4656-bb32-f0ec478bb861",
+            "phase": "start_turn",
+            "action_type": "start_turn",
+            "actor": {
+                "team": 1
+            },
+            "targets": [],
+            "drawn_cards": [],
+            "impacts": [],
+            "result": {
+                "success": true,
+                "reason": "Turn 1 started for player 1"
+            },
+            "before_state": {
+                "characters": [
+                    {
+                        "characterId": "885f2e07-085a-421c-be16-bfd3f041fa50",
+                        "health": 6079,
+                        "energy": 50,
+                        "activeEffects": [],
+                        "stats": {
+                            "atk": 2717,
+                            "def": 1536,
+                            "agi": 801,
+                            "crit_rate": 19,
+                            "crit_dmg": 330,
+                            "res": 25,
+                            "damage": 0,
+                            "mitigation": 12,
+                            "hit_rate": 102,
+                            "dodge": 17,
+                            "turnOrder": 1
+                        },
+                        "shields": {},
+                        "immunities": []
+                    },
+                    {
+                        "characterId": "624da9bb-5ac3-48b2-a557-51f233f925d3",
+                        "health": 5892,
+                        "energy": 50,
+                        "activeEffects": [],
+                        "stats": {
+                            "atk": 2627,
+                            "def": 1490,
+                            "agi": 772,
+                            "crit_rate": 18,
+                            "crit_dmg": 323,
+                            "res": 24,
+                            "damage": 0,
+                            "mitigation": 12,
+                            "hit_rate": 102,
+                            "dodge": 16,
+                            "turnOrder": 2
+                        },
+                        "shields": {},
+                        "immunities": []
+                    },
+                    {
+                        "characterId": "08fcbeff-2583-4c71-a894-d4254cc4d2e7",
+                        "health": 5895,
+                        "energy": 50,
+                        "activeEffects": [],
+                        "stats": {
+                            "atk": 2627,
+                            "def": 1486,
+                            "agi": 774,
+                            "crit_rate": 18,
+                            "crit_dmg": 323,
+                            "res": 24,
+                            "damage": 0,
+                            "mitigation": 12,
+                            "hit_rate": 102,
+                            "dodge": 16,
+                            "turnOrder": 3
+                        },
+                        "shields": {},
+                        "immunities": []
+                    },
+                    {
+                        "characterId": "26c32f59-619d-4c98-b56d-54836f2a0f9a",
+                        "health": 370,
+                        "energy": 50,
+                        "activeEffects": [],
+                        "stats": {
+                            "atk": 135,
+                            "def": 74,
+                            "agi": 44,
+                            "crit_rate": 6,
+                            "crit_dmg": 155,
+                            "res": 8,
+                            "damage": 0,
+                            "mitigation": 6,
+                            "hit_rate": 96,
+                            "dodge": 8,
+                            "turnOrder": 1
+                        },
+                        "shields": {},
+                        "immunities": []
+                    },
+                    {
+                        "characterId": "3a3c6da1-2a55-4bcf-ab6d-760892d507e3",
+                        "health": 370,
+                        "energy": 50,
+                        "activeEffects": [],
+                        "stats": {
+                            "atk": 135,
+                            "def": 71,
+                            "agi": 45,
+                            "crit_rate": 6,
+                            "crit_dmg": 155,
+                            "res": 8,
+                            "damage": 0,
+                            "mitigation": 6,
+                            "hit_rate": 96,
+                            "dodge": 8,
+                            "turnOrder": 2
+                        },
+                        "shields": {},
+                        "immunities": []
+                    },
+                    {
+                        "characterId": "217ebccf-b467-4ecc-9bb5-441165345d4a",
+                        "health": 371,
+                        "energy": 50,
+                        "activeEffects": [],
+                        "stats": {
+                            "atk": 131,
+                            "def": 73,
+                            "agi": 43,
+                            "crit_rate": 6,
+                            "crit_dmg": 155,
+                            "res": 8,
+                            "damage": 0,
+                            "mitigation": 6,
+                            "hit_rate": 96,
+                            "dodge": 8,
+                            "turnOrder": 3
+                        },
+                        "shields": {},
+                        "immunities": []
+                    }
+                ],
+                "turn": 1,
+                "phase": "start_turn",
+                "current_player": 1
+            },
+            "after_state": {
+                "characters": [
+                    {
+                        "characterId": "885f2e07-085a-421c-be16-bfd3f041fa50",
+                        "health": 6079,
+                        "energy": 50,
+                        "activeEffects": [],
+                        "stats": {
+                            "atk": 2717,
+                            "def": 1536,
+                            "agi": 801,
+                            "crit_rate": 19,
+                            "crit_dmg": 330,
+                            "res": 25,
+                            "damage": 0,
+                            "mitigation": 12,
+                            "hit_rate": 102,
+                            "dodge": 17,
+                            "turnOrder": 1
+                        },
+                        "shields": {},
+                        "immunities": []
+                    },
+                    {
+                        "characterId": "624da9bb-5ac3-48b2-a557-51f233f925d3",
+                        "health": 5892,
+                        "energy": 50,
+                        "activeEffects": [],
+                        "stats": {
+                            "atk": 2627,
+                            "def": 1490,
+                            "agi": 772,
+                            "crit_rate": 18,
+                            "crit_dmg": 323,
+                            "res": 24,
+                            "damage": 0,
+                            "mitigation": 12,
+                            "hit_rate": 102,
+                            "dodge": 16,
+                            "turnOrder": 2
+                        },
+                        "shields": {},
+                        "immunities": []
+                    },
+                    {
+                        "characterId": "08fcbeff-2583-4c71-a894-d4254cc4d2e7",
+                        "health": 5895,
+                        "energy": 50,
+                        "activeEffects": [],
+                        "stats": {
+                            "atk": 2627,
+                            "def": 1486,
+                            "agi": 774,
+                            "crit_rate": 18,
+                            "crit_dmg": 323,
+                            "res": 24,
+                            "damage": 0,
+                            "mitigation": 12,
+                            "hit_rate": 102,
+                            "dodge": 16,
+                            "turnOrder": 3
+                        },
+                        "shields": {},
+                        "immunities": []
+                    },
+                    {
+                        "characterId": "26c32f59-619d-4c98-b56d-54836f2a0f9a",
+                        "health": 370,
+                        "energy": 50,
+                        "activeEffects": [],
+                        "stats": {
+                            "atk": 135,
+                            "def": 74,
+                            "agi": 44,
+                            "crit_rate": 6,
+                            "crit_dmg": 155,
+                            "res": 8,
+                            "damage": 0,
+                            "mitigation": 6,
+                            "hit_rate": 96,
+                            "dodge": 8,
+                            "turnOrder": 1
+                        },
+                        "shields": {},
+                        "immunities": []
+                    },
+                    {
+                        "characterId": "3a3c6da1-2a55-4bcf-ab6d-760892d507e3",
+                        "health": 370,
+                        "energy": 50,
+                        "activeEffects": [],
+                        "stats": {
+                            "atk": 135,
+                            "def": 71,
+                            "agi": 45,
+                            "crit_rate": 6,
+                            "crit_dmg": 155,
+                            "res": 8,
+                            "damage": 0,
+                            "mitigation": 6,
+                            "hit_rate": 96,
+                            "dodge": 8,
+                            "turnOrder": 2
+                        },
+                        "shields": {},
+                        "immunities": []
+                    },
+                    {
+                        "characterId": "217ebccf-b467-4ecc-9bb5-441165345d4a",
+                        "health": 371,
+                        "energy": 50,
+                        "activeEffects": [],
+                        "stats": {
+                            "atk": 131,
+                            "def": 73,
+                            "agi": 43,
+                            "crit_rate": 6,
+                            "crit_dmg": 155,
+                            "res": 8,
+                            "damage": 0,
+                            "mitigation": 6,
+                            "hit_rate": 96,
+                            "dodge": 8,
+                            "turnOrder": 3
+                        },
+                        "shields": {},
+                        "immunities": []
+                    }
+                ],
+                "turn": 1,
+                "phase": "start_turn",
+                "current_player": 1
+            },
+            "animation_hint": "turn_start",
+            "created_at": "2025-09-23T03:42:37.527Z",
+            "updated_at": "2025-09-23T03:42:37.527Z"
+        },
+        {
+            "id": "3133d872-3b8b-4fa2-9373-a7aabcbe66ff",
+            "phase": "draw_phase",
+            "action_type": "draw_card",
+            "actor": {
+                "team": 1,
+                "player_id": "885f2e07-085a-421c-be16-bfd3f041fa50"
+            },
+            "card": {
+                "id": "9c88adc2-91a8-42e3-8663-b9a58eca0dbc",
+                "name": "Empowerment Heal",
+                "group": "Healing & Support",
+                "description": "Heals all allies for 150% of the caster's Attack and applies [Attack Buff] to them.",
+                "icon_url": "",
+                "card_type": "active",
+                "energy_cost": 2,
+                "rarity": "common",
+                "actions": [
+                    {
+                        "type": "heal",
+                        "amount_max": 150,
+                        "amount_min": 150,
+                        "effect_name": "Attack Buff",
+                        "target_type": "all_allies",
+                        "effect_chance": 100
+                    }
+                ]
+            },
+            "targets": [],
+            "drawn_cards": [
+                {
+                    "id": "9c88adc2-91a8-42e3-8663-b9a58eca0dbc",
+                    "name": "Empowerment Heal",
+                    "group": "Healing & Support",
+                    "description": "Heals all allies for 150% of the caster's Attack and applies [Attack Buff] to them.",
+                    "icon_url": "",
+                    "card_type": "active",
+                    "energy_cost": 2,
+                    "rarity": "common",
+                    "actions": [
+                        {
+                            "type": "heal",
+                            "amount_max": 150,
+                            "amount_min": 150,
+                            "effect_name": "Attack Buff",
+                            "target_type": "all_allies",
+                            "effect_chance": 100
+                        }
+                    ]
+                }
+            ],
+            "impacts": [],
+            "result": {
+                "success": true,
+                "reason": "Drew 1 cards"
+            },
+            "before_state": {
+                "characters": [
+                    {
+                        "characterId": "885f2e07-085a-421c-be16-bfd3f041fa50",
+                        "health": 6079,
+                        "energy": 50,
+                        "activeEffects": [],
+                        "stats": {
+                            "atk": 2717,
+                            "def": 1536,
+                            "agi": 801,
+                            "crit_rate": 19,
+                            "crit_dmg": 330,
+                            "res": 25,
+                            "damage": 0,
+                            "mitigation": 12,
+                            "hit_rate": 102,
+                            "dodge": 17,
+                            "turnOrder": 1
+                        },
+                        "shields": {},
+                        "immunities": []
+                    },
+                    {
+                        "characterId": "624da9bb-5ac3-48b2-a557-51f233f925d3",
+                        "health": 5892,
+                        "energy": 50,
+                        "activeEffects": [],
+                        "stats": {
+                            "atk": 2627,
+                            "def": 1490,
+                            "agi": 772,
+                            "crit_rate": 18,
+                            "crit_dmg": 323,
+                            "res": 24,
+                            "damage": 0,
+                            "mitigation": 12,
+                            "hit_rate": 102,
+                            "dodge": 16,
+                            "turnOrder": 2
+                        },
+                        "shields": {},
+                        "immunities": []
+                    },
+                    {
+                        "characterId": "08fcbeff-2583-4c71-a894-d4254cc4d2e7",
+                        "health": 5895,
+                        "energy": 50,
+                        "activeEffects": [],
+                        "stats": {
+                            "atk": 2627,
+                            "def": 1486,
+                            "agi": 774,
+                            "crit_rate": 18,
+                            "crit_dmg": 323,
+                            "res": 24,
+                            "damage": 0,
+                            "mitigation": 12,
+                            "hit_rate": 102,
+                            "dodge": 16,
+                            "turnOrder": 3
+                        },
+                        "shields": {},
+                        "immunities": []
+                    },
+                    {
+                        "characterId": "26c32f59-619d-4c98-b56d-54836f2a0f9a",
+                        "health": 370,
+                        "energy": 50,
+                        "activeEffects": [],
+                        "stats": {
+                            "atk": 135,
+                            "def": 74,
+                            "agi": 44,
+                            "crit_rate": 6,
+                            "crit_dmg": 155,
+                            "res": 8,
+                            "damage": 0,
+                            "mitigation": 6,
+                            "hit_rate": 96,
+                            "dodge": 8,
+                            "turnOrder": 1
+                        },
+                        "shields": {},
+                        "immunities": []
+                    },
+                    {
+                        "characterId": "3a3c6da1-2a55-4bcf-ab6d-760892d507e3",
+                        "health": 370,
+                        "energy": 50,
+                        "activeEffects": [],
+                        "stats": {
+                            "atk": 135,
+                            "def": 71,
+                            "agi": 45,
+                            "crit_rate": 6,
+                            "crit_dmg": 155,
+                            "res": 8,
+                            "damage": 0,
+                            "mitigation": 6,
+                            "hit_rate": 96,
+                            "dodge": 8,
+                            "turnOrder": 2
+                        },
+                        "shields": {},
+                        "immunities": []
+                    },
+                    {
+                        "characterId": "217ebccf-b467-4ecc-9bb5-441165345d4a",
+                        "health": 371,
+                        "energy": 50,
+                        "activeEffects": [],
+                        "stats": {
+                            "atk": 131,
+                            "def": 73,
+                            "agi": 43,
+                            "crit_rate": 6,
+                            "crit_dmg": 155,
+                            "res": 8,
+                            "damage": 0,
+                            "mitigation": 6,
+                            "hit_rate": 96,
+                            "dodge": 8,
+                            "turnOrder": 3
+                        },
+                        "shields": {},
+                        "immunities": []
+                    }
+                ],
+                "turn": 1,
+                "phase": "start_turn",
+                "current_player": 1
+            },
+            "after_state": {
+                "characters": [
+                    {
+                        "characterId": "885f2e07-085a-421c-be16-bfd3f041fa50",
+                        "health": 6079,
+                        "energy": 50,
+                        "activeEffects": [],
+                        "stats": {
+                            "atk": 2717,
+                            "def": 1536,
+                            "agi": 801,
+                            "crit_rate": 19,
+                            "crit_dmg": 330,
+                            "res": 25,
+                            "damage": 0,
+                            "mitigation": 12,
+                            "hit_rate": 102,
+                            "dodge": 17,
+                            "turnOrder": 1
+                        },
+                        "shields": {},
+                        "immunities": []
+                    },
+                    {
+                        "characterId": "624da9bb-5ac3-48b2-a557-51f233f925d3",
+                        "health": 5892,
+                        "energy": 50,
+                        "activeEffects": [],
+                        "stats": {
+                            "atk": 2627,
+                            "def": 1490,
+                            "agi": 772,
+                            "crit_rate": 18,
+                            "crit_dmg": 323,
+                            "res": 24,
+                            "damage": 0,
+                            "mitigation": 12,
+                            "hit_rate": 102,
+                            "dodge": 16,
+                            "turnOrder": 2
+                        },
+                        "shields": {},
+                        "immunities": []
+                    },
+                    {
+                        "characterId": "08fcbeff-2583-4c71-a894-d4254cc4d2e7",
+                        "health": 5895,
+                        "energy": 50,
+                        "activeEffects": [],
+                        "stats": {
+                            "atk": 2627,
+                            "def": 1486,
+                            "agi": 774,
+                            "crit_rate": 18,
+                            "crit_dmg": 323,
+                            "res": 24,
+                            "damage": 0,
+                            "mitigation": 12,
+                            "hit_rate": 102,
+                            "dodge": 16,
+                            "turnOrder": 3
+                        },
+                        "shields": {},
+                        "immunities": []
+                    },
+                    {
+                        "characterId": "26c32f59-619d-4c98-b56d-54836f2a0f9a",
+                        "health": 370,
+                        "energy": 50,
+                        "activeEffects": [],
+                        "stats": {
+                            "atk": 135,
+                            "def": 74,
+                            "agi": 44,
+                            "crit_rate": 6,
+                            "crit_dmg": 155,
+                            "res": 8,
+                            "damage": 0,
+                            "mitigation": 6,
+                            "hit_rate": 96,
+                            "dodge": 8,
+                            "turnOrder": 1
+                        },
+                        "shields": {},
+                        "immunities": []
+                    },
+                    {
+                        "characterId": "3a3c6da1-2a55-4bcf-ab6d-760892d507e3",
+                        "health": 370,
+                        "energy": 50,
+                        "activeEffects": [],
+                        "stats": {
+                            "atk": 135,
+                            "def": 71,
+                            "agi": 45,
+                            "crit_rate": 6,
+                            "crit_dmg": 155,
+                            "res": 8,
+                            "damage": 0,
+                            "mitigation": 6,
+                            "hit_rate": 96,
+                            "dodge": 8,
+                            "turnOrder": 2
+                        },
+                        "shields": {},
+                        "immunities": []
+                    },
+                    {
+                        "characterId": "217ebccf-b467-4ecc-9bb5-441165345d4a",
+                        "health": 371,
+                        "energy": 50,
+                        "activeEffects": [],
+                        "stats": {
+                            "atk": 131,
+                            "def": 73,
+                            "agi": 43,
+                            "crit_rate": 6,
+                            "crit_dmg": 155,
+                            "res": 8,
+                            "damage": 0,
+                            "mitigation": 6,
+                            "hit_rate": 96,
+                            "dodge": 8,
+                            "turnOrder": 3
+                        },
+                        "shields": {},
+                        "immunities": []
+                    }
+                ],
+                "turn": 1,
+                "phase": "start_turn",
+                "current_player": 1
+            },
+            "animation_hint": "card_draw",
+            "created_at": "2025-09-23T03:42:37.659Z",
+            "updated_at": "2025-09-23T03:42:37.659Z"
+        }
+    ],
+    "errors": null
 };
 
 export const mockBattleActionResult: BattleActionResult = {

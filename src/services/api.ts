@@ -5,7 +5,7 @@
  */
 
 import { config } from '@/config';
-import { mockPlayer, mockCharacters, mockSkills, mockDungeons, mockStages, mockCardBattleState, mockBattleRewards, mockDrawPhaseResult, mockPlayCardResponse, mockEndTurnResult } from '@/utils/mockData';
+import { mockPlayer, mockCharacters, mockSkills, mockDungeons, mockStages, mockCardBattleState, mockBattleRewards, mockDrawPhaseResult, mockPlayCardResponse, mockEndTurnResult, mockBattleStage } from '@/utils/mockData';
 import { 
   BattleApiResponse, 
   BattleMoveData, 
@@ -173,7 +173,7 @@ export const battleApi = {
     });
   },
 
-  async createBattleStage(stage_id: string): Promise<CardBattleApiResponse<BattleStageResponse>> {
+  async createBattleStage(stage_id: string): Promise<CardBattleApiResponse<any>> {
     const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
     return apiRequest(`/players/${playerId}/card-battle/stages/${stage_id}`, {
       method: 'POST'
@@ -181,19 +181,9 @@ export const battleApi = {
       success: true,
       code: 200,
       message: "Battle stage created successfully",
-      data: {
-        battle_id: 'battle_mock_001',
-        stage_id: stage_id,
-        player1_id: playerId,
-        status: 'created' as const,
-        cards: []
-      },
+      data: mockBattleStage,
       errors: null,
-      meta: {
-        playerId,
-        stageId: stage_id,
-        timestamp: new Date().toISOString()
-      }
+      meta: {}
     });
   },
 
