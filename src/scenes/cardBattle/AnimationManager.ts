@@ -540,12 +540,13 @@ export class CardBattleAnimationManager {
     handPosition: { x: number; y: number }
   ): Promise<void> {
     // Create temporary card visual
+    const tempCardContainer = new Container();
     const tempCard = new Graphics();
     const cardWidth = 50;
     const cardHeight = 70;
-    
+
     tempCard.roundRect(0, 0, cardWidth, cardHeight, 5)
-      .fill({ color: Colors.CARD_BACKGROUND, alpha: 0.9 })
+      .fill({ color: Colors.RARITY_COMMON, alpha: 0.9 })
       .stroke({ width: 2, color: Colors.CARD_BORDER });
     
     // Add card name text
@@ -563,7 +564,7 @@ export class CardBattleAnimationManager {
     nameText.anchor.set(0.5);
     nameText.x = cardWidth / 2;
     nameText.y = cardHeight / 2;
-    tempCard.addChild(nameText);
+    tempCardContainer.addChild(tempCard, nameText);
     
     // Start from deck position
     tempCard.x = deckPosition.x;
@@ -571,10 +572,10 @@ export class CardBattleAnimationManager {
     tempCard.alpha = 0.8;
     tempCard.scale.set(0.8); // Start smaller
     
-    this.effectsContainer.addChild(tempCard);
+    this.effectsContainer.addChild(tempCardContainer);
     
     // Animate card flying from deck to hand position
-    await gsap.to(tempCard, {
+    await gsap.to(tempCardContainer, {
       x: handPosition.x,
       y: handPosition.y,
       alpha: 1,
@@ -587,12 +588,12 @@ export class CardBattleAnimationManager {
     await new Promise(resolve => setTimeout(resolve, 100));
     
     // Fade out the temporary card
-    await gsap.to(tempCard, {
+    await gsap.to(tempCardContainer, {
       alpha: 0,
       duration: 0.2,
       ease: 'power2.in'
     });
     
-    this.effectsContainer.removeChild(tempCard);
+    this.effectsContainer.removeChild(tempCardContainer);
   }
 }

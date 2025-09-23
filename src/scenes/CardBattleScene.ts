@@ -225,6 +225,7 @@ export class CardBattleScene extends BaseScene {
   /** Show the screen with animation */
   async show(): Promise<void> {
     this.cardOperationsManager.startBattleSequence();
+    this.refreshUI();
   }
 
   // Delegated methods for card operations
