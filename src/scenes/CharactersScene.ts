@@ -1,11 +1,11 @@
-import { Container, Graphics, Text, Ticker } from 'pixi.js';
+import { Container, Graphics, Text } from 'pixi.js';
 import { navigation } from '@/utils/navigation';
 import { HomeScene } from './HomeScene';
 import { BaseScene } from '@/utils/BaseScene';
 import { Colors } from '@/utils/colors';
 import { CharacterDetailScene } from './CharacterDetailScene';
 import { ScrollBox } from '@pixi/ui';
-import { charactersApi, ApiError, isLikelyUsingMockData } from '@/services/api';
+import { charactersApi, isLikelyUsingMockData } from '@/services/api';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
 
 export class CharactersScene extends BaseScene {
@@ -292,7 +292,7 @@ export class CharactersScene extends BaseScene {
     this.buttonContainer.addChild(backButton);
   }
 
-  update(time: Ticker): void {
+  update(): void {
     // No specific animations needed
   }
 }

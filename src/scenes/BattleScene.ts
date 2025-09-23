@@ -1,4 +1,4 @@
-import { Container, Graphics, Text, Ticker } from 'pixi.js';
+import { Container, Graphics, Text } from 'pixi.js';
 import { navigation } from '@/utils/navigation';
 import { mockCharacters } from '@/utils/mockData';
 import { BaseScene } from '@/utils/BaseScene';

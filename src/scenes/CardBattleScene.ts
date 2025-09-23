@@ -1,4 +1,4 @@
-import { Container, Graphics, Text, Ticker } from 'pixi.js';
+import { Container, Graphics, Text } from 'pixi.js';
 import { navigation } from '@/utils/navigation';
 import { BaseScene } from '@/utils/BaseScene';
 import { HomeScene } from './HomeScene';
@@ -614,6 +614,7 @@ export class CardBattleScene extends BaseScene {
   private createPlayerArea(container: Container, playerNo: number): void {
     const characterWidth = 80;
     const characterSpacing = 10;
+    const padding = this.STANDARD_PADDING;
 
     const player = this.battleState ? this.battleState.players.find(p => p.team === playerNo) : null;
     const totalCharacterWidth = (player?.characters.length || 0) * characterWidth + Math.max(0, (player?.characters.length || 0) - 1) * characterSpacing;
@@ -693,7 +694,7 @@ export class CardBattleScene extends BaseScene {
 
       // Make player 1 cards draggable
       if (showCards && playerNo === 1) {
-        this.makeCardDraggable(cardContainer,  card);
+        this.makeCardDraggable(cardContainer);
       }
 
       container.addChild(cardContainer);
@@ -1089,12 +1090,12 @@ export class CardBattleScene extends BaseScene {
     this.container.addChild(buttonContainer);
   }
 
-  private makeCardDraggable(cardContainer: Container, card: CardInDeck): void {
+  private makeCardDraggable(cardContainer: Container): void {
     cardContainer.interactive = true;
     cardContainer.cursor = 'pointer';
 
     cardContainer.on('pointerdown', (event) => {
-      this.onDragStart(event, cardContainer, card);
+      this.onDragStart(event, cardContainer);
     });
   }
 
@@ -1118,7 +1119,7 @@ export class CardBattleScene extends BaseScene {
     });
   }
 
-  private onDragStart(event: any, cardContainer: Container, card: CardInDeck): void {
+  private onDragStart(event: any, cardContainer: Container): void {
     cardContainer.alpha = 0.8;
     this.dragTarget = cardContainer;
 
@@ -1478,7 +1479,6 @@ export class CardBattleScene extends BaseScene {
     // Find the deck position (where the card should fly from)
     const isPlayer1 = playerNo === 1;
     const player = this.battleState ? this.battleState.players.find(p => p.team === playerNo) : null;
-    const deckContainer = isPlayer1 ? this.player1Container : this.player2Container;
     const deckX = this.STANDARD_PADDING + 25; // Center of deck card
     const deckY = 35 + 35; // Y of deck + half height
 

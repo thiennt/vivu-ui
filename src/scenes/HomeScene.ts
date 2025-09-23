@@ -2,14 +2,12 @@ import { Container, Graphics, Text, Ticker } from 'pixi.js';
 import { navigation } from '@/utils/navigation';
 import { BaseScene } from '@/utils/BaseScene';
 import { CharactersScene } from './CharactersScene';
-import { DungeonScene } from './DungeonScene';
-import { PlayerDetailScene } from './PlayerDetailScene';
 import { LineupScene } from './LineupScene';
 import { BattleScene } from './BattleScene';
 import { CardBattleScene } from './CardBattleScene';
 import { TowerScene } from './TowerScene';
 import { Colors, Gradients } from '@/utils/colors';
-import { playerApi, ApiError, isLikelyUsingMockData } from '@/services/api';
+import { playerApi, isLikelyUsingMockData } from '@/services/api';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
 
 
