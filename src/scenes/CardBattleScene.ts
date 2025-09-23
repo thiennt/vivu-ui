@@ -43,10 +43,96 @@ export class CardBattleScene extends BaseScene {
   private dragTarget: Container | null = null;
   private dragOffset = { x: 0, y: 0 };
   private isDragging = false;
+
+  // Fixed variables for each player's game state
+  private player1Characters: CardBattleCharacter[] = [];
+  private player1HandCards: CardInDeck[] = [];
+  private player1DeckCards: CardInDeck[] = [];
+  private player1DiscardedCards: CardInDeck[] = [];
+  
+  private player2Characters: CardBattleCharacter[] = [];
+  private player2HandCards: CardInDeck[] = [];
+  private player2DeckCards: CardInDeck[] = [];
+  private player2DiscardedCards: CardInDeck[] = [];
   
   // Helper functions for card property access
   private getCurrentPlayer(): number {
     return this.battleState?.current_player || 1;
+  }
+
+  /**
+   * Update fixed variables from the current battle state
+   */
+  private updateFixedVariables(): void {
+    if (!this.battleState) return;
+
+    // Clear existing state
+    this.player1Characters = [];
+    this.player1HandCards = [];
+    this.player1DeckCards = [];
+    this.player1DiscardedCards = [];
+    this.player2Characters = [];
+    this.player2HandCards = [];
+    this.player2DeckCards = [];
+    this.player2DiscardedCards = [];
+
+    // Update from battle state players
+    this.battleState.players.forEach(player => {
+      if (player.team === 1) {
+        this.player1Characters = [...player.characters];
+        this.player1HandCards = [...player.deck.hand_cards];
+        this.player1DeckCards = [...player.deck.deck_cards];
+        this.player1DiscardedCards = [...player.deck.discard_cards];
+      } else if (player.team === 2) {
+        this.player2Characters = [...player.characters];
+        this.player2HandCards = [...player.deck.hand_cards];
+        this.player2DeckCards = [...player.deck.deck_cards];
+        this.player2DiscardedCards = [...player.deck.discard_cards];
+      }
+    });
+
+    console.log('🔄 Fixed variables updated:', {
+      player1: {
+        characters: this.player1Characters.length,
+        hand: this.player1HandCards.length,
+        deck: this.player1DeckCards.length,
+        discard: this.player1DiscardedCards.length
+      },
+      player2: {
+        characters: this.player2Characters.length,
+        hand: this.player2HandCards.length,
+        deck: this.player2DeckCards.length,
+        discard: this.player2DiscardedCards.length
+      }
+    });
+  }
+
+  /**
+   * Get characters for a specific player
+   */
+  private getPlayerCharacters(playerTeam: number): CardBattleCharacter[] {
+    return playerTeam === 1 ? this.player1Characters : this.player2Characters;
+  }
+
+  /**
+   * Get hand cards for a specific player
+   */
+  private getPlayerHandCards(playerTeam: number): CardInDeck[] {
+    return playerTeam === 1 ? this.player1HandCards : this.player2HandCards;
+  }
+
+  /**
+   * Get deck cards for a specific player
+   */
+  private getPlayerDeckCards(playerTeam: number): CardInDeck[] {
+    return playerTeam === 1 ? this.player1DeckCards : this.player2DeckCards;
+  }
+
+  /**
+   * Get discarded cards for a specific player
+   */
+  private getPlayerDiscardedCards(playerTeam: number): CardInDeck[] {
+    return playerTeam === 1 ? this.player1DiscardedCards : this.player2DiscardedCards;
   }
 
   private async animateActionResult(result: BattleActionResult): Promise<void> {
@@ -612,6 +698,7 @@ export class CardBattleScene extends BaseScene {
       const response = await battleApi.getBattleState(this.battleId);
       if (response.success && response.data) {
         this.battleState = response.data;
+        this.updateFixedVariables(); // Update fixed variables when battle state changes
         console.log(`✅ Battle state refreshed: ${response.message}`);
       } else {
         console.error(`❌ Failed to refresh battle state: ${response.message}`);
@@ -703,6 +790,7 @@ export class CardBattleScene extends BaseScene {
       const response = await battleApi.getBattleState(this.battleId);
       if (response.success && response.data) {
         this.battleState = response.data;
+        this.updateFixedVariables(); // Initialize fixed variables on first load
         console.log(`✅ Battle state loaded: ${response.message}`, this.battleState);
       } else {
         console.error(`❌ Failed to load battle state: ${response.message}`);
@@ -732,11 +820,11 @@ export class CardBattleScene extends BaseScene {
 
   private findCharacterCard(characterId: string, team: number): Container | null {
     const playerContainer = team === 1 ? this.player1Container : this.player2Container;
-    const player = this.battleState?.players.find(p => p.team === team);
+    const characters = this.getPlayerCharacters(team);
     
-    if (!player || !playerContainer) return null;
+    if (!playerContainer) return null;
     
-    const characterIndex = player.characters.findIndex(char => char.character_id === characterId);
+    const characterIndex = characters.findIndex(char => char.character_id === characterId);
     if (characterIndex >= 0 && characterIndex < playerContainer.children.length) {
       return playerContainer.children[characterIndex] as Container;
     }
@@ -1043,12 +1131,15 @@ export class CardBattleScene extends BaseScene {
     const characterSpacing = 10;
     const padding = this.STANDARD_PADDING;
 
-    const player = this.battleState ? this.battleState.players.find(p => p.team === playerNo) : null;
-    const totalCharacterWidth = (player?.characters.length || 0) * characterWidth + Math.max(0, (player?.characters.length || 0) - 1) * characterSpacing;
+    const characters = this.getPlayerCharacters(playerNo);
+    const deckCards = this.getPlayerDeckCards(playerNo);
+    const discardCards = this.getPlayerDiscardedCards(playerNo);
+    
+    const totalCharacterWidth = characters.length * characterWidth + Math.max(0, characters.length - 1) * characterSpacing;
     const startX = (this.gameWidth - totalCharacterWidth) / 2;
 
     // Create character cards (energy is now handled separately)
-    player?.characters.forEach((character, index) => {
+    characters.forEach((character, index) => {
       const x = startX + index * (characterWidth + characterSpacing);
       const y = 10; // Reduced Y offset since energy is separate
       const characterCard = this.createCharacterCard(character, x, y, characterWidth);
@@ -1069,11 +1160,11 @@ export class CardBattleScene extends BaseScene {
     const pileY = 10; // Reduced Y offset since energy is separate
 
     // Deck
-    const deckCard = this.createDeckCard(deckX, pileY, player?.deck.deck_cards.length ?? 0);
+    const deckCard = this.createDeckCard(deckX, pileY, deckCards.length);
     container.addChild(deckCard);
 
     // Discard pile
-    const discardCard = this.createDiscardPile(discardX, pileY, player?.deck.discard_cards || []);
+    const discardCard = this.createDiscardPile(discardX, pileY, discardCards);
     
     this.dropZones.push({
       area: discardCard,
@@ -1086,11 +1177,12 @@ export class CardBattleScene extends BaseScene {
 
   private createHandArea(container: Container, playerNo: number, showCards: boolean): void {
     const player = this.battleState ? this.battleState.players.find(p => p.team === playerNo) : null;
+    const handCards = this.getPlayerHandCards(playerNo);
 
     if (!player) return;
 
     const cardWidth = 60;
-    const handCount = player ? player.deck.hand_cards.length : 0;
+    const handCount = handCards.length;
     const padding = this.STANDARD_PADDING;
     const maxVisible = 5;
     let cardSpacing: number;
@@ -1113,7 +1205,7 @@ export class CardBattleScene extends BaseScene {
       const x = startX + index * cardSpacing;
       const y = 10;
 
-      const card = player.deck.hand_cards[index];
+      const card = handCards[index];
 
       const cardContainer = showCards
         ? this.createHandCard(card, x, y, cardWidth)
@@ -1760,11 +1852,11 @@ export class CardBattleScene extends BaseScene {
   private checkBattleEnd(): boolean {
     if (!this.battleState) return false;
 
-    // Check if all characters of player 1 are defeated
-    const player1 = this.battleState.players.find(p => p.team === 1);
-    const player2 = this.battleState.players.find(p => p.team === 2);
-    const player1Alive = player1?.characters.some(char => char.current_hp > 0) || false;
-    const player2Alive = player2?.characters.some(char => char.current_hp > 0) || false;
+    // Check if all characters of each player are defeated using fixed variables
+    const player1Characters = this.getPlayerCharacters(1);
+    const player2Characters = this.getPlayerCharacters(2);
+    const player1Alive = player1Characters.some(char => char.current_hp > 0);
+    const player2Alive = player2Characters.some(char => char.current_hp > 0);
     
     if (!player1Alive) {
       this.showBattleEnd(false);
@@ -1846,7 +1938,7 @@ export class CardBattleScene extends BaseScene {
   private async animateDrawCard(cardInDeck: CardInDeck, playerNo: number): Promise<void> {
     // Find the deck position (where the card should fly from)
     const isPlayer1 = playerNo === 1;
-    const player = this.battleState ? this.battleState.players.find(p => p.team === playerNo) : null;
+    const handCards = this.getPlayerHandCards(playerNo);
     const deckX = this.STANDARD_PADDING + 25; // Center of deck card
     const deckY = 35 + 35; // Y of deck + half height
 
@@ -1857,8 +1949,8 @@ export class CardBattleScene extends BaseScene {
 
     // Calculate target position in hand
     // After pushing to hand, the card will be at the end
-    const handIndex = player?.deck.hand_cards.length! - 1;
-    const handCount = player?.deck.hand_cards.length!;
+    const handIndex = handCards.length - 1;
+    const handCount = handCards.length;
     const padding = this.STANDARD_PADDING;
     const maxVisible = 5;
     let cardSpacing: number;
