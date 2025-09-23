@@ -26,9 +26,6 @@ import {
 } from '@/types';
 import { 
   mockCardBattleState, 
-  mockDrawPhaseResult, 
-  mockPlayCardResponse, 
-  mockEndTurnResult,
   mockBattleRewards 
 } from '@/utils/mockData';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
@@ -96,49 +93,6 @@ export class CardBattleScene extends BaseScene {
         response.errors.forEach(error => console.error(`   Error: ${error}`));
       }
     }
-  }
-
-  /**
-   * Helper to create a properly typed mock response for discard actions
-   */
-  private createMockDiscardResponse(cardId: string): BattleMoveResponse {
-    const mockLog: CardBattleLog = {
-      id: `log_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      phase: 'main_phase' as const,
-      action_type: 'discard_card',
-      actor: {
-        team: 1,
-        character_id: 'player_char_1',
-        player_id: 'player_fc_001'
-      },
-      card: {
-        id: cardId || 'unknown',
-        name: 'Unknown Card',
-        group: 'spell',
-        description: 'A discarded card',
-        card_type: 'action',
-        energy_cost: 1
-      },
-      result: {
-        success: true,
-        reason: undefined
-      },
-      created_at: new Date().toISOString(),
-      animation_hint: 'Card discarded successfully'
-    };
-    
-    return {
-      success: true,
-      code: 200,
-      message: "Card discarded successfully",
-      data: [mockLog],
-      errors: null,
-      meta: {
-        action: 'discard_card',
-        battleId: 'battle_mock_001',
-        timestamp: new Date().toISOString()
-      }
-    };
   }
 
 
@@ -269,13 +223,8 @@ export class CardBattleScene extends BaseScene {
   }
 
   private async refreshBattleState(): Promise<void> {
-    if (this.usingMockData) {
-      console.log('🔄 Using mock data, skipping server refresh...');
-      return;
-    }
-    
     try {
-      console.log('🔄 Refreshing battle state from server...');
+      console.log('🔄 Refreshing battle state...');
       const response = await battleApi.getBattleState(this.battleId);
       if (response.success && response.data) {
         this.battleState = response.data;
@@ -285,20 +234,16 @@ export class CardBattleScene extends BaseScene {
         if (response.errors) {
           response.errors.forEach(error => console.error(`   Error: ${error}`));
         }
-        // Continue with existing state
+        throw new Error('Failed to refresh battle state');
       }
       this.refreshUI();
     } catch (error) {
       console.error('❌ Error refreshing battle state:', error);
-      console.log('🔄 Continuing with mock data...');
-      this.usingMockData = true;
+      throw error;
     }
   }
 
-  private showMockDataNotification(): void {
-    console.log('ℹ️ Using offline battle mode with mock data');
-    // Could add a visual notification to the UI here if desired
-  }
+
 
   private async animateDamage(damage: number): Promise<void> {
     console.log(`💥 Animating ${damage} damage`);
@@ -351,9 +296,6 @@ export class CardBattleScene extends BaseScene {
   private battleId: string;
 
   private loadingManager: LoadingStateManager;
-  
-  // Track when we're using mock data due to API failure
-  private usingMockData: boolean = false;
 
   constructor(params?: {  battle_id?: string }) {
     super();
@@ -372,32 +314,18 @@ export class CardBattleScene extends BaseScene {
     try {
       console.log('🔄 Preparing CardBattleScene...');
       
-      // Move getBattleState to prepare function to load battlestate data for ui to init
-      try {
-        console.log('🔄 Loading battle state from server...');
-        const response = await battleApi.getBattleState(this.battleId);
-        if (response.success && response.data) {
-          this.battleState = response.data;
-          console.log(`✅ Battle state loaded: ${response.message}`, this.battleState);
-          this.usingMockData = false;
-        } else {
-          console.error(`❌ Failed to load battle state: ${response.message}`);
-          if (response.errors) {
-            response.errors.forEach(error => console.error(`   Error: ${error}`));
-          }
-          throw new Error('Failed to load battle state');
+      // Load battle state from API (will use mock data if configured)
+      console.log('🔄 Loading battle state...');
+      const response = await battleApi.getBattleState(this.battleId);
+      if (response.success && response.data) {
+        this.battleState = response.data;
+        console.log(`✅ Battle state loaded: ${response.message}`, this.battleState);
+      } else {
+        console.error(`❌ Failed to load battle state: ${response.message}`);
+        if (response.errors) {
+          response.errors.forEach(error => console.error(`   Error: ${error}`));
         }
-        
-      } catch (error) {
-        console.error('❌ Error loading battle state from API:', error);
-        console.log('🔄 Falling back to mock data for complete battle experience...');
-        
-        // Use mock data instead of failing
-        this.battleState = mockCardBattleState;
-        this.usingMockData = true;
-        
-        // Show user-friendly message about using offline mode
-        this.showMockDataNotification();
+        throw new Error('Failed to load battle state');
       }
       
       this.loadingManager.hideLoading();
@@ -479,38 +407,23 @@ export class CardBattleScene extends BaseScene {
   private async startPlayerTurn(): Promise<void> {
     console.log('🎯 Starting player turn...');
     
-    let turnStartResult;
+    // Call the API (will use mock data if configured)
+    const turnStartResult = await battleApi.startTurn(this.battleId);
     
-    if (this.usingMockData) {
-      console.log('🎯 Using mock data for turn start...');
-      turnStartResult = mockDrawPhaseResult;
-    } else {
-      try {
-        // Call the new startTurn API
-        turnStartResult = await battleApi.startTurn(this.battleId);
-        
-        if (!turnStartResult.success) {
-          console.log('🔄 API returned failure, falling back to mock data...');
-          turnStartResult = mockDrawPhaseResult;
-          this.usingMockData = true;
-        }
-      } catch (error) {
-        console.error('❌ Error starting turn via API:', error);
-        console.log('🔄 Using mock data for turn start...');
-        turnStartResult = mockDrawPhaseResult;
-        this.usingMockData = true;
-      }
+    if (!turnStartResult.success) {
+      console.error('❌ Failed to start turn:', turnStartResult.message);
+      throw new Error('Failed to start turn');
     }
 
     console.log('📥 Processing turn start result:', turnStartResult);
     
-    // Process new API response format
+    // Process API response format
     await this.processCardBattleApiResponse(turnStartResult);
     
     // Show "Your Turn" message
     await this.showTurnMessage('Your Turn!');
     
-    // Refresh battle state from server (or skip if using mock data)
+    // Refresh battle state
     await this.refreshBattleState();
     
     console.log('🎯 Player turn: Main phase - you can now play cards');
@@ -1309,33 +1222,18 @@ export class CardBattleScene extends BaseScene {
 
     console.log('🎮 Playing card...', moveData);
     
-    let moveResponse;
+    // Call the API (will use mock data if configured)
+    const moveResponse = await battleApi.playAction(this.battleId, moveData);
     
-    if (this.usingMockData) {
-      console.log('🎮 Using mock data for card play...');
-      moveResponse = mockPlayCardResponse;
-    } else {
-      try {
-        // Call the new playAction API
-        moveResponse = await battleApi.playAction(this.battleId, moveData);
-        
-        if (!moveResponse.success) {
-          console.log('🔄 API returned failure, using mock response...');
-          moveResponse = mockPlayCardResponse;
-          this.usingMockData = true;
-        }
-      } catch (error) {
-        console.error('❌ Error playing card via API:', error);
-        console.log('🔄 Using mock response for card play...');
-        moveResponse = mockPlayCardResponse;
-        this.usingMockData = true;
-      }
+    if (!moveResponse.success) {
+      console.error('❌ Failed to play card:', moveResponse.message);
+      throw new Error('Failed to play card');
     }
 
-    // Process new API response format
+    // Process API response format
     await this.processCardBattleApiResponse(moveResponse);
     
-    // Refresh battle state from server (or skip if using mock data)
+    // Refresh battle state
     await this.refreshBattleState();
     
     console.log('✅ Card played successfully');
@@ -1351,34 +1249,18 @@ export class CardBattleScene extends BaseScene {
 
     console.log('🗑️ Discarding card...', moveData);
     
-    let moveResponse;
+    // Call the API (will use mock data if configured)
+    const moveResponse = await battleApi.playAction(this.battleId, moveData);
     
-    if (this.usingMockData) {
-      console.log('🗑️ Using mock data for card discard...');
-      // Create a simple mock response for discard
-      moveResponse = this.createMockDiscardResponse(moveData.card_id || 'unknown');
-    } else {
-      try {
-        // Call the new playAction API
-        moveResponse = await battleApi.playAction(this.battleId, moveData);
-        
-        if (!moveResponse.success) {
-          console.log('🔄 API returned failure, using mock response...');
-          moveResponse = this.createMockDiscardResponse(moveData.card_id || 'unknown');
-          this.usingMockData = true;
-        }
-      } catch (error) {
-        console.error('❌ Error discarding card via API:', error);
-        console.log('🔄 Using mock response for card discard...');
-        moveResponse = this.createMockDiscardResponse(moveData.card_id || 'unknown');
-        this.usingMockData = true;
-      }
+    if (!moveResponse.success) {
+      console.error('❌ Failed to discard card:', moveResponse.message);
+      throw new Error('Failed to discard card');
     }
 
-    // Process new API response format
+    // Process API response format
     await this.processCardBattleApiResponse(moveResponse);
     
-    // Refresh battle state from server (or skip if using mock data)
+    // Refresh battle state
     await this.refreshBattleState();
     
     console.log('✅ Card discarded successfully');
@@ -1408,38 +1290,23 @@ export class CardBattleScene extends BaseScene {
   private async endTurn(): Promise<void> {
     console.log('🎯 Ending player turn...');
     
-    let turnResponse;
+    // Call the API (will use mock data if configured)
+    const turnResponse = await battleApi.endTurn(this.battleId);
     
-    if (this.usingMockData) {
-      console.log('🎯 Using mock data for turn end...');
-      turnResponse = mockEndTurnResult;
-    } else {
-      try {
-        // Call the new endTurn API which returns AI actions
-        turnResponse = await battleApi.endTurn(this.battleId);
-        
-        if (!turnResponse.success) {
-          console.log('🔄 API returned failure, using mock response...');
-          turnResponse = mockEndTurnResult;
-          this.usingMockData = true;
-        }
-      } catch (error) {
-        console.error('❌ Error ending turn via API:', error);
-        console.log('🔄 Using mock response for turn end...');
-        turnResponse = mockEndTurnResult;
-        this.usingMockData = true;
-      }
+    if (!turnResponse.success) {
+      console.error('❌ Failed to end turn:', turnResponse.message);
+      throw new Error('Failed to end turn');
     }
 
     console.log('📥 Processing turn end response:', turnResponse);
     
-    // Process new API response format
+    // Process API response format
     await this.processCardBattleApiResponse(turnResponse);
     
     // Show turn ending message
     await this.showTurnMessage('Turn Ending...');
     
-    // Refresh battle state from server (or skip if using mock data)
+    // Refresh battle state
     await this.refreshBattleState();
     
     // Check for battle end conditions
@@ -1493,37 +1360,31 @@ export class CardBattleScene extends BaseScene {
 
     let rewards: BattleRewards | null = null;
 
-    if (this.usingMockData) {
-      console.log('🎁 Using mock rewards for battle end...');
-      rewards = playerWon ? mockBattleRewards : null;
-    } else {
-      try {
-        // Step 1: Report battle end to backend if we have a battleId
-        if (this.battleId) {
-          console.log('🔄 Reporting battle end to backend...', battleEndData);
-          const battleEndResponse = await battleApi.endBattle(this.battleId, battleEndData);
-          
-          // Get rewards from the response
-          if (battleEndResponse.rewards) {
-            rewards = battleEndResponse.rewards;
-            console.log('🎁 Battle rewards received:', rewards);
-          } else if (playerWon) {
-            // Fallback: try to fetch rewards separately
-            try {
-              rewards = await battleApi.getBattleRewards(this.battleId);
-            } catch (rewardError) {
-              console.warn('⚠️ Could not fetch rewards:', rewardError);
-            }
+    try {
+      // Report battle end to backend and get rewards
+      if (this.battleId) {
+        console.log('🔄 Reporting battle end to backend...', battleEndData);
+        const battleEndResponse = await battleApi.endBattle(this.battleId, battleEndData);
+        
+        // Get rewards from the response
+        if (battleEndResponse.rewards) {
+          rewards = battleEndResponse.rewards;
+          console.log('🎁 Battle rewards received:', rewards);
+        } else if (playerWon) {
+          // Fallback: try to fetch rewards separately
+          try {
+            rewards = await battleApi.getBattleRewards(this.battleId);
+          } catch (rewardError) {
+            console.warn('⚠️ Could not fetch rewards:', rewardError);
           }
-        } else {
-          console.log('⚠️ No battleId - using default rewards');
         }
-      } catch (error) {
-        console.error('❌ Error reporting battle end via API:', error);
-        console.log('🔄 Using mock rewards as fallback...');
+      } else {
+        console.log('⚠️ No battleId - using default rewards');
         rewards = playerWon ? mockBattleRewards : null;
-        this.usingMockData = true;
       }
+    } catch (error) {
+      console.error('❌ Error reporting battle end via API:', error);
+      throw error;
     }
 
     // Step 2: Display battle end UI
