@@ -37,7 +37,6 @@ export class CardBattleScene extends BaseScene {
   private player1EnergyContainer!: Container;
   private player2EnergyContainer!: Container;
   private battleLogContainer!: Container;
-  private uiContainer!: Container;
   
   // Drag and drop
   private dragTarget: Container | null = null;
@@ -87,8 +86,6 @@ export class CardBattleScene extends BaseScene {
       }
     }
   }
-
-
 
   /**
    * Centralized method to process CardBattleLogs for animations
@@ -152,7 +149,8 @@ export class CardBattleScene extends BaseScene {
    */
   private async animateCardBattleDrawPhase(logEntry: CardBattleLog): Promise<void> {
     const playerText = logEntry.actor.team === 1 ? 'Player' : 'AI';
-    await this.showTurnMessage(`${playerText}: ${logEntry.animation_hint || 'Drawing cards'}`);
+    this.animateDrawCard(logEntry.drawn_cards || []);
+    
   }
 
   private async animateCardBattlePlayCard(logEntry: CardBattleLog): Promise<void> {
@@ -400,6 +398,9 @@ export class CardBattleScene extends BaseScene {
   private async startPlayerTurn(): Promise<void> {
     console.log('🎯 Starting player turn...');
     
+    // Show "Your Turn" message
+    await this.showTurnMessage('Your Turn!');
+
     // Call the API (will use mock data if configured)
     const turnStartResult = await battleApi.startTurn(this.battleId);
     
@@ -412,14 +413,30 @@ export class CardBattleScene extends BaseScene {
     
     // Process API response format
     await this.processCardBattleApiResponse(turnStartResult);
-    
-    // Show "Your Turn" message
-    await this.showTurnMessage('Your Turn!');
-    
-    // Refresh battle state
-    await this.refreshBattleState();
+
+    await this.drawCards();
     
     console.log('🎯 Player turn: Main phase - you can now play cards');
+  }
+
+  private async drawCards(): Promise<void> {
+    if (!this.battleState) return;
+    
+    const turnAction: TurnAction = {
+      type: 'draw_card',
+      player_team: this.getCurrentPlayer()
+    };
+
+    const drawResult = await battleApi.drawCards(this.battleId, turnAction);
+    if (!drawResult.success) {
+      console.error('❌ Failed to draw cards:', drawResult.message);
+      throw new Error('Failed to draw cards');
+    }
+
+    console.log('📥 Processing draw cards result:', drawResult);
+
+    // Process API response format
+    await this.processCardBattleApiResponse(drawResult);
   }
 
   private async showTurnMessage(message: string): Promise<void> {
@@ -501,7 +518,6 @@ export class CardBattleScene extends BaseScene {
     this.player1EnergyContainer = new Container();
     this.player2EnergyContainer = new Container();
     this.battleLogContainer = new Container();
-    this.uiContainer = new Container();
 
     // Layout calculations - fit all elements with proper spacing
     const availableHeight = this.getContentHeight();

@@ -5,10 +5,11 @@
  */
 
 import { config } from '@/config';
-import { mockPlayer, mockSkills, mockDungeons, mockStages, mockCardBattleState,  mockBattleStage, mockPlayer1Characters, mockActionResult } from '@/utils/mockData';
+import { mockPlayer, mockSkills, mockDungeons, mockStages, mockCardBattleState,  mockBattleStage, mockPlayer1Characters, mockActionResult, mockDrawCardResult } from '@/utils/mockData';
 import { 
   TurnAction, 
 } from '@/types';
+import { drawCards } from '@/utils/cardData';
 
 
 
@@ -214,6 +215,17 @@ export const battleApi = {
       body: JSON.stringify(turnAction),
     }, mockActionResult);
   },
+
+  async drawCards(battleId: string, turnAction: TurnAction): Promise<any> {
+    console.log('🎮 drawCards API called for battle:', battleId, 'with data:', turnAction);
+
+    const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
+    return apiRequest(`/players/${playerId}/card-battle/${battleId}/action`, {
+      method: 'POST',
+      body: JSON.stringify(turnAction),
+    }, mockDrawCardResult);
+  },
+  
 
   async getBattleLogs(battleId: string, turn?: number): Promise<any> {
     console.log('📋 getBattleLogs API called for battle:', battleId, 'turn:', turn);

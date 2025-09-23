@@ -48,7 +48,7 @@ export class PrepareScene extends BaseScene {
     } else {
       console.error(`❌ Failed to create battle stage: ${response.message}`);
       if (response.errors) {
-        response.errors.forEach(error => console.error(`   Error: ${error}`));
+        response.errors.forEach((error: any) => console.error(`   Error: ${error}`));
       }
       this.battleStage = null; // Use null as fallback
     }
@@ -417,7 +417,7 @@ export class PrepareScene extends BaseScene {
     } else {
       console.error(`❌ Failed to start battle: ${response.message}`);
       if (response.errors) {
-        response.errors.forEach(error => console.error(`   Error: ${error}`));
+        response.errors.forEach((error: any) => console.error(`   Error: ${error}`));
       }
       // Could show an error message to the user here
     }
