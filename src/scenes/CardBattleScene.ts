@@ -526,25 +526,7 @@ export class CardBattleScene extends BaseScene {
 
   /** Show the screen with animation */
   async show(): Promise<void> {
-    this.container.alpha = 0;
-    const tween = { alpha: 0 };
-    
-    return new Promise(async (resolve) => {
-      const animate = () => {
-        tween.alpha += 0.05;
-        this.container.alpha = tween.alpha;
-        
-        if (tween.alpha >= 1) {
-          this.container.alpha = 1;
-          // Start the battle sequence after UI is initialized
-          this.startBattleSequence();
-          resolve();
-        } else {
-          requestAnimationFrame(animate);
-        }
-      };
-      animate();
-    });
+    this.startBattleSequence();
   }
 
   private async startBattleSequence(): Promise<void> {

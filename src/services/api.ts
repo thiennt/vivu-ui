@@ -353,8 +353,9 @@ export const battleApi = {
       timestamp: new Date().toISOString()
     };
     const mockCardBattleLogs = [convertToCardBattleLog(mockBattleLogEntry)];
-    
-    return apiRequest(`/card-battle/${battleId}/action`, {
+
+    const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
+    return apiRequest(`/players/${playerId}/card-battle/${battleId}/action`, {
       method: 'POST',
       body: JSON.stringify(moveData),
     }, {
