@@ -4,8 +4,7 @@ import { Colors } from '@/utils/colors';
 import { 
   CardBattleLog, 
   CardInDeck, 
-  BattleActionResult,
-  CardBattleCharacter 
+  BattleActionResult
 } from '@/types';
 
 /**
@@ -81,7 +80,7 @@ export class CardBattleAnimationManager {
         await this.animateEnergyUpdate(logEntry);
         break;
       case 'end_turn':
-        await this.animateEndTurn(logEntry);
+        await this.animateEndTurn();
         break;
       default:
         console.log(`⚠️ Unknown CardBattle log entry type: ${logEntry.action_type}`);
@@ -393,7 +392,7 @@ export class CardBattleAnimationManager {
     await this.showTurnMessage(effect);
   }
 
-  private async animateEndTurn(logEntry: CardBattleLog): Promise<void> {
+  private async animateEndTurn(): Promise<void> {
     await this.showTurnMessage('Turn ended');
   }
 

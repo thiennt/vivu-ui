@@ -217,8 +217,8 @@ export class CardBattleScene extends BaseScene {
       this.playerStateManager.getPlayerCharacters(2), 
       this.gameWidth
     );
-    this.uiManager.createEnergyArea(this.player1EnergyContainer, 1, this.gameWidth);
-    this.uiManager.createEnergyArea(this.player2EnergyContainer, 2, this.gameWidth);
+    this.uiManager.createEnergyArea(this.player1EnergyContainer, 1);
+    this.uiManager.createEnergyArea(this.player2EnergyContainer, 2);
     
     // Create hand areas with proper data
     this.uiManager.createHandArea(

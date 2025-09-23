@@ -33,7 +33,7 @@ export class CardBattleUIManager {
     gameWidth: number,
     availableHeight: number
   ): void {
-    const padding = (this.scene as any).STANDARD_PADDING;
+    const padding = (this.scene as BaseScene & { STANDARD_PADDING: number }).STANDARD_PADDING;
 
     // Clear containers
     gameContainer.removeChildren();
@@ -83,12 +83,12 @@ export class CardBattleUIManager {
     );
   }
 
-  createEnergyArea(container: Container, playerNo: number, gameWidth: number): void {
+  createEnergyArea(container: Container, playerNo: number): void {
     container.removeChildren();
 
     const energyValue = playerNo === 1 ? 3 : 2; // Mock values
     const maxEnergy = 5;
-    const padding = (this.scene as any).STANDARD_PADDING;
+    const padding = (this.scene as BaseScene & { STANDARD_PADDING: number }).STANDARD_PADDING;
 
     // Energy title
     const energyText = new Text({
@@ -133,10 +133,9 @@ export class CardBattleUIManager {
   ): void {
     container.removeChildren();
 
-    const padding = (this.scene as any).STANDARD_PADDING;
+    const padding = (this.scene as BaseScene & { STANDARD_PADDING: number }).STANDARD_PADDING;
     const characterCount = characters.length;
     const maxCardWidth = 150;
-    const cardHeight = 90;
 
     let cardWidth = Math.min(maxCardWidth, (gameWidth - 2 * padding - (characterCount - 1) * 10) / characterCount);
     cardWidth = Math.max(80, cardWidth);
@@ -226,7 +225,7 @@ export class CardBattleUIManager {
   ): void {
     container.removeChildren();
 
-    const padding = (this.scene as any).STANDARD_PADDING;
+    const padding = (this.scene as BaseScene & { STANDARD_PADDING: number }).STANDARD_PADDING;
     const handCount = handCards.length;
 
     if (handCount === 0) return;
@@ -324,7 +323,7 @@ export class CardBattleUIManager {
     cardContainer.y = y;
 
     // Store card data for interactions
-    (cardContainer as any).cardData = card;
+    (cardContainer as Container & { cardData: CardInDeck }).cardData = card;
 
     return cardContainer;
   }
@@ -432,7 +431,7 @@ export class CardBattleUIManager {
   createBattleLog(container: Container, gameWidth: number): void {
     container.removeChildren();
 
-    const padding = (this.scene as any).STANDARD_PADDING;
+    const padding = (this.scene as BaseScene & { STANDARD_PADDING: number }).STANDARD_PADDING;
     const logWidth = gameWidth - 2 * padding;
     const logHeight = 80;
 

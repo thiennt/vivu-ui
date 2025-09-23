@@ -1,6 +1,5 @@
 import { Container, FederatedPointerEvent } from 'pixi.js';
 import { CardInDeck } from '@/types';
-import { CardDetailPopup } from '@/popups/CardDetailPopup';
 
 /**
  * Manages drag and drop interactions for cards in the CardBattleScene
@@ -42,27 +41,11 @@ export class CardBattleDragDropManager {
     cardContainer.on('rightclick', () => this.showCardDetails(cardContainer));
   }
 
-  /**
-   * Show card details popup
-   */
   private showCardDetails(cardContainer: Container): void {
-    const cardData = (cardContainer as any).cardData as CardInDeck;
+    const cardData = (cardContainer as Container & { cardData?: CardInDeck }).cardData;
     if (cardData && cardData.card) {
-      // Convert CardInDeck to the format expected by CardDetailPopup
-      const battleCard = {
-        card: {
-          id: cardData.card.id,
-          name: cardData.card.name,
-          description: cardData.card.description,
-          energyCost: cardData.card.energy_cost,
-          group: cardData.card.group as any,
-          rarity: cardData.card.rarity as any,
-          effects: [] // CardDetailPopup expects effects array
-        }
-      };
-      const popup = new CardDetailPopup(battleCard);
-      // Assume popup has an open method or similar
-      console.log('Card details:', cardData.card.name);
+      // Show card details in console for now
+      console.log('Card details:', cardData.card.name, cardData.card.description);
     }
   }
 
@@ -70,7 +53,7 @@ export class CardBattleDragDropManager {
    * Handle drag start
    */
   private onDragStart(event: FederatedPointerEvent, cardContainer: Container): void {
-    const cardData = (cardContainer as any).cardData as CardInDeck;
+    const cardData = (cardContainer as Container & { cardData?: CardInDeck }).cardData;
     if (!cardData) return;
 
     this.isDragging = true;
@@ -116,7 +99,7 @@ export class CardBattleDragDropManager {
 
     const globalPos = event.global;
     const dropTarget = this.getDropTarget(globalPos);
-    const cardData = (this.dragTarget as any).cardData as CardInDeck;
+    const cardData = (this.dragTarget as Container & { cardData?: CardInDeck }).cardData;
 
     if (dropTarget && cardData) {
       if (dropTarget.type === 'character') {
@@ -192,7 +175,7 @@ export class CardBattleDragDropManager {
    */
   getDraggedCard(): CardInDeck | null {
     if (this.dragTarget) {
-      return (this.dragTarget as any).cardData as CardInDeck || null;
+      return (this.dragTarget as Container & { cardData?: CardInDeck }).cardData || null;
     }
     return null;
   }
