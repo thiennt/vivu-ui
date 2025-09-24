@@ -242,9 +242,12 @@ export class CardBattleScene extends BaseScene {
     const { height } = config;
     const { y: yPosition } = position;
     
-    // Hand background
+    // Hand background with proper side padding for vertical screen fit
     const handBg = new Graphics();
-    handBg.roundRect(0, 0, this.gameWidth, height, 10)
+    const bgWidth = this.gameWidth - (this.STANDARD_PADDING * 2);
+    const bgX = this.STANDARD_PADDING;
+    
+    handBg.roundRect(bgX, 0, bgWidth, height, 10)
       .fill(Colors.UI_BACKGROUND)
       .stroke({ width: 2, color: Colors.UI_BORDER });
     
@@ -262,8 +265,16 @@ export class CardBattleScene extends BaseScene {
     
     const topY = this.STANDARD_PADDING;
     const elementHeight = 50;
-    const elementWidth = 80;
+    
+    // Calculate responsive element width to prevent overlap (same logic as player area)
+    const availableWidth = this.gameWidth - (this.STANDARD_PADDING * 2);
     const spacing = this.STANDARD_SPACING;
+    const minElementWidth = 70;
+    const maxElementWidth = 90;
+    
+    // Calculate width that fits all 3 elements with proper spacing
+    let elementWidth = (availableWidth - (spacing * 2)) / 3;
+    elementWidth = Math.max(minElementWidth, Math.min(maxElementWidth, elementWidth));
     
     // Calculate total width and center horizontally
     const totalWidth = (elementWidth * 3) + (spacing * 2);
@@ -288,10 +299,10 @@ export class CardBattleScene extends BaseScene {
   private createOpponentHandArea(): void {
     this.opponentHandContainer = new Container();
     
-    // Position below opponent energy/deck/discard with padding
-    const opponentTopHeight = 50 + this.STANDARD_PADDING; // Height of top area
+    // Position below opponent energy/deck/discard with consistent padding
+    const opponentTopHeight = 50 + this.STANDARD_PADDING; // Height of top area (element height + padding)
     const handY = opponentTopHeight + this.STANDARD_PADDING;
-    const handHeight = 60; // Smaller height for opponent hand
+    const handHeight = 80; // Same height as player hand for consistency
     
     this.createHandAreaUI(
       this.opponentHandContainer,
@@ -307,10 +318,10 @@ export class CardBattleScene extends BaseScene {
     this.player1CharactersContainer = new Container();
     this.player2CharactersContainer = new Container();
     
-    // Calculate available space for battlefield layout
+    // Calculate available space for battlefield layout with consistent padding
     const opponentTopHeight = 50 + this.STANDARD_PADDING; // Opponent energy/deck/discard
-    const opponentHandHeight = 60 + this.STANDARD_PADDING; // Opponent hand
-    const playerHandHeight = 80; // Player hand (larger)
+    const opponentHandHeight = 80 + this.STANDARD_PADDING; // Opponent hand (now same as player)
+    const playerHandHeight = 80; // Player hand
     const playerBottomHeight = 50 + this.STANDARD_PADDING; // Player energy/deck/discard  
     const endTurnHeight = 50; // End turn button space
     
@@ -337,7 +348,7 @@ export class CardBattleScene extends BaseScene {
   private createActionLogInCenter(logY: number, logHeight: number): void {
     this.actionLogContainer = new Container();
     
-    // Center the action log horizontally and use provided position
+    // Center the action log horizontally with side padding for vertical screen fit
     const logWidth = Math.min(350, this.gameWidth - (this.STANDARD_PADDING * 2));
     
     const logBg = new Graphics();
