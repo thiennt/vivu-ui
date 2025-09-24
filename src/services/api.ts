@@ -212,26 +212,45 @@ export const battleApi = {
     }, mockActionResult);
   },
 
-  async playAction(battleId: string, turnAction: TurnAction): Promise<any> {
-    console.log('🎮 playAction API called for battle:', battleId, 'with data:', turnAction);
-    
+  async drawCards(battleId: string, turnAction: TurnAction): Promise<any> {
+    console.log('🎮 drawCards API called for battle:', battleId, 'with data:', turnAction);
+
     const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
-    return apiRequest(`/players/${playerId}/card-battle/${battleId}/action`, {
+    return apiRequest(`/players/${playerId}/card-battle/${battleId}/draw-card`, {
+      method: 'POST',
+      body: JSON.stringify(turnAction),
+    }, mockDrawCardResult);
+  },
+
+  async discardCard(battleId: string, turnAction: TurnAction): Promise<any> {
+    console.log('🎮 discardCard API called for battle:', battleId, 'with data:', turnAction);
+
+    const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
+    return apiRequest(`/players/${playerId}/card-battle/${battleId}/discard-card`, {
       method: 'POST',
       body: JSON.stringify(turnAction),
     }, mockActionResult);
   },
 
-  async drawCards(battleId: string, turnAction: TurnAction): Promise<any> {
-    console.log('🎮 drawCards API called for battle:', battleId, 'with data:', turnAction);
+  async playCard(battleId: string, turnAction: TurnAction): Promise<any> {
+    console.log('🎮 playCard API called for battle:', battleId, 'with data:', turnAction);
 
     const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
-    return apiRequest(`/players/${playerId}/card-battle/${battleId}/action`, {
+    return apiRequest(`/players/${playerId}/card-battle/${battleId}/play-card`, {
       method: 'POST',
       body: JSON.stringify(turnAction),
-    }, mockDrawCardResult);
+    }, mockActionResult);
   },
-  
+
+  async endTurn(battleId: string, turnAction: TurnAction): Promise<any> {
+    console.log('🎮 endTurn API called for battle:', battleId, 'with data:', turnAction);
+
+    const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
+    return apiRequest(`/players/${playerId}/card-battle/${battleId}/end-turn`, {
+      method: 'POST',
+      body: JSON.stringify(turnAction),
+    }, mockActionResult);
+  },
 
   async getBattleLogs(battleId: string, turn?: number): Promise<any> {
     console.log('📋 getBattleLogs API called for battle:', battleId, 'turn:', turn);
