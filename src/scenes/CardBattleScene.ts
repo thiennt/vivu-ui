@@ -33,6 +33,7 @@ export class CardBattleScene extends BaseScene {
   private player2CharactersContainer!: Container;
   private handContainer!: Container;
   private discardPileContainer!: Container;
+  private deckRemainingContainer!: Container;
   private energyContainer!: Container;
   private turnIndicatorContainer!: Container;
   private actionLogContainer!: Container;
@@ -73,6 +74,7 @@ export class CardBattleScene extends BaseScene {
     this.createTurnIndicator();
     this.createActionLog();
     this.createDiscardPile();
+    this.createDeckRemaining();
   }
 
   private createBackground(): void {
@@ -93,15 +95,19 @@ export class CardBattleScene extends BaseScene {
     this.player1CharactersContainer = new Container();
     this.player2CharactersContainer = new Container();
     
-    // Position player areas (vertical layout)
-    const battlefieldHeight = this.gameHeight * 0.6;
-    const battlefieldY = this.gameHeight * 0.1;
+    // Calculate available space for battlefield
+    const topUIHeight = 60; // Space for turn indicator and energy  
+    const handHeight = this.gameHeight * 0.2;
+    const bottomSpacing = this.STANDARD_PADDING * 2;
     
-    // Player 2 (opponent) at top
+    const battlefieldHeight = this.gameHeight - topUIHeight - handHeight - bottomSpacing;
+    const battlefieldY = topUIHeight + this.STANDARD_PADDING;
+    
+    // Player 2 (opponent) at top of battlefield
     this.player2CharactersContainer.y = battlefieldY;
     
-    // Player 1 (current player) at bottom
-    this.player1CharactersContainer.y = battlefieldY + battlefieldHeight * 0.5;
+    // Player 1 (current player) at bottom of battlefield
+    this.player1CharactersContainer.y = battlefieldY + battlefieldHeight * 0.6;
     
     this.battlefieldContainer.addChild(this.player2CharactersContainer);
     this.battlefieldContainer.addChild(this.player1CharactersContainer);
@@ -111,9 +117,9 @@ export class CardBattleScene extends BaseScene {
   private createHandArea(): void {
     this.handContainer = new Container();
     
-    // Position hand at bottom of screen
-    const handY = this.gameHeight * 0.8;
+    // Position hand at bottom of screen with proper padding
     const handHeight = this.gameHeight * 0.2;
+    const handY = this.gameHeight - handHeight - this.STANDARD_PADDING;
     
     // Hand background
     const handBg = new Graphics();
@@ -130,9 +136,9 @@ export class CardBattleScene extends BaseScene {
   private createEnergyIndicator(): void {
     this.energyContainer = new Container();
     
-    // Position in top-right corner
-    this.energyContainer.x = this.gameWidth - 150;
-    this.energyContainer.y = 10;
+    // Position in top-right corner with proper padding
+    this.energyContainer.x = this.gameWidth - 150 - this.STANDARD_PADDING;
+    this.energyContainer.y = this.STANDARD_PADDING;
     
     this.container.addChild(this.energyContainer);
   }
@@ -140,9 +146,9 @@ export class CardBattleScene extends BaseScene {
   private createTurnIndicator(): void {
     this.turnIndicatorContainer = new Container();
     
-    // Position in top-center
+    // Position in top-center with proper padding
     this.turnIndicatorContainer.x = this.gameWidth / 2;
-    this.turnIndicatorContainer.y = 10;
+    this.turnIndicatorContainer.y = this.STANDARD_PADDING;
     
     this.container.addChild(this.turnIndicatorContainer);
   }
@@ -150,18 +156,24 @@ export class CardBattleScene extends BaseScene {
   private createActionLog(): void {
     this.actionLogContainer = new Container();
     
-    // Position on left side
+    // Position on left side with proper spacing
     const logWidth = 200;
     const logHeight = this.gameHeight * 0.4;
     
+    // Calculate position to avoid overlapping with other elements
+    const topUIHeight = 60; // Space for turn indicator and energy
+    const handHeight = this.gameHeight * 0.2;
+    const availableHeight = this.gameHeight - topUIHeight - handHeight - (this.STANDARD_PADDING * 3);
+    const actualLogHeight = Math.min(logHeight, availableHeight);
+    
     const logBg = new Graphics();
-    logBg.roundRect(0, 0, logWidth, logHeight, 8)
+    logBg.roundRect(0, 0, logWidth, actualLogHeight, 8)
       .fill(Colors.UI_BACKGROUND)
       .stroke({ width: 2, color: Colors.UI_BORDER });
     
     this.actionLogContainer.addChild(logBg);
-    this.actionLogContainer.x = 10;
-    this.actionLogContainer.y = this.gameHeight * 0.3;
+    this.actionLogContainer.x = this.STANDARD_PADDING;
+    this.actionLogContainer.y = topUIHeight + this.STANDARD_PADDING;
     
     this.container.addChild(this.actionLogContainer);
   }
@@ -169,13 +181,17 @@ export class CardBattleScene extends BaseScene {
   private createDiscardPile(): void {
     this.discardPileContainer = new Container();
     
-    // Position in bottom-left corner
-    this.discardPileContainer.x = 10;
-    this.discardPileContainer.y = this.gameHeight * 0.7;
+    // Position in bottom-left corner with proper spacing from hand
+    const handHeight = this.gameHeight * 0.2;
+    const discardWidth = this.CARD_WIDTH + 10;
+    const discardHeight = this.CARD_HEIGHT + 10;
+    
+    this.discardPileContainer.x = this.STANDARD_PADDING;
+    this.discardPileContainer.y = this.gameHeight - handHeight - discardHeight - this.STANDARD_PADDING * 2;
     
     // Discard pile background
     const discardBg = new Graphics();
-    discardBg.roundRect(0, 0, this.CARD_WIDTH + 10, this.CARD_HEIGHT + 10, 8)
+    discardBg.roundRect(0, 0, discardWidth, discardHeight, 8)
       .fill(Colors.CARD_DISCARD)
       .stroke({ width: 2, color: Colors.UI_BORDER });
     
@@ -189,11 +205,60 @@ export class CardBattleScene extends BaseScene {
       }
     });
     discardLabel.anchor.set(0.5);
-    discardLabel.x = (this.CARD_WIDTH + 10) / 2;
-    discardLabel.y = (this.CARD_HEIGHT + 10) / 2;
+    discardLabel.x = discardWidth / 2;
+    discardLabel.y = discardHeight / 2;
     
     this.discardPileContainer.addChild(discardBg, discardLabel);
     this.container.addChild(this.discardPileContainer);
+  }
+
+  private createDeckRemaining(): void {
+    this.deckRemainingContainer = new Container();
+    
+    // Position next to discard pile with spacing
+    const discardWidth = this.CARD_WIDTH + 10;
+    const deckWidth = discardWidth;
+    const deckHeight = this.CARD_HEIGHT + 10;
+    const handHeight = this.gameHeight * 0.2;
+    
+    this.deckRemainingContainer.x = this.STANDARD_PADDING + discardWidth + this.STANDARD_SPACING;
+    this.deckRemainingContainer.y = this.gameHeight - handHeight - deckHeight - this.STANDARD_PADDING * 2;
+    
+    // Deck remaining background
+    const deckBg = new Graphics();
+    deckBg.roundRect(0, 0, deckWidth, deckHeight, 8)
+      .fill(Colors.CARD_BACKGROUND)
+      .stroke({ width: 2, color: Colors.UI_BORDER });
+    
+    const deckLabel = new Text({
+      text: 'DECK',
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 12,
+        fill: Colors.TEXT_PRIMARY,
+        align: 'center'
+      }
+    });
+    deckLabel.anchor.set(0.5);
+    deckLabel.x = deckWidth / 2;
+    deckLabel.y = deckHeight / 2 - 10;
+    
+    // Remaining count will be updated in updateUI
+    const countLabel = new Text({
+      text: '0',
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 14,
+        fill: Colors.TEXT_SECONDARY,
+        align: 'center'
+      }
+    });
+    countLabel.anchor.set(0.5);
+    countLabel.x = deckWidth / 2;
+    countLabel.y = deckHeight / 2 + 10;
+    
+    this.deckRemainingContainer.addChild(deckBg, deckLabel, countLabel);
+    this.container.addChild(this.deckRemainingContainer);
   }
 
   private async initializeBattle(): Promise<void> {
@@ -663,6 +728,7 @@ export class CardBattleScene extends BaseScene {
     this.updateEnergyIndicator();
     this.updateTurnIndicator();
     this.updateHandCards();
+    this.updateDeckRemaining();
   }
 
   private updateEnergyIndicator(): void {
@@ -692,6 +758,25 @@ export class CardBattleScene extends BaseScene {
     energyText.y = 20;
     
     this.energyContainer.addChild(energyBg, energyText);
+  }
+
+  private updateDeckRemaining(): void {
+    if (!this.battleState || !this.deckRemainingContainer) return;
+    
+    const currentPlayer = this.battleState.players.find(p => p.team === this.battleState!.current_player);
+    if (!currentPlayer) return;
+    
+    // Calculate remaining cards (total deck minus hand and discard)
+    const totalDeckCards = currentPlayer.deck.deck_cards.length;
+    const handCards = currentPlayer.deck.hand_cards.length;
+    const discardCards = currentPlayer.deck.discard_cards.length;
+    const remainingCards = totalDeckCards - handCards - discardCards;
+    
+    // Update the count label (it's the third child: bg, label, count)
+    const countLabel = this.deckRemainingContainer.children[2] as Text;
+    if (countLabel && countLabel instanceof Text) {
+      countLabel.text = remainingCards.toString();
+    }
   }
 
   private updateTurnIndicator(): void {
