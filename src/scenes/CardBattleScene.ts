@@ -13,6 +13,7 @@ import {
   Card
 } from '@/types';
 import { battleApi } from '@/services/api';
+import { app } from '../app';
 
 export class CardBattleScene extends BaseScene {
   /** Assets bundles required by this screen */
@@ -113,6 +114,12 @@ export class CardBattleScene extends BaseScene {
 
     // End turn button
     this.createEndTurnButtonAtBottom(BOTTOM_PADDING);
+    
+    // Setup stage event handlers for drag and drop
+    app.stage.eventMode = 'static';
+    app.stage.on('pointerup', this.onCardDragEnd, this);
+    app.stage.on('pointerupoutside', this.onCardDragEnd, this);
+    app.stage.hitArea = app.screen;
   }
 
   // Helper methods for positioning each area
@@ -1082,36 +1089,25 @@ export class CardBattleScene extends BaseScene {
     cardContainer.alpha = 0.8;
     cardContainer.cursor = 'grabbing';
     
-    // Calculate drag offset
-    const globalPos = cardContainer.parent?.toGlobal({ x: cardContainer.x, y: cardContainer.y });
+    // Calculate and store drag offset
+    const globalCardPos = cardContainer.parent?.toGlobal({ x: cardContainer.x, y: cardContainer.y });
     this.dragOffset = {
-      x: event.global.x - (globalPos?.x || 0),
-      y: event.global.y - (globalPos?.y || 0)
+      x: event.global.x - (globalCardPos?.x || 0),
+      y: event.global.y - (globalCardPos?.y || 0)
     };
     
-    // Move to top layer for dragging (use app.stage instead of container)
+    // Move card to top layer (app.stage) for dragging above all
+    const globalPos = cardContainer.parent?.toGlobal({ x: cardContainer.x, y: cardContainer.y });
     if (cardContainer.parent) {
       cardContainer.parent.removeChild(cardContainer);
     }
-    // Use app.stage to ensure card is above all other elements
-    const app = (globalThis as any).app;
-    if (app && app.stage) {
-      app.stage.addChild(cardContainer);
-      if (globalPos) {
-        cardContainer.position.set(globalPos.x, globalPos.y);
-      }
-    } else {
-      this.container.addChild(cardContainer);
+    app.stage.addChild(cardContainer);
+    if (globalPos) {
+      cardContainer.position.set(globalPos.x, globalPos.y);
     }
     
-    // Attach drag events to stage for better capture
-    if (app && app.stage) {
-      app.stage.on('pointermove', this.onCardDragMove, this);
-      app.stage.on('pointerup', this.onCardDragEnd, this);
-    } else {
-      this.container.on('pointermove', this.onCardDragMove, this);
-      this.container.on('pointerup', this.onCardDragEnd, this);
-    }
+    // Attach pointermove to stage
+    app.stage.on('pointermove', this.onCardDragMove, this);
     
     event.stopPropagation();
   }
@@ -1119,7 +1115,7 @@ export class CardBattleScene extends BaseScene {
   private onCardDragMove(event: FederatedPointerEvent): void {
     if (!this.dragTarget) return;
     
-    // Use global coordinates with proper offset calculation
+    // Use dragOffset to keep the pointer at the same relative position on the card
     const parent = this.dragTarget.parent;
     if (parent) {
       const newPos = parent.toLocal({
@@ -1127,10 +1123,6 @@ export class CardBattleScene extends BaseScene {
         y: event.global.y - this.dragOffset.y
       });
       this.dragTarget.position.set(newPos.x, newPos.y);
-    } else {
-      // Fallback for direct positioning
-      this.dragTarget.x = event.global.x - this.dragOffset.x;
-      this.dragTarget.y = event.global.y - this.dragOffset.y;
     }
   }
 
@@ -1140,15 +1132,8 @@ export class CardBattleScene extends BaseScene {
     const card = (this.dragTarget as any).card;
     const dropTarget = this.getDropTarget(event.global.x, event.global.y);
     
-    // Remove drag events from both container and stage
-    const app = (globalThis as any).app;
-    if (app && app.stage) {
-      app.stage.off('pointermove', this.onCardDragMove, this);
-      app.stage.off('pointerup', this.onCardDragEnd, this);
-    } else {
-      this.container.off('pointermove', this.onCardDragMove, this);
-      this.container.off('pointerup', this.onCardDragEnd, this);
-    }
+    // Remove drag events from stage
+    app.stage.off('pointermove', this.onCardDragMove, this);
     
     if (dropTarget) {
       this.handleCardDrop(card, dropTarget);
