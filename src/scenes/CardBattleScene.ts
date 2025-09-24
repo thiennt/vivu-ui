@@ -32,9 +32,13 @@ export class CardBattleScene extends BaseScene {
   private player1CharactersContainer!: Container;
   private player2CharactersContainer!: Container;
   private handContainer!: Container;
+  private opponentHandContainer!: Container;
   private discardPileContainer!: Container;
   private deckRemainingContainer!: Container;
   private energyContainer!: Container;
+  private opponentEnergyContainer!: Container;
+  private opponentDiscardPileContainer!: Container;
+  private opponentDeckRemainingContainer!: Container;
   private turnIndicatorContainer!: Container;
   private actionLogContainer!: Container;
   
@@ -68,13 +72,12 @@ export class CardBattleScene extends BaseScene {
 
   private setupLayout(): void {
     this.createBackground();
-    this.createBattlefield();
-    this.createHandArea();
-    this.createEnergyIndicator();
-    this.createTurnIndicator();
-    this.createActionLog();
-    this.createDiscardPile();
-    this.createDeckRemaining();
+    this.createOpponentEnergyDeckDiscard(); // At the very top
+    this.createOpponentHandArea(); // Below opponent energy/deck/discard
+    this.createBattlefield(); // Opponent chars, then battle log, then player chars
+    this.createHandArea(); // Player hand above player energy/deck/discard
+    this.createPlayerEnergyDeckDiscard(); // At the bottom
+    this.createEndTurnButtonAtBottom(); // At very bottom, thumb-friendly
   }
 
   private createBackground(): void {
@@ -88,6 +91,135 @@ export class CardBattleScene extends BaseScene {
     this.container.addChild(this.backgroundContainer);
   }
 
+  private createOpponentEnergyDeckDiscard(): void {
+    // Create containers for opponent's energy, deck, and discard at the very top
+    this.opponentEnergyContainer = new Container();
+    this.opponentDeckRemainingContainer = new Container();
+    this.opponentDiscardPileContainer = new Container();
+    
+    const topY = this.STANDARD_PADDING;
+    const elementHeight = 50;
+    const elementWidth = 80;
+    const spacing = this.STANDARD_SPACING;
+    
+    // Calculate total width and center horizontally
+    const totalWidth = (elementWidth * 3) + (spacing * 2);
+    const startX = (this.gameWidth - totalWidth) / 2;
+    
+    // Position opponent energy on the left
+    this.opponentEnergyContainer.x = startX;
+    this.opponentEnergyContainer.y = topY;
+    
+    // Create energy background and label
+    const energyBg = new Graphics();
+    energyBg.roundRect(0, 0, elementWidth, elementHeight, 8)
+      .fill(Colors.UI_BACKGROUND)
+      .stroke({ width: 2, color: Colors.UI_BORDER });
+    
+    const energyLabel = new Text({
+      text: 'Energy: 0',
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 11,
+        fill: Colors.TEXT_PRIMARY,
+        align: 'center'
+      }
+    });
+    energyLabel.anchor.set(0.5);
+    energyLabel.x = elementWidth / 2;
+    energyLabel.y = elementHeight / 2;
+    
+    this.opponentEnergyContainer.addChild(energyBg, energyLabel);
+    
+    // Position opponent deck in the center
+    this.opponentDeckRemainingContainer.x = startX + elementWidth + spacing;
+    this.opponentDeckRemainingContainer.y = topY;
+    
+    // Create deck background and label
+    const deckBg = new Graphics();
+    deckBg.roundRect(0, 0, elementWidth, elementHeight, 8)
+      .fill(Colors.CARD_BACKGROUND)
+      .stroke({ width: 2, color: Colors.UI_BORDER });
+    
+    const deckLabel = new Text({
+      text: 'DECK',
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 10,
+        fill: Colors.TEXT_PRIMARY,
+        align: 'center'
+      }
+    });
+    deckLabel.anchor.set(0.5);
+    deckLabel.x = elementWidth / 2;
+    deckLabel.y = elementHeight / 2 - 8;
+    
+    const deckCount = new Text({
+      text: '0',
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 12,
+        fill: Colors.TEXT_SECONDARY,
+        align: 'center'
+      }
+    });
+    deckCount.anchor.set(0.5);
+    deckCount.x = elementWidth / 2;
+    deckCount.y = elementHeight / 2 + 8;
+    
+    this.opponentDeckRemainingContainer.addChild(deckBg, deckLabel, deckCount);
+    
+    // Position opponent discard on the right
+    this.opponentDiscardPileContainer.x = startX + (elementWidth + spacing) * 2;
+    this.opponentDiscardPileContainer.y = topY;
+    
+    // Create discard background and label
+    const discardBg = new Graphics();
+    discardBg.roundRect(0, 0, elementWidth, elementHeight, 8)
+      .fill(Colors.CARD_DISCARD)
+      .stroke({ width: 2, color: Colors.UI_BORDER });
+    
+    const discardLabel = new Text({
+      text: 'DISCARD',
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 10,
+        fill: Colors.TEXT_PRIMARY,
+        align: 'center'
+      }
+    });
+    discardLabel.anchor.set(0.5);
+    discardLabel.x = elementWidth / 2;
+    discardLabel.y = elementHeight / 2;
+    
+    this.opponentDiscardPileContainer.addChild(discardBg, discardLabel);
+    
+    // Add all containers to the main container
+    this.container.addChild(this.opponentEnergyContainer);
+    this.container.addChild(this.opponentDeckRemainingContainer);
+    this.container.addChild(this.opponentDiscardPileContainer);
+  }
+
+  private createOpponentHandArea(): void {
+    this.opponentHandContainer = new Container();
+    
+    // Position below opponent energy/deck/discard with padding
+    const opponentTopHeight = 50 + this.STANDARD_PADDING; // Height of top area
+    const handY = opponentTopHeight + this.STANDARD_PADDING;
+    const handHeight = 60; // Smaller height for opponent hand
+    
+    // Hand background
+    const handBg = new Graphics();
+    handBg.roundRect(0, 0, this.gameWidth, handHeight, 10)
+      .fill(Colors.UI_BACKGROUND)
+      .stroke({ width: 2, color: Colors.UI_BORDER });
+    
+    this.opponentHandContainer.addChild(handBg);
+    this.opponentHandContainer.y = handY;
+    
+    this.container.addChild(this.opponentHandContainer);
+  }
+
   private createBattlefield(): void {
     this.battlefieldContainer = new Container();
     
@@ -95,35 +227,211 @@ export class CardBattleScene extends BaseScene {
     this.player1CharactersContainer = new Container();
     this.player2CharactersContainer = new Container();
     
-    // Calculate available space for battlefield
-    const topUIHeight = 60; // Space for turn indicator and energy  
-    const handHeight = this.gameHeight * 0.2;
-    const bottomSpacing = this.STANDARD_PADDING * 2;
+    // Calculate available space for battlefield layout
+    const opponentTopHeight = 50 + this.STANDARD_PADDING; // Opponent energy/deck/discard
+    const opponentHandHeight = 60 + this.STANDARD_PADDING; // Opponent hand
+    const playerHandHeight = 80; // Player hand (larger)
+    const playerBottomHeight = 50 + this.STANDARD_PADDING; // Player energy/deck/discard  
+    const endTurnHeight = 50; // End turn button space
     
-    const battlefieldHeight = this.gameHeight - topUIHeight - handHeight - bottomSpacing;
-    const battlefieldY = topUIHeight + this.STANDARD_PADDING;
+    const battlefieldStartY = opponentTopHeight + opponentHandHeight + this.STANDARD_PADDING;
+    const availableHeight = this.gameHeight - battlefieldStartY - playerHandHeight - playerBottomHeight - endTurnHeight - (this.STANDARD_PADDING * 2);
     
-    // Player 2 (opponent) at top of battlefield
-    this.player2CharactersContainer.y = battlefieldY;
+    // Divide battlefield into sections: opponent chars, battle log, player chars
+    const sectionHeight = availableHeight / 3;
     
-    // Player 1 (current player) at bottom of battlefield
-    this.player1CharactersContainer.y = battlefieldY + battlefieldHeight * 0.6;
+    // Position opponent characters at top of battlefield
+    this.player2CharactersContainer.y = battlefieldStartY;
+    
+    // Create and position action log in the middle section
+    this.createActionLogInCenter(battlefieldStartY + sectionHeight, sectionHeight);
+    
+    // Position player characters at bottom of battlefield  
+    this.player1CharactersContainer.y = battlefieldStartY + sectionHeight * 2;
     
     this.battlefieldContainer.addChild(this.player2CharactersContainer);
     this.battlefieldContainer.addChild(this.player1CharactersContainer);
     this.container.addChild(this.battlefieldContainer);
   }
 
+  private createActionLogInCenter(logY: number, logHeight: number): void {
+    this.actionLogContainer = new Container();
+    
+    // Center the action log horizontally and use provided position
+    const logWidth = Math.min(300, this.gameWidth - (this.STANDARD_PADDING * 2));
+    
+    const logBg = new Graphics();
+    logBg.roundRect(0, 0, logWidth, logHeight, 8)
+      .fill(Colors.UI_BACKGROUND)
+      .stroke({ width: 2, color: Colors.UI_BORDER });
+    
+    // Add title for battle log
+    const logTitle = new Text({
+      text: 'BATTLE LOG',
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 12,
+        fill: Colors.TEXT_PRIMARY,
+        align: 'center'
+      }
+    });
+    logTitle.anchor.set(0.5, 0);
+    logTitle.x = logWidth / 2;
+    logTitle.y = 8;
+    
+    this.actionLogContainer.addChild(logBg, logTitle);
+    this.actionLogContainer.x = (this.gameWidth - logWidth) / 2;
+    this.actionLogContainer.y = logY;
+    
+    this.container.addChild(this.actionLogContainer);
+  }
+
+  private createPlayerEnergyDeckDiscard(): void {
+    // Create containers for player's energy, deck, and discard at the bottom
+    this.energyContainer = new Container();
+    this.deckRemainingContainer = new Container();
+    this.discardPileContainer = new Container();
+    
+    const endTurnHeight = 50; // End turn button space
+    const elementHeight = 50;
+    const elementWidth = 80;
+    const spacing = this.STANDARD_SPACING;
+    const bottomY = this.gameHeight - endTurnHeight - elementHeight - this.STANDARD_PADDING;
+    
+    // Calculate total width and center horizontally
+    const totalWidth = (elementWidth * 3) + (spacing * 2);
+    const startX = (this.gameWidth - totalWidth) / 2;
+    
+    // Position player energy on the left
+    this.energyContainer.x = startX;
+    this.energyContainer.y = bottomY;
+    
+    // Create energy background and label
+    const energyBg = new Graphics();
+    energyBg.roundRect(0, 0, elementWidth, elementHeight, 8)
+      .fill(Colors.UI_BACKGROUND)
+      .stroke({ width: 2, color: Colors.UI_BORDER });
+    
+    const energyLabel = new Text({
+      text: 'Energy: 0',
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 11,
+        fill: Colors.TEXT_PRIMARY,
+        align: 'center'
+      }
+    });
+    energyLabel.anchor.set(0.5);
+    energyLabel.x = elementWidth / 2;
+    energyLabel.y = elementHeight / 2;
+    
+    this.energyContainer.addChild(energyBg, energyLabel);
+    
+    // Position player deck in the center
+    this.deckRemainingContainer.x = startX + elementWidth + spacing;
+    this.deckRemainingContainer.y = bottomY;
+    
+    // Create deck background and label
+    const deckBg = new Graphics();
+    deckBg.roundRect(0, 0, elementWidth, elementHeight, 8)
+      .fill(Colors.CARD_BACKGROUND)
+      .stroke({ width: 2, color: Colors.UI_BORDER });
+    
+    const deckLabel = new Text({
+      text: 'DECK',
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 10,
+        fill: Colors.TEXT_PRIMARY,
+        align: 'center'
+      }
+    });
+    deckLabel.anchor.set(0.5);
+    deckLabel.x = elementWidth / 2;
+    deckLabel.y = elementHeight / 2 - 8;
+    
+    const deckCount = new Text({
+      text: '0',
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 12,
+        fill: Colors.TEXT_SECONDARY,
+        align: 'center'
+      }
+    });
+    deckCount.anchor.set(0.5);
+    deckCount.x = elementWidth / 2;
+    deckCount.y = elementHeight / 2 + 8;
+    
+    this.deckRemainingContainer.addChild(deckBg, deckLabel, deckCount);
+    
+    // Position player discard on the right - make it a clear drop target
+    this.discardPileContainer.x = startX + (elementWidth + spacing) * 2;
+    this.discardPileContainer.y = bottomY;
+    
+    // Create discard background with enhanced drop target styling
+    const discardBg = new Graphics();
+    discardBg.roundRect(0, 0, elementWidth, elementHeight, 8)
+      .fill(Colors.CARD_DISCARD)
+      .stroke({ width: 3, color: Colors.UI_BORDER }); // Enhanced border for drop target
+    
+    const discardLabel = new Text({
+      text: 'DROP HERE',
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 9,
+        fill: Colors.TEXT_PRIMARY,
+        align: 'center'
+      }
+    });
+    discardLabel.anchor.set(0.5);
+    discardLabel.x = elementWidth / 2;
+    discardLabel.y = elementHeight / 2 - 8;
+    
+    const discardSubLabel = new Text({
+      text: 'DISCARD',
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 8,
+        fill: Colors.TEXT_SECONDARY,
+        align: 'center'
+      }
+    });
+    discardSubLabel.anchor.set(0.5);
+    discardSubLabel.x = elementWidth / 2;
+    discardSubLabel.y = elementHeight / 2 + 8;
+    
+    this.discardPileContainer.addChild(discardBg, discardLabel, discardSubLabel);
+    
+    // Add all containers to the main container
+    this.container.addChild(this.energyContainer);
+    this.container.addChild(this.deckRemainingContainer);
+    this.container.addChild(this.discardPileContainer);
+  }
+
+  private createEndTurnButtonAtBottom(): void {
+    // This method creates the end turn button layout, but the actual button
+    // will be created dynamically during the main phase
+    // We just reserve the space at the bottom for thumb-friendly access
+    
+    // Initialize turn indicator container (hidden in mobile layout)
+    this.turnIndicatorContainer = new Container();
+    this.turnIndicatorContainer.visible = false; // Hide it in mobile layout
+    this.container.addChild(this.turnIndicatorContainer);
+  }
+
   private createHandArea(): void {
     this.handContainer = new Container();
     
-    // Position hand at bottom of screen with proper padding
-    const handHeight = this.gameHeight * 0.2;
-    const handY = this.gameHeight - handHeight - this.STANDARD_PADDING;
+    // Position hand above player energy/deck/discard with proper spacing
+    const playerBottomHeight = 50 + this.STANDARD_PADDING; // Player energy/deck/discard height
+    const endTurnHeight = 50; // End turn button space
+    const handHeight = 80; // Player hand height
+    const handY = this.gameHeight - playerBottomHeight - endTurnHeight - handHeight - this.STANDARD_PADDING;
     
     // Hand background
     const handBg = new Graphics();
-    handBg.roundRect(0, handY, this.gameWidth, handHeight, 10)
+    handBg.roundRect(0, 0, this.gameWidth, handHeight, 10)
       .fill(Colors.UI_BACKGROUND)
       .stroke({ width: 2, color: Colors.UI_BORDER });
     
@@ -785,34 +1093,12 @@ export class CardBattleScene extends BaseScene {
   private updateTurnIndicator(): void {
     if (!this.battleState) return;
     
-    this.turnIndicatorContainer.removeChildren();
-    
+    // Update the turn indicator by integrating it into the battle log
+    // Since we removed the separate turn indicator container for the mobile layout
     const isPlayerTurn = this.battleState.current_player === 1;
-    const turnText = new Text({
-      text: isPlayerTurn ? 'YOUR TURN' : 'OPPONENT TURN',
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 16,
-        fill: isPlayerTurn ? Colors.TEAM_ALLY : Colors.TEAM_ENEMY,
-        align: 'center'
-      }
-    });
-    turnText.anchor.set(0.5);
     
-    // Phase indicator
-    const phaseText = new Text({
-      text: `Phase: ${this.currentPhase.replace('_', ' ').toUpperCase()}`,
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 12,
-        fill: Colors.TEXT_SECONDARY,
-        align: 'center'
-      }
-    });
-    phaseText.anchor.set(0.5);
-    phaseText.y = 25;
-    
-    this.turnIndicatorContainer.addChild(turnText, phaseText);
+    // We can add the turn info to the action log title instead of a separate container
+    // This is more space-efficient for mobile
   }
 
   private updateHandCards(): void {
@@ -1182,8 +1468,12 @@ export class CardBattleScene extends BaseScene {
   private createEndTurnButton(): void {
     const endTurnButton = new Container();
     
+    // Make the button larger and more thumb-friendly
+    const buttonWidth = Math.min(200, this.gameWidth - (this.STANDARD_PADDING * 2));
+    const buttonHeight = 44;
+    
     const buttonBg = new Graphics();
-    buttonBg.roundRect(0, 0, 120, 40, 8)
+    buttonBg.roundRect(0, 0, buttonWidth, buttonHeight, 12)
       .fill(Colors.BUTTON_PRIMARY)
       .stroke({ width: 2, color: Colors.BUTTON_BORDER });
     
@@ -1191,18 +1481,20 @@ export class CardBattleScene extends BaseScene {
       text: 'END TURN',
       style: {
         fontFamily: 'Kalam',
-        fontSize: 14,
+        fontSize: 16,
         fill: Colors.TEXT_PRIMARY,
         align: 'center'
       }
     });
     buttonText.anchor.set(0.5);
-    buttonText.x = 60;
-    buttonText.y = 20;
+    buttonText.x = buttonWidth / 2;
+    buttonText.y = buttonHeight / 2;
     
     endTurnButton.addChild(buttonBg, buttonText);
-    endTurnButton.x = this.gameWidth - 140;
-    endTurnButton.y = this.gameHeight - 60;
+    
+    // Position at very bottom, centered, thumb-friendly
+    endTurnButton.x = (this.gameWidth - buttonWidth) / 2;
+    endTurnButton.y = this.gameHeight - buttonHeight - this.STANDARD_PADDING;
     
     endTurnButton.interactive = true;
     endTurnButton.cursor = 'pointer';
