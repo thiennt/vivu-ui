@@ -710,9 +710,12 @@ export class CardBattleScene extends BaseScene {
     });
   }
 
-  private makeCharacterCardInteractive(card: Container, _character: CardBattleCharacter): void {
+  private makeCharacterCardInteractive(card: Container, character: CardBattleCharacter): void {
     card.interactive = true;
     card.cursor = 'pointer';
+    
+    // Store character reference for future use
+    (card as any).character = character;
     
     // Add glow effect on hover
     card.on('pointerover', () => {
