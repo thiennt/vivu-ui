@@ -69,6 +69,7 @@ export const Colors = {
   ENERGY_TEXT: '#ffa500',            // Energy cost text
   SUCCESS: '#4caf50',                // Success message color
   ERROR: '#f44336',                  // Error message color
+  WARNING: '#ff9800',                // Warning message color
 
   // Decorative elements - Orange theme
   DECORATION_MAGIC: '#ff8c00',       // Dark orange for magical elements

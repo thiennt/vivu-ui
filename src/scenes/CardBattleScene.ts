@@ -10,7 +10,8 @@ import {
   CardBattleCharacter, 
   TurnAction,
   BattlePhaseName,
-  Card
+  Card,
+  CardType
 } from '@/types';
 import { battleApi } from '@/services/api';
 import { app } from '../app';
@@ -66,54 +67,67 @@ export class CardBattleScene extends BaseScene {
     this.battleId = battleId || 'mock-battle-001';
     this.container = new Container();
     this.addChild(this.container);
+
+    // Initialize container references
+    this.deckRemainingContainer = new Container();
+    this.opponentDeckRemainingContainer = new Container();
+    this.opponentEnergyContainer = new Container();
+    this.opponentDiscardPileContainer = new Container();
+    this.battlefieldContainer = new Container();
     
     this.setupLayout();
     this.initializeBattle();
   }
 
   private setupLayout(): void {
-    // Define vertical paddings for each area
-    const TOP_PADDING = this.STANDARD_PADDING * 2;
-    const BETWEEN_AREAS = this.STANDARD_PADDING * 2;
-    const BOTTOM_PADDING = this.STANDARD_PADDING * 2;
+    // New layout structure based on the provided image
+    const SECTION_PADDING = this.STANDARD_PADDING;
+    const BETWEEN_SECTIONS = this.STANDARD_PADDING / 2;
 
-    // Calculate available height for all areas
-    const totalVerticalPadding = TOP_PADDING + BETWEEN_AREAS * 4 + BOTTOM_PADDING;
-    const availableHeight = this.gameHeight - totalVerticalPadding;
+    // Calculate section heights
+    const statusBarHeight = 40;
+    const handSectionHeight = 60;
+    const characterSectionHeight = 80;
+    const actionLogHeight = 120;
+    const discardSectionHeight = 50;
+    const endTurnButtonHeight = 50;
 
-    // Assign heights for each area proportionally
-    const opponentEnergyHeight = 50;
-    const opponentHandHeight = 80;
-    const playerHandHeight = 80;
-    const playerEnergyHeight = 50;
-    const endTurnHeight = 50;
-    const battlefieldHeight = availableHeight - (opponentEnergyHeight + opponentHandHeight + playerHandHeight + playerEnergyHeight + endTurnHeight);
+    let currentY = SECTION_PADDING;
 
-    // Y positions for each area
-    let currentY = TOP_PADDING;
+    // 1. Top status bar (Energy 5, Cards 12, Trash 3)
+    this.createTopStatusBar(currentY, statusBarHeight);
+    currentY += statusBarHeight + BETWEEN_SECTIONS;
 
-    // Opponent energy/deck/discard
-    this.createOpponentEnergyDeckDiscard(currentY, opponentEnergyHeight);
-    currentY += opponentEnergyHeight + BETWEEN_AREAS;
+    // 2. Opponent hand (hidden card backs)
+    this.createOpponentHandSection(currentY, handSectionHeight);
+    currentY += handSectionHeight + BETWEEN_SECTIONS;
 
-    // Opponent hand
-    this.createOpponentHandArea(currentY, opponentHandHeight);
-    currentY += opponentHandHeight + BETWEEN_AREAS;
+    // 3. Opponent section (avatar + character cards)
+    this.createOpponentSection(currentY, characterSectionHeight);
+    currentY += characterSectionHeight + BETWEEN_SECTIONS;
 
-    // Battlefield (opponent chars, log, player chars)
-    this.createBattlefield(currentY, battlefieldHeight);
-    currentY += battlefieldHeight + BETWEEN_AREAS;
+    // 4. Action log with integrated discard
+    this.createActionLogSection(currentY, actionLogHeight);
+    currentY += actionLogHeight + BETWEEN_SECTIONS;
 
-    // Player hand
-    this.createHandArea(currentY, playerHandHeight);
-    currentY += playerHandHeight + BETWEEN_AREAS;
+    // 5. Player section (avatar + character cards)
+    this.createPlayerSection(currentY, characterSectionHeight);
+    currentY += characterSectionHeight + BETWEEN_SECTIONS;
 
-    // Player energy/deck/discard
-    this.createPlayerEnergyDeckDiscard(currentY, playerEnergyHeight);
-    currentY += playerEnergyHeight + BETWEEN_AREAS;
+    // 6. Player hand (visible cards)
+    this.createPlayerHandSection(currentY, handSectionHeight);
+    currentY += handSectionHeight + BETWEEN_SECTIONS;
 
-    // End turn button
-    this.createEndTurnButtonAtBottom(BOTTOM_PADDING);
+    // 7. Bottom discard section
+    this.createBottomDiscardSection(currentY, discardSectionHeight);
+    currentY += discardSectionHeight + BETWEEN_SECTIONS;
+
+    // 8. Bottom status bar (same as top)
+    this.createBottomStatusBar(currentY, statusBarHeight);
+    currentY += statusBarHeight + BETWEEN_SECTIONS;
+
+    // 9. End Turn button (centered at bottom)
+    this.createEndTurnButtonAtBottom(SECTION_PADDING);
     
     // Setup stage event handlers for drag and drop
     app.stage.eventMode = 'static';
@@ -122,86 +136,547 @@ export class CardBattleScene extends BaseScene {
     app.stage.hitArea = app.screen;
   }
 
-  // Helper methods for positioning each area
-  private createOpponentEnergyDeckDiscard(y: number, height: number) {
-    // ...use y and height for positioning...
-    this.opponentEnergyContainer = new Container();
-    this.opponentDeckRemainingContainer = new Container();
-    this.opponentDiscardPileContainer = new Container();
-    const elementWidth = 80;
-    const spacing = this.STANDARD_SPACING;
-    const totalWidth = (elementWidth * 3) + (spacing * 2);
+  // New helper methods for the updated layout
+  private createTopStatusBar(y: number, height: number) {
+    const statusContainer = new Container();
+    statusContainer.y = y;
+    
+    // Create dark background bar
+    const bg = new Graphics();
+    bg.roundRect(0, 0, this.gameWidth, height, 8)
+      .fill(Colors.UI_BACKGROUND);
+    statusContainer.addChild(bg);
+
+    // Create three status indicators: Energy, Cards, Trash
+    const indicatorWidth = 80;
+    const spacing = 20;
+    const totalWidth = (indicatorWidth * 3) + (spacing * 2);
     const startX = (this.gameWidth - totalWidth) / 2;
-    this.createEnergyDeckDiscardUI(
-      { x: startX, y },
-      {
-        energy: this.opponentEnergyContainer,
-        deck: this.opponentDeckRemainingContainer,
-        discard: this.opponentDiscardPileContainer
-      },
-      {
-        elementWidth,
-        elementHeight: height,
-        spacing,
-        isPlayerDiscard: false
+
+    // Energy indicator (with lightning icon)
+    const energyBg = new Graphics();
+    energyBg.roundRect(0, 0, indicatorWidth, height - 10, 6)
+      .fill(Colors.CARD_BACKGROUND)
+      .stroke({ width: 1, color: Colors.UI_BORDER });
+    energyBg.x = startX;
+    energyBg.y = 5;
+
+    const energyText = new Text({
+      text: '⚡ 5',
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 14,
+        fill: Colors.TEXT_PRIMARY,
+        align: 'center'
       }
-    );
+    });
+    energyText.anchor.set(0.5);
+    energyText.x = startX + indicatorWidth / 2;
+    energyText.y = height / 2;
+
+    // Cards indicator (with card icon)
+    const cardsBg = new Graphics();
+    cardsBg.roundRect(0, 0, indicatorWidth, height - 10, 6)
+      .fill(Colors.CARD_BACKGROUND)
+      .stroke({ width: 1, color: Colors.UI_BORDER });
+    cardsBg.x = startX + indicatorWidth + spacing;
+    cardsBg.y = 5;
+
+    const cardsText = new Text({
+      text: '🃏 12',
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 14,
+        fill: Colors.TEXT_PRIMARY,
+        align: 'center'
+      }
+    });
+    cardsText.anchor.set(0.5);
+    cardsText.x = startX + indicatorWidth + spacing + indicatorWidth / 2;
+    cardsText.y = height / 2;
+
+    // Trash indicator (with trash icon)
+    const trashBg = new Graphics();
+    trashBg.roundRect(0, 0, indicatorWidth, height - 10, 6)
+      .fill(Colors.CARD_BACKGROUND)
+      .stroke({ width: 1, color: Colors.UI_BORDER });
+    trashBg.x = startX + (indicatorWidth + spacing) * 2;
+    trashBg.y = 5;
+
+    const trashText = new Text({
+      text: '🗑️ 3',
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 14,
+        fill: Colors.TEXT_PRIMARY,
+        align: 'center'
+      }
+    });
+    trashText.anchor.set(0.5);
+    trashText.x = startX + (indicatorWidth + spacing) * 2 + indicatorWidth / 2;
+    trashText.y = height / 2;
+
+    // Store references for later updates
+    this.energyContainer = statusContainer;
+    (statusContainer as any).energyText = energyText;
+    (statusContainer as any).cardsText = cardsText;
+    (statusContainer as any).trashText = trashText;
+
+    statusContainer.addChild(energyBg, energyText, cardsBg, cardsText, trashBg, trashText);
+    this.container.addChild(statusContainer);
   }
 
-  private createOpponentHandArea(y: number, height: number) {
-    this.opponentHandContainer = new Container();
-    this.createHandAreaUI(
-      this.opponentHandContainer,
-      { y },
-      { height }
-    );
-  }
+  private createOpponentHandSection(y: number, height: number) {
+    const handContainer = new Container();
+    handContainer.y = y;
 
-  private createBattlefield(y: number, height: number) {
-    this.battlefieldContainer = new Container();
-    // Divide battlefield into 3 sections: opponent chars, log, player chars
-    const sectionHeight = height / 3;
-    this.player2CharactersContainer = new Container();
-    this.player2CharactersContainer.y = y;
-    this.createActionLogInCenter(y + sectionHeight, sectionHeight - 20);
-    this.player1CharactersContainer = new Container();
-    this.player1CharactersContainer.y = y + sectionHeight * 2;
-    this.battlefieldContainer.addChild(this.player2CharactersContainer);
-    this.battlefieldContainer.addChild(this.player1CharactersContainer);
-    this.container.addChild(this.battlefieldContainer);
-  }
+    // Create background
+    const bg = new Graphics();
+    bg.roundRect(0, 0, this.gameWidth, height, 8)
+      .fill(Colors.UI_BACKGROUND)
+      .stroke({ width: 1, color: Colors.UI_BORDER });
+    handContainer.addChild(bg);
 
-  private createHandArea(y: number, height: number) {
-    this.handContainer = new Container();
-    this.createHandAreaUI(
-      this.handContainer,
-      { y },
-      { height }
-    );
-  }
-
-  private createPlayerEnergyDeckDiscard(y: number, height: number) {
-    this.energyContainer = new Container();
-    this.deckRemainingContainer = new Container();
-    this.discardPileContainer = new Container();
-    const elementWidth = 80;
-    const spacing = this.STANDARD_SPACING;
-    const totalWidth = (elementWidth * 3) + (spacing * 2);
+    // Create card backs for opponent hand
+    const cardWidth = 35;
+    const cardHeight = 50;
+    const numCards = 5; // Show 5 card backs
+    const spacing = 5;
+    const totalWidth = (cardWidth * numCards) + (spacing * (numCards - 1));
     const startX = (this.gameWidth - totalWidth) / 2;
-    this.createEnergyDeckDiscardUI(
-      { x: startX, y },
-      {
-        energy: this.energyContainer,
-        deck: this.deckRemainingContainer,
-        discard: this.discardPileContainer
-      },
-      {
-        elementWidth,
-        elementHeight: height,
-        spacing,
-        isPlayerDiscard: true
+
+    for (let i = 0; i < numCards; i++) {
+      const cardBack = new Graphics();
+      cardBack.roundRect(0, 0, cardWidth, cardHeight, 4)
+        .fill(Colors.CARD_BACKGROUND)
+        .stroke({ width: 1, color: Colors.CARD_BORDER });
+      
+      cardBack.x = startX + (i * (cardWidth + spacing));
+      cardBack.y = (height - cardHeight) / 2;
+      
+      handContainer.addChild(cardBack);
+    }
+
+    this.opponentHandContainer = handContainer;
+    this.container.addChild(handContainer);
+  }
+
+  private createOpponentSection(y: number, height: number) {
+    const sectionContainer = new Container();
+    sectionContainer.y = y;
+
+    // Create background
+    const bg = new Graphics();
+    bg.roundRect(0, 0, this.gameWidth, height, 8)
+      .fill({ color: '#8B4513' }) // Brown color like in the image
+      .stroke({ width: 1, color: Colors.UI_BORDER });
+    sectionContainer.addChild(bg);
+
+    // Create "Opponent" label and avatar
+    const labelContainer = new Container();
+    
+    // Avatar circle (white)
+    const avatar = new Graphics();
+    avatar.circle(25, height / 2, 20)
+      .fill(Colors.TEXT_WHITE)
+      .stroke({ width: 2, color: Colors.UI_BORDER });
+    
+    // Opponent label
+    const opponentLabel = new Text({
+      text: 'Opponent',
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 16,
+        fill: Colors.TEXT_WHITE,
+        fontWeight: 'bold'
       }
-    );
+    });
+    opponentLabel.x = 55;
+    opponentLabel.y = (height - opponentLabel.height) / 2;
+
+    labelContainer.addChild(avatar, opponentLabel);
+    labelContainer.x = 20;
+    sectionContainer.addChild(labelContainer);
+
+    // Create opponent character cards area (3 cards)
+    const cardContainer = new Container();
+    const cardWidth = 45;
+    const cardHeight = 60;
+    const cardSpacing = 10;
+    const totalCardsWidth = (cardWidth * 3) + (cardSpacing * 2);
+    const cardsStartX = this.gameWidth - totalCardsWidth - 20;
+
+    for (let i = 0; i < 3; i++) {
+      const characterCard = new Graphics();
+      characterCard.roundRect(0, 0, cardWidth, cardHeight, 4)
+        .fill(Colors.CARD_BACKGROUND)
+        .stroke({ width: 1, color: Colors.CARD_BORDER });
+      
+      characterCard.x = cardsStartX + (i * (cardWidth + cardSpacing));
+      characterCard.y = (height - cardHeight) / 2;
+      
+      cardContainer.addChild(characterCard);
+    }
+
+    this.player2CharactersContainer = cardContainer;
+    sectionContainer.addChild(cardContainer);
+    this.container.addChild(sectionContainer);
+  }
+
+  private createActionLogSection(y: number, height: number) {
+    const logContainer = new Container();
+    logContainer.y = y;
+
+    // Create background
+    const bg = new Graphics();
+    bg.roundRect(0, 0, this.gameWidth, height, 8)
+      .fill(Colors.UI_BACKGROUND)
+      .stroke({ width: 1, color: Colors.UI_BORDER });
+    logContainer.addChild(bg);
+
+    // DISCARD button (dotted border)
+    const discardButton = new Graphics();
+    const buttonWidth = 120;
+    const buttonHeight = 35;
+    discardButton.setStrokeStyle({
+      width: 2,
+      color: Colors.WARNING,
+      cap: 'round',
+      join: 'round',
+    });
+    // Create dotted effect by drawing small lines
+    const dashLength = 5;
+    const gapLength = 3;
+    const perimeter = 2 * (buttonWidth + buttonHeight);
+    let currentLength = 0;
+    
+    discardButton.moveTo(0, 0);
+    // Top edge
+    for (let i = 0; i < buttonWidth; i += dashLength + gapLength) {
+      discardButton.lineTo(Math.min(i + dashLength, buttonWidth), 0);
+      discardButton.moveTo(Math.min(i + dashLength + gapLength, buttonWidth), 0);
+    }
+    // Right edge
+    discardButton.moveTo(buttonWidth, 0);
+    for (let i = 0; i < buttonHeight; i += dashLength + gapLength) {
+      discardButton.lineTo(buttonWidth, Math.min(i + dashLength, buttonHeight));
+      discardButton.moveTo(buttonWidth, Math.min(i + dashLength + gapLength, buttonHeight));
+    }
+    // Bottom edge
+    discardButton.moveTo(buttonWidth, buttonHeight);
+    for (let i = buttonWidth; i > 0; i -= dashLength + gapLength) {
+      discardButton.lineTo(Math.max(i - dashLength, 0), buttonHeight);
+      discardButton.moveTo(Math.max(i - dashLength - gapLength, 0), buttonHeight);
+    }
+    // Left edge
+    discardButton.moveTo(0, buttonHeight);
+    for (let i = buttonHeight; i > 0; i -= dashLength + gapLength) {
+      discardButton.lineTo(0, Math.max(i - dashLength, 0));
+      discardButton.moveTo(0, Math.max(i - dashLength - gapLength, 0));
+    }
+    discardButton.stroke();
+
+    const discardText = new Text({
+      text: '🗑️ DISCARD',
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 14,
+        fill: Colors.WARNING,
+        fontWeight: 'bold',
+        align: 'center'
+      }
+    });
+    discardText.anchor.set(0.5);
+    discardText.x = buttonWidth / 2;
+    discardText.y = buttonHeight / 2;
+
+    discardButton.addChild(discardText);
+    discardButton.x = (this.gameWidth - buttonWidth) / 2;
+    discardButton.y = 10;
+
+    // Battle log messages
+    const logMessages = [
+      '⚔️ BTC attacked ETH for 230 dmg!',
+      '❤️ ETH healed 100',
+      '🛡️ BNB blocked DOGE'
+    ];
+
+    logMessages.forEach((message, index) => {
+      const messageText = new Text({
+        text: message,
+        style: {
+          fontFamily: 'Kalam',
+          fontSize: 12,
+          fill: Colors.TEXT_PRIMARY,
+          align: 'center'
+        }
+      });
+      messageText.anchor.set(0.5, 0);
+      messageText.x = this.gameWidth / 2;
+      messageText.y = 55 + (index * 20);
+      
+      logContainer.addChild(messageText);
+    });
+
+    logContainer.addChild(discardButton);
+    
+    // Store reference for discard functionality
+    this.discardPileContainer = logContainer;
+    (discardButton as any).interactive = true;
+    (discardButton as any).cursor = 'pointer';
+
+    this.actionLogContainer = logContainer;
+    this.container.addChild(logContainer);
+  }
+
+  private createPlayerSection(y: number, height: number) {
+    const sectionContainer = new Container();
+    sectionContainer.y = y;
+
+    // Create background
+    const bg = new Graphics();
+    bg.roundRect(0, 0, this.gameWidth, height, 8)
+      .fill({ color: '#DEB887' }) // Light brown color like in the image
+      .stroke({ width: 1, color: Colors.UI_BORDER });
+    sectionContainer.addChild(bg);
+
+    // Create "You" label and avatar
+    const labelContainer = new Container();
+    
+    // Avatar circle (white)
+    const avatar = new Graphics();
+    avatar.circle(25, height / 2, 20)
+      .fill(Colors.TEXT_WHITE)
+      .stroke({ width: 2, color: Colors.UI_BORDER });
+    
+    // You label
+    const youLabel = new Text({
+      text: 'You',
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 16,
+        fill: Colors.TEXT_PRIMARY,
+        fontWeight: 'bold'
+      }
+    });
+    youLabel.x = 55;
+    youLabel.y = (height - youLabel.height) / 2;
+
+    labelContainer.addChild(avatar, youLabel);
+    labelContainer.x = 20;
+    sectionContainer.addChild(labelContainer);
+
+    // Create player character cards area (showing different states)
+    const cardContainer = new Container();
+    const cardWidth = 45;
+    const cardHeight = 60;
+    const cardSpacing = 10;
+    const totalCardsWidth = (cardWidth * 3) + (cardSpacing * 2);
+    const cardsStartX = this.gameWidth - totalCardsWidth - 20;
+
+    // Card 1: Normal
+    const card1 = new Graphics();
+    card1.roundRect(0, 0, cardWidth, cardHeight, 4)
+      .fill(Colors.CARD_BACKGROUND)
+      .stroke({ width: 1, color: Colors.CARD_BORDER });
+    card1.x = cardsStartX;
+    card1.y = (height - cardHeight) / 2;
+
+    // Card 2: With heal effect (purple glow)
+    const card2 = new Graphics();
+    card2.roundRect(0, 0, cardWidth, cardHeight, 4)
+      .fill({ color: '#DA70D6' }) // Purple color
+      .stroke({ width: 2, color: '#9370DB' });
+    card2.x = cardsStartX + cardWidth + cardSpacing;
+    card2.y = (height - cardHeight) / 2;
+
+    // Card 3: Locked (grayed out)
+    const card3 = new Graphics();
+    card3.roundRect(0, 0, cardWidth, cardHeight, 4)
+      .fill({ color: '#808080' }) // Gray color
+      .stroke({ width: 1, color: '#696969' });
+    card3.x = cardsStartX + (cardWidth + cardSpacing) * 2;
+    card3.y = (height - cardHeight) / 2;
+
+    cardContainer.addChild(card1, card2, card3);
+    this.player1CharactersContainer = cardContainer;
+    sectionContainer.addChild(cardContainer);
+    this.container.addChild(sectionContainer);
+  }
+
+  private createPlayerHandSection(y: number, height: number) {
+    const handContainer = new Container();
+    handContainer.y = y;
+
+    // Create background
+    const bg = new Graphics();
+    bg.roundRect(0, 0, this.gameWidth, height, 8)
+      .fill(Colors.UI_BACKGROUND)
+      .stroke({ width: 1, color: Colors.UI_BORDER });
+    handContainer.addChild(bg);
+
+    // Player hand will be populated dynamically with actual cards
+    // This is just the container setup
+    this.handContainer = handContainer;
+    this.container.addChild(handContainer);
+  }
+
+  private createBottomDiscardSection(y: number, height: number) {
+    const discardContainer = new Container();
+    discardContainer.y = y;
+
+    // Create background
+    const bg = new Graphics();
+    bg.roundRect(0, 0, this.gameWidth, height, 8)
+      .fill(Colors.UI_BACKGROUND)
+      .stroke({ width: 1, color: Colors.UI_BORDER });
+    discardContainer.addChild(bg);
+
+    // DISCARD button (similar to the one above)
+    const discardButton = new Graphics();
+    const buttonWidth = 150;
+    const buttonHeight = 35;
+    
+    // Create dotted border
+    discardButton.setStrokeStyle({
+      width: 2,
+      color: Colors.WARNING,
+      cap: 'round',
+      join: 'round',
+    });
+    
+    // Create dotted effect
+    const dashLength = 5;
+    const gapLength = 3;
+    
+    discardButton.moveTo(0, 0);
+    // Simple rectangle with dotted appearance
+    for (let i = 0; i < buttonWidth; i += dashLength + gapLength) {
+      discardButton.lineTo(Math.min(i + dashLength, buttonWidth), 0);
+      discardButton.moveTo(Math.min(i + dashLength + gapLength, buttonWidth), 0);
+    }
+    discardButton.moveTo(buttonWidth, 0);
+    for (let i = 0; i < buttonHeight; i += dashLength + gapLength) {
+      discardButton.lineTo(buttonWidth, Math.min(i + dashLength, buttonHeight));
+      discardButton.moveTo(buttonWidth, Math.min(i + dashLength + gapLength, buttonHeight));
+    }
+    discardButton.moveTo(buttonWidth, buttonHeight);
+    for (let i = buttonWidth; i > 0; i -= dashLength + gapLength) {
+      discardButton.lineTo(Math.max(i - dashLength, 0), buttonHeight);
+      discardButton.moveTo(Math.max(i - dashLength - gapLength, 0), buttonHeight);
+    }
+    discardButton.moveTo(0, buttonHeight);
+    for (let i = buttonHeight; i > 0; i -= dashLength + gapLength) {
+      discardButton.lineTo(0, Math.max(i - dashLength, 0));
+      discardButton.moveTo(0, Math.max(i - dashLength - gapLength, 0));
+    }
+    discardButton.stroke();
+
+    const discardText = new Text({
+      text: '🗑️ DISCARD',
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 14,
+        fill: Colors.WARNING,
+        fontWeight: 'bold',
+        align: 'center'
+      }
+    });
+    discardText.anchor.set(0.5);
+    discardText.x = buttonWidth / 2;
+    discardText.y = buttonHeight / 2;
+
+    discardButton.addChild(discardText);
+    discardButton.x = (this.gameWidth - buttonWidth) / 2;
+    discardButton.y = (height - buttonHeight) / 2;
+    discardButton.interactive = true;
+    discardButton.cursor = 'pointer';
+
+    discardContainer.addChild(discardButton);
+    this.container.addChild(discardContainer);
+  }
+
+  private createBottomStatusBar(y: number, height: number) {
+    const statusContainer = new Container();
+    statusContainer.y = y;
+    
+    // Create dark background bar (same as top)
+    const bg = new Graphics();
+    bg.roundRect(0, 0, this.gameWidth, height, 8)
+      .fill(Colors.UI_BACKGROUND);
+    statusContainer.addChild(bg);
+
+    // Create same three status indicators as top
+    const indicatorWidth = 80;
+    const spacing = 20;
+    const totalWidth = (indicatorWidth * 3) + (spacing * 2);
+    const startX = (this.gameWidth - totalWidth) / 2;
+
+    // Energy indicator
+    const energyBg = new Graphics();
+    energyBg.roundRect(0, 0, indicatorWidth, height - 10, 6)
+      .fill(Colors.CARD_BACKGROUND)
+      .stroke({ width: 1, color: Colors.UI_BORDER });
+    energyBg.x = startX;
+    energyBg.y = 5;
+
+    const energyText = new Text({
+      text: '⚡ 5',
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 14,
+        fill: Colors.TEXT_PRIMARY,
+        align: 'center'
+      }
+    });
+    energyText.anchor.set(0.5);
+    energyText.x = startX + indicatorWidth / 2;
+    energyText.y = height / 2;
+
+    // Cards indicator
+    const cardsBg = new Graphics();
+    cardsBg.roundRect(0, 0, indicatorWidth, height - 10, 6)
+      .fill(Colors.CARD_BACKGROUND)
+      .stroke({ width: 1, color: Colors.UI_BORDER });
+    cardsBg.x = startX + indicatorWidth + spacing;
+    cardsBg.y = 5;
+
+    const cardsText = new Text({
+      text: '🃏 12',
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 14,
+        fill: Colors.TEXT_PRIMARY,
+        align: 'center'
+      }
+    });
+    cardsText.anchor.set(0.5);
+    cardsText.x = startX + indicatorWidth + spacing + indicatorWidth / 2;
+    cardsText.y = height / 2;
+
+    // Trash indicator
+    const trashBg = new Graphics();
+    trashBg.roundRect(0, 0, indicatorWidth, height - 10, 6)
+      .fill(Colors.CARD_BACKGROUND)
+      .stroke({ width: 1, color: Colors.UI_BORDER });
+    trashBg.x = startX + (indicatorWidth + spacing) * 2;
+    trashBg.y = 5;
+
+    const trashText = new Text({
+      text: '🗑️ 3',
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 14,
+        fill: Colors.TEXT_PRIMARY,
+        align: 'center'
+      }
+    });
+    trashText.anchor.set(0.5);
+    trashText.x = startX + (indicatorWidth + spacing) * 2 + indicatorWidth / 2;
+    trashText.y = height / 2;
+
+    statusContainer.addChild(energyBg, energyText, cardsBg, cardsText, trashBg, trashText);
+    this.container.addChild(statusContainer);
   }
 
   private createEndTurnButtonAtBottom(bottomPadding: number) {
@@ -209,7 +684,7 @@ export class CardBattleScene extends BaseScene {
     // will be created dynamically during the main phase
     this.turnIndicatorContainer = new Container();
     this.turnIndicatorContainer.visible = false;
-    this.turnIndicatorContainer.y = this.gameHeight - bottomPadding - 44; // 44 is button height
+    this.turnIndicatorContainer.y = this.gameHeight - bottomPadding - 54; // 54 is button height
     this.container.addChild(this.turnIndicatorContainer);
   }
 
@@ -222,170 +697,6 @@ export class CardBattleScene extends BaseScene {
     
     this.backgroundContainer.addChild(bg);
     this.container.addChild(this.backgroundContainer);
-  }
-
-  private createEnergyDeckDiscardUI(
-    position: { x: number; y: number },
-    containers: { 
-      energy: Container; 
-      deck: Container; 
-      discard: Container; 
-    },
-    config: {
-      elementWidth: number;
-      elementHeight: number;
-      spacing: number;
-      isPlayerDiscard?: boolean;
-    }
-  ): void {
-    const { elementWidth, elementHeight, spacing, isPlayerDiscard = false } = config;
-    const { x: startX, y: yPosition } = position;
-    
-    // Position energy container on the left
-    containers.energy.x = startX;
-    containers.energy.y = yPosition;
-    
-    // Create energy background and label
-    const energyBg = new Graphics();
-    energyBg.roundRect(0, 0, elementWidth, elementHeight, 8)
-      .fill(Colors.UI_BACKGROUND)
-      .stroke({ width: 2, color: Colors.UI_BORDER });
-    
-    const energyLabel = new Text({
-      text: 'Energy: 0',
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 11,
-        fill: Colors.TEXT_PRIMARY,
-        align: 'center'
-      }
-    });
-    energyLabel.anchor.set(0.5);
-    energyLabel.x = elementWidth / 2;
-    energyLabel.y = elementHeight / 2;
-    
-    containers.energy.addChild(energyBg, energyLabel);
-    
-    // Position deck container in the center
-    containers.deck.x = startX + elementWidth + spacing;
-    containers.deck.y = yPosition;
-    
-    // Create deck background and label
-    const deckBg = new Graphics();
-    deckBg.roundRect(0, 0, elementWidth, elementHeight, 8)
-      .fill(Colors.CARD_BACKGROUND)
-      .stroke({ width: 2, color: Colors.UI_BORDER });
-    
-    const deckLabel = new Text({
-      text: 'DECK',
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 10,
-        fill: Colors.TEXT_PRIMARY,
-        align: 'center'
-      }
-    });
-    deckLabel.anchor.set(0.5);
-    deckLabel.x = elementWidth / 2;
-    deckLabel.y = elementHeight / 2 - 8;
-    
-    const deckCount = new Text({
-      text: '0',
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 12,
-        fill: Colors.TEXT_SECONDARY,
-        align: 'center'
-      }
-    });
-    deckCount.anchor.set(0.5);
-    deckCount.x = elementWidth / 2;
-    deckCount.y = elementHeight / 2 + 8;
-    
-    containers.deck.addChild(deckBg, deckLabel, deckCount);
-    
-    // Position discard container on the right
-    containers.discard.x = startX + (elementWidth + spacing) * 2;
-    containers.discard.y = yPosition;
-    
-    // Create discard background with optional enhanced styling for player
-    const discardBg = new Graphics();
-    discardBg.roundRect(0, 0, elementWidth, elementHeight, 8)
-      .fill(Colors.CARD_DISCARD)
-      .stroke({ width: isPlayerDiscard ? 3 : 2, color: Colors.UI_BORDER });
-  
-    const discardLabel = new Text({
-      text: 'DISCARD PILE',
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 10,
-        fill: Colors.TEXT_PRIMARY,
-        align: 'center'
-      }
-    });
-    discardLabel.anchor.set(0.5);
-    discardLabel.x = elementWidth / 2;
-    discardLabel.y = elementHeight / 2;
-    
-    containers.discard.addChild(discardBg, discardLabel);
-    
-    // Add all containers to the main container
-    this.container.addChild(containers.energy);
-    this.container.addChild(containers.deck);
-    this.container.addChild(containers.discard);
-  }
-
-  private createHandAreaUI(
-    container: Container,
-    position: { y: number },
-    config: { height: number }
-  ): void {
-    const { height } = config;
-    const { y: yPosition } = position;
-    
-    // Hand background
-    const handBg = new Graphics();
-    handBg.roundRect(0, 0, this.gameWidth, height, 10)
-      .fill(Colors.UI_BACKGROUND)
-      .stroke({ width: 2, color: Colors.UI_BORDER });
-    
-    container.addChild(handBg);
-    container.y = yPosition;
-    
-    this.container.addChild(container);
-  }
-
-
-  private createActionLogInCenter(logY: number, logHeight: number): void {
-    this.actionLogContainer = new Container();
-    
-    // Center the action log horizontally and use provided position
-    const logWidth = Math.min(350, this.gameWidth - (this.STANDARD_PADDING * 2));
-    
-    const logBg = new Graphics();
-    logBg.roundRect(0, 0, logWidth, logHeight, 8)
-      .fill(Colors.UI_BACKGROUND)
-      .stroke({ width: 2, color: Colors.UI_BORDER });
-    
-    // Add title for battle log
-    const logTitle = new Text({
-      text: 'BATTLE LOG',
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 12,
-        fill: Colors.TEXT_PRIMARY,
-        align: 'center'
-      }
-    });
-    logTitle.anchor.set(0.5, 0);
-    logTitle.x = logWidth / 2;
-    logTitle.y = 8;
-    
-    this.actionLogContainer.addChild(logBg, logTitle);
-    this.actionLogContainer.x = (this.gameWidth - logWidth) / 2;
-    this.actionLogContainer.y = logY;
-    
-    this.container.addChild(this.actionLogContainer);
   }
 
 
@@ -940,11 +1251,16 @@ export class CardBattleScene extends BaseScene {
   }
 
   private updateEnergyIndicator(): void {
-    if (!this.battleState) return;
+    if (!this.battleState || !this.energyContainer) return;
     
-    // Update both player and opponent energy
-    this.updateEnergyContainer(this.energyContainer, 1);
-    this.updateEnergyContainer(this.opponentEnergyContainer, 2);
+    const currentPlayer = this.battleState.players.find(p => p.team === this.battleState!.current_player);
+    if (!currentPlayer) return;
+    
+    // Update energy text in status bar
+    const energyText = (this.energyContainer as any).energyText;
+    if (energyText && energyText instanceof Text) {
+      energyText.text = `⚡ ${currentPlayer.deck.current_energy}`;
+    }
   }
 
   private updateEnergyContainer(container: Container, teamNumber: number): void {
@@ -961,11 +1277,28 @@ export class CardBattleScene extends BaseScene {
   }
 
   private updateDeckRemaining(): void {
-    if (!this.battleState) return;
+    if (!this.battleState || !this.energyContainer) return;
     
-    // Update both player and opponent deck/discard counts
-    this.updateDeckRemainingContainer(this.deckRemainingContainer, 1);
-    this.updateDeckRemainingContainer(this.opponentDeckRemainingContainer, 2);
+    const currentPlayer = this.battleState.players.find(p => p.team === this.battleState!.current_player);
+    if (!currentPlayer) return;
+    
+    // Calculate remaining cards
+    const totalDeckCards = currentPlayer.deck.deck_cards.length;
+    const handCards = currentPlayer.deck.hand_cards.length;
+    const discardCards = currentPlayer.deck.discard_cards.length;
+    const remainingCards = totalDeckCards - handCards - discardCards;
+    
+    // Update cards text in status bar
+    const cardsText = (this.energyContainer as any).cardsText;
+    if (cardsText && cardsText instanceof Text) {
+      cardsText.text = `🃏 ${handCards}`;
+    }
+    
+    // Update trash text in status bar
+    const trashText = (this.energyContainer as any).trashText;
+    if (trashText && trashText instanceof Text) {
+      trashText.text = `🗑️ ${discardCards}`;
+    }
   }
 
   private updateDeckRemainingContainer(container: Container, teamNumber: number): void {
@@ -999,9 +1332,9 @@ export class CardBattleScene extends BaseScene {
   }
 
   private updateHandCards(): void {
-    if (!this.battleState) return;
+    if (!this.battleState || !this.handContainer) return;
     
-    // Clear existing hand cards
+    // Clear existing hand cards (except background)
     this.handCards.forEach(card => card.destroy());
     this.handCards = [];
     
@@ -1011,17 +1344,13 @@ export class CardBattleScene extends BaseScene {
     const handCards = currentPlayer.deck.hand_cards;
     if (handCards.length === 0) return;
     
-    // Calculate responsive card dimensions and spacing
-    const availableWidth = this.gameWidth - (this.STANDARD_PADDING * 2);
-    const maxCards = handCards.length;
-    const minCardWidth = 40;
-    const maxCardWidth = 60;
-    const minSpacing = 5;
-    const maxSpacing = 15;
-    
-    // Calculate optimal card width and spacing
-    let cardWidth = (availableWidth - (minSpacing * (maxCards - 1))) / maxCards;
-    cardWidth = Math.max(minCardWidth, Math.min(maxCardWidth, cardWidth));
+    // Calculate card dimensions and spacing for the hand area
+    const availableWidth = this.gameWidth - (this.STANDARD_PADDING * 4);
+    const maxCards = Math.min(handCards.length, 6); // Show max 6 cards
+    const cardWidth = 45;
+    const cardHeight = 55;
+    const minSpacing = 2;
+    const maxSpacing = 8;
     
     let cardSpacing = (availableWidth - (cardWidth * maxCards)) / Math.max(1, maxCards - 1);
     cardSpacing = Math.max(minSpacing, Math.min(maxSpacing, cardSpacing));
@@ -1029,32 +1358,94 @@ export class CardBattleScene extends BaseScene {
     const totalWidth = (cardWidth * maxCards) + (cardSpacing * Math.max(0, maxCards - 1));
     const startX = (this.gameWidth - totalWidth) / 2;
     
-    handCards.forEach((cardInDeck, index) => {
+    handCards.slice(0, maxCards).forEach((cardInDeck, index) => {
       if (cardInDeck.card) {
         const x = startX + (index * (cardWidth + cardSpacing));
-        const y = 10;
+        const y = 5; // Small padding from top of hand container
         
-        const handCard = this.createHandCard(cardInDeck.card, x, y, cardWidth);
+        const handCard = this.createVisibleHandCard(cardInDeck.card, x, y, cardWidth, cardHeight);
         this.handContainer.addChild(handCard);
         this.handCards.push(handCard);
       }
     });
   }
 
-  private createHandCard(card: Card, x: number, y: number, cardWidth: number = this.HAND_CARD_WIDTH): Container {
-    const cardHeight = cardWidth * 1.4; // Maintain aspect ratio
-    
-    // Calculate appropriate font scale for smaller hand cards
-    const baseFontScale = Math.min(1.0, cardWidth / 80); // Scale down for smaller cards
-    
-    const cardContainer = this.createDeckCard(card, cardWidth, cardHeight, {
-      fontScale: baseFontScale,
-      showDescription: false, // Don't show description in hand cards for space
-      enableHover: false // We handle hover effects ourselves for drag and drop
-    });
-    
+  private createVisibleHandCard(card: Card, x: number, y: number, cardWidth: number, cardHeight: number): Container {
+    const cardContainer = new Container();
     cardContainer.x = x;
     cardContainer.y = y;
+    
+    // Card background
+    const bg = new Graphics();
+    bg.roundRect(0, 0, cardWidth, cardHeight, 4)
+      .fill(Colors.CARD_BACKGROUND)
+      .stroke({ width: 1, color: Colors.CARD_BORDER });
+    
+    // Card name at the bottom (like Fireball, Heal, etc.)
+    const cardName = new Text({
+      text: card.name,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 8,
+        fill: Colors.TEXT_PRIMARY,
+        align: 'center',
+        wordWrap: true,
+        wordWrapWidth: cardWidth - 4
+      }
+    });
+    cardName.anchor.set(0.5, 1);
+    cardName.x = cardWidth / 2;
+    cardName.y = cardHeight - 2;
+    
+    // Energy cost (top left corner)
+    const energyCost = new Graphics();
+    energyCost.circle(8, 8, 6)
+      .fill(Colors.BUTTON_PRIMARY)
+      .stroke({ width: 1, color: Colors.BUTTON_BORDER });
+    
+    const energyText = new Text({
+      text: card.energy_cost.toString(),
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 8,
+        fontWeight: 'bold',
+        fill: Colors.TEXT_WHITE
+      }
+    });
+    energyText.anchor.set(0.5);
+    energyText.x = 8;
+    energyText.y = 8;
+    
+    // Card type icon in the center
+    let cardIcon = '⭐';
+    switch (card.group) {
+      case CardType.ATTACK:
+        cardIcon = '⚔️';
+        break;
+      case CardType.HEAL:
+        cardIcon = '❤️';
+        break;
+      case CardType.DEBUFF:
+        cardIcon = '🌀';
+        break;
+      case CardType.BUFF:
+        cardIcon = '🔼';
+        break;
+    }
+    
+    const iconText = new Text({
+      text: cardIcon,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 16,
+        align: 'center'
+      }
+    });
+    iconText.anchor.set(0.5);
+    iconText.x = cardWidth / 2;
+    iconText.y = cardHeight / 2 - 5;
+    
+    cardContainer.addChild(bg, cardName, energyCost, energyText, iconText);
     
     // Store card reference
     (cardContainer as any).card = card;
@@ -1064,6 +1455,8 @@ export class CardBattleScene extends BaseScene {
     
     return cardContainer;
   }
+
+
 
   private makeHandCardDraggable(cardContainer: Container, card: Card): void {
     cardContainer.interactive = true;
@@ -1368,21 +1761,22 @@ export class CardBattleScene extends BaseScene {
   private createEndTurnButton(): void {
     const endTurnButton = new Container();
     
-    // Make the button larger and more thumb-friendly
-    const buttonWidth = Math.min(200, this.gameWidth - (this.STANDARD_PADDING * 2));
-    const buttonHeight = 44;
+    // Make the button large and prominent like in the image
+    const buttonWidth = Math.min(250, this.gameWidth - (this.STANDARD_PADDING * 2));
+    const buttonHeight = 54;
     
     const buttonBg = new Graphics();
     buttonBg.roundRect(0, 0, buttonWidth, buttonHeight, 12)
-      .fill(Colors.BUTTON_PRIMARY)
-      .stroke({ width: 2, color: Colors.BUTTON_BORDER });
+      .fill({ color: '#FF6B35' }) // Orange color like in the image
+      .stroke({ width: 2, color: '#CC4A1D' });
     
     const buttonText = new Text({
       text: 'END TURN',
       style: {
         fontFamily: 'Kalam',
-        fontSize: 16,
-        fill: Colors.TEXT_PRIMARY,
+        fontSize: 18,
+        fontWeight: 'bold',
+        fill: Colors.TEXT_WHITE,
         align: 'center'
       }
     });
@@ -1392,7 +1786,7 @@ export class CardBattleScene extends BaseScene {
     
     endTurnButton.addChild(buttonBg, buttonText);
     
-    // Position at very bottom, centered, thumb-friendly
+    // Position at the very bottom, centered
     endTurnButton.x = (this.gameWidth - buttonWidth) / 2;
     endTurnButton.y = this.gameHeight - buttonHeight - this.STANDARD_PADDING;
     
@@ -1405,6 +1799,14 @@ export class CardBattleScene extends BaseScene {
         this.mainPhaseResolve();
         this.mainPhaseResolve = undefined;
       }
+    });
+    
+    // Add hover effect
+    endTurnButton.on('pointerover', () => {
+      buttonBg.tint = 0xFFAA88;
+    });
+    endTurnButton.on('pointerout', () => {
+      buttonBg.tint = 0xFFFFFF;
     });
     
     this.container.addChild(endTurnButton);
