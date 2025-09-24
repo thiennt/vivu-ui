@@ -187,7 +187,9 @@ export class PrepareScene extends BaseScene {
       const row = Math.floor(index / cardsPerRow);
       const col = index % cardsPerRow;
 
-      const cardContainer = this.createDeckCard(card, cardWidth, cardHeight);
+      const cardContainer = this.createDeckCard(card, cardWidth, cardHeight, {
+        onClick: (clickedCard) => this.showCardDetails(clickedCard)
+      });
       cardContainer.x = col * (cardWidth + spacing);
       cardContainer.y = 40 + row * (cardHeight + spacing);
 
@@ -225,135 +227,6 @@ export class PrepareScene extends BaseScene {
     this.deckContainer.y = 90 + lineupHeight + 20;
 
     this.container.addChild(this.deckContainer);
-  }
-
-  private createDeckCard(card: Card, width: number, height: number): Container {
-    const cardContainer = new Container();
-
-    // Card background with rarity color
-    const rarityColors = {
-      common: Colors.RARITY_COMMON,
-      uncommon: Colors.RARITY_UNCOMMON,
-      rare: Colors.RARITY_RARE,
-      epic: Colors.RARITY_EPIC,
-      legendary: Colors.RARITY_LEGENDARY
-    };
-
-    const bg = new Graphics()
-      .roundRect(0, 0, width, height, 8)
-      .fill({ color: Colors.BACKGROUND_SECONDARY })
-      .stroke({ width: 2, color: Colors.CARD_BORDER });
-
-    // Group icon at top right
-    let groupIcon = '';
-    switch (card.group) {
-      case CardType.ATTACK:
-        groupIcon = '⚔️';
-        break;
-      case CardType.HEAL:
-        groupIcon = '✨';
-        break;
-      case CardType.DEBUFF:
-        groupIcon = '🌀';
-        break;
-      case CardType.BUFF:
-        groupIcon = '🔼';
-        break;
-      default:
-        groupIcon = '⭐';
-    }
-    const groupIconText = new Text({
-      text: groupIcon,
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 16,
-        align: 'center',
-        fill: Colors.TEXT_PRIMARY
-      }
-    });
-    groupIconText.anchor.set(1, 0);
-    groupIconText.x = width - 8;
-    groupIconText.y = 6;
-
-    // Card name at top, below icon
-    const cardName = new Text({
-      text: card.name,
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 12,
-        fontWeight: 'bold',
-        fill: Colors.TEXT_PRIMARY,
-        wordWrap: true,
-        wordWrapWidth: width - 16
-      }
-    });
-    cardName.anchor.set(0.5, 0);
-    cardName.x = width / 2;
-    cardName.y = groupIconText.y + groupIconText.height + 5;
-
-    // Energy cost (top left)
-    const energyCost = new Graphics()
-      .circle(18, 18, 14)
-      .fill({ color: Colors.BUTTON_PRIMARY })
-      .stroke({ width: 1, color: Colors.BUTTON_BORDER });
-    const energyText = new Text({
-      text: card.energy_cost.toString(),
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 14,
-        fontWeight: 'bold',
-        fill: Colors.TEXT_WHITE
-      }
-    });
-    energyText.anchor.set(0.5);
-    energyText.x = 18;
-    energyText.y = 18;
-
-    // Card description, trimmed if too long
-    const maxDescLength = 50;
-    let descText = card.description;
-    if (descText.length > maxDescLength) {
-      descText = descText.slice(0, maxDescLength - 3) + '...';
-    }
-    const description = new Text({
-      text: descText,
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 14,
-        fill: Colors.TEXT_SECONDARY,
-        wordWrap: true,
-        wordWrapWidth: width - 24,
-        align: 'center'
-      }
-    });
-    description.anchor.set(0.5, 0.5);
-    description.x = width / 2;
-    description.y = height / 2 + 20;
-
-    cardContainer.addChild(bg, groupIconText, cardName, energyCost, energyText, description);
-
-    // Make card interactive for hover effects and click
-    cardContainer.interactive = true;
-    cardContainer.cursor = 'pointer';
-
-    cardContainer.on('pointerover', () => {
-      bg.tint = 0xcccccc;
-    });
-
-    cardContainer.on('pointerout', () => {
-      bg.tint = 0xffffff;
-    });
-
-    // Add click event to show card details
-    cardContainer.on('pointertap', () => {
-      this.showCardDetails(card);
-    });
-
-    // Ensure card fits the given width and height
-    cardContainer.width = width;
-    cardContainer.height = height;
-
-    return cardContainer;
   }
 
   private createActionButtons(): void {

@@ -1149,50 +1149,17 @@ export class CardBattleScene extends BaseScene {
   }
 
   private createHandCard(card: Card, x: number, y: number, cardWidth: number = this.HAND_CARD_WIDTH): Container {
-    const cardContainer = new Container();
     const cardHeight = cardWidth * 1.4; // Maintain aspect ratio
     
-    // Card background
-    const bg = new Graphics();
-    bg.roundRect(0, 0, cardWidth, cardHeight, 6)
-      .fill(Colors.CARD_BACKGROUND)
-      .stroke({ width: 2, color: Colors.CARD_BORDER });
+    // Calculate appropriate font scale for smaller hand cards
+    const baseFontScale = Math.min(1.0, cardWidth / 80); // Scale down for smaller cards
     
-    // Calculate responsive font sizes
-    const nameFontSize = Math.max(8, Math.min(12, cardWidth * 0.18));
-    const costFontSize = Math.max(10, Math.min(14, cardWidth * 0.20));
-    
-    // Card name
-    const nameText = new Text({
-      text: card.name,
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: nameFontSize,
-        fill: Colors.TEXT_PRIMARY,
-        align: 'center',
-        wordWrap: true,
-        wordWrapWidth: cardWidth - 6
-      }
+    const cardContainer = this.createDeckCard(card, cardWidth, cardHeight, {
+      fontScale: baseFontScale,
+      showDescription: false, // Don't show description in hand cards for space
+      enableHover: false // We handle hover effects ourselves for drag and drop
     });
-    nameText.anchor.set(0.5);
-    nameText.x = cardWidth / 2;
-    nameText.y = cardHeight * 0.2;
     
-    // Energy cost
-    const costText = new Text({
-      text: card.energy_cost?.toString() || '0',
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: costFontSize,
-        fill: Colors.ENERGY_TEXT,
-        align: 'center'
-      }
-    });
-    costText.anchor.set(0.5);
-    costText.x = cardWidth / 2;
-    costText.y = cardHeight - cardHeight * 0.2;
-    
-    cardContainer.addChild(bg, nameText, costText);
     cardContainer.x = x;
     cardContainer.y = y;
     

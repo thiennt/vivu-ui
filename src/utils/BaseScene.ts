@@ -3,6 +3,7 @@ import { app } from '@/app';
 import { navigation } from './navigation';
 import { Colors, Gradients } from './colors';
 import { BottomNavigationMenu } from './BottomNavigationMenu';
+import { Card, CardType } from '@/types';
 
 export abstract class BaseScene extends Container {
   /** Assets bundles required by this screen */
@@ -285,6 +286,150 @@ export abstract class BaseScene extends Container {
     card.cursor = 'pointer';
     
     return card;
+  }
+
+  protected createDeckCard(
+    card: Card, 
+    width: number, 
+    height: number, 
+    options: {
+      fontScale?: number;
+      showDescription?: boolean;
+      maxDescriptionLength?: number;
+      onClick?: (card: Card) => void;
+      enableHover?: boolean;
+    } = {}
+  ): Container {
+    const {
+      fontScale = 1,
+      showDescription = true,
+      maxDescriptionLength = 50,
+      onClick,
+      enableHover = true
+    } = options;
+
+    const cardContainer = new Container();
+
+    // Card background
+    const bg = new Graphics()
+      .roundRect(0, 0, width, height, 8)
+      .fill({ color: Colors.BACKGROUND_SECONDARY })
+      .stroke({ width: 2, color: Colors.CARD_BORDER });
+
+    // Group icon at top right
+    let groupIcon = '';
+    switch (card.group) {
+      case CardType.ATTACK:
+        groupIcon = '⚔️';
+        break;
+      case CardType.HEAL:
+        groupIcon = '✨';
+        break;
+      case CardType.DEBUFF:
+        groupIcon = '🌀';
+        break;
+      case CardType.BUFF:
+        groupIcon = '🔼';
+        break;
+      default:
+        groupIcon = '⭐';
+    }
+    const groupIconText = new Text({
+      text: groupIcon,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: Math.max(8, Math.round(16 * fontScale)),
+        align: 'center',
+        fill: Colors.TEXT_PRIMARY
+      }
+    });
+    groupIconText.anchor.set(1, 0);
+    groupIconText.x = width - 8;
+    groupIconText.y = 6;
+
+    // Card name at top, below icon
+    const cardName = new Text({
+      text: card.name,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: Math.max(6, Math.round(12 * fontScale)),
+        fontWeight: 'bold',
+        fill: Colors.TEXT_PRIMARY,
+        wordWrap: true,
+        wordWrapWidth: width - 16
+      }
+    });
+    cardName.anchor.set(0.5, 0);
+    cardName.x = width / 2;
+    cardName.y = groupIconText.y + groupIconText.height + 5;
+
+    // Energy cost (top left)
+    const energyCircleRadius = Math.max(8, Math.round(14 * fontScale));
+    const energyCost = new Graphics()
+      .circle(18, 18, energyCircleRadius)
+      .fill({ color: Colors.BUTTON_PRIMARY })
+      .stroke({ width: 1, color: Colors.BUTTON_BORDER });
+    const energyText = new Text({
+      text: card.energy_cost.toString(),
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: Math.max(8, Math.round(14 * fontScale)),
+        fontWeight: 'bold',
+        fill: Colors.TEXT_WHITE
+      }
+    });
+    energyText.anchor.set(0.5);
+    energyText.x = 18;
+    energyText.y = 18;
+
+    cardContainer.addChild(bg, groupIconText, cardName, energyCost, energyText);
+
+    // Card description (optional)
+    if (showDescription && card.description) {
+      let descText = card.description;
+      if (descText.length > maxDescriptionLength) {
+        descText = descText.slice(0, maxDescriptionLength - 3) + '...';
+      }
+      const description = new Text({
+        text: descText,
+        style: {
+          fontFamily: 'Kalam',
+          fontSize: Math.max(6, Math.round(14 * fontScale)),
+          fill: Colors.TEXT_SECONDARY,
+          wordWrap: true,
+          wordWrapWidth: width - 24,
+          align: 'center'
+        }
+      });
+      description.anchor.set(0.5, 0.5);
+      description.x = width / 2;
+      description.y = height / 2 + 20;
+      cardContainer.addChild(description);
+    }
+
+    // Make card interactive for hover effects and click
+    if (enableHover || onClick) {
+      cardContainer.interactive = true;
+      cardContainer.cursor = 'pointer';
+
+      if (enableHover) {
+        cardContainer.on('pointerover', () => {
+          bg.tint = 0xcccccc;
+        });
+
+        cardContainer.on('pointerout', () => {
+          bg.tint = 0xffffff;
+        });
+      }
+
+      if (onClick) {
+        cardContainer.on('pointertap', () => {
+          onClick(card);
+        });
+      }
+    }
+
+    return cardContainer;
   }
 
   protected createHeroCard(
