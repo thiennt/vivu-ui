@@ -666,7 +666,7 @@ export class CardBattleScene extends BaseScene {
     for (const player of this.battleState.players) {
       if (!player.characters) continue;
       
-      const aliveCharacters = player.characters.filter(c => c.current_hp > 0);
+      const aliveCharacters = player.characters.filter(c => c.hp > 0);
       if (aliveCharacters.length === 0) {
         this.battleState.status = 'completed';
         this.battleState.winner_team = player.team === 1 ? 2 : 1;
@@ -913,10 +913,10 @@ export class CardBattleScene extends BaseScene {
     // The character card structure varies, but we need to update HP and status effects
     const hpText = this.findTextInContainer(card, (text) => text.text.includes('HP'));
     if (hpText) {
-      hpText.text = `HP: ${character.current_hp}/${character.max_hp}`;
+      hpText.text = `HP: ${character.hp}/${character.max_hp}`;
       
       // Update text color based on HP percentage
-      const hpPercent = character.current_hp / character.max_hp;
+      const hpPercent = character.hp / character.max_hp;
       if (hpPercent <= 0.25) {
         hpText.style.fill = 0xff4444; // Red for critical HP
       } else if (hpPercent <= 0.5) {

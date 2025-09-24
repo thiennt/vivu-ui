@@ -326,7 +326,7 @@ export interface CharacterState {
   characterId: string;
   team: number;
   max_hp: number;
-  current_hp: number;
+  hp: number;
   atk: number;
   def: number;
   agi: number;

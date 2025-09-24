@@ -35,7 +35,7 @@ export class BattleScene extends BaseScene {
     // Select first 4 characters for team 1
     this.team1 = mockCharacters.slice(0, 4).map(char => ({
       ...char,
-      current_hp: char.current_hp,
+      hp: char.hp,
       current_energy: 50,
       team: 1
     }));
@@ -43,7 +43,7 @@ export class BattleScene extends BaseScene {
     // Select next 4 characters for team 2 (or duplicate if not enough)
     this.team2 = mockCharacters.slice(4, 8).map(char => ({
       ...char,
-      current_hp: char.current_hp,
+      hp: char.hp,
       current_energy: 50,
       team: 2
     }));
@@ -54,7 +54,7 @@ export class BattleScene extends BaseScene {
       this.team2.push({
         ...char,
         id: `${char.id}_copy`,
-        current_hp: char.current_hp,
+        hp: char.hp,
         current_energy: 50,
         team: 2
       });
@@ -251,14 +251,14 @@ export class BattleScene extends BaseScene {
       .fill(Colors.BACKGROUND_SECONDARY)
       .stroke({ width: 1, color: Colors.CARD_BORDER });
     
-    const hpPercentage = character.current_hp / character.hp;
+    const hpPercentage = character.hp / character.hp;
     const hpBarFill = new Graphics();
     hpBarFill.roundRect(6, 46, (cardWidth - 12) * hpPercentage, 6, 3)
       .fill(hpPercentage > 0.5 ? 0x4caf50 : hpPercentage > 0.25 ? 0xff9800 : 0xf44336);
     
     // HP Text
     const hpText = new Text({
-      text: `HP: ${character.current_hp}/${character.hp}`,
+      text: `HP: ${character.hp}/${character.hp}`,
       style: {
         fontFamily: 'Kalam',
         fontSize: 8,
@@ -626,8 +626,8 @@ export class BattleScene extends BaseScene {
     this.isAnimating = true;
     
     // Get all living characters
-    const team1Alive = this.team1.filter(char => char.current_hp > 0);
-    const team2Alive = this.team2.filter(char => char.current_hp > 0);
+    const team1Alive = this.team1.filter(char => char.hp > 0);
+    const team2Alive = this.team2.filter(char => char.hp > 0);
     
     // Check for battle end conditions
     if (team1Alive.length === 0) {
@@ -650,12 +650,12 @@ export class BattleScene extends BaseScene {
     
     // Process each character's turn in order with animations
     for (const attacker of allAlive) {
-      if (attacker.current_hp <= 0) continue; // Skip if character died this turn
+      if (attacker.hp <= 0) continue; // Skip if character died this turn
       
       // Find valid targets (opposing team)
       const targets = attacker.team === 1 ? 
-        this.team2.filter(char => char.current_hp > 0) : 
-        this.team1.filter(char => char.current_hp > 0);
+        this.team2.filter(char => char.hp > 0) : 
+        this.team1.filter(char => char.hp > 0);
       
       if (targets.length === 0) break; // No targets available
       
@@ -696,7 +696,7 @@ export class BattleScene extends BaseScene {
       }
       
       // Apply damage
-      target.current_hp = Math.max(0, target.current_hp - damage);
+      target.hp = Math.max(0, target.hp - damage);
       
       // Gain energy for attacking
       attacker.current_energy = Math.min(100, attacker.current_energy + 15);
@@ -709,7 +709,7 @@ export class BattleScene extends BaseScene {
       const critText = isCrit ? ' (CRIT)' : '';
       this.battleLog.push(`${attacker.ticker} ${actionEmoji} ${actionType}s ${target.ticker} for ${damage} damage${critText}`);
       
-      if (target.current_hp === 0) {
+      if (target.hp === 0) {
         this.battleLog.push(`${target.ticker} is defeated!`);
         // Attacker gains bonus energy for defeating enemy
         attacker.current_energy = Math.min(100, attacker.current_energy + 25);
@@ -780,12 +780,12 @@ export class BattleScene extends BaseScene {
     const energyText = cardContainer.children[8] as Text; // Energy text
     
     if (hpBarFill && hpText) {
-      const hpPercentage = character.current_hp / character.hp;
+      const hpPercentage = character.hp / character.hp;
       hpBarFill.clear();
       hpBarFill.roundRect(6, 46, (cardWidth - 12) * hpPercentage, 6, 3)
         .fill(hpPercentage > 0.5 ? 0x4caf50 : hpPercentage > 0.25 ? 0xff9800 : 0xf44336);
       
-      hpText.text = `HP: ${character.current_hp}/${character.hp}`;
+      hpText.text = `HP: ${character.hp}/${character.hp}`;
     }
     
     if (energyBarFill && energyText) {
@@ -798,7 +798,7 @@ export class BattleScene extends BaseScene {
     }
     
     // Add visual effect for defeated characters
-    if (character.current_hp === 0) {
+    if (character.hp === 0) {
       cardContainer.alpha = 0.5; // Make defeated characters semi-transparent
       
       // Add "DEFEATED" overlay if not already present
