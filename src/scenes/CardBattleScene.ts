@@ -1,4 +1,4 @@
-import { Container, Graphics, Text, FederatedPointerEvent, Sprite } from 'pixi.js';
+import { Container, Graphics, Text, FederatedPointerEvent } from 'pixi.js';
 import { navigation } from '@/utils/navigation';
 import { BaseScene } from '@/utils/BaseScene';
 import { Colors, Gradients } from '@/utils/colors';
@@ -8,8 +8,6 @@ import {
   CardBattleState, 
   CardBattlePlayerState, 
   CardBattleCharacter, 
-  CardInDeck, 
-  TurnPhase,
   TurnAction,
   BattlePhaseName,
   Card
@@ -48,13 +46,13 @@ export class CardBattleScene extends BaseScene {
   // Game flow control
   private mainPhaseResolve?: () => void;
   
-  // Layout constants
-  private readonly CARD_WIDTH = 80;
-  private readonly CARD_HEIGHT = 110;
-  private readonly CHARACTER_CARD_WIDTH = 120;
-  private readonly CHARACTER_CARD_HEIGHT = 160;
-  private readonly HAND_CARD_WIDTH = 60;
-  private readonly HAND_CARD_HEIGHT = 80;
+  // Layout constants - made more responsive
+  private readonly CARD_WIDTH = 70;
+  private readonly CARD_HEIGHT = 100;
+  private readonly CHARACTER_CARD_WIDTH = 100;
+  private readonly CHARACTER_CARD_HEIGHT = 140;
+  private readonly HAND_CARD_WIDTH = 50;
+  private readonly HAND_CARD_HEIGHT = 70;
 
   constructor(battleId?: string) {
     super();
@@ -262,7 +260,25 @@ export class CardBattleScene extends BaseScene {
     try {
       const response = await battleApi.startTurn(this.battleId);
       if (response.success && response.data) {
-        this.battleState = response.data;
+        // response.data is CardBattleLog[], not battleState
+        const logs = response.data;
+        console.log('Turn start logs:', logs);
+        
+        // Update battle state from the logs if available
+        if (logs.length > 0 && logs[0].after_state) {
+          const afterState = logs[0].after_state;
+          if (afterState.characters && this.battleState) {
+            this.battleState.players.forEach(player => {
+              const teamCharacters = afterState.characters!.filter((c: any) => 
+                c.team === player.team
+              );
+              if (teamCharacters.length > 0) {
+                player.characters = teamCharacters;
+              }
+            });
+          }
+        }
+        
         this.updateUI();
       }
     } catch (error) {
@@ -291,7 +307,27 @@ export class CardBattleScene extends BaseScene {
     try {
       const response = await battleApi.drawCards(this.battleId, turnAction);
       if (response.success && response.data) {
-        this.battleState = response.data;
+        // response.data is CardBattleLog[], not battleState
+        const logs = response.data;
+        console.log('Draw phase logs:', logs);
+        
+        // Update hand cards from drawn_cards if available
+        if (logs.length > 0 && logs[0].drawn_cards) {
+          const drawnCards = logs[0].drawn_cards;
+          console.log('Cards drawn:', drawnCards);
+          
+          // Add cards to player's hand in battleState
+          if (this.battleState) {
+            const currentPlayer = this.battleState.players.find(p => p.team === this.battleState!.current_player);
+            if (currentPlayer) {
+              currentPlayer.deck.hand_cards = currentPlayer.deck.hand_cards || [];
+              drawnCards.forEach((card: any) => {
+                currentPlayer.deck.hand_cards.push({ card: card as Card });
+              });
+            }
+          }
+        }
+        
         this.updateUI();
         await this.animateCardDraw();
       }
@@ -337,7 +373,31 @@ export class CardBattleScene extends BaseScene {
     try {
       const response = await battleApi.endTurn(this.battleId, turnAction);
       if (response.success && response.data) {
-        this.battleState = response.data;
+        // response.data is CardBattleLog[], not battleState
+        const logs = response.data;
+        console.log('End turn logs:', logs);
+        
+        // Update battle state from the logs if available
+        if (logs.length > 0 && logs[0].after_state && this.battleState) {
+          const afterState = logs[0].after_state;
+          if (afterState.current_player !== undefined) {
+            this.battleState.current_player = afterState.current_player;
+          }
+          if (afterState.turn !== undefined) {
+            this.battleState.current_turn = afterState.turn;
+          }
+          if (afterState.characters) {
+            this.battleState.players.forEach(player => {
+              const teamCharacters = afterState.characters!.filter((c: any) => 
+                c.team === player.team
+              );
+              if (teamCharacters.length > 0) {
+                player.characters = teamCharacters;
+              }
+            });
+          }
+        }
+        
         this.updateUI();
         await this.animateEndTurnEffects();
       }
@@ -555,83 +615,37 @@ export class CardBattleScene extends BaseScene {
   }
 
   private createPlayerCharacters(player: CardBattlePlayerState, container: Container, isOpponent: boolean): void {
-    const characterSpacing = this.gameWidth / 4;
+    const characterSpacing = Math.min(this.gameWidth / 4, 140); // Max spacing of 140px
+    const maxCharacters = Math.min(player.characters.length, 3); // Only show first 3 characters
+    const totalWidth = characterSpacing * maxCharacters;
+    const startX = (this.gameWidth - totalWidth) / 2 + characterSpacing / 2; // Center the characters
     
     player.characters.forEach((character, index) => {
-      if (index < 3) { // Only show first 3 characters
-        const x = characterSpacing * (index + 0.5);
+      if (index < maxCharacters) {
+        const x = startX + characterSpacing * index;
         const y = 0;
         
-        const characterCard = this.createCharacterCard(character, x, y, isOpponent);
+        const characterCard = this.createHeroCard(
+          character, 
+          x, 
+          y, 
+          'preview', // Use preview size for better fit
+          index,
+          this.CHARACTER_CARD_WIDTH
+        );
+        
         container.addChild(characterCard);
         this.characterCards.set(character.id, characterCard);
+        
+        // Make interactive for targeting
+        if (!isOpponent) {
+          this.makeCharacterCardInteractive(characterCard, character);
+        }
       }
     });
   }
 
-  private createCharacterCard(character: CardBattleCharacter, x: number, y: number, isOpponent: boolean): Container {
-    const card = new Container();
-    
-    // Background
-    const bg = new Graphics();
-    bg.roundRect(0, 0, this.CHARACTER_CARD_WIDTH, this.CHARACTER_CARD_HEIGHT, 8)
-      .fill(isOpponent ? Colors.TEAM_ENEMY : Colors.TEAM_ALLY)
-      .stroke({ width: 2, color: Colors.CARD_BORDER });
-    
-    // Character name
-    const nameText = new Text({
-      text: character.name || 'Character',
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 12,
-        fill: Colors.TEXT_PRIMARY,
-        align: 'center'
-      }
-    });
-    nameText.anchor.set(0.5);
-    nameText.x = this.CHARACTER_CARD_WIDTH / 2;
-    nameText.y = 15;
-    
-    // HP Bar
-    const hpBarBg = new Graphics();
-    hpBarBg.roundRect(10, 130, this.CHARACTER_CARD_WIDTH - 20, 12, 6)
-      .fill(Colors.HP_BAR_BG);
-    
-    const hpBarFill = new Graphics();
-    const hpPercent = character.current_hp / character.max_hp;
-    hpBarFill.roundRect(10, 130, (this.CHARACTER_CARD_WIDTH - 20) * hpPercent, 12, 6)
-      .fill(Colors.HP_BAR_FILL);
-    
-    // HP Text
-    const hpText = new Text({
-      text: `${character.current_hp}/${character.max_hp}`,
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 10,
-        fill: Colors.TEXT_PRIMARY,
-        align: 'center'
-      }
-    });
-    hpText.anchor.set(0.5);
-    hpText.x = this.CHARACTER_CARD_WIDTH / 2;
-    hpText.y = 150;
-    
-    card.addChild(bg, nameText, hpBarBg, hpBarFill, hpText);
-    card.x = x - this.CHARACTER_CARD_WIDTH / 2;
-    card.y = y;
-    
-    // Store character reference
-    (card as any).character = character;
-    
-    // Make interactive for targeting
-    if (!isOpponent) {
-      this.makeCharacterCardInteractive(card, character);
-    }
-    
-    return card;
-  }
-
-  private makeCharacterCardInteractive(card: Container, character: CardBattleCharacter): void {
+  private makeCharacterCardInteractive(card: Container, _character: CardBattleCharacter): void {
     card.interactive = true;
     card.cursor = 'pointer';
     
@@ -724,11 +738,23 @@ export class CardBattleScene extends BaseScene {
     if (!currentPlayer || this.battleState.current_player !== 1) return; // Only show player 1's hand
     
     const handCards = currentPlayer.deck.hand_cards;
-    const cardSpacing = Math.min(80, (this.gameWidth - 40) / Math.max(handCards.length, 1));
+    if (handCards.length === 0) return;
+    
+    // Calculate responsive card spacing
+    const availableWidth = this.gameWidth - 40; // 20px margin on each side
+    const cardWidth = this.HAND_CARD_WIDTH;
+    const maxCardSpacing = cardWidth + 10; // Ideal spacing
+    const minCardSpacing = cardWidth - 10; // Minimum spacing for overlap
+    
+    let cardSpacing = Math.min(maxCardSpacing, availableWidth / handCards.length);
+    cardSpacing = Math.max(minCardSpacing, cardSpacing);
+    
+    const totalWidth = cardSpacing * (handCards.length - 1) + cardWidth;
+    const startX = (this.gameWidth - totalWidth) / 2;
     
     handCards.forEach((cardInDeck, index) => {
       if (cardInDeck.card) {
-        const x = 20 + (index * cardSpacing);
+        const x = startX + (index * cardSpacing);
         const y = 10;
         
         const handCard = this.createHandCard(cardInDeck.card, x, y);
@@ -916,7 +942,18 @@ export class CardBattleScene extends BaseScene {
     try {
       const response = await battleApi.discardCard(this.battleId, turnAction);
       if (response.success && response.data) {
-        this.battleState = response.data;
+        // response.data is CardBattleLog[], not battleState
+        const logs = response.data;
+        console.log('Discard card logs:', logs);
+        
+        // Remove card from player's hand
+        if (this.battleState) {
+          const currentPlayer = this.battleState.players.find(p => p.team === this.battleState!.current_player);
+          if (currentPlayer && currentPlayer.deck.hand_cards) {
+            currentPlayer.deck.hand_cards = currentPlayer.deck.hand_cards.filter((c: any) => c.card?.id !== card.id);
+          }
+        }
+        
         this.updateUI();
         this.animateCardToDiscard();
       }
@@ -938,7 +975,32 @@ export class CardBattleScene extends BaseScene {
     try {
       const response = await battleApi.playCard(this.battleId, turnAction);
       if (response.success && response.data) {
-        this.battleState = response.data;
+        // response.data is CardBattleLog[], not battleState
+        const logs = response.data;
+        console.log('Play card logs:', logs);
+        
+        // Remove card from player's hand
+        if (this.battleState) {
+          const currentPlayer = this.battleState.players.find(p => p.team === this.battleState!.current_player);
+          if (currentPlayer && currentPlayer.deck.hand_cards) {
+            currentPlayer.deck.hand_cards = currentPlayer.deck.hand_cards.filter((c: any) => c.card?.id !== card.id);
+          }
+          
+          // Update character states from log targets if available
+          if (logs.length > 0 && logs[0].targets) {
+            logs[0].targets.forEach((target: any) => {
+              const player = this.battleState!.players.find(p => p.team === target.team);
+              if (player) {
+                const character = player.characters.find(c => c.id === target.id);
+                if (character) {
+                  // Update character with after state
+                  Object.assign(character, target.after);
+                }
+              }
+            });
+          }
+        }
+        
         this.updateUI();
         this.animateCardPlay(characterId);
       }
