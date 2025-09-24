@@ -71,13 +71,139 @@ export class CardBattleScene extends BaseScene {
   }
 
   private setupLayout(): void {
-    this.createBackground();
-    this.createOpponentEnergyDeckDiscard(); // At the very top
-    this.createOpponentHandArea(); // Below opponent energy/deck/discard
-    this.createBattlefield(); // Opponent chars, then battle log, then player chars
-    this.createHandArea(); // Player hand above player energy/deck/discard
-    this.createPlayerEnergyDeckDiscard(); // At the bottom
-    this.createEndTurnButtonAtBottom(); // At very bottom, thumb-friendly
+    // Define vertical paddings for each area
+    const TOP_PADDING = this.STANDARD_PADDING * 2;
+    const BETWEEN_AREAS = this.STANDARD_PADDING * 2;
+    const BOTTOM_PADDING = this.STANDARD_PADDING * 2;
+
+    // Calculate available height for all areas
+    const totalVerticalPadding = TOP_PADDING + BETWEEN_AREAS * 4 + BOTTOM_PADDING;
+    const availableHeight = this.gameHeight - totalVerticalPadding;
+
+    // Assign heights for each area proportionally
+    const opponentEnergyHeight = 50;
+    const opponentHandHeight = 80;
+    const playerHandHeight = 80;
+    const playerEnergyHeight = 50;
+    const endTurnHeight = 50;
+    const battlefieldHeight = availableHeight - (opponentEnergyHeight + opponentHandHeight + playerHandHeight + playerEnergyHeight + endTurnHeight);
+
+    // Y positions for each area
+    let currentY = TOP_PADDING;
+
+    // Opponent energy/deck/discard
+    this.createOpponentEnergyDeckDiscard(currentY, opponentEnergyHeight);
+    currentY += opponentEnergyHeight + BETWEEN_AREAS;
+
+    // Opponent hand
+    this.createOpponentHandArea(currentY, opponentHandHeight);
+    currentY += opponentHandHeight + BETWEEN_AREAS;
+
+    // Battlefield (opponent chars, log, player chars)
+    this.createBattlefield(currentY, battlefieldHeight);
+    currentY += battlefieldHeight + BETWEEN_AREAS;
+
+    // Player hand
+    this.createHandArea(currentY, playerHandHeight);
+    currentY += playerHandHeight + BETWEEN_AREAS;
+
+    // Player energy/deck/discard
+    this.createPlayerEnergyDeckDiscard(currentY, playerEnergyHeight);
+    currentY += playerEnergyHeight + BETWEEN_AREAS;
+
+    // End turn button
+    this.createEndTurnButtonAtBottom(BOTTOM_PADDING);
+  }
+
+  // Helper methods for positioning each area
+  private createOpponentEnergyDeckDiscard(y: number, height: number) {
+    // ...use y and height for positioning...
+    this.opponentEnergyContainer = new Container();
+    this.opponentDeckRemainingContainer = new Container();
+    this.opponentDiscardPileContainer = new Container();
+    const elementWidth = 80;
+    const spacing = this.STANDARD_SPACING;
+    const totalWidth = (elementWidth * 3) + (spacing * 2);
+    const startX = (this.gameWidth - totalWidth) / 2;
+    this.createEnergyDeckDiscardUI(
+      { x: startX, y },
+      {
+        energy: this.opponentEnergyContainer,
+        deck: this.opponentDeckRemainingContainer,
+        discard: this.opponentDiscardPileContainer
+      },
+      {
+        elementWidth,
+        elementHeight: height,
+        spacing,
+        isPlayerDiscard: false
+      }
+    );
+  }
+
+  private createOpponentHandArea(y: number, height: number) {
+    this.opponentHandContainer = new Container();
+    this.createHandAreaUI(
+      this.opponentHandContainer,
+      { y },
+      { height }
+    );
+  }
+
+  private createBattlefield(y: number, height: number) {
+    this.battlefieldContainer = new Container();
+    // Divide battlefield into 3 sections: opponent chars, log, player chars
+    const sectionHeight = height / 3;
+    this.player2CharactersContainer = new Container();
+    this.player2CharactersContainer.y = y;
+    this.createActionLogInCenter(y + sectionHeight, sectionHeight - 20);
+    this.player1CharactersContainer = new Container();
+    this.player1CharactersContainer.y = y + sectionHeight * 2;
+    this.battlefieldContainer.addChild(this.player2CharactersContainer);
+    this.battlefieldContainer.addChild(this.player1CharactersContainer);
+    this.container.addChild(this.battlefieldContainer);
+  }
+
+  private createHandArea(y: number, height: number) {
+    this.handContainer = new Container();
+    this.createHandAreaUI(
+      this.handContainer,
+      { y },
+      { height }
+    );
+  }
+
+  private createPlayerEnergyDeckDiscard(y: number, height: number) {
+    this.energyContainer = new Container();
+    this.deckRemainingContainer = new Container();
+    this.discardPileContainer = new Container();
+    const elementWidth = 80;
+    const spacing = this.STANDARD_SPACING;
+    const totalWidth = (elementWidth * 3) + (spacing * 2);
+    const startX = (this.gameWidth - totalWidth) / 2;
+    this.createEnergyDeckDiscardUI(
+      { x: startX, y },
+      {
+        energy: this.energyContainer,
+        deck: this.deckRemainingContainer,
+        discard: this.discardPileContainer
+      },
+      {
+        elementWidth,
+        elementHeight: height,
+        spacing,
+        isPlayerDiscard: true
+      }
+    );
+  }
+
+  private createEndTurnButtonAtBottom(bottomPadding: number) {
+    // This method creates the end turn button layout, but the actual button
+    // will be created dynamically during the main phase
+    this.turnIndicatorContainer = new Container();
+    this.turnIndicatorContainer.visible = false;
+    this.turnIndicatorContainer.y = this.gameHeight - bottomPadding - 44; // 44 is button height
+    this.container.addChild(this.turnIndicatorContainer);
   }
 
   private createBackground(): void {
@@ -180,53 +306,21 @@ export class CardBattleScene extends BaseScene {
     discardBg.roundRect(0, 0, elementWidth, elementHeight, 8)
       .fill(Colors.CARD_DISCARD)
       .stroke({ width: isPlayerDiscard ? 3 : 2, color: Colors.UI_BORDER });
+  
+    const discardLabel = new Text({
+      text: 'DISCARD PILE',
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 10,
+        fill: Colors.TEXT_PRIMARY,
+        align: 'center'
+      }
+    });
+    discardLabel.anchor.set(0.5);
+    discardLabel.x = elementWidth / 2;
+    discardLabel.y = elementHeight / 2;
     
-    if (isPlayerDiscard) {
-      // Player discard has enhanced drop target styling
-      const discardLabel = new Text({
-        text: 'DROP HERE',
-        style: {
-          fontFamily: 'Kalam',
-          fontSize: 9,
-          fill: Colors.TEXT_PRIMARY,
-          align: 'center'
-        }
-      });
-      discardLabel.anchor.set(0.5);
-      discardLabel.x = elementWidth / 2;
-      discardLabel.y = elementHeight / 2 - 8;
-      
-      const discardSubLabel = new Text({
-        text: 'DISCARD',
-        style: {
-          fontFamily: 'Kalam',
-          fontSize: 8,
-          fill: Colors.TEXT_SECONDARY,
-          align: 'center'
-        }
-      });
-      discardSubLabel.anchor.set(0.5);
-      discardSubLabel.x = elementWidth / 2;
-      discardSubLabel.y = elementHeight / 2 + 8;
-      
-      containers.discard.addChild(discardBg, discardLabel, discardSubLabel);
-    } else {
-      // Opponent discard has simple styling
-      const discardLabel = new Text({
-        text: 'DISCARD',
-        style: {
-          fontFamily: 'Kalam',
-          fontSize: 10,
-          fill: Colors.TEXT_PRIMARY,
-          align: 'center'
-        }
-      });
-      discardLabel.anchor.set(0.5);
-      discardLabel.x = elementWidth / 2;
-      discardLabel.y = elementHeight / 2;
-      
-      containers.discard.addChild(discardBg, discardLabel);
-    }
+    containers.discard.addChild(discardBg, discardLabel);
     
     // Add all containers to the main container
     this.container.addChild(containers.energy);
@@ -254,85 +348,6 @@ export class CardBattleScene extends BaseScene {
     this.container.addChild(container);
   }
 
-  private createOpponentEnergyDeckDiscard(): void {
-    // Create containers for opponent's energy, deck, and discard at the very top
-    this.opponentEnergyContainer = new Container();
-    this.opponentDeckRemainingContainer = new Container();
-    this.opponentDiscardPileContainer = new Container();
-    
-    const topY = this.STANDARD_PADDING;
-    const elementHeight = 50;
-    const elementWidth = 80;
-    const spacing = this.STANDARD_SPACING;
-    
-    // Calculate total width and center horizontally
-    const totalWidth = (elementWidth * 3) + (spacing * 2);
-    const startX = (this.gameWidth - totalWidth) / 2;
-    
-    this.createEnergyDeckDiscardUI(
-      { x: startX, y: topY },
-      {
-        energy: this.opponentEnergyContainer,
-        deck: this.opponentDeckRemainingContainer,
-        discard: this.opponentDiscardPileContainer
-      },
-      {
-        elementWidth,
-        elementHeight,
-        spacing,
-        isPlayerDiscard: false
-      }
-    );
-  }
-
-  private createOpponentHandArea(): void {
-    this.opponentHandContainer = new Container();
-    
-    // Position below opponent energy/deck/discard with padding
-    const opponentTopHeight = 50 + this.STANDARD_PADDING; // Height of top area
-    const handY = opponentTopHeight + this.STANDARD_PADDING;
-    const handHeight = 60; // Smaller height for opponent hand
-    
-    this.createHandAreaUI(
-      this.opponentHandContainer,
-      { y: handY },
-      { height: handHeight }
-    );
-  }
-
-  private createBattlefield(): void {
-    this.battlefieldContainer = new Container();
-    
-    // Create containers for each player's characters
-    this.player1CharactersContainer = new Container();
-    this.player2CharactersContainer = new Container();
-    
-    // Calculate available space for battlefield layout
-    const opponentTopHeight = 50 + this.STANDARD_PADDING; // Opponent energy/deck/discard
-    const opponentHandHeight = 60 + this.STANDARD_PADDING; // Opponent hand
-    const playerHandHeight = 80; // Player hand (larger)
-    const playerBottomHeight = 50 + this.STANDARD_PADDING; // Player energy/deck/discard  
-    const endTurnHeight = 50; // End turn button space
-    
-    const battlefieldStartY = opponentTopHeight + opponentHandHeight + this.STANDARD_PADDING;
-    const availableHeight = this.gameHeight - battlefieldStartY - playerHandHeight - playerBottomHeight - endTurnHeight - (this.STANDARD_PADDING * 2);
-    
-    // Divide battlefield into sections: opponent chars, battle log, player chars
-    const sectionHeight = availableHeight / 3;
-    
-    // Position opponent characters at top of battlefield
-    this.player2CharactersContainer.y = battlefieldStartY;
-    
-    // Create and position action log in the middle section
-    this.createActionLogInCenter(battlefieldStartY + sectionHeight, sectionHeight);
-    
-    // Position player characters at bottom of battlefield  
-    this.player1CharactersContainer.y = battlefieldStartY + sectionHeight * 2;
-    
-    this.battlefieldContainer.addChild(this.player2CharactersContainer);
-    this.battlefieldContainer.addChild(this.player1CharactersContainer);
-    this.container.addChild(this.battlefieldContainer);
-  }
 
   private createActionLogInCenter(logY: number, logHeight: number): void {
     this.actionLogContainer = new Container();
@@ -366,201 +381,6 @@ export class CardBattleScene extends BaseScene {
     this.container.addChild(this.actionLogContainer);
   }
 
-  private createPlayerEnergyDeckDiscard(): void {
-    // Create containers for player's energy, deck, and discard at the bottom
-    this.energyContainer = new Container();
-    this.deckRemainingContainer = new Container();
-    this.discardPileContainer = new Container();
-    
-    const endTurnHeight = 50; // End turn button space
-    const elementHeight = 50;
-    
-    // Calculate responsive element width to prevent overlap
-    const availableWidth = this.gameWidth - (this.STANDARD_PADDING * 2);
-    const spacing = this.STANDARD_SPACING;
-    const minElementWidth = 70;
-    const maxElementWidth = 90;
-    
-    // Calculate width that fits all 3 elements with proper spacing
-    let elementWidth = (availableWidth - (spacing * 2)) / 3;
-    elementWidth = Math.max(minElementWidth, Math.min(maxElementWidth, elementWidth));
-    
-    const bottomY = this.gameHeight - endTurnHeight - elementHeight - this.STANDARD_PADDING;
-    
-    // Calculate total width and center horizontally
-    const totalWidth = (elementWidth * 3) + (spacing * 2);
-    const startX = (this.gameWidth - totalWidth) / 2;
-    
-    this.createEnergyDeckDiscardUI(
-      { x: startX, y: bottomY },
-      {
-        energy: this.energyContainer,
-        deck: this.deckRemainingContainer,
-        discard: this.discardPileContainer
-      },
-      {
-        elementWidth,
-        elementHeight,
-        spacing,
-        isPlayerDiscard: true
-      }
-    );
-  }
-
-  private createEndTurnButtonAtBottom(): void {
-    // This method creates the end turn button layout, but the actual button
-    // will be created dynamically during the main phase
-    // We just reserve the space at the bottom for thumb-friendly access
-    
-    // Initialize turn indicator container (hidden in mobile layout)
-    this.turnIndicatorContainer = new Container();
-    this.turnIndicatorContainer.visible = false; // Hide it in mobile layout
-    this.container.addChild(this.turnIndicatorContainer);
-  }
-
-  private createHandArea(): void {
-    this.handContainer = new Container();
-    
-    // Position hand above player energy/deck/discard with proper spacing
-    const playerBottomHeight = 50 + this.STANDARD_PADDING; // Player energy/deck/discard height
-    const endTurnHeight = 50; // End turn button space
-    const handHeight = 80; // Player hand height
-    const handY = this.gameHeight - playerBottomHeight - endTurnHeight - handHeight - this.STANDARD_PADDING;
-    
-    this.createHandAreaUI(
-      this.handContainer,
-      { y: handY },
-      { height: handHeight }
-    );
-  }
-
-  private createEnergyIndicator(): void {
-    this.energyContainer = new Container();
-    
-    // Position in top-right corner with proper padding
-    this.energyContainer.x = this.gameWidth - 150 - this.STANDARD_PADDING;
-    this.energyContainer.y = this.STANDARD_PADDING;
-    
-    this.container.addChild(this.energyContainer);
-  }
-
-  private createTurnIndicator(): void {
-    this.turnIndicatorContainer = new Container();
-    
-    // Position in top-center with proper padding
-    this.turnIndicatorContainer.x = this.gameWidth / 2;
-    this.turnIndicatorContainer.y = this.STANDARD_PADDING;
-    
-    this.container.addChild(this.turnIndicatorContainer);
-  }
-
-  private createActionLog(): void {
-    this.actionLogContainer = new Container();
-    
-    // Position on left side with proper spacing
-    const logWidth = 200;
-    const logHeight = this.gameHeight * 0.4;
-    
-    // Calculate position to avoid overlapping with other elements
-    const topUIHeight = 60; // Space for turn indicator and energy
-    const handHeight = this.gameHeight * 0.2;
-    const availableHeight = this.gameHeight - topUIHeight - handHeight - (this.STANDARD_PADDING * 3);
-    const actualLogHeight = Math.min(logHeight, availableHeight);
-    
-    const logBg = new Graphics();
-    logBg.roundRect(0, 0, logWidth, actualLogHeight, 8)
-      .fill(Colors.UI_BACKGROUND)
-      .stroke({ width: 2, color: Colors.UI_BORDER });
-    
-    this.actionLogContainer.addChild(logBg);
-    this.actionLogContainer.x = this.STANDARD_PADDING;
-    this.actionLogContainer.y = topUIHeight + this.STANDARD_PADDING;
-    
-    this.container.addChild(this.actionLogContainer);
-  }
-
-  private createDiscardPile(): void {
-    this.discardPileContainer = new Container();
-    
-    // Position in bottom-left corner with proper spacing from hand
-    const handHeight = this.gameHeight * 0.2;
-    const discardWidth = this.CARD_WIDTH + 10;
-    const discardHeight = this.CARD_HEIGHT + 10;
-    
-    this.discardPileContainer.x = this.STANDARD_PADDING;
-    this.discardPileContainer.y = this.gameHeight - handHeight - discardHeight - this.STANDARD_PADDING * 2;
-    
-    // Discard pile background
-    const discardBg = new Graphics();
-    discardBg.roundRect(0, 0, discardWidth, discardHeight, 8)
-      .fill(Colors.CARD_DISCARD)
-      .stroke({ width: 2, color: Colors.UI_BORDER });
-    
-    const discardLabel = new Text({
-      text: 'DISCARD',
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 12,
-        fill: Colors.TEXT_PRIMARY,
-        align: 'center'
-      }
-    });
-    discardLabel.anchor.set(0.5);
-    discardLabel.x = discardWidth / 2;
-    discardLabel.y = discardHeight / 2;
-    
-    this.discardPileContainer.addChild(discardBg, discardLabel);
-    this.container.addChild(this.discardPileContainer);
-  }
-
-  private createDeckRemaining(): void {
-    this.deckRemainingContainer = new Container();
-    
-    // Position next to discard pile with spacing
-    const discardWidth = this.CARD_WIDTH + 10;
-    const deckWidth = discardWidth;
-    const deckHeight = this.CARD_HEIGHT + 10;
-    const handHeight = this.gameHeight * 0.2;
-    
-    this.deckRemainingContainer.x = this.STANDARD_PADDING + discardWidth + this.STANDARD_SPACING;
-    this.deckRemainingContainer.y = this.gameHeight - handHeight - deckHeight - this.STANDARD_PADDING * 2;
-    
-    // Deck remaining background
-    const deckBg = new Graphics();
-    deckBg.roundRect(0, 0, deckWidth, deckHeight, 8)
-      .fill(Colors.CARD_BACKGROUND)
-      .stroke({ width: 2, color: Colors.UI_BORDER });
-    
-    const deckLabel = new Text({
-      text: 'DECK',
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 12,
-        fill: Colors.TEXT_PRIMARY,
-        align: 'center'
-      }
-    });
-    deckLabel.anchor.set(0.5);
-    deckLabel.x = deckWidth / 2;
-    deckLabel.y = deckHeight / 2 - 10;
-    
-    // Remaining count will be updated in updateUI
-    const countLabel = new Text({
-      text: '0',
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 14,
-        fill: Colors.TEXT_SECONDARY,
-        align: 'center'
-      }
-    });
-    countLabel.anchor.set(0.5);
-    countLabel.x = deckWidth / 2;
-    countLabel.y = deckHeight / 2 + 10;
-    
-    this.deckRemainingContainer.addChild(deckBg, deckLabel, countLabel);
-    this.container.addChild(this.deckRemainingContainer);
-  }
 
   private async initializeBattle(): Promise<void> {
     try {
@@ -1537,15 +1357,6 @@ export class CardBattleScene extends BaseScene {
     });
     
     this.container.addChild(endTurnButton);
-  }
-
-  private async endTurn(): Promise<void> {
-    // This method is now replaced by processEndTurn in the new flow
-    // Keep it for backward compatibility but delegate to the new system
-    if (this.mainPhaseResolve) {
-      this.mainPhaseResolve();
-      this.mainPhaseResolve = undefined;
-    }
   }
 
   private showBattleResult(): void {
