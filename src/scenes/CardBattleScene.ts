@@ -294,8 +294,17 @@ export class CardBattleScene extends BaseScene {
     
     const endTurnHeight = 50; // End turn button space
     const elementHeight = 50;
-    const elementWidth = 80;
+    
+    // Calculate responsive element width to prevent overlap
+    const availableWidth = this.gameWidth - (this.STANDARD_PADDING * 2);
     const spacing = this.STANDARD_SPACING;
+    const minElementWidth = 70;
+    const maxElementWidth = 90;
+    
+    // Calculate width that fits all 3 elements with proper spacing
+    let elementWidth = (availableWidth - (spacing * 2)) / 3;
+    elementWidth = Math.max(minElementWidth, Math.min(maxElementWidth, elementWidth));
+    
     const bottomY = this.gameHeight - endTurnHeight - elementHeight - this.STANDARD_PADDING;
     
     // Calculate total width and center horizontally
@@ -988,14 +997,25 @@ export class CardBattleScene extends BaseScene {
   }
 
   private createPlayerCharacters(player: CardBattlePlayerState, container: Container, isOpponent: boolean): void {
-    const characterSpacing = Math.min(this.gameWidth / 4, 140); // Max spacing of 140px
     const maxCharacters = Math.min(player.characters.length, 3); // Only show first 3 characters
-    const totalWidth = characterSpacing * maxCharacters;
-    const startX = (this.gameWidth - totalWidth) / 2 + characterSpacing / 2; // Center the characters
+    
+    // Calculate responsive character card dimensions
+    const availableWidth = this.gameWidth - (this.STANDARD_PADDING * 2);
+    const minCardWidth = 80;
+    const maxCardWidth = 120;
+    const spacing = this.STANDARD_SPACING;
+    
+    // Calculate card width that fits all characters with proper spacing
+    let cardWidth = (availableWidth - (spacing * (maxCharacters - 1))) / maxCharacters;
+    cardWidth = Math.max(minCardWidth, Math.min(maxCardWidth, cardWidth));
+    
+    const cardHeight = cardWidth * 1.4; // Maintain aspect ratio
+    const totalWidth = (cardWidth * maxCharacters) + (spacing * (maxCharacters - 1));
+    const startX = (this.gameWidth - totalWidth) / 2;
     
     player.characters.forEach((character, index) => {
       if (index < maxCharacters) {
-        const x = startX + characterSpacing * index;
+        const x = startX + index * (cardWidth + spacing);
         const y = 0;
         
         const characterCard = this.createHeroCard(
@@ -1004,7 +1024,7 @@ export class CardBattleScene extends BaseScene {
           y, 
           'preview', // Use preview size for better fit
           index,
-          this.CHARACTER_CARD_WIDTH
+          cardWidth
         );
         
         container.addChild(characterCard);
@@ -1114,68 +1134,79 @@ export class CardBattleScene extends BaseScene {
     const handCards = currentPlayer.deck.hand_cards;
     if (handCards.length === 0) return;
     
-    // Calculate responsive card spacing
-    const availableWidth = this.gameWidth - 40; // 20px margin on each side
-    const cardWidth = this.HAND_CARD_WIDTH;
-    const maxCardSpacing = cardWidth + 10; // Ideal spacing
-    const minCardSpacing = cardWidth - 10; // Minimum spacing for overlap
+    // Calculate responsive card dimensions and spacing
+    const availableWidth = this.gameWidth - (this.STANDARD_PADDING * 2);
+    const maxCards = handCards.length;
+    const minCardWidth = 40;
+    const maxCardWidth = 60;
+    const minSpacing = 5;
+    const maxSpacing = 15;
     
-    let cardSpacing = Math.min(maxCardSpacing, availableWidth / handCards.length);
-    cardSpacing = Math.max(minCardSpacing, cardSpacing);
+    // Calculate optimal card width and spacing
+    let cardWidth = (availableWidth - (minSpacing * (maxCards - 1))) / maxCards;
+    cardWidth = Math.max(minCardWidth, Math.min(maxCardWidth, cardWidth));
     
-    const totalWidth = cardSpacing * (handCards.length - 1) + cardWidth;
+    let cardSpacing = (availableWidth - (cardWidth * maxCards)) / Math.max(1, maxCards - 1);
+    cardSpacing = Math.max(minSpacing, Math.min(maxSpacing, cardSpacing));
+    
+    const totalWidth = (cardWidth * maxCards) + (cardSpacing * Math.max(0, maxCards - 1));
     const startX = (this.gameWidth - totalWidth) / 2;
     
     handCards.forEach((cardInDeck, index) => {
       if (cardInDeck.card) {
-        const x = startX + (index * cardSpacing);
+        const x = startX + (index * (cardWidth + cardSpacing));
         const y = 10;
         
-        const handCard = this.createHandCard(cardInDeck.card, x, y);
+        const handCard = this.createHandCard(cardInDeck.card, x, y, cardWidth);
         this.handContainer.addChild(handCard);
         this.handCards.push(handCard);
       }
     });
   }
 
-  private createHandCard(card: Card, x: number, y: number): Container {
+  private createHandCard(card: Card, x: number, y: number, cardWidth: number = this.HAND_CARD_WIDTH): Container {
     const cardContainer = new Container();
+    const cardHeight = cardWidth * 1.4; // Maintain aspect ratio
     
     // Card background
     const bg = new Graphics();
-    bg.roundRect(0, 0, this.HAND_CARD_WIDTH, this.HAND_CARD_HEIGHT, 6)
+    bg.roundRect(0, 0, cardWidth, cardHeight, 6)
       .fill(Colors.CARD_BACKGROUND)
       .stroke({ width: 2, color: Colors.CARD_BORDER });
+    
+    // Calculate responsive font sizes
+    const nameFontSize = Math.max(8, Math.min(12, cardWidth * 0.18));
+    const costFontSize = Math.max(10, Math.min(14, cardWidth * 0.20));
     
     // Card name
     const nameText = new Text({
       text: card.name,
       style: {
         fontFamily: 'Kalam',
-        fontSize: 10,
+        fontSize: nameFontSize,
         fill: Colors.TEXT_PRIMARY,
         align: 'center',
         wordWrap: true,
-        wordWrapWidth: this.HAND_CARD_WIDTH - 10
+        wordWrapWidth: cardWidth - 6
       }
     });
     nameText.anchor.set(0.5);
-    nameText.x = this.HAND_CARD_WIDTH / 2;
-    nameText.y = 15;
+    nameText.x = cardWidth / 2;
+    nameText.y = cardHeight * 0.2;
     
     // Energy cost
     const costText = new Text({
       text: card.energy_cost?.toString() || '0',
       style: {
         fontFamily: 'Kalam',
-        fontSize: 12,
+        fontSize: costFontSize,
         fill: Colors.ENERGY_TEXT,
         align: 'center'
       }
     });
     costText.anchor.set(0.5);
-    costText.x = this.HAND_CARD_WIDTH / 2;
-    costText.y = this.HAND_CARD_HEIGHT - 15;
+    costText.x = cardWidth / 2;
+    costText.y = cardHeight - cardHeight * 0.2;
     
     cardContainer.addChild(bg, nameText, costText);
     cardContainer.x = x;
@@ -1221,15 +1252,29 @@ export class CardBattleScene extends BaseScene {
       y: event.global.y - (globalPos?.y || 0)
     };
     
-    // Move to top layer for dragging
+    // Move to top layer for dragging (use app.stage instead of container)
     if (cardContainer.parent) {
       cardContainer.parent.removeChild(cardContainer);
     }
-    this.container.addChild(cardContainer);
+    // Use app.stage to ensure card is above all other elements
+    const app = (globalThis as any).app;
+    if (app && app.stage) {
+      app.stage.addChild(cardContainer);
+      if (globalPos) {
+        cardContainer.position.set(globalPos.x, globalPos.y);
+      }
+    } else {
+      this.container.addChild(cardContainer);
+    }
     
-    // Attach drag events
-    this.container.on('pointermove', this.onCardDragMove, this);
-    this.container.on('pointerup', this.onCardDragEnd, this);
+    // Attach drag events to stage for better capture
+    if (app && app.stage) {
+      app.stage.on('pointermove', this.onCardDragMove, this);
+      app.stage.on('pointerup', this.onCardDragEnd, this);
+    } else {
+      this.container.on('pointermove', this.onCardDragMove, this);
+      this.container.on('pointerup', this.onCardDragEnd, this);
+    }
     
     event.stopPropagation();
   }
@@ -1237,8 +1282,19 @@ export class CardBattleScene extends BaseScene {
   private onCardDragMove(event: FederatedPointerEvent): void {
     if (!this.dragTarget) return;
     
-    this.dragTarget.x = event.global.x - this.dragOffset.x;
-    this.dragTarget.y = event.global.y - this.dragOffset.y;
+    // Use global coordinates with proper offset calculation
+    const parent = this.dragTarget.parent;
+    if (parent) {
+      const newPos = parent.toLocal({
+        x: event.global.x - this.dragOffset.x,
+        y: event.global.y - this.dragOffset.y
+      });
+      this.dragTarget.position.set(newPos.x, newPos.y);
+    } else {
+      // Fallback for direct positioning
+      this.dragTarget.x = event.global.x - this.dragOffset.x;
+      this.dragTarget.y = event.global.y - this.dragOffset.y;
+    }
   }
 
   private onCardDragEnd(event: FederatedPointerEvent): void {
@@ -1247,9 +1303,15 @@ export class CardBattleScene extends BaseScene {
     const card = (this.dragTarget as any).card;
     const dropTarget = this.getDropTarget(event.global.x, event.global.y);
     
-    // Remove drag events
-    this.container.off('pointermove', this.onCardDragMove, this);
-    this.container.off('pointerup', this.onCardDragEnd, this);
+    // Remove drag events from both container and stage
+    const app = (globalThis as any).app;
+    if (app && app.stage) {
+      app.stage.off('pointermove', this.onCardDragMove, this);
+      app.stage.off('pointerup', this.onCardDragEnd, this);
+    } else {
+      this.container.off('pointermove', this.onCardDragMove, this);
+      this.container.off('pointerup', this.onCardDragEnd, this);
+    }
     
     if (dropTarget) {
       this.handleCardDrop(card, dropTarget);
@@ -1384,14 +1446,30 @@ export class CardBattleScene extends BaseScene {
   }
 
   private returnCardToHand(cardContainer: Container): void {
-    // Animate card back to hand
-    gsap.to(cardContainer, {
-      duration: 0.3,
-      ease: 'power2.out',
-      onComplete: () => {
-        this.updateHandCards(); // Refresh hand display
-      }
-    });
+    // Remove from current parent (stage or container)
+    if (cardContainer.parent) {
+      cardContainer.parent.removeChild(cardContainer);
+    }
+    
+    // Add back to hand container
+    this.handContainer.addChild(cardContainer);
+    
+    // Find the card in the handCards array and restore position
+    const cardIndex = this.handCards.indexOf(cardContainer);
+    if (cardIndex !== -1) {
+      // Recalculate hand layout and position with animation
+      gsap.to(cardContainer, {
+        duration: 0.3,
+        ease: 'power2.out',
+        onComplete: () => {
+          this.updateHandCards(); // Refresh hand display
+        }
+      });
+    } else {
+      // Fallback: add to hand cards array and update
+      this.handCards.push(cardContainer);
+      this.updateHandCards();
+    }
   }
 
   private animateCardToDiscard(): void {
