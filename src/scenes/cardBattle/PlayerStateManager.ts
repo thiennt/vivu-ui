@@ -1,7 +1,8 @@
 import { 
   CardBattleState, 
   CardBattleCharacter, 
-  CardInDeck 
+  CardInDeck,
+  CharacterState
 } from '@/types';
 
 /**
@@ -153,6 +154,37 @@ export class CardBattlePlayerStateManager {
     
     if (character) {
       character.current_hp = Math.max(0, Math.min(newHP, character.max_hp));
+    }
+  }
+
+  /**
+   * Remove cards from deck (for draw operations)
+   */
+  removeCardsFromDeck(playerTeam: number, count: number): CardInDeck[] {
+    const deckCards = playerTeam === 1 ? this.player1DeckCards : this.player2DeckCards;
+    const removedCards: CardInDeck[] = [];
+    
+    for (let i = 0; i < count && deckCards.length > 0; i++) {
+      const card = deckCards.shift();
+      if (card) {
+        removedCards.push(card);
+      }
+    }
+    
+    return removedCards;
+  }
+
+  /**
+   * Update character state from log data
+   */
+  updateCharacterState(characterState: CharacterState): void {
+    const characters = characterState.team === 1 ? this.player1Characters : this.player2Characters;
+    const character = characters.find(char => char.character_id === characterState.characterId);
+    
+    if (character) {
+      // Update all character properties from the state data
+      Object.assign(character, characterState);
+      console.log(`✅ Updated character ${characterState.characterId} state:`, character);
     }
   }
 

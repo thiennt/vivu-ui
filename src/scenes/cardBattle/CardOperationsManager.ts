@@ -2,6 +2,7 @@ import {
   CardInDeck, 
   CardBattleApiResponse, 
   CardBattleLog,
+  CardBattleLogTarget,
   TurnAction
 } from '@/types';
 import { battleApi } from '@/services/api';
@@ -212,12 +213,142 @@ export class CardBattleCardOperationsManager {
   }
 
   /**
+   * Update local game state based on a CardBattleLog entry
+   */
+  private updateGameStateFromLog(log: CardBattleLog): void {
+    console.log(`🔄 Updating game state for action: ${log.action_type}`, log);
+
+    switch (log.action_type) {
+      case 'draw_card':
+        this.handleDrawCardStateUpdate(log);
+        break;
+      case 'play_card':
+        this.handlePlayCardStateUpdate(log);
+        break;
+      case 'discard_card':
+        this.handleDiscardCardStateUpdate(log);
+        break;
+      default:
+        // Handle other action types like character effects, status changes
+        this.handleGenericStateUpdate(log);
+        break;
+    }
+  }
+
+  /**
+   * Handle state update for draw card action
+   */
+  private handleDrawCardStateUpdate(log: CardBattleLog): void {
+    if (!log.drawn_cards || log.drawn_cards.length === 0) {
+      return;
+    }
+
+    const playerTeam = log.actor.team;
+    console.log(`🃏 Adding ${log.drawn_cards.length} cards to player ${playerTeam} hand`);
+
+    // Add drawn cards to hand
+    for (const drawnCard of log.drawn_cards) {
+      const cardInDeck: CardInDeck = {
+        card_id: drawnCard.id,
+        card: drawnCard
+      };
+      this.playerStateManager.addCardToHand(playerTeam, cardInDeck);
+    }
+
+    // Remove cards from deck (we can't know exactly which cards were removed,
+    // but we know the count, so remove the same number from the top)
+    this.playerStateManager.removeCardsFromDeck(playerTeam, log.drawn_cards.length);
+  }
+
+  /**
+   * Handle state update for play card action
+   */
+  private handlePlayCardStateUpdate(log: CardBattleLog): void {
+    if (!log.card) {
+      return;
+    }
+
+    const playerTeam = log.actor.team;
+    console.log(`🎯 Removing played card ${log.card.name} from player ${playerTeam} hand`);
+
+    // Remove card from hand
+    this.playerStateManager.removeCardFromHand(playerTeam, log.card.id);
+
+    // Update character states if targets are affected
+    if (log.targets && log.targets.length > 0) {
+      this.updateCharacterStatesFromTargets(log.targets);
+    }
+
+    // Deduct energy cost
+    const currentEnergy = this.playerStateManager.getPlayerEnergy(playerTeam);
+    this.playerStateManager.updatePlayerEnergy(playerTeam, currentEnergy - log.card.energy_cost);
+  }
+
+  /**
+   * Handle state update for discard card action
+   */
+  private handleDiscardCardStateUpdate(log: CardBattleLog): void {
+    if (!log.card) {
+      return;
+    }
+
+    const playerTeam = log.actor.team;
+    console.log(`🗑️ Moving discarded card ${log.card.name} from hand to discard pile`);
+
+    // Remove card from hand
+    const removedCard = this.playerStateManager.removeCardFromHand(playerTeam, log.card.id);
+    
+    // Add to discard pile if successfully removed
+    if (removedCard) {
+      this.playerStateManager.addCardToDiscard(playerTeam, removedCard);
+    }
+  }
+
+  /**
+   * Handle generic state updates for other action types
+   */
+  private handleGenericStateUpdate(log: CardBattleLog): void {
+    // Update character states if targets are affected
+    if (log.targets && log.targets.length > 0) {
+      this.updateCharacterStatesFromTargets(log.targets);
+    }
+
+    // Handle energy changes from impacts
+    if (log.impacts) {
+      for (const impact of log.impacts) {
+        if (impact.type === 'energy') {
+          const playerTeam = log.actor.team;
+          const currentEnergy = this.playerStateManager.getPlayerEnergy(playerTeam);
+          const energyChange = typeof impact.value === 'number' ? impact.value : 0;
+          this.playerStateManager.updatePlayerEnergy(playerTeam, currentEnergy + energyChange);
+        }
+      }
+    }
+  }
+
+  /**
+   * Update character states based on target information from log
+   */
+  private updateCharacterStatesFromTargets(targets: CardBattleLogTarget[]): void {
+    for (const target of targets) {
+      if (target.after && target.after.characterId) {
+        console.log(`⚡ Updating character ${target.after.characterId} state`);
+        this.playerStateManager.updateCharacterState(target.after);
+      }
+    }
+  }
+
+  /**
    * Centralized method to process CardBattleLogs for animations
    */
   private async processCardBattleLogs(battleLogs: CardBattleLog[]): Promise<void> {
     console.log('🎬 Processing CardBattle logs for animation:', battleLogs);
     
     for (const log of battleLogs) {
+      // First update the game state based on the log entry
+      this.updateGameStateFromLog(log);
+      
+      // Then animate the action
       await this.animationManager.animateCardBattleLogEntry(log);
       
       // Small delay between log animations for better visual flow
