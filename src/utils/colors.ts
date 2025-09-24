@@ -57,7 +57,18 @@ export const Colors = {
   ENERGY_INACTIVE: '#808080',        // Inactive energy color
   HP_BAR_BACKGROUND: '#666666',      // HP bar background
   HP_BAR_FILL: '#ff4500',           // HP bar fill
+  HP_BAR_BG: '#666666',              // HP bar background (alias)
   TEXT_ON_DARK: '#ffffff',          // Text on dark backgrounds
+  
+  // Card Battle UI colors
+  UI_BACKGROUND: '#8b4513',          // UI panel background
+  UI_BORDER: '#6b2e17',              // UI panel border
+  CARD_DISCARD: '#654321',           // Discard pile color
+  TEAM_ALLY: '#4caf50',              // Player team color (green)
+  TEAM_ENEMY: '#f44336',             // Enemy team color (red)
+  ENERGY_TEXT: '#ffa500',            // Energy cost text
+  SUCCESS: '#4caf50',                // Success message color
+  ERROR: '#f44336',                  // Error message color
 
   // Decorative elements - Orange theme
   DECORATION_MAGIC: '#ff8c00',       // Dark orange for magical elements
@@ -137,5 +148,10 @@ export const Gradients = {
       ]
     });
     return gradient;
-  }
+  },
+
+  /**
+   * Dark background gradient for battle scenes
+   */
+  BACKGROUND_DARK: 0x2d1810,  // Dark brown color
 };
