@@ -525,13 +525,14 @@ export abstract class BaseScene extends Container {
 
   private addDetailedCardElements(card: Container, character: any, width: number, height: number): void {    
     // Experience with responsive font
-    const baseExpSize = 9;
-    const expSize = this.calculateResponsiveFontSize(baseExpSize, width, this.gameWidth, 7, 12);
+    const baseExpSize = 10; // Increased from 9
+    const expSize = this.calculateResponsiveFontSize(baseExpSize, width, this.gameWidth, 8, 14); // Increased range
     const expText = new Text({
       text: `EXP: ${character.exp}`,
       style: {
         fontFamily: 'Kalam',
         fontSize: expSize,
+        fontWeight: 'bold', // Made bold for better readability
         fill: Colors.TEXT_SECONDARY,
         align: 'center'
       }
@@ -540,23 +541,26 @@ export abstract class BaseScene extends Container {
     expText.x = width / 2;
     expText.y = height * 0.65;
     
-    // Stats in a compact grid with responsive font
-    const baseStatSize = 8;
-    const statSize = this.calculateResponsiveFontSize(baseStatSize, width, this.gameWidth, 6, 10);
+    // Stats in a compact grid with responsive font and color coding
+    const baseStatSize = 10; // Increased from 8
+    const statSize = this.calculateResponsiveFontSize(baseStatSize, width, this.gameWidth, 8, 14); // Increased range
+    
+    // Define stats with color coding
     const stats = [
-      `HP: ${character.hp}`,
-      `ATK: ${character.atk}`,
-      `DEF: ${character.def}`,
-      `AGI: ${character.agi}`
+      { text: `❤️ ${character.hp}`, color: Colors.STAT_HEALTH },      // Red for health
+      { text: `⚔️ ${character.atk}`, color: Colors.STAT_ATTACK },    // Orange for attack  
+      { text: `🛡️ ${character.def}`, color: Colors.STAT_DEFENSE },   // Blue for defense
+      { text: `💨 ${character.agi}`, color: Colors.STAT_ENERGY }     // Green for agility/energy
     ];
     
     stats.forEach((stat, index) => {
       const statText = new Text({
-        text: stat,
+        text: stat.text,
         style: {
           fontFamily: 'Kalam',
           fontSize: statSize,
-          fill: Colors.TEXT_SECONDARY
+          fontWeight: 'bold', // Made bold for better readability
+          fill: stat.color // Color-coded stats
         }
       });
       statText.x = width * 0.08 + (index % 2) * (width / 2 - width * 0.08);
@@ -568,39 +572,44 @@ export abstract class BaseScene extends Container {
   }
 
   private addPreviewCardElements(card: Container, character: any, width: number, height: number): void {
-    // Basic stats for preview
+    // Enhanced stats for preview with larger fonts and color coding
+    const statFontSize = Math.max(16, width * 0.14); // Larger, responsive font size
+    
     const hpText = new Text({
       text: `❤️ ${character.hp}`,
       style: {
         fontFamily: 'Kalam',
-        fontSize: 14,
-        fill: Colors.TEXT_SECONDARY
+        fontSize: statFontSize,
+        fontWeight: 'bold',
+        fill: Colors.STAT_HEALTH // Red for health
       }
     });
-    hpText.x = width / 4;
-    hpText.y = 85;
+    hpText.x = width * 0.05; // Better positioning
+    hpText.y = height * 0.68; // Relative positioning
 
     const atkText = new Text({
       text: `⚔️ ${character.atk}`,
       style: {
         fontFamily: 'Kalam',
-        fontSize: 14,
-        fill: Colors.TEXT_SECONDARY
+        fontSize: statFontSize,
+        fontWeight: 'bold',
+        fill: Colors.STAT_ATTACK // Orange for attack
       }
     });
-    atkText.x = width / 4;
-    atkText.y = 105;
+    atkText.x = width * 0.05;
+    atkText.y = height * 0.78;
 
     const defText = new Text({
       text: `🛡️ ${character.def}`,
       style: {
         fontFamily: 'Kalam',
-        fontSize: 14,
-        fill: Colors.TEXT_SECONDARY
+        fontSize: statFontSize,
+        fontWeight: 'bold',
+        fill: Colors.STAT_DEFENSE // Blue for defense
       }
     });
-    defText.x = width / 4;
-    defText.y = 125;
+    defText.x = width * 0.05;
+    defText.y = height * 0.88;
 
     card.addChild(hpText, atkText, defText);
   }

@@ -52,6 +52,9 @@ export class CardBattleScene extends BaseScene {
   // Game flow control
   private mainPhaseResolve?: () => void;
   
+  // Battle log state
+  private battleLogEntries: Array<{text: string, type: 'action' | 'damage' | 'heal' | 'info', timestamp: number}> = [];
+  
   // Layout constants - made more responsive
   private readonly CARD_WIDTH = 70;
   private readonly CARD_HEIGHT = 100;
@@ -291,18 +294,24 @@ export class CardBattleScene extends BaseScene {
     containers.energy.x = startX;
     containers.energy.y = yPosition;
     
-    // Create energy background and label
+    // Create energy background and label with enhanced visibility
     const energyBg = new Graphics();
     energyBg.roundRect(0, 0, elementWidth, elementHeight, 8)
-      .fill(Colors.UI_BACKGROUND)
-      .stroke({ width: 2, color: Colors.UI_BORDER });
+      .fill({ color: Colors.UI_BACKGROUND, alpha: 0.9 })
+      .stroke({ width: 3, color: Colors.STAT_ENERGY }); // Green border for energy
+    
+    // Add inner glow for energy indicator
+    const energyGlow = new Graphics();
+    energyGlow.roundRect(2, 2, elementWidth - 4, elementHeight - 4, 6)
+      .fill({ color: Colors.STAT_ENERGY, alpha: 0.2 });
     
     const energyLabel = new Text({
-      text: 'Energy: 0',
+      text: '⚡ Energy: 0',
       style: {
         fontFamily: 'Kalam',
-        fontSize: 11,
-        fill: Colors.TEXT_PRIMARY,
+        fontSize: Math.max(12, elementWidth * 0.15), // Responsive font size
+        fontWeight: 'bold',
+        fill: Colors.STAT_ENERGY, // Green color for energy
         align: 'center'
       }
     });
@@ -310,7 +319,7 @@ export class CardBattleScene extends BaseScene {
     energyLabel.x = elementWidth / 2;
     energyLabel.y = elementHeight / 2;
     
-    containers.energy.addChild(energyBg, energyLabel);
+    containers.energy.addChild(energyGlow, energyBg, energyLabel);
     
     // Position deck container in the center
     containers.deck.x = startX + elementWidth + spacing;
@@ -413,13 +422,14 @@ export class CardBattleScene extends BaseScene {
       .fill(Colors.UI_BACKGROUND)
       .stroke({ width: 2, color: Colors.UI_BORDER });
     
-    // Add title for battle log
+    // Add title for battle log with enhanced styling
     const logTitle = new Text({
-      text: 'BATTLE LOG',
+      text: '⚔️ BATTLE LOG',
       style: {
         fontFamily: 'Kalam',
-        fontSize: 12,
-        fill: Colors.TEXT_PRIMARY,
+        fontSize: 14,
+        fontWeight: 'bold',
+        fill: Colors.ACCENT_PRIMARY, // Use bright cyan for title
         align: 'center'
       }
     });
@@ -431,7 +441,99 @@ export class CardBattleScene extends BaseScene {
     this.actionLogContainer.x = (this.gameWidth - logWidth) / 2;
     this.actionLogContainer.y = logY;
     
+    // Add some sample log entries to demonstrate the visual improvements
+    this.addBattleLogEntry("Battle begins!", 'info');
+    this.addBattleLogEntry("Player draws cards", 'action');
+    this.addBattleLogEntry("Ready for combat!", 'info');
+    
     this.container.addChild(this.actionLogContainer);
+  }
+
+  // Enhanced battle log system with visual improvements
+  private addBattleLogEntry(text: string, type: 'action' | 'damage' | 'heal' | 'info'): void {
+    const entry = {
+      text,
+      type,
+      timestamp: Date.now()
+    };
+    
+    this.battleLogEntries.push(entry);
+    
+    // Keep only last 3 entries for space
+    if (this.battleLogEntries.length > 3) {
+      this.battleLogEntries.shift();
+    }
+    
+    this.updateBattleLogDisplay();
+  }
+  
+  private updateBattleLogDisplay(): void {
+    if (!this.actionLogContainer) return;
+    
+    // Remove existing log entry texts (keep background and title)
+    const entriesToRemove = this.actionLogContainer.children.filter(child => 
+      child instanceof Text && (child as any).isLogEntry
+    );
+    entriesToRemove.forEach(entry => this.actionLogContainer.removeChild(entry));
+    
+    // Add current entries with enhanced visuals
+    this.battleLogEntries.forEach((entry, index) => {
+      const yPos = 30 + (index * 20); // Start below title
+      
+      // Get icon and color based on entry type
+      const { icon, color } = this.getLogEntryStyle(entry.type);
+      
+      const logText = new Text({
+        text: `${icon} ${entry.text}`,
+        style: {
+          fontFamily: 'Kalam',
+          fontSize: 12,
+          fontWeight: 'bold',
+          fill: color,
+          align: 'left'
+        }
+      });
+      
+      logText.x = 10;
+      logText.y = yPos;
+      (logText as any).isLogEntry = true; // Mark for cleanup
+      
+      // Add fade-in animation for new entries
+      if (index === this.battleLogEntries.length - 1) {
+        logText.alpha = 0;
+        gsap.to(logText, {
+          alpha: 1,
+          duration: 0.5,
+          ease: 'power2.out'
+        });
+        
+        // Add subtle glow effect for new entries
+        gsap.to(logText.scale, {
+          x: 1.1,
+          y: 1.1,
+          duration: 0.3,
+          yoyo: true,
+          repeat: 1,
+          ease: 'power2.inOut'
+        });
+      }
+      
+      this.actionLogContainer.addChild(logText);
+    });
+  }
+  
+  private getLogEntryStyle(type: 'action' | 'damage' | 'heal' | 'info'): {icon: string, color: string} {
+    switch (type) {
+      case 'action':
+        return { icon: '⚡', color: Colors.ACCENT_WARNING };
+      case 'damage':
+        return { icon: '💥', color: Colors.STAT_HEALTH };
+      case 'heal':
+        return { icon: '💚', color: Colors.ACCENT_SUCCESS };
+      case 'info':
+      default:
+        return { icon: 'ℹ️', color: Colors.ACCENT_PRIMARY };
+    }
   }
 
 
@@ -496,6 +598,10 @@ export class CardBattleScene extends BaseScene {
     
     console.log(`Turn Start - Player ${this.battleState?.current_player}`);
     
+    // Add battle log entry
+    const playerName = this.battleState?.current_player === 1 ? "Player" : "Opponent";
+    this.addBattleLogEntry(`${playerName}'s turn begins`, 'info');
+    
     try {
       const response = await battleApi.startTurn(this.battleId);
       if (response.success && response.data) {
@@ -537,6 +643,9 @@ export class CardBattleScene extends BaseScene {
     this.updateTurnIndicator();
     
     console.log('Draw Phase');
+    
+    // Add battle log entry
+    this.addBattleLogEntry("Drawing cards", 'action');
     
     const turnAction: TurnAction = {
       type: 'draw_card',
@@ -1078,10 +1187,38 @@ export class CardBattleScene extends BaseScene {
     const player = this.battleState.players.find(p => p.team === teamNumber);
     if (!player) return;
     
-    // Find the energy text (second child after background)
-    const energyText = container.children[1] as Text;
+    // Find the energy text (third child after glow and background)
+    const energyText = container.children[2] as Text;
     if (energyText && energyText instanceof Text) {
-      energyText.text = `Energy: ${player.deck.current_energy}`;
+      const oldText = energyText.text;
+      const newText = `⚡ Energy: ${player.deck.current_energy}`;
+      
+      // Only animate if energy changed
+      if (oldText !== newText) {
+        energyText.text = newText;
+        
+        // Add energy change animation
+        gsap.to(energyText.scale, {
+          x: 1.2,
+          y: 1.2,
+          duration: 0.2,
+          yoyo: true,
+          repeat: 1,
+          ease: 'power2.inOut'
+        });
+        
+        // Flash the container background to indicate change
+        const energyBg = container.children[1] as Graphics;
+        if (energyBg) {
+          gsap.to(energyBg, {
+            alpha: 0.7,
+            duration: 0.1,
+            yoyo: true,
+            repeat: 3,
+            ease: 'power2.inOut'
+          });
+        }
+      }
     }
   }
 
