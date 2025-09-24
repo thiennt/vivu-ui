@@ -45,6 +45,9 @@ export class CardBattleScene extends BaseScene {
   private handCards: Container[] = [];
   private characterCards: Map<string, Container> = new Map();
   
+  // Game flow control
+  private mainPhaseResolve?: () => void;
+  
   // Layout constants
   private readonly CARD_WIDTH = 80;
   private readonly CARD_HEIGHT = 110;
@@ -53,10 +56,10 @@ export class CardBattleScene extends BaseScene {
   private readonly HAND_CARD_WIDTH = 60;
   private readonly HAND_CARD_HEIGHT = 80;
 
-  constructor(battleId: string) {
+  constructor(battleId?: string) {
     super();
     
-    this.battleId = battleId;
+    this.battleId = battleId || 'mock-battle-001';
     this.container = new Container();
     this.addChild(this.container);
     
@@ -197,18 +200,338 @@ export class CardBattleScene extends BaseScene {
 
   private async initializeBattle(): Promise<void> {
     try {
-      // Start the battle and get initial state
-      const response = await battleApi.startTurn(this.battleId);
-      this.battleState = response.data;
+      // Match Setup: Load battle state
+      await this.setupMatch();
       
-      if (this.battleState) {
+      if (this.battleState && this.battleState.players) {
         this.setupCharacters();
         this.updateUI();
-        this.startTurnPhase();
+        this.startGameLoop();
+      } else {
+        console.warn('Battle state is invalid, using fallback layout');
+        this.createFallbackUI();
       }
     } catch (error) {
       console.error('Failed to initialize battle:', error);
+      this.createFallbackUI();
     }
+  }
+
+  private async setupMatch(): Promise<void> {
+    // Load initial battle state without starting a turn
+    const response = await battleApi.getBattleState(this.battleId);
+    this.battleState = response.data;
+    
+    console.log('Match setup complete with battle state:', this.battleState);
+  }
+
+  private async startGameLoop(): Promise<void> {
+    // Main game loop following the requested flow
+    while (this.battleState && this.battleState.status === 'ongoing') {
+      // Turn Start (effects)
+      await this.processTurnStart();
+      
+      // Draw Phase
+      await this.processDrawPhase();
+      
+      // Main Phase (actions, discard)
+      await this.processMainPhase();
+      
+      // End Turn (effects)  
+      await this.processEndTurn();
+      
+      // AI Turn (auto) - if next player is AI
+      if (this.battleState.current_player === 2) {
+        await this.processAITurn();
+      }
+      
+      // Check win/lose
+      if (this.checkGameEnd()) {
+        break;
+      }
+    }
+  }
+
+  private async processTurnStart(): Promise<void> {
+    this.currentPhase = 'start_turn';
+    this.isAnimating = true;
+    this.updateTurnIndicator();
+    
+    console.log(`Turn Start - Player ${this.battleState?.current_player}`);
+    
+    try {
+      const response = await battleApi.startTurn(this.battleId);
+      if (response.success && response.data) {
+        this.battleState = response.data;
+        this.updateUI();
+      }
+    } catch (error) {
+      console.error('Failed to process turn start:', error);
+    }
+    
+    // Show turn start effects animation
+    await this.animateTurnStartEffects();
+    this.isAnimating = false;
+  }
+
+  private async processDrawPhase(): Promise<void> {
+    if (!this.battleState) return;
+    
+    this.currentPhase = 'draw_phase';
+    this.isAnimating = true;
+    this.updateTurnIndicator();
+    
+    console.log('Draw Phase');
+    
+    const turnAction: TurnAction = {
+      type: 'draw_card',
+      player_team: this.battleState.current_player
+    };
+    
+    try {
+      const response = await battleApi.drawCards(this.battleId, turnAction);
+      if (response.success && response.data) {
+        this.battleState = response.data;
+        this.updateUI();
+        await this.animateCardDraw();
+      }
+    } catch (error) {
+      console.error('Failed to draw cards:', error);
+    }
+    
+    this.isAnimating = false;
+  }
+
+  private async processMainPhase(): Promise<void> {
+    this.currentPhase = 'main_phase';
+    this.updateTurnIndicator();
+    
+    console.log('Main Phase - Player can take actions');
+    
+    // For player 1: Enable interactions and wait for player input
+    if (this.battleState?.current_player === 1) {
+      this.createEndTurnButton();
+      
+      // Return Promise that resolves when player ends turn
+      return new Promise((resolve) => {
+        this.mainPhaseResolve = resolve;
+      });
+    } else {
+      // For AI: Skip main phase as AI will act in AI turn
+      return Promise.resolve();
+    }
+  }
+
+  private async processEndTurn(): Promise<void> {
+    this.currentPhase = 'end_turn';
+    this.isAnimating = true;
+    this.updateTurnIndicator();
+    
+    console.log('End Turn - Processing end turn effects');
+    
+    const turnAction: TurnAction = {
+      type: 'end_turn',
+      player_team: this.battleState!.current_player
+    };
+    
+    try {
+      const response = await battleApi.endTurn(this.battleId, turnAction);
+      if (response.success && response.data) {
+        this.battleState = response.data;
+        this.updateUI();
+        await this.animateEndTurnEffects();
+      }
+    } catch (error) {
+      console.error('Failed to process end turn:', error);
+    }
+    
+    this.isAnimating = false;
+  }
+
+  private async processAITurn(): Promise<void> {
+    console.log('AI Turn - Processing AI actions');
+    
+    this.isAnimating = true;
+    
+    // Simulate AI thinking time
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // AI can play cards, discard cards, etc.
+    await this.simulateAIActions();
+    
+    this.isAnimating = false;
+  }
+
+  private async simulateAIActions(): Promise<void> {
+    if (!this.battleState || !this.battleState.players) return;
+    
+    // Simulate AI playing 1-2 cards randomly
+    const aiPlayer = this.battleState.players.find(p => p.team === 2);
+    if (!aiPlayer || !aiPlayer.deck || !aiPlayer.characters) return;
+    
+    const handCards = aiPlayer.deck.hand_cards;
+    const numActions = Math.min(2, handCards.length);
+    
+    for (let i = 0; i < numActions; i++) {
+      const randomCard = handCards[Math.floor(Math.random() * handCards.length)];
+      const randomCharacter = aiPlayer.characters[Math.floor(Math.random() * Math.min(3, aiPlayer.characters.length))];
+      
+      if (randomCard.card && randomCharacter) {
+        const turnAction: TurnAction = {
+          type: 'play_card',
+          player_team: 2,
+          card_id: randomCard.card.id,
+          character_id: randomCharacter.id
+        };
+        
+        try {
+          const response = await battleApi.playCard(this.battleId, turnAction);
+          if (response.success && response.data) {
+            this.battleState = response.data;
+            this.updateUI();
+            
+            // Animate AI card play
+            console.log(`AI played card: ${randomCard.card.name} on character: ${randomCharacter.name}`);
+            await new Promise(resolve => setTimeout(resolve, 500));
+          }
+        } catch (error) {
+          console.error('AI action failed:', error);
+        }
+      }
+    }
+  }
+
+  private checkGameEnd(): boolean {
+    if (!this.battleState || !this.battleState.players) return false;
+    
+    if (this.battleState.status === 'completed') {
+      this.showBattleResult();
+      return true;
+    }
+    
+    // Check if any team has no characters with HP > 0
+    for (const player of this.battleState.players) {
+      if (!player.characters) continue;
+      
+      const aliveCharacters = player.characters.filter(c => c.current_hp > 0);
+      if (aliveCharacters.length === 0) {
+        this.battleState.status = 'completed';
+        this.battleState.winner_team = player.team === 1 ? 2 : 1;
+        this.showBattleResult();
+        return true;
+      }
+    }
+    
+    return false;
+  }
+
+  private async animateTurnStartEffects(): Promise<void> {
+    // Show any turn start effects (buffs, debuffs, etc.)
+    const currentPlayerCards = this.getCurrentPlayerCharacterCards();
+    
+    for (const card of currentPlayerCards) {
+      // Animate a gentle glow to indicate turn start
+      await gsap.to(card, {
+        alpha: 0.7,
+        duration: 0.3,
+        yoyo: true,
+        repeat: 1,
+        ease: 'power2.inOut'
+      });
+    }
+  }
+
+  private async animateEndTurnEffects(): Promise<void> {
+    // Show any end turn effects (poison, regeneration, etc.)
+    const allCharacterCards = Array.from(this.characterCards.values());
+    
+    for (const card of allCharacterCards) {
+      // Animate a subtle pulse to indicate end turn processing
+      await gsap.to(card.scale, {
+        x: 1.05,
+        y: 1.05,
+        duration: 0.2,
+        yoyo: true,
+        repeat: 1,
+        ease: 'power2.inOut'
+      });
+    }
+  }
+
+  private getCurrentPlayerCharacterCards(): Container[] {
+    if (!this.battleState || !this.battleState.players) return [];
+    
+    const currentPlayer = this.battleState.players.find(p => p.team === this.battleState!.current_player);
+    if (!currentPlayer || !currentPlayer.characters) return [];
+    
+    return currentPlayer.characters
+      .slice(0, 3)
+      .map(char => this.characterCards.get(char.id))
+      .filter(card => card !== undefined) as Container[];
+  }
+
+  private createFallbackUI(): void {
+    // Create a simple fallback UI to show the scene is working
+    const fallbackContainer = new Container();
+    
+    const titleText = new Text({
+      text: 'Card Battle Scene',
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 24,
+        fill: Colors.TEXT_PRIMARY,
+        align: 'center'
+      }
+    });
+    titleText.anchor.set(0.5);
+    titleText.x = this.gameWidth / 2;
+    titleText.y = this.gameHeight / 2 - 50;
+    
+    const statusText = new Text({
+      text: 'Waiting for battle data...\nBattle ID: ' + this.battleId,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 16,
+        fill: Colors.TEXT_SECONDARY,
+        align: 'center'
+      }
+    });
+    statusText.anchor.set(0.5);
+    statusText.x = this.gameWidth / 2;
+    statusText.y = this.gameHeight / 2;
+    
+    // Add back button
+    const backButton = new Container();
+    const backBg = new Graphics();
+    backBg.roundRect(0, 0, 120, 40, 8)
+      .fill(Colors.BUTTON_PRIMARY)
+      .stroke({ width: 2, color: Colors.BUTTON_BORDER });
+    
+    const backText = new Text({
+      text: 'BACK TO HOME',
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 14,
+        fill: Colors.TEXT_PRIMARY,
+        align: 'center'
+      }
+    });
+    backText.anchor.set(0.5);
+    backText.x = 60;
+    backText.y = 20;
+    
+    backButton.addChild(backBg, backText);
+    backButton.x = this.gameWidth / 2 - 60;
+    backButton.y = this.gameHeight / 2 + 50;
+    
+    backButton.interactive = true;
+    backButton.cursor = 'pointer';
+    backButton.on('pointertap', () => {
+      navigation.showScreen(HomeScene);
+    });
+    
+    fallbackContainer.addChild(titleText, statusText, backButton);
+    this.container.addChild(fallbackContainer);
   }
 
   private setupCharacters(): void {
@@ -684,45 +1007,7 @@ export class CardBattleScene extends BaseScene {
     });
   }
 
-  private async startTurnPhase(): Promise<void> {
-    this.currentPhase = 'start_turn';
-    this.updateTurnIndicator();
-    
-    // Auto-proceed to draw phase
-    setTimeout(() => {
-      this.startDrawPhase();
-    }, 1000);
-  }
-
-  private async startDrawPhase(): Promise<void> {
-    if (!this.battleState) return;
-    
-    this.currentPhase = 'draw_phase';
-    this.updateTurnIndicator();
-    
-    const turnAction: TurnAction = {
-      type: 'draw_card',
-      player_team: this.battleState.current_player
-    };
-    
-    try {
-      const response = await battleApi.drawCards(this.battleId, turnAction);
-      if (response.success && response.data) {
-        this.battleState = response.data;
-        this.updateUI();
-        this.animateCardDraw();
-      }
-    } catch (error) {
-      console.error('Failed to draw cards:', error);
-    }
-    
-    // Proceed to main phase
-    setTimeout(() => {
-      this.startMainPhase();
-    }, 1500);
-  }
-
-  private animateCardDraw(): void {
+  private async animateCardDraw(): Promise<void> {
     // Animate cards being drawn from deck
     this.handCards.forEach((card, index) => {
       card.alpha = 0;
@@ -736,15 +1021,12 @@ export class CardBattleScene extends BaseScene {
         ease: 'back.out(1.7)'
       });
     });
-  }
-
-  private startMainPhase(): void {
-    this.currentPhase = 'main_phase';
-    this.updateTurnIndicator();
     
-    // Player can now interact with cards
-    // Create end turn button
-    this.createEndTurnButton();
+    // Return promise that resolves when animation completes
+    return new Promise(resolve => {
+      const longestDelay = (this.handCards.length - 1) * 0.1 + 0.4;
+      setTimeout(resolve, longestDelay * 1000);
+    });
   }
 
   private createEndTurnButton(): void {
@@ -775,45 +1057,24 @@ export class CardBattleScene extends BaseScene {
     endTurnButton.interactive = true;
     endTurnButton.cursor = 'pointer';
     endTurnButton.on('pointertap', () => {
-      this.endTurn();
+      // Remove the button and resolve main phase
+      endTurnButton.destroy();
+      if (this.mainPhaseResolve) {
+        this.mainPhaseResolve();
+        this.mainPhaseResolve = undefined;
+      }
     });
     
     this.container.addChild(endTurnButton);
   }
 
   private async endTurn(): Promise<void> {
-    if (!this.battleState || this.isAnimating) return;
-    
-    this.isAnimating = true;
-    this.currentPhase = 'end_turn';
-    this.updateTurnIndicator();
-    
-    const turnAction: TurnAction = {
-      type: 'end_turn',
-      player_team: this.battleState.current_player
-    };
-    
-    try {
-      const response = await battleApi.endTurn(this.battleId, turnAction);
-      if (response.success && response.data) {
-        this.battleState = response.data;
-        this.updateUI();
-        
-        // Check for victory/defeat
-        if (this.battleState && this.battleState.status === 'completed') {
-          this.showBattleResult();
-        } else {
-          // Continue to next turn
-          setTimeout(() => {
-            this.startTurnPhase();
-          }, 1000);
-        }
-      }
-    } catch (error) {
-      console.error('Failed to end turn:', error);
+    // This method is now replaced by processEndTurn in the new flow
+    // Keep it for backward compatibility but delegate to the new system
+    if (this.mainPhaseResolve) {
+      this.mainPhaseResolve();
+      this.mainPhaseResolve = undefined;
     }
-    
-    this.isAnimating = false;
   }
 
   private showBattleResult(): void {
