@@ -863,52 +863,118 @@ export class CardBattleScene extends BaseScene {
     this.updateEnergyIndicator();
     this.updateTurnIndicator();
     this.updateHandCards();
+    this.updateOpponentHandCards();
     this.updateDeckRemaining();
+    this.updateCharacterStates();
+  }
+
+  private updateOpponentHandCards(): void {
+    if (!this.battleState || !this.opponentHandContainer) return;
+    
+    const opponentPlayer = this.battleState.players.find(p => p.team === 2);
+    if (!opponentPlayer) return;
+    
+    // Update opponent hand card count display
+    const handCardCount = opponentPlayer.deck.hand_cards.length;
+    
+    // Find and update the hand count text in the opponent hand container
+    const handCountText = this.findTextInContainer(this.opponentHandContainer, (text) => 
+      text.text.includes('Hand:') || !!text.text.match(/^\d+$/)
+    );
+    
+    if (handCountText) {
+      handCountText.text = `Hand: ${handCardCount}`;
+    }
+  }
+
+  private updateCharacterStates(): void {
+    if (!this.battleState) return;
+    
+    // Update all character displays with current stats
+    this.battleState.players.forEach(player => {
+      player.characters.forEach(character => {
+        const characterCard = this.characterCards.get(character.id);
+        if (characterCard) {
+          this.updateCharacterCard(characterCard, character);
+        }
+      });
+    });
+  }
+
+  private updateCharacterCard(card: Container, character: CardBattleCharacter): void {
+    // Find the HP text element in the character card
+    // The character card structure varies, but we need to update HP and status effects
+    const hpText = this.findTextInContainer(card, (text) => text.text.includes('HP'));
+    if (hpText) {
+      hpText.text = `HP: ${character.current_hp}/${character.max_hp}`;
+      
+      // Update text color based on HP percentage
+      const hpPercent = character.current_hp / character.max_hp;
+      if (hpPercent <= 0.25) {
+        hpText.style.fill = 0xff4444; // Red for critical HP
+      } else if (hpPercent <= 0.5) {
+        hpText.style.fill = 0xffaa44; // Orange for low HP
+      } else {
+        hpText.style.fill = Colors.TEXT_PRIMARY; // Normal color
+      }
+    }
+  }
+
+  private findTextInContainer(container: Container, predicate: (text: Text) => boolean): Text | null {
+    for (const child of container.children) {
+      if (child instanceof Text && predicate(child)) {
+        return child;
+      } else if (child instanceof Container) {
+        const found = this.findTextInContainer(child, predicate);
+        if (found) return found;
+      }
+    }
+    return null;
   }
 
   private updateEnergyIndicator(): void {
     if (!this.battleState) return;
     
-    this.energyContainer.removeChildren();
+    // Update both player and opponent energy
+    this.updateEnergyContainer(this.energyContainer, 1);
+    this.updateEnergyContainer(this.opponentEnergyContainer, 2);
+  }
+
+  private updateEnergyContainer(container: Container, teamNumber: number): void {
+    if (!container || !this.battleState) return;
     
-    const currentPlayer = this.battleState.players.find(p => p.team === this.battleState!.current_player);
-    if (!currentPlayer) return;
+    const player = this.battleState.players.find(p => p.team === teamNumber);
+    if (!player) return;
     
-    const energyBg = new Graphics();
-    energyBg.roundRect(0, 0, 140, 40, 8)
-      .fill(Colors.UI_BACKGROUND)
-      .stroke({ width: 2, color: Colors.UI_BORDER });
-    
-    const energyText = new Text({
-      text: `Energy: ${currentPlayer.deck.current_energy}`,
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 14,
-        fill: Colors.TEXT_PRIMARY,
-        align: 'center'
-      }
-    });
-    energyText.anchor.set(0.5);
-    energyText.x = 70;
-    energyText.y = 20;
-    
-    this.energyContainer.addChild(energyBg, energyText);
+    // Find the energy text (second child after background)
+    const energyText = container.children[1] as Text;
+    if (energyText && energyText instanceof Text) {
+      energyText.text = `Energy: ${player.deck.current_energy}`;
+    }
   }
 
   private updateDeckRemaining(): void {
-    if (!this.battleState || !this.deckRemainingContainer) return;
+    if (!this.battleState) return;
     
-    const currentPlayer = this.battleState.players.find(p => p.team === this.battleState!.current_player);
-    if (!currentPlayer) return;
+    // Update both player and opponent deck/discard counts
+    this.updateDeckRemainingContainer(this.deckRemainingContainer, 1);
+    this.updateDeckRemainingContainer(this.opponentDeckRemainingContainer, 2);
+  }
+
+  private updateDeckRemainingContainer(container: Container, teamNumber: number): void {
+    if (!container || !this.battleState) return;
+    
+    const player = this.battleState.players.find(p => p.team === teamNumber);
+    if (!player) return;
     
     // Calculate remaining cards (total deck minus hand and discard)
-    const totalDeckCards = currentPlayer.deck.deck_cards.length;
-    const handCards = currentPlayer.deck.hand_cards.length;
-    const discardCards = currentPlayer.deck.discard_cards.length;
+    const totalDeckCards = player.deck.deck_cards.length;
+    const handCards = player.deck.hand_cards.length;
+    const discardCards = player.deck.discard_cards.length;
     const remainingCards = totalDeckCards - handCards - discardCards;
     
     // Update the count label (it's the third child: bg, label, count)
-    const countLabel = this.deckRemainingContainer.children[2] as Text;
+    const countLabel = container.children[2] as Text;
     if (countLabel && countLabel instanceof Text) {
       countLabel.text = remainingCards.toString();
     }
