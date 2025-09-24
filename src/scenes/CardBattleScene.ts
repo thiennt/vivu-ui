@@ -338,7 +338,7 @@ export class CardBattleScene extends BaseScene {
     this.actionLogContainer = new Container();
     
     // Center the action log horizontally and use provided position
-    const logWidth = Math.min(300, this.gameWidth - (this.STANDARD_PADDING * 2));
+    const logWidth = Math.min(350, this.gameWidth - (this.STANDARD_PADDING * 2));
     
     const logBg = new Graphics();
     logBg.roundRect(0, 0, logWidth, logHeight, 8)
