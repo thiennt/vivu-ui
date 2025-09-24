@@ -267,7 +267,7 @@ export interface CardBattleCharacter {
   team: number;
   position: number;
   max_hp: number;
-  current_hp: number;
+  hp: number;
   atk: number;
   def: number;
   agi: number;
