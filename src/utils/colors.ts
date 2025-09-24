@@ -75,6 +75,28 @@ export const Colors = {
 
   // Shadow and effects
   SHADOW_COLOR: '#000000',
+
+  // High contrast colors for UI improvements
+  ACCENT_PRIMARY: '#00d4ff',       // Bright cyan for important elements
+  ACCENT_SECONDARY: '#ff6b35',     // Bright orange-red for warnings/actions
+  ACCENT_SUCCESS: '#00ff88',       // Bright green for positive actions
+  ACCENT_WARNING: '#ffaa00',       // Bright amber for warnings
+  
+  // Card interaction states
+  CARD_SELECTED: '#00d4ff',        // Bright cyan for selected cards
+  CARD_HOVER: '#ff8c00',          // Orange for hover state
+  CARD_DISABLED: '#666666',        // Gray for disabled cards
+  CARD_AVAILABLE: '#00ff88',       // Green for available/affordable cards
+  
+  // Background zones for player distinction
+  ZONE_PLAYER: '#4a1f0d',         // Player zone (original dark brown)
+  ZONE_OPPONENT: '#2d1810',       // Opponent zone (darker brown)
+  
+  // Enhanced stat colors
+  STAT_HEALTH: '#ff4444',         // Red for health
+  STAT_ATTACK: '#ff8800',         // Orange for attack
+  STAT_DEFENSE: '#4488ff',        // Blue for defense
+  STAT_ENERGY: '#44ff88',         // Green for energy
 } as const;
 
 // Type-safe color access

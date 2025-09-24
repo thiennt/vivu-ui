@@ -216,11 +216,57 @@ export class CardBattleScene extends BaseScene {
   private createBackground(): void {
     this.backgroundContainer = new Container();
     
+    // Main background
     const bg = new Graphics();
     bg.rect(0, 0, this.gameWidth, this.gameHeight)
       .fill(Gradients.BACKGROUND_DARK);
     
-    this.backgroundContainer.addChild(bg);
+    // Create distinct zones for player and opponent
+    const zoneHeight = this.gameHeight * 0.4; // Each zone takes 40% of screen
+    const middleZone = this.gameHeight - (zoneHeight * 2); // Middle area for shared elements
+    
+    // Player zone (bottom)
+    const playerZone = new Graphics();
+    playerZone.rect(0, this.gameHeight - zoneHeight, this.gameWidth, zoneHeight)
+      .fill({ color: Colors.ZONE_PLAYER, alpha: 0.3 })
+      .stroke({ width: 2, color: Colors.TEAM_ALLY, alpha: 0.5 });
+    
+    // Opponent zone (top)
+    const opponentZone = new Graphics();
+    opponentZone.rect(0, 0, this.gameWidth, zoneHeight)
+      .fill({ color: Colors.ZONE_OPPONENT, alpha: 0.3 })
+      .stroke({ width: 2, color: Colors.TEAM_ENEMY, alpha: 0.5 });
+    
+    // Add subtle zone labels
+    const playerLabel = new Text({
+      text: 'PLAYER ZONE',
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 12,
+        fill: Colors.TEAM_ALLY,
+        align: 'center'
+      }
+    });
+    playerLabel.alpha = 0.6;
+    playerLabel.anchor.set(0.5);
+    playerLabel.x = this.gameWidth / 2;
+    playerLabel.y = this.gameHeight - zoneHeight + 15;
+    
+    const opponentLabel = new Text({
+      text: 'OPPONENT ZONE',
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 12,
+        fill: Colors.TEAM_ENEMY,
+        align: 'center'
+      }
+    });
+    opponentLabel.alpha = 0.6;
+    opponentLabel.anchor.set(0.5);
+    opponentLabel.x = this.gameWidth / 2;
+    opponentLabel.y = zoneHeight - 15;
+    
+    this.backgroundContainer.addChild(bg, opponentZone, playerZone, opponentLabel, playerLabel);
     this.container.addChild(this.backgroundContainer);
   }
 
@@ -856,13 +902,92 @@ export class CardBattleScene extends BaseScene {
     // Store character reference for future use
     (card as any).character = character;
     
-    // Add glow effect on hover
+    // Add card border for selection state
+    const cardBorder = new Graphics();
+    cardBorder.visible = false; // Initially hidden
+    cardBorder.roundRect(-3, -3, card.width + 6, card.height + 6, 8)
+      .stroke({ width: 3, color: Colors.CARD_SELECTED });
+    card.addChildAt(cardBorder, 0); // Add as first child (background)
+    (card as any).selectionBorder = cardBorder;
+    
+    // Enhanced hover effects with glow
     card.on('pointerover', () => {
-      card.alpha = 0.8;
+      // Add glow effect
+      gsap.to(card, {
+        alpha: 0.9,
+        duration: 0.2,
+        ease: 'power2.out'
+      });
+      
+      // Add subtle scale up
+      gsap.to(card.scale, {
+        x: 1.05,
+        y: 1.05,
+        duration: 0.2,
+        ease: 'back.out(1.7)'
+      });
+      
+      // Show hover border
+      cardBorder.visible = true;
+      cardBorder.clear();
+      cardBorder.roundRect(-3, -3, card.width + 6, card.height + 6, 8)
+        .stroke({ width: 3, color: Colors.CARD_HOVER });
     });
     
     card.on('pointerout', () => {
-      card.alpha = 1.0;
+      // Reset effects
+      gsap.to(card, {
+        alpha: 1.0,
+        duration: 0.2,
+        ease: 'power2.out'
+      });
+      
+      gsap.to(card.scale, {
+        x: 1.0,
+        y: 1.0,
+        duration: 0.2,
+        ease: 'power2.out'
+      });
+      
+      // Hide hover border if not selected
+      if (!(card as any).isSelected) {
+        cardBorder.visible = false;
+      }
+    });
+    
+    // Add tap feedback
+    card.on('pointerdown', () => {
+      gsap.to(card.scale, {
+        x: 0.95,
+        y: 0.95,
+        duration: 0.1,
+        ease: 'power2.out'
+      });
+    });
+    
+    card.on('pointerup', () => {
+      gsap.to(card.scale, {
+        x: 1.05,
+        y: 1.05,
+        duration: 0.1,
+        ease: 'power2.out'
+      });
+    });
+    
+    // Selection toggle
+    card.on('pointertap', () => {
+      const isSelected = (card as any).isSelected || false;
+      (card as any).isSelected = !isSelected;
+      
+      if ((card as any).isSelected) {
+        // Show selection border
+        cardBorder.visible = true;
+        cardBorder.clear();
+        cardBorder.roundRect(-3, -3, card.width + 6, card.height + 6, 8)
+          .stroke({ width: 4, color: Colors.CARD_SELECTED });
+      } else {
+        cardBorder.visible = false;
+      }
     });
   }
 
@@ -1069,17 +1194,77 @@ export class CardBattleScene extends BaseScene {
     cardContainer.interactive = true;
     cardContainer.cursor = 'grab';
     
+    // Add card border for states
+    const cardBorder = new Graphics();
+    cardBorder.visible = false;
+    cardBorder.roundRect(-2, -2, cardContainer.width + 4, cardContainer.height + 4, 6)
+      .stroke({ width: 2, color: Colors.CARD_HOVER });
+    cardContainer.addChildAt(cardBorder, 0);
+    (cardContainer as any).cardBorder = cardBorder;
+    
+    // Check if card is affordable/available
+    const isAffordable = this.isCardAffordable(card);
+    if (!isAffordable) {
+      cardContainer.alpha = 0.6; // Slightly dim unaffordable cards
+      cardContainer.tint = Colors.CARD_DISABLED;
+    }
+    
     cardContainer.on('pointerdown', (event: FederatedPointerEvent) => {
-      this.onCardDragStart(event, cardContainer, card);
+      if (isAffordable) {
+        this.onCardDragStart(event, cardContainer, card);
+      }
     });
     
     cardContainer.on('pointerover', () => {
-      cardContainer.scale.set(1.05);
+      if (isAffordable) {
+        // Enhanced hover effect
+        gsap.to(cardContainer.scale, {
+          x: 1.1,
+          y: 1.1,
+          duration: 0.2,
+          ease: 'back.out(1.7)'
+        });
+        
+        cardBorder.visible = true;
+        cardBorder.clear();
+        cardBorder.roundRect(-2, -2, cardContainer.width + 4, cardContainer.height + 4, 6)
+          .stroke({ width: 2, color: Colors.CARD_AVAILABLE });
+      } else {
+        // Subtle feedback for unaffordable cards
+        gsap.to(cardContainer, {
+          alpha: 0.4,
+          duration: 0.2
+        });
+      }
     });
     
     cardContainer.on('pointerout', () => {
-      cardContainer.scale.set(1.0);
+      if (isAffordable) {
+        gsap.to(cardContainer.scale, {
+          x: 1.0,
+          y: 1.0,
+          duration: 0.2,
+          ease: 'power2.out'
+        });
+        cardBorder.visible = false;
+      } else {
+        gsap.to(cardContainer, {
+          alpha: 0.6,
+          duration: 0.2
+        });
+      }
     });
+  }
+  
+  // Helper method to check if a card is affordable
+  private isCardAffordable(card: Card): boolean {
+    if (!this.battleState) return false;
+    
+    const currentPlayer = this.battleState.players.find(p => p.team === this.battleState!.current_player);
+    if (!currentPlayer) return false;
+    
+    // Check if player has enough energy (use deck.current_energy)
+    return currentPlayer.deck.current_energy >= (card.energy_cost || 0);
   }
 
   private onCardDragStart(event: FederatedPointerEvent, cardContainer: Container, card: Card): void {
@@ -1368,21 +1553,28 @@ export class CardBattleScene extends BaseScene {
   private createEndTurnButton(): void {
     const endTurnButton = new Container();
     
-    // Make the button larger and more thumb-friendly
-    const buttonWidth = Math.min(200, this.gameWidth - (this.STANDARD_PADDING * 2));
-    const buttonHeight = 44;
+    // Make the button larger and more thumb-friendly with minimum touch target
+    const buttonWidth = Math.min(240, this.gameWidth - (this.STANDARD_PADDING * 2));
+    const buttonHeight = Math.max(48, 44); // Ensure minimum 48px for touch
     
     const buttonBg = new Graphics();
+    // High contrast background with glow effect
     buttonBg.roundRect(0, 0, buttonWidth, buttonHeight, 12)
-      .fill(Colors.BUTTON_PRIMARY)
-      .stroke({ width: 2, color: Colors.BUTTON_BORDER });
+      .fill(Colors.ACCENT_SECONDARY) // Bright orange-red for high visibility
+      .stroke({ width: 3, color: Colors.ACCENT_PRIMARY }); // Cyan border for contrast
+    
+    // Add inner glow effect
+    const glowBg = new Graphics();
+    glowBg.roundRect(2, 2, buttonWidth - 4, buttonHeight - 4, 10)
+      .fill({ color: Colors.ACCENT_SUCCESS, alpha: 0.2 }); // Subtle green glow
     
     const buttonText = new Text({
       text: 'END TURN',
       style: {
         fontFamily: 'Kalam',
-        fontSize: 16,
-        fill: Colors.TEXT_PRIMARY,
+        fontSize: 18, // Larger font for better readability
+        fontWeight: 'bold',
+        fill: Colors.TEXT_WHITE, // Pure white for maximum contrast
         align: 'center'
       }
     });
@@ -1390,7 +1582,7 @@ export class CardBattleScene extends BaseScene {
     buttonText.x = buttonWidth / 2;
     buttonText.y = buttonHeight / 2;
     
-    endTurnButton.addChild(buttonBg, buttonText);
+    endTurnButton.addChild(glowBg, buttonBg, buttonText);
     
     // Position at very bottom, centered, thumb-friendly
     endTurnButton.x = (this.gameWidth - buttonWidth) / 2;
@@ -1398,13 +1590,47 @@ export class CardBattleScene extends BaseScene {
     
     endTurnButton.interactive = true;
     endTurnButton.cursor = 'pointer';
+    
+    // Enhanced hover/interaction feedback
+    endTurnButton.on('pointerover', () => {
+      buttonBg.clear();
+      buttonBg.roundRect(0, 0, buttonWidth, buttonHeight, 12)
+        .fill(Colors.ACCENT_WARNING) // Change to amber on hover
+        .stroke({ width: 3, color: Colors.ACCENT_PRIMARY });
+      endTurnButton.scale.set(1.05); // Slight scale up
+    });
+    
+    endTurnButton.on('pointerout', () => {
+      buttonBg.clear();
+      buttonBg.roundRect(0, 0, buttonWidth, buttonHeight, 12)
+        .fill(Colors.ACCENT_SECONDARY)
+        .stroke({ width: 3, color: Colors.ACCENT_PRIMARY });
+      endTurnButton.scale.set(1.0); // Reset scale
+    });
+    
+    endTurnButton.on('pointerdown', () => {
+      endTurnButton.scale.set(0.95); // Press feedback
+    });
+    
+    endTurnButton.on('pointerup', () => {
+      endTurnButton.scale.set(1.05); // Return to hover state
+    });
+    
     endTurnButton.on('pointertap', () => {
-      // Remove the button and resolve main phase
-      endTurnButton.destroy();
-      if (this.mainPhaseResolve) {
-        this.mainPhaseResolve();
-        this.mainPhaseResolve = undefined;
-      }
+      // Add flash animation before removing
+      gsap.to(buttonBg, {
+        alpha: 0.5,
+        duration: 0.1,
+        yoyo: true,
+        repeat: 1,
+        onComplete: () => {
+          endTurnButton.destroy();
+          if (this.mainPhaseResolve) {
+            this.mainPhaseResolve();
+            this.mainPhaseResolve = undefined;
+          }
+        }
+      });
     });
     
     this.container.addChild(endTurnButton);
