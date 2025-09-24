@@ -35,7 +35,7 @@ export class BattleScene extends BaseScene {
     // Select first 4 characters for team 1
     this.team1 = mockCharacters.slice(0, 4).map(char => ({
       ...char,
-      current_hp: char.hp,
+      current_hp: char.current_hp,
       current_energy: 50,
       team: 1
     }));
@@ -43,7 +43,7 @@ export class BattleScene extends BaseScene {
     // Select next 4 characters for team 2 (or duplicate if not enough)
     this.team2 = mockCharacters.slice(4, 8).map(char => ({
       ...char,
-      current_hp: char.hp,
+      current_hp: char.current_hp,
       current_energy: 50,
       team: 2
     }));
