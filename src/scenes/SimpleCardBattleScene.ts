@@ -6,9 +6,9 @@ import {
   CardBattleState, 
   CardBattlePlayerState, 
   CardBattleCharacter, 
-  TurnAction,
   BattlePhaseName,
-  Card
+  Card,
+  CardInDeck
 } from '@/types';
 import { battleApi } from '@/services/api';
 import { app } from '../app';
@@ -22,6 +22,11 @@ import { app } from '../app';
  * - Essential separation of concerns
  * - Easy-to-follow game flow
  */
+
+interface CardContainer extends Container {
+  cardData?: Card;
+}
+
 export class SimpleCardBattleScene extends BaseScene {
   public static assetBundles = [];
   
@@ -49,7 +54,7 @@ export class SimpleCardBattleScene extends BaseScene {
   private characterCards: Map<string, Container> = new Map();
   
   // Drag and drop - simplified
-  private dragTarget: Container | null = null;
+  private dragTarget: CardContainer | null = null;
   private dragOffset = { x: 0, y: 0 };
   
   // Game flow control
@@ -333,7 +338,7 @@ export class SimpleCardBattleScene extends BaseScene {
   /**
    * Update a specific player's hand
    */
-  private updatePlayerHandCards(handCards: any[], container: Container, cardArray: Container[], isOpponent: boolean): void {
+  private updatePlayerHandCards(handCards: CardInDeck[], container: Container, cardArray: Container[], isOpponent: boolean): void {
     // Clear existing cards
     container.removeChildren();
     cardArray.length = 0;
@@ -349,23 +354,25 @@ export class SimpleCardBattleScene extends BaseScene {
     const startX = (this.gameWidth - totalWidth) / 2;
     
     visibleCards.forEach((handCard, index) => {
-      const x = startX + (index * spacing);
-      const card = this.createHandCard(handCard.card, x, this.STANDARD_PADDING, isOpponent);
-      container.addChild(card);
-      cardArray.push(card);
+      if (handCard.card) {
+        const x = startX + (index * spacing);
+        const card = this.createHandCard(handCard.card, x, this.STANDARD_PADDING, isOpponent);
+        container.addChild(card);
+        cardArray.push(card);
+      }
     });
   }
 
   /**
    * Create a hand card - simple and functional
    */
-  private createHandCard(card: Card, x: number, y: number, isOpponent: boolean): Container {
-    const cardContainer = new Container();
+  private createHandCard(card: Card, x: number, y: number, isOpponent: boolean): CardContainer {
+    const cardContainer: CardContainer = new Container();
     cardContainer.x = x;
     cardContainer.y = y;
     
     // Store card data
-    (cardContainer as any).cardData = card;
+    cardContainer.cardData = card;
     
     // Card background
     const bg = new Graphics();
@@ -417,7 +424,7 @@ export class SimpleCardBattleScene extends BaseScene {
   /**
    * Make a card draggable - simple drag implementation
    */
-  private makeCardDraggable(card: Container): void {
+  private makeCardDraggable(card: CardContainer): void {
     card.eventMode = 'static';
     card.cursor = 'grab';
     
@@ -456,7 +463,7 @@ export class SimpleCardBattleScene extends BaseScene {
       const dropTarget = this.getDropTarget(event.globalX, event.globalY);
       
       if (dropTarget) {
-        this.handleCardDrop((this.dragTarget as any).cardData, dropTarget);
+        this.handleCardDrop(this.dragTarget.cardData!, dropTarget);
       } else {
         // Return to hand
         this.returnCardToHand(this.dragTarget);
