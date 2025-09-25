@@ -188,12 +188,29 @@ export class CardRenderer {
   ): void {
     container.y = position.y;
     
-    // Add a subtle background for the hand area
+    // Add a more visible background for the hand area
     const handBg = new Graphics();
     handBg.rect(0, 0, this.gameWidth, config.height)
-      .fill(0x000000, 0.2);
+      .fill({ color: 0x2a2a2a, alpha: 0.8 })
+      .stroke({ width: 2, color: 0x555555 });
     
     container.addChild(handBg);
+
+    // Add a label to identify the hand area
+    const handLabel = new Text({
+      text: 'Hand Area',
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 12,
+        fill: 0xaaaaaa,
+        align: 'center'
+      }
+    });
+    handLabel.anchor.set(0.5);
+    handLabel.x = this.gameWidth / 2;
+    handLabel.y = config.height / 2;
+    
+    container.addChild(handLabel);
   }
 
   /**
@@ -208,7 +225,7 @@ export class CardRenderer {
     const logX = (this.gameWidth - logWidth) / 2;
     
     logBg.roundRect(logX, 0, logWidth, logHeight, 8)
-      .fill(Colors.UI_BACKGROUND, 0.8)
+      .fill({ color: Colors.UI_BACKGROUND, alpha: 0.8 })
       .stroke({ width: 1, color: Colors.UI_BORDER });
     
     const logTitle = new Text({

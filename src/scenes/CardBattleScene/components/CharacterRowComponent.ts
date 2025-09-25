@@ -1,4 +1,4 @@
-import { Container, Text } from 'pixi.js';
+import { Container, Text, Graphics } from 'pixi.js';
 import { BaseScene } from '@/utils/BaseScene';
 import { LayoutCalculator } from '../utils/layout';
 import { CardBattlePlayerState, CardBattleCharacter } from '@/types';
@@ -56,7 +56,13 @@ export class CharacterRowComponent {
     
     const maxCharacters = Math.min(player.characters.length, this.config.maxCharacters);
     
-    if (maxCharacters === 0) return;
+    // Always show character area background, even if empty
+    this.createCharacterAreaBackground();
+    
+    if (maxCharacters === 0) {
+      this.createEmptyCharacterPlaceholder();
+      return;
+    }
 
     const layout = LayoutCalculator.calculateCharacterLayout(
       this.config.gameWidth,
@@ -88,6 +94,38 @@ export class CharacterRowComponent {
         }
       }
     });
+  }
+
+  /**
+   * Create background for character area
+   */
+  private createCharacterAreaBackground(): void {
+    const bg = new Graphics();
+    bg.rect(10, 0, this.config.gameWidth - 20, this.config.dimensions.height)
+      .fill({ color: 0x1a1a1a, alpha: 0.6 })
+      .stroke({ width: 1, color: 0x444444 });
+    
+    this.container.addChild(bg);
+  }
+
+  /**
+   * Create placeholder when no characters
+   */
+  private createEmptyCharacterPlaceholder(): void {
+    const placeholderText = new Text({
+      text: this.config.isOpponent ? 'Opponent Characters' : 'Your Characters',
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 12,
+        fill: 0x888888,
+        align: 'center'
+      }
+    });
+    placeholderText.anchor.set(0.5);
+    placeholderText.x = this.config.gameWidth / 2;
+    placeholderText.y = this.config.dimensions.height / 2;
+    
+    this.container.addChild(placeholderText);
   }
 
   /**

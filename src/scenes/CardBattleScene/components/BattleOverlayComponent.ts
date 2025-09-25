@@ -76,7 +76,7 @@ export class BattleOverlayComponent {
     
     const overlay = new Graphics();
     overlay.rect(0, 0, this.config.gameWidth, this.config.gameHeight)
-      .fill(0x000000, 0.7);
+      .fill({ color: 0x000000, alpha: 0.7 });
     
     const resultBg = new Graphics();
     resultBg.roundRect(0, 0, 300, 200, 20)

@@ -94,11 +94,25 @@ export class RefactoredCardBattleScene extends BaseScene {
    * Initialize all UI components - High-level composition
    */
   private initializeComponents(): void {
+    console.log('🏗️  Initializing RefactoredCardBattleScene components...');
+    
     // Calculate responsive layout
     const layout = LayoutCalculator.calculateBattleLayout(this.gameWidth, this.gameHeight);
+    console.log('📐 Layout calculated:', {
+      gameWidth: this.gameWidth,
+      gameHeight: this.gameHeight,
+      areas: {
+        opponentEnergy: layout.areas.opponentEnergy,
+        opponentHand: layout.areas.opponentHand,
+        battlefield: layout.areas.battlefield,
+        playerHand: layout.areas.playerHand,
+        playerEnergy: layout.areas.playerEnergy,
+      }
+    });
 
     // Setup background
     this.createBackground();
+    console.log('🎨 Background created');
 
     // Initialize drag and drop manager for card interactions
     this.dragDropManager = new DragDropManager((card: Card, dropTarget: string | null) => {
@@ -109,14 +123,29 @@ export class RefactoredCardBattleScene extends BaseScene {
       }
     });
     this.dragDropManager.setupDragEndHandlers();
+    console.log('🖱️  Drag drop manager initialized');
 
     // Setup all UI components with their configurations
     this.setupHandComponents(layout);
+    console.log('🃏 Hand components setup complete');
+    
     this.setupCharacterRowComponents(layout);  
+    console.log('👥 Character row components setup complete');
+    
     this.setupEnergyDeckDiscardComponents(layout);
+    console.log('⚡ Energy/deck/discard components setup complete');
+    
     this.setupBattleLogComponent(layout);
+    console.log('📜 Battle log component setup complete');
+    
     this.setupEndTurnButtonComponent();
+    console.log('🔚 End turn button component setup complete');
+    
     this.setupBattleOverlayComponent();
+    console.log('🎭 Battle overlay component setup complete');
+
+    console.log('✅ All components initialized successfully');
+    console.log('📊 Container children count:', this.container.children.length);
   }
 
   /**
@@ -333,34 +362,49 @@ export class RefactoredCardBattleScene extends BaseScene {
    * Update UI using components - Delegated to specialized components
    */
   private updateUI(): void {
-    if (!this.battleState) return;
+    if (!this.battleState) {
+      console.log('❌ updateUI: No battle state available');
+      return;
+    }
+
+    console.log('🔄 updateUI: Updating UI with battle state', this.battleState);
 
     const player1 = this.battleState.players.find(p => p.team === 1);
     const player2 = this.battleState.players.find(p => p.team === 2);
 
+    console.log('👥 Players found:', { player1: !!player1, player2: !!player2 });
+
     // Update hands
     if (player1?.deck.hand_cards) {
+      console.log('🃏 Updating player1 hand cards:', player1.deck.hand_cards.length);
       this.playerHandComponent.updateHandCards(player1.deck.hand_cards);
     }
     if (player2?.deck.hand_cards) {
+      console.log('🃏 Updating player2 hand cards:', player2.deck.hand_cards.length);
       this.opponentHandComponent.updateHandCards(player2.deck.hand_cards);
     }
 
     // Update energy/deck/discard indicators
     if (player1) {
+      console.log('⚡ Updating player1 energy/deck/discard');
       this.playerEnergyDeckDiscardComponent.updateAll(player1);
     }
     if (player2) {
+      console.log('⚡ Updating player2 energy/deck/discard');
       this.opponentEnergyDeckDiscardComponent.updateAll(player2);
     }
 
     // Update character states
     if (player1) {
+      console.log('👤 Updating player1 characters');
       this.playerCharacterRowComponent.updateCharacterStates(player1);
     }
     if (player2) {
+      console.log('👤 Updating player2 characters');
       this.opponentCharacterRowComponent.updateCharacterStates(player2);
     }
+
+    console.log('✅ updateUI: UI update complete');
   }
 
   /**
