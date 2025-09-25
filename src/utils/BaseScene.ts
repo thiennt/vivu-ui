@@ -289,7 +289,7 @@ export abstract class BaseScene extends Container {
     return card;
   }
 
-  protected createDeckCard(
+  public createDeckCard(
     card: Card, 
     width: number, 
     height: number, 
@@ -433,7 +433,7 @@ export abstract class BaseScene extends Container {
     return cardContainer;
   }
 
-  protected createHeroCard(
+  public createHeroCard(
     character: any,
     x: number,
     y: number,
