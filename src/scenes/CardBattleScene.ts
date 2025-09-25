@@ -72,25 +72,30 @@ export class CardBattleScene extends BaseScene {
   }
 
   private setupLayout(): void {
-    // Define vertical paddings for each area
-    const TOP_PADDING = this.STANDARD_PADDING * 2;
-    const BETWEEN_AREAS = this.STANDARD_PADDING * 2;
-    const BOTTOM_PADDING = this.STANDARD_PADDING * 2;
+    // Define smaller vertical paddings for mobile to fit everything
+    const TOP_PADDING = this.STANDARD_PADDING;
+    const BETWEEN_AREAS = this.STANDARD_PADDING;
+    const BOTTOM_PADDING = this.STANDARD_PADDING * 2; // Keep some space for END TURN button
 
-    // Calculate available height for all areas (adding discard zones)
+    // Calculate available height more carefully for mobile viewport
     const totalVerticalPadding = TOP_PADDING + BETWEEN_AREAS * 6 + BOTTOM_PADDING;
     const availableHeight = this.gameHeight - totalVerticalPadding;
 
-    // Assign heights for each area proportionally
-    const opponentEnergyHeight = 50;
-    const opponentHandHeight = 80;
-    const opponentDiscardZoneHeight = 30; // New discard zone
-    const playerDiscardZoneHeight = 30;   // New discard zone  
-    const playerHandHeight = 80;
-    const playerEnergyHeight = 50;
-    const endTurnHeight = 50;
-    const battlefieldHeight = availableHeight - (opponentEnergyHeight + opponentHandHeight + opponentDiscardZoneHeight + playerDiscardZoneHeight + playerHandHeight + playerEnergyHeight + endTurnHeight);
+    // Reduced heights for mobile to prevent overlapping - total should be around 600px for 720px viewport
+    const opponentEnergyHeight = 45;      // Reduced from 50
+    const opponentHandHeight = 60;        // Reduced from 80
+    const opponentDiscardZoneHeight = 25; // Reduced from 30
+    const playerDiscardZoneHeight = 25;   // Reduced from 30
+    const playerHandHeight = 60;          // Reduced from 80  
+    const playerEnergyHeight = 45;        // Reduced from 50
+    const endTurnHeight = 50;            // Keep same for thumb accessibility
+    
+    // Calculate battlefield height with minimum safe value
+    const totalFixedHeight = opponentEnergyHeight + opponentHandHeight + opponentDiscardZoneHeight + 
+                            playerDiscardZoneHeight + playerHandHeight + playerEnergyHeight + endTurnHeight;
+    const battlefieldHeight = Math.max(120, availableHeight - totalFixedHeight); // Minimum 120px for battlefield
 
+    
     // Y positions for each area
     let currentY = TOP_PADDING;
 
