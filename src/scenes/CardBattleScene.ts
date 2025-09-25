@@ -408,7 +408,7 @@ export class CardBattleScene extends BaseScene {
       isOpponent?: boolean;
     }
   ): void {
-    const { elementWidth, elementHeight, spacing, isPlayerDiscard = false, isOpponent = false } = config;
+    const { elementWidth, elementHeight, spacing, isPlayerDiscard = false } = config;
     const { x: startX, y: yPosition } = position;
     
     // Dark background with white text for high contrast (both player and opponent)
@@ -1241,12 +1241,8 @@ export class CardBattleScene extends BaseScene {
   private updateTurnIndicator(): void {
     if (!this.battleState) return;
     
-    // Update the turn indicator by integrating it into the battle log
-    // Since we removed the separate turn indicator container for the mobile layout
-    const isPlayerTurn = this.battleState.current_player === 1;
-    
-    // We can add the turn info to the action log title instead of a separate container
-    // This is more space-efficient for mobile
+    // Turn indicator integrated into battle log for space efficiency
+    // Mobile-optimized approach removes separate turn indicator
   }
 
   private updateHandCards(): void {
@@ -1293,12 +1289,10 @@ export class CardBattleScene extends BaseScene {
   }
 
   private createHandCard(card: Card, x: number, y: number, cardWidth: number = this.HAND_CARD_WIDTH): Container {
-    const cardHeight = cardWidth * 1.4; // Maintain aspect ratio
-    
     // Calculate appropriate font scale for smaller hand cards
     const baseFontScale = Math.min(1.0, cardWidth / 80); // Scale down for smaller cards
     
-    const cardContainer = this.createDeckCard(card, cardWidth, cardHeight, {
+    const cardContainer = this.createDeckCard(card, cardWidth, cardWidth * 1.4, {
       fontScale: baseFontScale,
       showDescription: false, // Don't show description in hand cards for space
       enableHover: false // We handle hover effects ourselves for drag and drop
@@ -1333,7 +1327,7 @@ export class CardBattleScene extends BaseScene {
     });
   }
 
-  private onCardDragStart(event: FederatedPointerEvent, cardContainer: Container, card: Card): void {
+  private onCardDragStart(event: FederatedPointerEvent, cardContainer: Container, _card: Card): void {
     if (this.isAnimating) return;
     
     this.dragTarget = cardContainer;
