@@ -52,13 +52,13 @@ export class CardBattleScene extends BaseScene {
   // Game flow control
   private mainPhaseResolve?: () => void;
   
-  // Layout constants - made more responsive
+  // Layout constants - optimized for mobile with smaller character cards
   private readonly CARD_WIDTH = 70;
   private readonly CARD_HEIGHT = 100;
-  private readonly CHARACTER_CARD_WIDTH = 100;
-  private readonly CHARACTER_CARD_HEIGHT = 140;
-  private readonly HAND_CARD_WIDTH = 50;
-  private readonly HAND_CARD_HEIGHT = 70;
+  private readonly CHARACTER_CARD_WIDTH = 85;  // Reduced from 100 for smaller characters
+  private readonly CHARACTER_CARD_HEIGHT = 120; // Reduced from 140 for smaller characters
+  private readonly HAND_CARD_WIDTH = 60;  // Increased from 50 for bigger hand cards
+  private readonly HAND_CARD_HEIGHT = 85; // Increased from 70 for bigger hand cards
 
   constructor(battleId?: string) {
     super();
@@ -81,19 +81,22 @@ export class CardBattleScene extends BaseScene {
     const totalVerticalPadding = TOP_PADDING + BETWEEN_AREAS * 6 + BOTTOM_PADDING;
     const availableHeight = this.gameHeight - totalVerticalPadding;
 
-    // Reduced heights for mobile to prevent overlapping - total should be around 600px for 720px viewport
-    const opponentEnergyHeight = 45;      // Reduced from 50
-    const opponentHandHeight = 60;        // Reduced from 80
-    const opponentDiscardZoneHeight = 25; // Reduced from 30
-    const playerDiscardZoneHeight = 25;   // Reduced from 30
-    const playerHandHeight = 60;          // Reduced from 80  
-    const playerEnergyHeight = 45;        // Reduced from 50
-    const endTurnHeight = 50;            // Keep same for thumb accessibility
+    // Adjusted heights based on user feedback:
+    // - Bigger discard zones (30px)
+    // - Bigger hand areas for larger cards (75px)  
+    // - Smaller battlefield for smaller battle log (3 lines max)
+    const opponentEnergyHeight = 45;      
+    const opponentHandHeight = 75;        // Increased from 60 for bigger cards
+    const opponentDiscardZoneHeight = 30; // Increased from 25 for bigger discard zone
+    const playerDiscardZoneHeight = 30;   // Increased from 25 for bigger discard zone
+    const playerHandHeight = 75;          // Increased from 60 for bigger cards  
+    const playerEnergyHeight = 45;        
+    const endTurnHeight = 50;            
     
-    // Calculate battlefield height with minimum safe value
+    // Calculate battlefield height with smaller value for compact battle log (3 lines)
     const totalFixedHeight = opponentEnergyHeight + opponentHandHeight + opponentDiscardZoneHeight + 
                             playerDiscardZoneHeight + playerHandHeight + playerEnergyHeight + endTurnHeight;
-    const battlefieldHeight = Math.max(120, availableHeight - totalFixedHeight); // Minimum 120px for battlefield
+    const battlefieldHeight = Math.max(90, availableHeight - totalFixedHeight); // Reduced minimum from 120px to 90px for smaller battle log
 
     
     // Y positions for each area
@@ -203,14 +206,26 @@ export class CardBattleScene extends BaseScene {
       .fill(Colors.CONTAINER_BACKGROUND) // Sienna color for warm brown
       .stroke({ width: 2, color: Colors.PANEL_BACKGROUND }); // Saddle brown border
     
-    // Add player/opponent label with avatar placeholder
+    // Get player names - use simple team-based names for now
+    let playerName = isOpponent ? 'Opponent' : 'You';
+    if (this.battleState) {
+      const targetTeam = isOpponent ? 2 : 1;
+      const player = this.battleState.players.find(p => p.team === targetTeam);
+      if (player) {
+        // Use simple team-based naming since player names aren't in the battle state
+        playerName = isOpponent ? `Player ${targetTeam}` : 'You';
+      }
+    }
+    
+    // Add player name label
     const label = new Text({
-      text: isOpponent ? 'Opponent' : 'You',
+      text: playerName,
       style: {
         fontFamily: 'Kalam',
         fontSize: 16,
         fill: Colors.TEXT_WHITE,
-        align: 'left'
+        align: 'left',
+        fontWeight: 'bold'
       }
     });
     label.anchor.set(0, 0.5);
@@ -519,32 +534,33 @@ export class CardBattleScene extends BaseScene {
   private createActionLogInCenter(logY: number, logHeight: number): void {
     this.actionLogContainer = new Container();
     
-    // Center the action log horizontally and use provided position
-    const logWidth = Math.min(350, this.gameWidth - (this.STANDARD_PADDING * 2));
+    // Smaller battle log area for 3 lines max - reduced width and height
+    const logWidth = Math.min(300, this.gameWidth - (this.STANDARD_PADDING * 2)); // Reduced from 350
+    const logHeightAdjusted = Math.min(logHeight, 60); // Max 60px height for 3 lines
     
     // Pale background with brown border for battle log
     const logBg = new Graphics();
-    logBg.roundRect(0, 0, logWidth, logHeight, 8)
+    logBg.roundRect(0, 0, logWidth, logHeightAdjusted, 8)
       .fill('#faf5f0') // Pale background
       .stroke({ width: 2, color: Colors.BUTTON_BORDER }); // Brown border
     
-    // Add title for battle log
+    // Smaller title for compact battle log
     const logTitle = new Text({
       text: 'BATTLE LOG',
       style: {
         fontFamily: 'Kalam',
-        fontSize: 12,
+        fontSize: 10, // Reduced from 12 for compact design
         fill: Colors.BUTTON_BORDER, // Brown text for contrast
         align: 'center'
       }
     });
     logTitle.anchor.set(0.5, 0);
     logTitle.x = logWidth / 2;
-    logTitle.y = 8;
+    logTitle.y = 6; // Reduced padding from 8
     
     this.actionLogContainer.addChild(logBg, logTitle);
     this.actionLogContainer.x = (this.gameWidth - logWidth) / 2;
-    this.actionLogContainer.y = logY;
+    this.actionLogContainer.y = logY + (logHeight - logHeightAdjusted) / 2; // Center vertically in available space
     
     this.container.addChild(this.actionLogContainer);
   }
