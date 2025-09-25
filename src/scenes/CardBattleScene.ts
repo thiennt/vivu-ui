@@ -213,13 +213,21 @@ export class CardBattleScene extends BaseScene {
       const player = this.battleState.players.find(p => p.team === targetTeam);
       if (player) {
         // Use simple team-based naming since player names aren't in the battle state
-        playerName = isOpponent ? `Player ${targetTeam}` : 'You';
+        playerName = isOpponent ? 'Opponent' : 'You';
       }
     }
     
-    // Add player name label
+    // Add avatar placeholder (left side)
+    const avatarPlaceholder = new Graphics();
+    avatarPlaceholder.circle(0, 0, 15)
+      .fill(Colors.UI_BACKGROUND)
+      .stroke({ width: 2, color: Colors.UI_BORDER });
+    avatarPlaceholder.x = 25;
+    avatarPlaceholder.y = height / 2;
+    
+    // Add player name label next to avatar
     const label = new Text({
-      text: playerName,
+      text: playerName + '.',  // Add period as shown in requirement
       style: {
         fontFamily: 'Kalam',
         fontSize: 16,
@@ -229,10 +237,10 @@ export class CardBattleScene extends BaseScene {
       }
     });
     label.anchor.set(0, 0.5);
-    label.x = 15;
+    label.x = 45; // Position after avatar
     label.y = height / 2;
     
-    container.addChild(rowBg, label);
+    container.addChild(rowBg, avatarPlaceholder, label);
   }
 
   private createOpponentDiscardZone(y: number, height: number) {
@@ -504,27 +512,13 @@ export class CardBattleScene extends BaseScene {
     const borderColor = isOpponent ? Colors.BUTTON_BORDER : Colors.UI_BORDER; // Orange/brown border for opponent
     const borderWidth = isOpponent ? 3 : 2; // Thicker border for opponent
     
-    // Hand background
+    // Hand background - no labels here, labels should be in character areas only
     const handBg = new Graphics();
     handBg.roundRect(0, 0, this.gameWidth, height, 10)
       .fill(bgColor)
       .stroke({ width: borderWidth, color: borderColor });
     
-    // Add label for the hand area
-    const handLabel = new Text({
-      text: isOpponent ? 'Opponent' : 'You',
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 14,
-        fill: isOpponent ? Colors.TEXT_TERTIARY : Colors.TEXT_PRIMARY,
-        align: 'left'
-      }
-    });
-    handLabel.anchor.set(0, 0.5);
-    handLabel.x = 15;
-    handLabel.y = height / 2;
-    
-    container.addChild(handBg, handLabel);
+    container.addChild(handBg);
     container.y = yPosition;
     
     this.container.addChild(container);
