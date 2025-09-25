@@ -4,6 +4,7 @@ import { navigation } from './navigation';
 import { Colors, Gradients } from './colors';
 import { BottomNavigationMenu } from './BottomNavigationMenu';
 import { Card, CardType } from '@/types';
+import { DropShadowFilter, GlowFilter } from 'pixi-filters';
 
 export abstract class BaseScene extends Container {
   /** Assets bundles required by this screen */
@@ -264,7 +265,7 @@ export abstract class BaseScene extends Container {
     height: number = 160,
     rarity: string = 'common'
   ): Container {
-    const card = new Container();
+    const card = this.createPolishedCard(width, height);
     
     const rarityColors: { [key: string]: string } = {
       common: Colors.RARITY_COMMON,
@@ -620,5 +621,29 @@ export abstract class BaseScene extends Container {
       .fill(elementColors[character.element || 'earth'] || Colors.ELEMENT_DEFAULT);
     
     card.addChild(elementIndicator);
+  }
+
+  private createPolishedCard(w: number, h: number, isSelected: boolean = false): Container {
+    const c = new Container();
+
+    // Shadow
+    c.filters = [
+      new DropShadowFilter({ color: 0x000000, alpha: 0.17, blur: 8, offset: { x: 4, y: 4 } })
+    ];
+
+    // Card background
+    const bg = new Graphics();
+    bg.roundRect(0, 0, w, h, 12).fill(0xffffff);
+    c.addChild(bg);
+
+    // Glow on selection
+    if (isSelected) {
+      c.filters = [
+        ...(c.filters ?? []),
+        new GlowFilter({ color: 0xffa000, distance: 8, outerStrength: 2, innerStrength: 0.8 })
+      ];
+    }
+
+    return c;
   }
 }
