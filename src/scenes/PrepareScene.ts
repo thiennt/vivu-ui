@@ -1,7 +1,7 @@
 import { Container, Graphics, Text } from 'pixi.js';
 import { navigation } from '@/utils/navigation';
 import { BaseScene } from '@/utils/BaseScene';
-import { Colors, Gradients } from '@/utils/colors';
+import { Colors } from '@/utils/colors';
 import { CardBattleScene } from './CardBattleScene';
 import { BattleCard, BattleStageResponse, Card, CardType, CardRarity, Character } from '@/types';
 import { battleApi } from '@/services/api';
@@ -74,7 +74,7 @@ export class PrepareScene extends BaseScene {
   private createBackground(): void {
     const background = new Graphics()
       .rect(0, 0, this.gameWidth, this.gameHeight)
-      .fill(Gradients.createBackgroundGradient(this.gameWidth, this.gameHeight));
+      .fill(Colors.BACKGROUND_PRIMARY);
     
     this.container.addChild(background);
   }
@@ -267,7 +267,7 @@ export class PrepareScene extends BaseScene {
     const startBg = startButton.children[0] as Graphics;
     startBg.clear()
       .roundRect(0, 0, buttonWidth, buttonHeight, 8)
-      .fill(Gradients.createButtonGradient(buttonWidth, buttonHeight))
+      .fill(Colors.BUTTON_PRIMARY)
       .stroke({ width: 2, color: Colors.RARITY_LEGENDARY });
 
     buttonContainer.addChild(backButton, startButton);

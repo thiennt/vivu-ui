@@ -2,6 +2,7 @@ import { Colors } from "@/utils/colors";
 import { Container, Graphics, Text } from "pixi.js";
 import { CardBattlePlayerState } from "@/types";
 import { BaseScene } from "@/utils/BaseScene";
+import { VisualEffects } from "@/utils/visualEffects";
 
 export class PlayerCharacterZone extends Container {
   private zoneBg: Graphics;
@@ -49,50 +50,88 @@ export class PlayerCharacterZone extends Container {
 
   resize(width: number, height: number): void {
     this.zoneBg.clear();
-    this.zoneBg.roundRect(0, 0, width, height, 10)
-      .fill(Colors.UI_BACKGROUND)
-      .stroke({ width: 2, color: Colors.UI_BORDER });
+    
+    // Use enhanced battle zone background
+    const battleBg = VisualEffects.createBattleZoneBackground(width, height);
+    this.zoneBg.addChild(battleBg);
     
     // Layout player info zone at the left
     const infoWidth = width * 0.18;
     this.playerInfoZone.x = 0;
     this.playerInfoZone.y = 0;
 
-    const infoBgBorder = this.playerNo === 1 ? '#E67A1C' : '#4A90E2';
+    const infoBgBorder = this.playerNo === 1 ? Colors.TEAM_ALLY : Colors.TEAM_ENEMY;
+    const infoBgColor = this.playerNo === 1 ? '#4a4a4a' : '#3a3a3a';
+    
     this.playerInfoBg.clear();
-    this.playerInfoBg.roundRect(0, 0, infoWidth, height, 10)
-      .fill('#ececece3')
-      .stroke({ width: 2, color: infoBgBorder });
+    
+    // Create enhanced player info background
+    const infoFrame = VisualEffects.createDecorativeFrame(infoWidth, height, 8);
+    this.playerInfoBg.addChild(infoFrame);
+    
+    // Add inner background
+    const innerBg = new Graphics();
+    innerBg.roundRect(3, 3, infoWidth - 6, height - 6, 5)
+      .fill(infoBgColor)
+      .stroke({ width: 1, color: infoBgBorder, alpha: 0.8 });
+    this.playerInfoBg.addChild(innerBg);
 
+    // Enhanced player label
     this.playerInfoLabel.text = this.playerNo === 1 ? 'P1' : 'P2';
     this.playerInfoLabel.style = {
       fontFamily: 'Kalam',
-      fontSize: 18,
+      fontSize: 20,
+      fontWeight: 'bold',
       fill: infoBgBorder,
-      align: 'left'
+      align: 'center',
+      dropShadow: {
+        color: Colors.SHADOW_COLOR,
+        blur: 2,
+        angle: Math.PI / 4,
+        distance: 2
+      }
     };
-    this.playerInfoLabel.x = infoWidth * 0.4;
-    this.playerInfoLabel.y = height * 0.15;
+    this.playerInfoLabel.anchor.set(0.5);
+    this.playerInfoLabel.x = infoWidth / 2;
+    this.playerInfoLabel.y = height * 0.2;
 
-    this.energyText.text = `⚡x ${this.energyCount}`;
+    // Enhanced energy display with orb visual
+    this.energyText.text = `⚡${this.energyCount}`;
     this.energyText.style = {
       fontFamily: 'Kalam',
-      fontSize: 16,
-      fill: infoBgBorder,
-      align: 'left'
+      fontSize: 14,
+      fontWeight: 'bold',
+      fill: Colors.ENERGY_TEXT,
+      align: 'center',
+      dropShadow: {
+        color: Colors.SHADOW_COLOR,
+        blur: 1,
+        angle: Math.PI / 4,
+        distance: 1
+      }
     };
-    this.energyText.x = 5;
-    this.energyText.y = height * 0.45;
+    this.energyText.anchor.set(0.5);
+    this.energyText.x = infoWidth / 2;
+    this.energyText.y = height * 0.5;
 
-    this.deckText.text = `🃏x ${this.deckCount}`;
+    // Enhanced deck display
+    this.deckText.text = `🃏${this.deckCount}`;
     this.deckText.style = {
       fontFamily: 'Kalam',
-      fontSize: 16,
-      fill: infoBgBorder,
-      align: 'left'
+      fontSize: 14,
+      fontWeight: 'bold',
+      fill: Colors.TEXT_PRIMARY,
+      align: 'center',
+      dropShadow: {
+        color: Colors.SHADOW_COLOR,
+        blur: 1,
+        angle: Math.PI / 4,
+        distance: 1
+      }
     };
-    this.deckText.x = 5;
-    this.deckText.y = height * 0.7;
+    this.deckText.anchor.set(0.5);
+    this.deckText.x = infoWidth / 2;
+    this.deckText.y = height * 0.75;
 
     // Layout characters zone to the right of player info
     const charactersWidth = width - infoWidth;

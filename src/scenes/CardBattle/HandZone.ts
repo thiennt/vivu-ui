@@ -4,6 +4,7 @@ import { CardBattlePlayerState, Card } from "@/types";
 import { BaseScene } from "@/utils/BaseScene";
 import { app } from "@/app";
 import { gsap } from "gsap";
+import { VisualEffects } from "@/utils/visualEffects";
 
 
 export class HandZone extends Container {
@@ -31,9 +32,17 @@ export class HandZone extends Container {
 
   resize(width: number, height: number): void {
     this.handBg.clear();
-    this.handBg.roundRect(0, 0, width, height, 10)
-      .fill(Colors.UI_BACKGROUND)
-      .stroke({ width: 2, color: Colors.UI_BORDER });
+    
+    // Use enhanced battle zone background for hands
+    const handBg = VisualEffects.createBattleZoneBackground(width, height);
+    this.handBg.addChild(handBg);
+    
+    // Add additional card zone styling
+    const innerArea = new Graphics();
+    const padding = 4;
+    innerArea.roundRect(padding, padding, width - padding * 2, height - padding * 2, 6)
+      .stroke({ width: 1, color: Colors.UI_BORDER_GLOW, alpha: 0.6 });
+    this.handBg.addChild(innerArea);
     
     // Redraw hand cards if we have player state
     if (this.playerState) {

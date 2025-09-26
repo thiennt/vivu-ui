@@ -1,6 +1,7 @@
 import { Colors } from "@/utils/colors";
 import { Container, Graphics, Text } from "pixi.js";
 import { BattlePhaseName } from "@/types";
+import { VisualEffects } from "@/utils/visualEffects";
 
 export class BattleLogZone extends Container {
   private logBg: Graphics;
@@ -22,17 +23,24 @@ export class BattleLogZone extends Container {
 
   resize(width: number, height: number): void {
     this.logBg.clear();
-    this.logBg.roundRect(0, 0, width, height, 8)
-      .fill(Colors.UI_BACKGROUND)
-      .stroke({ width: 2, color: Colors.UI_BORDER });
+    
+    // Use enhanced mystical frame instead of simple rectangle
+    const mysticalFrame = VisualEffects.createMysticalFrame(width, height);
+    this.logBg.addChild(mysticalFrame);
 
     this.logTitle.text = 'Battle Log';
     this.logTitle.style = {
       fontFamily: 'Kalam',
-      fontSize: 14,
+      fontSize: 16,
       fontWeight: 'bold',
-      fill: Colors.TEXT_PRIMARY,
-      align: 'center'
+      fill: Colors.DECORATION_FRAME,
+      align: 'center',
+      dropShadow: {
+        color: Colors.SHADOW_COLOR,
+        blur: 2,
+        angle: Math.PI / 4,
+        distance: 2
+      }
     };
     this.logTitle.anchor.set(0.5);
     this.logTitle.x = width / 2;
@@ -41,8 +49,14 @@ export class BattleLogZone extends Container {
     this.phaseText.style = {
       fontFamily: 'Kalam',
       fontSize: 12,
-      fill: Colors.TEXT_SECONDARY,
-      align: 'center'
+      fill: Colors.TEXT_PRIMARY,
+      align: 'center',
+      dropShadow: {
+        color: Colors.SHADOW_COLOR,
+        blur: 1,
+        angle: Math.PI / 4,
+        distance: 1
+      }
     };
     this.phaseText.anchor.set(0.5);
     this.phaseText.x = width / 2;
