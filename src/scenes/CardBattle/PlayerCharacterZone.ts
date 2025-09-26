@@ -1,6 +1,6 @@
 import { Colors } from "@/utils/colors";
 import { Container, Graphics, Text } from "pixi.js";
-import { CardInDeck, CharacterState } from "@/types";
+import { CharacterState } from "@/types";
 
 
 export class PlayerCharacterZone extends Container {
