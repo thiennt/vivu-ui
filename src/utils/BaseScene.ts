@@ -325,7 +325,7 @@ export abstract class BaseScene extends Container {
     
     // Inner card frame for that trading card look
     bg.roundRect(4, 4, width - 8, height - 8, 4)
-      .stroke({ width: 1, color: Colors.TEXT_SECONDARY, alpha: 0.5 });
+      .stroke({ width: 1, color: Colors.CARD_BORDER, alpha: 0.3 });
     
     // Top border accent for premium card feel
     bg.roundRect(6, 6, width - 12, 12, 2)
