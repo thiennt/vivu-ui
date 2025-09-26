@@ -5,7 +5,6 @@ import { BaseScene } from "@/utils/BaseScene";
 import { app } from "@/app";
 import { gsap } from "gsap";
 import { CardDetailPopup, cardToBattleCard } from "@/popups/CardDetailPopup";
-import { VisualEffects } from "@/utils/visualEffects";
 
 
 export class HandZone extends Container {
@@ -37,13 +36,7 @@ export class HandZone extends Container {
   resize(width: number, height: number): void {
     this.handBg.clear();
     
-    // Use the enhanced battle zone background
-    const battleBg = VisualEffects.createBattleZoneBackground(width, height);
-    
-    // Copy the battle background to our graphics object
-    this.handBg.rect(0, 0, width, height).fill({ color: Colors.BATTLEFIELD_PRIMARY, alpha: 0 }); // Transparent base
-    
-    // Manually recreate the battle zone styling for the hand zone
+    // Create enhanced hand zone background with mystical styling
     // Deep shadow for depth
     this.handBg.roundRect(3, 3, width, height, 8)
       .fill({ color: Colors.BATTLE_SHADOW_DEEP, alpha: 0.4 });

@@ -1,6 +1,5 @@
 import { Colors } from "@/utils/colors";
 import { Container, Graphics, Text } from "pixi.js";
-import { VisualEffects } from "@/utils/visualEffects";
 
 export class DiscardZone extends Container {
   private discardBg: Graphics;

@@ -2,7 +2,6 @@ import { Colors } from "@/utils/colors";
 import { Container, Graphics, Text } from "pixi.js";
 import { CardBattlePlayerState } from "@/types";
 import { BaseScene } from "@/utils/BaseScene";
-import { VisualEffects } from "@/utils/visualEffects";
 
 export class PlayerCharacterZone extends Container {
   private zoneBg: Graphics;

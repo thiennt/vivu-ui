@@ -1,7 +1,6 @@
 import { Colors } from "@/utils/colors";
 import { Container, Graphics, Text } from "pixi.js";
 import { BattlePhaseName } from "@/types";
-import { VisualEffects } from "@/utils/visualEffects";
 
 export class BattleLogZone extends Container {
   private logBg: Graphics;

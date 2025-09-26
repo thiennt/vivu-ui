@@ -1,4 +1,4 @@
-import { Container, Graphics } from 'pixi.js';
+import { Container, Graphics, Text } from 'pixi.js';
 import { BaseScene } from '@/utils/BaseScene';
 import { HandZone } from './CardBattle/HandZone';
 import { DiscardZone } from './CardBattle/DiscardZone';
@@ -94,15 +94,124 @@ export class CardBattleScene extends BaseScene {
   }
 
   private setupButtons(): void {
-    // Create End Turn button
-    const endTurnButton = this.createButton(
-      'End Turn',
+    // Create enhanced End Turn button with battle styling
+    const endTurnButton = this.createEpicBattleButton(
+      '⚔️ END TURN ⚔️',
       0, 0, 200, 50,
       () => {
         this.endTurn();
       }
     );
     this.buttonsContainer.addChild(endTurnButton);
+  }
+
+  private createEpicBattleButton(
+    text: string, 
+    x: number, 
+    y: number, 
+    width: number = 200, 
+    height: number = 50,
+    onClick?: () => void
+  ): Container {
+    const button = new Container();
+    
+    // Adjust dimensions for mobile
+    const minHeight = Math.min(44, this.gameHeight * 0.08);
+    const adjustedHeight = Math.max(minHeight, height);
+    const maxWidth = this.gameWidth - (2 * this.STANDARD_PADDING);
+    const adjustedWidth = Math.min(width, maxWidth);
+    
+    // Epic battle button background with multiple layers
+    const bg = new Graphics();
+    
+    // Deep shadow for depth
+    bg.roundRect(3, 3, adjustedWidth, adjustedHeight, 12)
+      .fill({ color: Colors.BATTLE_SHADOW_DEEP, alpha: 0.8 });
+    
+    // Main button background
+    bg.roundRect(0, 0, adjustedWidth, adjustedHeight, 12)
+      .fill(Colors.BUTTON_PRIMARY);
+    
+    // Mystical inner glow
+    bg.roundRect(2, 2, adjustedWidth - 4, adjustedHeight - 4, 10)
+      .stroke({ width: 2, color: Colors.BATTLE_ENERGY_GLOW, alpha: 0.8 });
+    
+    // Golden battle border
+    bg.roundRect(0, 0, adjustedWidth, adjustedHeight, 12)
+      .stroke({ width: 3, color: Colors.BATTLE_FRAME_GOLD });
+    
+    // Corner accents
+    const cornerSize = 8;
+    const corners = [
+      { x: 4, y: 4 },
+      { x: adjustedWidth - cornerSize - 4, y: 4 },
+      { x: 4, y: adjustedHeight - cornerSize - 4 },
+      { x: adjustedWidth - cornerSize - 4, y: adjustedHeight - cornerSize - 4 }
+    ];
+    
+    corners.forEach(corner => {
+      bg.roundRect(corner.x, corner.y, cornerSize, cornerSize, 2)
+        .fill({ color: Colors.MYSTICAL_GLOW, alpha: 0.9 });
+    });
+    
+    // Calculate responsive font size
+    const responsiveFontSize = this.calculateResponsiveFontSize(
+      18,
+      adjustedWidth,
+      this.gameWidth,
+      Math.max(12, adjustedHeight * 0.25),
+      Math.min(22, adjustedHeight * 0.6)
+    );
+
+    // Enhanced button text
+    const buttonText = new Text({
+      text: text,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: responsiveFontSize,
+        fontWeight: 'bold',
+        fill: Colors.BATTLE_FRAME_GOLD,
+        align: 'center',
+        dropShadow: {
+          color: Colors.SHADOW_COLOR,
+          blur: 3,
+          angle: Math.PI / 4,
+          distance: 2
+        }
+      }
+    });
+    buttonText.anchor.set(0.5);
+    buttonText.x = adjustedWidth / 2;
+    buttonText.y = adjustedHeight / 2;
+    
+    button.addChild(bg, buttonText);
+    button.x = x;
+    button.y = y;
+    button.interactive = true;
+    button.cursor = 'pointer';
+    
+    // Enhanced hover effects
+    button.on('pointerover', () => {
+      bg.tint = 0xffcc66; // Golden glow on hover
+    });
+    
+    button.on('pointerout', () => {
+      bg.tint = 0xffffff;
+    });
+    
+    // Enhanced click effect
+    button.on('pointerdown', () => {
+      bg.tint = 0xff9900;
+      button.scale.set(0.95);
+    });
+    
+    button.on('pointerup', () => {
+      bg.tint = 0xffffff;
+      button.scale.set(1);
+      if (onClick) onClick();
+    });
+    
+    return button;
   }
 
   private setupDragDropHandlers(): void {
