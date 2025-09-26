@@ -36,27 +36,11 @@ export class HandZone extends Container {
   resize(width: number, height: number): void {
     this.handBg.clear();
     
-    // Create enhanced hand zone background with mystical styling
-    // Deep shadow for depth
-    this.handBg.roundRect(3, 3, width, height, 8)
-      .fill({ color: Colors.BATTLE_SHADOW_DEEP, alpha: 0.4 });
-    
+    // Create simplified hand zone background
     // Main background
     this.handBg.roundRect(0, 0, width, height, 8)
-      .fill(Colors.BATTLEFIELD_PRIMARY);
-    
-    // Inner mystical glow
-    this.handBg.roundRect(2, 2, width - 4, height - 4, 6)
-      .stroke({ width: 1, color: Colors.BATTLEFIELD_INNER_GLOW, alpha: 0.5 });
-    
-    // Main border with epic glow
-    this.handBg.roundRect(0, 0, width, height, 8)
-      .stroke({ width: 2, color: Colors.BATTLEFIELD_BORDER, alpha: 0.8 });
-    
-    // Hand zone specific indicator (subtle inner frame)
-    const padding = 4;
-    this.handBg.roundRect(padding, padding, width - padding * 2, height - padding * 2, 4)
-      .stroke({ width: 1, color: Colors.BATTLE_ENERGY_GLOW, alpha: 0.4 });
+      .fill(Colors.UI_BACKGROUND)
+      .stroke({ width: 1, color: Colors.UI_BORDER, alpha: 0.6 });
     
     // Redraw hand cards if we have player state
     if (this.playerState) {

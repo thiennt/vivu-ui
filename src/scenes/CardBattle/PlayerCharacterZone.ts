@@ -50,38 +50,15 @@ export class PlayerCharacterZone extends Container {
   resize(width: number, height: number): void {
     this.zoneBg.clear();
     
-    // Use the enhanced epic battle frame for character zones
-    // Manually recreate epic battle frame styling
-    // Deep shadow for depth
-    this.zoneBg.roundRect(3, 3, width, height, 12)
-      .fill({ color: Colors.BATTLE_SHADOW_DEEP, alpha: 0.5 });
-    
+    // Simplified character zone background
     // Main background
-    this.zoneBg.roundRect(0, 0, width, height, 12)
-      .fill(Colors.BATTLEFIELD_PRIMARY);
+    this.zoneBg.roundRect(0, 0, width, height, 8)
+      .fill(Colors.UI_BACKGROUND);
     
-    // Inner mystical glow
-    this.zoneBg.roundRect(2, 2, width - 4, height - 4, 10)
-      .stroke({ width: 2, color: Colors.MYSTICAL_GLOW, alpha: 0.6 });
-    
-    // Golden battle frame
-    this.zoneBg.roundRect(0, 0, width, height, 12)
-      .stroke({ width: 3, color: Colors.BATTLE_FRAME_GOLD });
-    
-    // Add mystical corner accents
-    const cornerSize = 20;
+    // Simple team-colored border
     const accentColor = this.playerNo === 1 ? Colors.TEAM_ALLY : Colors.TEAM_ENEMY;
-    
-    // Top corners
-    this.zoneBg.moveTo(cornerSize, 2)
-      .lineTo(2, 2)
-      .lineTo(2, cornerSize)
-      .stroke({ width: 3, color: accentColor, alpha: 0.8 });
-    
-    this.zoneBg.moveTo(width - cornerSize, 2)
-      .lineTo(width - 2, 2)
-      .lineTo(width - 2, cornerSize)
-      .stroke({ width: 3, color: accentColor, alpha: 0.8 });
+    this.zoneBg.roundRect(0, 0, width, height, 8)
+      .stroke({ width: 2, color: accentColor, alpha: 0.7 });
     
     // Layout player info zone at the left
     const infoWidth = width * 0.18;
@@ -92,76 +69,45 @@ export class PlayerCharacterZone extends Container {
     
     this.playerInfoBg.clear();
     
-    // Create enhanced player info background with mystical frame
-    this.playerInfoBg.roundRect(2, 2, infoWidth, height - 4, 8)
-      .fill({ color: Colors.BATTLE_SHADOW_DEEP, alpha: 0.3 });
-    
-    this.playerInfoBg.roundRect(0, 0, infoWidth, height, 8)
-      .fill(Colors.UI_BACKGROUND)
-      .stroke({ width: 2, color: infoBgBorder, alpha: 0.9 });
-    
-    // Add mystical inner glow
-    this.playerInfoBg.roundRect(2, 2, infoWidth - 4, height - 4, 6)
-      .stroke({ width: 1, color: Colors.BATTLE_ENERGY_GLOW, alpha: 0.7 });
-    
-    // Add inner background with team color accent
-    const infoBgColor = this.playerNo === 1 ? '#4a4a4a' : '#3a3a3a';
-    this.playerInfoBg.roundRect(3, 3, infoWidth - 6, height - 6, 5)
-      .fill(infoBgColor)
+    // Simplified player info background
+    this.playerInfoBg.roundRect(0, 0, infoWidth, height, 6)
+      .fill(Colors.PANEL_BACKGROUND)
       .stroke({ width: 1, color: infoBgBorder, alpha: 0.8 });
 
-    // Enhanced player label
+    // Simplified player label
     this.playerInfoLabel.text = this.playerNo === 1 ? 'P1' : 'P2';
     this.playerInfoLabel.style = {
       fontFamily: 'Kalam',
       fontSize: 20,
       fontWeight: 'bold',
       fill: infoBgBorder,
-      align: 'center',
-      dropShadow: {
-        color: Colors.SHADOW_COLOR,
-        blur: 2,
-        angle: Math.PI / 4,
-        distance: 2
-      }
+      align: 'center'
     };
     this.playerInfoLabel.anchor.set(0.5);
     this.playerInfoLabel.x = infoWidth / 2;
     this.playerInfoLabel.y = height * 0.2;
 
-    // Enhanced energy display with orb visual
+    // Simplified energy display
     this.energyText.text = `⚡${this.energyCount}`;
     this.energyText.style = {
       fontFamily: 'Kalam',
       fontSize: 14,
       fontWeight: 'bold',
       fill: Colors.ENERGY_TEXT,
-      align: 'center',
-      dropShadow: {
-        color: Colors.SHADOW_COLOR,
-        blur: 1,
-        angle: Math.PI / 4,
-        distance: 1
-      }
+      align: 'center'
     };
     this.energyText.anchor.set(0.5);
     this.energyText.x = infoWidth / 2;
     this.energyText.y = height * 0.5;
 
-    // Enhanced deck display
+    // Simplified deck display
     this.deckText.text = `🃏${this.deckCount}`;
     this.deckText.style = {
       fontFamily: 'Kalam',
       fontSize: 14,
       fontWeight: 'bold',
       fill: Colors.TEXT_PRIMARY,
-      align: 'center',
-      dropShadow: {
-        color: Colors.SHADOW_COLOR,
-        blur: 1,
-        angle: Math.PI / 4,
-        distance: 1
-      }
+      align: 'center'
     };
     this.deckText.anchor.set(0.5);
     this.deckText.x = infoWidth / 2;

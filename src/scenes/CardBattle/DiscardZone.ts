@@ -20,55 +20,24 @@ export class DiscardZone extends Container {
   resize(width: number, height: number): void {
     this.discardBg.clear();
     
-    // Create enhanced mystical discard pile with depth
-    // Deep shadow for depth
-    this.discardBg.roundRect(2, 2, width, height, 12)
-      .fill({ color: Colors.BATTLE_SHADOW_DEEP, alpha: 0.7 });
-    
-    // Main frame with battle styling
-    this.discardBg.roundRect(0, 0, width, height, 12)
-      .fill(Colors.UI_BACKGROUND)
-      .stroke({ width: 3, color: Colors.BATTLE_FRAME_GOLD });
-    
-    // Mystical inner glow
-    this.discardBg.roundRect(2, 2, width - 4, height - 4, 10)
-      .stroke({ width: 1, color: Colors.MYSTICAL_GLOW, alpha: 0.8 });
-    
-    // Discard pile area with enhanced mystical look
-    this.discardBg.roundRect(4, 4, width - 8, height - 8, 8)
+    // Simplified discard pile
+    // Simple frame with subtle depth
+    this.discardBg.roundRect(0, 0, width, height, 8)
       .fill(Colors.CARD_DISCARD)
-      .stroke({ width: 2, color: Colors.BATTLE_MAGIC_AURA, alpha: 0.7 });
+      .stroke({ width: 2, color: Colors.CARD_BORDER });
     
-    // Add energy orb indicators in corners
-    const orbSize = 2;
-    const orbOffset = 8;
-    
-    this.discardBg.circle(orbOffset, orbOffset, orbSize)
-      .fill({ color: Colors.BATTLE_ENERGY_GLOW, alpha: 0.9 });
-    
-    this.discardBg.circle(width - orbOffset, orbOffset, orbSize)
-      .fill({ color: Colors.BATTLE_ENERGY_GLOW, alpha: 0.9 });
-    
-    this.discardBg.circle(orbOffset, height - orbOffset, orbSize)
-      .fill({ color: Colors.BATTLE_ENERGY_GLOW, alpha: 0.9 });
-    
-    this.discardBg.circle(width - orbOffset, height - orbOffset, orbSize)
-      .fill({ color: Colors.BATTLE_ENERGY_GLOW, alpha: 0.9 });
+    // Inner area for drop zone visual
+    this.discardBg.roundRect(3, 3, width - 6, height - 6, 5)
+      .stroke({ width: 1, color: Colors.TEXT_SECONDARY, alpha: 0.5 });
   
-    // Update label with enhanced styling
-    this.discardLabel.text = '🔥 DISCARD 🔥';
+    // Simple label
+    this.discardLabel.text = 'DISCARD';
     this.discardLabel.style = {
       fontFamily: 'Kalam',
       fontSize: 11,
       fontWeight: 'bold',
-      fill: Colors.BATTLE_FRAME_GOLD,
-      align: 'center',
-      dropShadow: {
-        color: Colors.SHADOW_COLOR,
-        blur: 3,
-        angle: Math.PI / 4,
-        distance: 2
-      }
+      fill: Colors.TEXT_PRIMARY,
+      align: 'center'
     };
     this.discardLabel.anchor.set(0.5);
     this.discardLabel.x = width / 2;

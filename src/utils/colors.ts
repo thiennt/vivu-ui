@@ -41,9 +41,9 @@ export const Colors = {
   LINEUP_FRONT: '#ff6347',           // Tomato orange
   LINEUP_BACK: '#2196f3',
 
-  // Card borders - Orange theme
-  CARD_BORDER: '#6b2e17',            // Dark orange
-  CARD_BACKGROUND: '#d2691e',        // Card background
+  // Card borders and backgrounds - More realistic card colors
+  CARD_BORDER: '#2d1810',            // Darker border for better definition
+  CARD_BACKGROUND: '#f5f0e8',        // Cream/parchment color for cards
   CARD_BACK: '#8b4513',             // Card back color
 
   // Panel and container backgrounds - Orange theme
