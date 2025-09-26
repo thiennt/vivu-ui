@@ -285,7 +285,7 @@ export class PrepareScene extends BaseScene {
       console.log(`✅ Battle started successfully: ${response.message}`);
       // Navigate to card battle scene with battle data
       navigation.showScreen(CardBattleScene, {
-        battle_id: this.battleStage?.battle_id,
+        battleId: this.battleStage?.battle_id,
       });
     } else {
       console.error(`❌ Failed to start battle: ${response.message}`);

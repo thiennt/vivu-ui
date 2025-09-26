@@ -42,11 +42,11 @@ export class CardBattleScene extends BaseScene {
   private p1HandZone: HandZone;
   private p1DiscardZone: DiscardZone;
   private buttonsContainer: Container;
-  
-  constructor(battleId?: string) {
+
+  constructor(params?: { battleId?: string }) {
     super();
-    
-    this.battleId = battleId || 'mock-battle-001';
+
+    this.battleId = params?.battleId || 'mock-battle-001';
 
     // Initialize all zones
     this.p2DiscardZone = new DiscardZone();
