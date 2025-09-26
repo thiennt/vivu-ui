@@ -1,4 +1,4 @@
-import { Container } from 'pixi.js';
+import { Container, Graphics, Text } from 'pixi.js';
 import { BaseScene } from '@/utils/BaseScene';
 import { HandZone } from './CardBattle/HandZone';
 import { DiscardZone } from './CardBattle/DiscardZone';
@@ -11,6 +11,7 @@ import {
   Card
 } from '@/types';
 import { battleApi } from '@/services/api';
+import { Colors } from '@/utils/colors';
 
 export class CardBattleScene extends BaseScene {
   /** Assets bundles required by this screen */
@@ -24,6 +25,9 @@ export class CardBattleScene extends BaseScene {
   private isAnimating: boolean = false;
   private mainPhaseResolve?: () => void;
   
+  // Background
+  private mysticalBackground!: Container;
+  
   // Zone components following the layout order:
   // PLAYER 2 DISCARD ZONE
   // PLAYER 2 HAND ZONE (Skill Cards)  
@@ -33,7 +37,7 @@ export class CardBattleScene extends BaseScene {
   // PLAYER 1 HAND ZONE (Skill Cards)
   // PLAYER 1 DISCARD ZONE
   // BUTTONS ZONE
-  
+
   private p2DiscardZone: DiscardZone;
   private p2HandZone: HandZone;
   private p2CharacterZone: PlayerCharacterZone;
@@ -47,6 +51,9 @@ export class CardBattleScene extends BaseScene {
     super();
 
     this.battleId = params?.battleId || 'mock-battle-001';
+
+    // Create and add mystical battle arena background
+    this.createMysticalBackground();
 
     // Initialize all zones
     this.p2DiscardZone = new DiscardZone();
@@ -80,16 +87,131 @@ export class CardBattleScene extends BaseScene {
     this.initializeBattle();
   }
 
+  private createMysticalBackground(): void {
+    // Create mystical battle arena background container
+    this.mysticalBackground = new Container();
+    this.addChildAt(this.mysticalBackground, 0); // Add at bottom layer
+  }
+
   private setupButtons(): void {
-    // Create End Turn button
-    const endTurnButton = this.createButton(
-      'End Turn',
+    // Create enhanced End Turn button with battle styling
+    const endTurnButton = this.createEpicBattleButton(
+      '⚔️ END TURN ⚔️',
       0, 0, 200, 50,
       () => {
         this.endTurn();
       }
     );
     this.buttonsContainer.addChild(endTurnButton);
+  }
+
+  private createEpicBattleButton(
+    text: string, 
+    x: number, 
+    y: number, 
+    width: number = 200, 
+    height: number = 50,
+    onClick?: () => void
+  ): Container {
+    const button = new Container();
+    
+    // Adjust dimensions for mobile
+    const minHeight = Math.min(44, this.gameHeight * 0.08);
+    const adjustedHeight = Math.max(minHeight, height);
+    const maxWidth = this.gameWidth - (2 * this.STANDARD_PADDING);
+    const adjustedWidth = Math.min(width, maxWidth);
+    
+    // Epic battle button background with multiple layers
+    const bg = new Graphics();
+    
+    // Deep shadow for depth
+    bg.roundRect(3, 3, adjustedWidth, adjustedHeight, 12)
+      .fill({ color: Colors.BATTLE_SHADOW_DEEP, alpha: 0.8 });
+    
+    // Main button background
+    bg.roundRect(0, 0, adjustedWidth, adjustedHeight, 12)
+      .fill(Colors.BUTTON_PRIMARY);
+    
+    // Mystical inner glow
+    bg.roundRect(2, 2, adjustedWidth - 4, adjustedHeight - 4, 10)
+      .stroke({ width: 2, color: Colors.BATTLE_ENERGY_GLOW, alpha: 0.8 });
+    
+    // Golden battle border
+    bg.roundRect(0, 0, adjustedWidth, adjustedHeight, 12)
+      .stroke({ width: 3, color: Colors.BATTLE_FRAME_GOLD });
+    
+    // Corner accents
+    const cornerSize = 8;
+    const corners = [
+      { x: 4, y: 4 },
+      { x: adjustedWidth - cornerSize - 4, y: 4 },
+      { x: 4, y: adjustedHeight - cornerSize - 4 },
+      { x: adjustedWidth - cornerSize - 4, y: adjustedHeight - cornerSize - 4 }
+    ];
+    
+    corners.forEach(corner => {
+      bg.roundRect(corner.x, corner.y, cornerSize, cornerSize, 2)
+        .fill({ color: Colors.MYSTICAL_GLOW, alpha: 0.9 });
+    });
+    
+    // Calculate responsive font size
+    const responsiveFontSize = this.calculateResponsiveFontSize(
+      18,
+      adjustedWidth,
+      this.gameWidth,
+      Math.max(12, adjustedHeight * 0.25),
+      Math.min(22, adjustedHeight * 0.6)
+    );
+
+    // Enhanced button text
+    const buttonText = new Text({
+      text: text,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: responsiveFontSize,
+        fontWeight: 'bold',
+        fill: Colors.BATTLE_FRAME_GOLD,
+        align: 'center',
+        dropShadow: {
+          color: Colors.SHADOW_COLOR,
+          blur: 3,
+          angle: Math.PI / 4,
+          distance: 2
+        }
+      }
+    });
+    buttonText.anchor.set(0.5);
+    buttonText.x = adjustedWidth / 2;
+    buttonText.y = adjustedHeight / 2;
+    
+    button.addChild(bg, buttonText);
+    button.x = x;
+    button.y = y;
+    button.interactive = true;
+    button.cursor = 'pointer';
+    
+    // Enhanced hover effects
+    button.on('pointerover', () => {
+      bg.tint = 0xffcc66; // Golden glow on hover
+    });
+    
+    button.on('pointerout', () => {
+      bg.tint = 0xffffff;
+    });
+    
+    // Enhanced click effect
+    button.on('pointerdown', () => {
+      bg.tint = 0xff9900;
+      button.scale.set(0.95);
+    });
+    
+    button.on('pointerup', () => {
+      bg.tint = 0xffffff;
+      button.scale.set(1);
+      if (onClick) onClick();
+    });
+    
+    return button;
   }
 
   private setupDragDropHandlers(): void {
@@ -398,6 +520,56 @@ export class CardBattleScene extends BaseScene {
   resize(width: number, height: number): void {
     this.gameWidth = width;
     this.gameHeight = height;
+    
+    // Create mystical battle arena background
+    this.mysticalBackground.removeChildren();
+    const arenaBackground = new Graphics();
+    
+    // Create deep mystical background with multiple layers
+    // Deepest shadow layer
+    arenaBackground.roundRect(0, 0, width, height, 0)
+      .fill(Colors.BATTLE_SHADOW_DEEP);
+    
+    // Main mystical arena background
+    arenaBackground.roundRect(0, 0, width, height, 0)
+      .fill(Colors.BATTLEFIELD_PRIMARY);
+    
+    // Add mystical energy patterns
+    const centerX = width / 2;
+    const centerY = height / 2;
+    
+    // Central mystical glow
+    arenaBackground.circle(centerX, centerY, Math.min(width, height) * 0.4)
+      .fill({ color: Colors.BATTLE_MAGIC_AURA, alpha: 0.1 });
+    
+    // Outer mystical ring
+    arenaBackground.circle(centerX, centerY, Math.min(width, height) * 0.3)
+      .stroke({ width: 2, color: Colors.MYSTICAL_GLOW, alpha: 0.3 });
+    
+    // Inner mystical ring  
+    arenaBackground.circle(centerX, centerY, Math.min(width, height) * 0.2)
+      .stroke({ width: 1, color: Colors.BATTLE_ENERGY_GLOW, alpha: 0.4 });
+    
+    // Add corner mystical accents
+    const cornerSize = 40;
+    const corners = [
+      { x: 0, y: 0 },
+      { x: width - cornerSize, y: 0 },
+      { x: 0, y: height - cornerSize },
+      { x: width - cornerSize, y: height - cornerSize }
+    ];
+    
+    corners.forEach((corner, index) => {
+      // Corner mystical glow
+      arenaBackground.roundRect(corner.x, corner.y, cornerSize, cornerSize, 8)
+        .fill({ color: Colors.BATTLE_MAGIC_AURA, alpha: 0.2 });
+      
+      // Corner frame
+      arenaBackground.roundRect(corner.x + 2, corner.y + 2, cornerSize - 4, cornerSize - 4, 6)
+        .stroke({ width: 1, color: Colors.BATTLE_FRAME_GOLD, alpha: 0.5 });
+    });
+    
+    this.mysticalBackground.addChild(arenaBackground);
     
     // Calculate layout based on backup structure
     const TOP_PADDING = this.STANDARD_PADDING * 2;

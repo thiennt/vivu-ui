@@ -1,7 +1,6 @@
 import { Colors } from "@/utils/colors";
 import { Container, Graphics, Text } from "pixi.js";
 import { BattlePhaseName } from "@/types";
-import { VisualEffects } from "@/utils/visualEffects";
 
 export class BattleLogZone extends Container {
   private logBg: Graphics;
@@ -24,46 +23,75 @@ export class BattleLogZone extends Container {
   resize(width: number, height: number): void {
     this.logBg.clear();
     
-    // Create enhanced mystical frame directly
+    // Use the enhanced mystical frame
+    // Shadow for depth
+    this.logBg.roundRect(2, 2, width, height, 12)
+      .fill({ color: Colors.BATTLE_SHADOW_DEEP, alpha: 0.6 });
+    
+    // Main background with battle theme
     this.logBg.roundRect(0, 0, width, height, 12)
-      .fill(Colors.BATTLEFIELD_PRIMARY)
-      .stroke({ width: 3, color: Colors.DECORATION_MAGIC });
+      .fill(Colors.BATTLEFIELD_PRIMARY);
     
-    // Add corner decorations
-    const cornerSize = 16;
+    // Inner mystical glow
+    this.logBg.roundRect(2, 2, width - 4, height - 4, 10)
+      .stroke({ width: 1, color: Colors.MYSTICAL_GLOW, alpha: 0.8 });
     
-    // Top corners
+    // Main mystical border
+    this.logBg.roundRect(0, 0, width, height, 12)
+      .stroke({ width: 3, color: Colors.BATTLE_MAGIC_AURA });
+    
+    // Add enhanced corner decorations
+    const cornerSize = 18;
+    
+    // Top corners with mystical energy
     this.logBg.moveTo(cornerSize, 2)
       .lineTo(2, 2)
       .lineTo(2, cornerSize)
-      .stroke({ width: 2, color: Colors.DECORATION_FRAME });
+      .stroke({ width: 3, color: Colors.BATTLE_FRAME_GOLD });
     
     this.logBg.moveTo(width - cornerSize, 2)
       .lineTo(width - 2, 2)
       .lineTo(width - 2, cornerSize)
-      .stroke({ width: 2, color: Colors.DECORATION_FRAME });
+      .stroke({ width: 3, color: Colors.BATTLE_FRAME_GOLD });
     
-    // Bottom corners
+    // Bottom corners with mystical energy
     this.logBg.moveTo(2, height - cornerSize)
       .lineTo(2, height - 2)
       .lineTo(cornerSize, height - 2)
-      .stroke({ width: 2, color: Colors.DECORATION_FRAME });
+      .stroke({ width: 3, color: Colors.BATTLE_FRAME_GOLD });
     
     this.logBg.moveTo(width - 2, height - cornerSize)
       .lineTo(width - 2, height - 2)
       .lineTo(width - cornerSize, height - 2)
-      .stroke({ width: 2, color: Colors.DECORATION_FRAME });
+      .stroke({ width: 3, color: Colors.BATTLE_FRAME_GOLD });
+    
+    // Add subtle energy orbs in corners
+    const orbSize = 4;
+    const orbOffset = 6;
+    
+    // Corner energy orbs
+    this.logBg.circle(orbOffset, orbOffset, orbSize)
+      .fill({ color: Colors.BATTLE_ENERGY_GLOW, alpha: 0.9 });
+    
+    this.logBg.circle(width - orbOffset, orbOffset, orbSize)
+      .fill({ color: Colors.BATTLE_ENERGY_GLOW, alpha: 0.9 });
+    
+    this.logBg.circle(orbOffset, height - orbOffset, orbSize)
+      .fill({ color: Colors.BATTLE_ENERGY_GLOW, alpha: 0.9 });
+    
+    this.logBg.circle(width - orbOffset, height - orbOffset, orbSize)
+      .fill({ color: Colors.BATTLE_ENERGY_GLOW, alpha: 0.9 });
 
-    this.logTitle.text = 'Battle Log';
+    this.logTitle.text = '⚔️ Battle Chronicle ⚔️';
     this.logTitle.style = {
       fontFamily: 'Kalam',
       fontSize: 16,
       fontWeight: 'bold',
-      fill: Colors.DECORATION_FRAME,
+      fill: Colors.BATTLE_FRAME_GOLD,
       align: 'center',
       dropShadow: {
         color: Colors.SHADOW_COLOR,
-        blur: 2,
+        blur: 3,
         angle: Math.PI / 4,
         distance: 2
       }
@@ -75,11 +103,11 @@ export class BattleLogZone extends Container {
     this.phaseText.style = {
       fontFamily: 'Kalam',
       fontSize: 12,
-      fill: Colors.TEXT_PRIMARY,
+      fill: Colors.MYSTICAL_GLOW,
       align: 'center',
       dropShadow: {
         color: Colors.SHADOW_COLOR,
-        blur: 1,
+        blur: 2,
         angle: Math.PI / 4,
         distance: 1
       }
