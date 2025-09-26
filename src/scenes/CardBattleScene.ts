@@ -1,4 +1,4 @@
-import { Container } from 'pixi.js';
+import { Container, Graphics } from 'pixi.js';
 import { BaseScene } from '@/utils/BaseScene';
 import { HandZone } from './CardBattle/HandZone';
 import { DiscardZone } from './CardBattle/DiscardZone';
@@ -11,6 +11,7 @@ import {
   Card
 } from '@/types';
 import { battleApi } from '@/services/api';
+import { Colors } from '@/utils/colors';
 
 export class CardBattleScene extends BaseScene {
   /** Assets bundles required by this screen */
@@ -24,6 +25,9 @@ export class CardBattleScene extends BaseScene {
   private isAnimating: boolean = false;
   private mainPhaseResolve?: () => void;
   
+  // Background
+  private mysticalBackground!: Container;
+  
   // Zone components following the layout order:
   // PLAYER 2 DISCARD ZONE
   // PLAYER 2 HAND ZONE (Skill Cards)  
@@ -33,7 +37,7 @@ export class CardBattleScene extends BaseScene {
   // PLAYER 1 HAND ZONE (Skill Cards)
   // PLAYER 1 DISCARD ZONE
   // BUTTONS ZONE
-  
+
   private p2DiscardZone: DiscardZone;
   private p2HandZone: HandZone;
   private p2CharacterZone: PlayerCharacterZone;
@@ -47,6 +51,9 @@ export class CardBattleScene extends BaseScene {
     super();
 
     this.battleId = params?.battleId || 'mock-battle-001';
+
+    // Create and add mystical battle arena background
+    this.createMysticalBackground();
 
     // Initialize all zones
     this.p2DiscardZone = new DiscardZone();
@@ -78,6 +85,12 @@ export class CardBattleScene extends BaseScene {
     
     // Initialize battle after zones are set up
     this.initializeBattle();
+  }
+
+  private createMysticalBackground(): void {
+    // Create mystical battle arena background container
+    this.mysticalBackground = new Container();
+    this.addChildAt(this.mysticalBackground, 0); // Add at bottom layer
   }
 
   private setupButtons(): void {
@@ -398,6 +411,56 @@ export class CardBattleScene extends BaseScene {
   resize(width: number, height: number): void {
     this.gameWidth = width;
     this.gameHeight = height;
+    
+    // Create mystical battle arena background
+    this.mysticalBackground.removeChildren();
+    const arenaBackground = new Graphics();
+    
+    // Create deep mystical background with multiple layers
+    // Deepest shadow layer
+    arenaBackground.roundRect(0, 0, width, height, 0)
+      .fill(Colors.BATTLE_SHADOW_DEEP);
+    
+    // Main mystical arena background
+    arenaBackground.roundRect(0, 0, width, height, 0)
+      .fill(Colors.BATTLEFIELD_PRIMARY);
+    
+    // Add mystical energy patterns
+    const centerX = width / 2;
+    const centerY = height / 2;
+    
+    // Central mystical glow
+    arenaBackground.circle(centerX, centerY, Math.min(width, height) * 0.4)
+      .fill({ color: Colors.BATTLE_MAGIC_AURA, alpha: 0.1 });
+    
+    // Outer mystical ring
+    arenaBackground.circle(centerX, centerY, Math.min(width, height) * 0.3)
+      .stroke({ width: 2, color: Colors.MYSTICAL_GLOW, alpha: 0.3 });
+    
+    // Inner mystical ring  
+    arenaBackground.circle(centerX, centerY, Math.min(width, height) * 0.2)
+      .stroke({ width: 1, color: Colors.BATTLE_ENERGY_GLOW, alpha: 0.4 });
+    
+    // Add corner mystical accents
+    const cornerSize = 40;
+    const corners = [
+      { x: 0, y: 0 },
+      { x: width - cornerSize, y: 0 },
+      { x: 0, y: height - cornerSize },
+      { x: width - cornerSize, y: height - cornerSize }
+    ];
+    
+    corners.forEach((corner, index) => {
+      // Corner mystical glow
+      arenaBackground.roundRect(corner.x, corner.y, cornerSize, cornerSize, 8)
+        .fill({ color: Colors.BATTLE_MAGIC_AURA, alpha: 0.2 });
+      
+      // Corner frame
+      arenaBackground.roundRect(corner.x + 2, corner.y + 2, cornerSize - 4, cornerSize - 4, 6)
+        .stroke({ width: 1, color: Colors.BATTLE_FRAME_GOLD, alpha: 0.5 });
+    });
+    
+    this.mysticalBackground.addChild(arenaBackground);
     
     // Calculate layout based on backup structure
     const TOP_PADDING = this.STANDARD_PADDING * 2;

@@ -51,30 +51,38 @@ export class PlayerCharacterZone extends Container {
   resize(width: number, height: number): void {
     this.zoneBg.clear();
     
-    // Create enhanced battle zone background directly
-    this.zoneBg.roundRect(0, 0, width, height, 8)
+    // Use the enhanced epic battle frame for character zones
+    // Manually recreate epic battle frame styling
+    // Deep shadow for depth
+    this.zoneBg.roundRect(3, 3, width, height, 12)
+      .fill({ color: Colors.BATTLE_SHADOW_DEEP, alpha: 0.5 });
+    
+    // Main background
+    this.zoneBg.roundRect(0, 0, width, height, 12)
       .fill(Colors.BATTLEFIELD_PRIMARY);
     
-    // Add decorative corner accents
-    const accentSize = 16;
+    // Inner mystical glow
+    this.zoneBg.roundRect(2, 2, width - 4, height - 4, 10)
+      .stroke({ width: 2, color: Colors.MYSTICAL_GLOW, alpha: 0.6 });
     
-    // Top-left corner accent
-    this.zoneBg.moveTo(0, accentSize)
-      .lineTo(0, 8)
-      .arc(8, 8, 8, Math.PI, 3 * Math.PI / 2)
-      .lineTo(accentSize, 0)
-      .fill({ color: Colors.BATTLEFIELD_ACCENT, alpha: 0.3 });
+    // Golden battle frame
+    this.zoneBg.roundRect(0, 0, width, height, 12)
+      .stroke({ width: 3, color: Colors.BATTLE_FRAME_GOLD });
     
-    // Top-right corner accent
-    this.zoneBg.moveTo(width - accentSize, 0)
-      .lineTo(width - 8, 0)
-      .arc(width - 8, 8, 8, 3 * Math.PI / 2, 0)
-      .lineTo(width, accentSize)
-      .fill({ color: Colors.BATTLEFIELD_ACCENT, alpha: 0.3 });
+    // Add mystical corner accents
+    const cornerSize = 20;
+    const accentColor = this.playerNo === 1 ? Colors.TEAM_ALLY : Colors.TEAM_ENEMY;
     
-    // Border with glow effect
-    this.zoneBg.roundRect(0, 0, width, height, 8)
-      .stroke({ width: 2, color: Colors.UI_BORDER_GLOW, alpha: 0.8 });
+    // Top corners
+    this.zoneBg.moveTo(cornerSize, 2)
+      .lineTo(2, 2)
+      .lineTo(2, cornerSize)
+      .stroke({ width: 3, color: accentColor, alpha: 0.8 });
+    
+    this.zoneBg.moveTo(width - cornerSize, 2)
+      .lineTo(width - 2, 2)
+      .lineTo(width - 2, cornerSize)
+      .stroke({ width: 3, color: accentColor, alpha: 0.8 });
     
     // Layout player info zone at the left
     const infoWidth = width * 0.18;
@@ -82,21 +90,23 @@ export class PlayerCharacterZone extends Container {
     this.playerInfoZone.y = 0;
 
     const infoBgBorder = this.playerNo === 1 ? Colors.TEAM_ALLY : Colors.TEAM_ENEMY;
-    const infoBgColor = this.playerNo === 1 ? '#4a4a4a' : '#3a3a3a';
     
     this.playerInfoBg.clear();
     
-    // Create enhanced player info background directly
+    // Create enhanced player info background with mystical frame
+    this.playerInfoBg.roundRect(2, 2, infoWidth, height - 4, 8)
+      .fill({ color: Colors.BATTLE_SHADOW_DEEP, alpha: 0.3 });
+    
     this.playerInfoBg.roundRect(0, 0, infoWidth, height, 8)
       .fill(Colors.UI_BACKGROUND)
-      .stroke({ width: 3, color: Colors.DECORATION_FRAME });
+      .stroke({ width: 2, color: infoBgBorder, alpha: 0.9 });
     
-    // Add inner highlight
-    const innerPadding = 3;
-    this.playerInfoBg.roundRect(innerPadding, innerPadding, infoWidth - innerPadding * 2, height - innerPadding * 2, 5)
-      .stroke({ width: 1, color: Colors.DECORATION_INNER_GLOW, alpha: 0.6 });
+    // Add mystical inner glow
+    this.playerInfoBg.roundRect(2, 2, infoWidth - 4, height - 4, 6)
+      .stroke({ width: 1, color: Colors.BATTLE_ENERGY_GLOW, alpha: 0.7 });
     
-    // Add inner background
+    // Add inner background with team color accent
+    const infoBgColor = this.playerNo === 1 ? '#4a4a4a' : '#3a3a3a';
     this.playerInfoBg.roundRect(3, 3, infoWidth - 6, height - 6, 5)
       .fill(infoBgColor)
       .stroke({ width: 1, color: infoBgBorder, alpha: 0.8 });

@@ -74,14 +74,24 @@ export const Colors = {
   DECORATION_FRAME: '#d4af37',       // Gold frame accents
   DECORATION_INNER_GLOW: '#ffcc66',  // Inner glow effects
   
-  // Battle zone specific colors
-  BATTLEFIELD_PRIMARY: '#5d2b0d',    // Darker battlefield background
-  BATTLEFIELD_SECONDARY: '#4a1f0d',  // Even darker zones
-  BATTLEFIELD_ACCENT: '#ff6a00',     // Accent highlights
+  // Battle zone specific colors - Enhanced for epic battle feel
+  BATTLEFIELD_PRIMARY: '#2d1810',    // Deep mystical brown background
+  BATTLEFIELD_SECONDARY: '#1e0f08',  // Darker mystical zones
+  BATTLEFIELD_ACCENT: '#ff8c00',     // Vibrant orange accents
+  BATTLEFIELD_BORDER: '#d4af37',     // Golden battle borders
+  BATTLEFIELD_INNER_GLOW: '#ffcc66', // Inner mystical glow
+
+  // Enhanced battle effects
+  BATTLE_MAGIC_AURA: '#ff6600',      // Magical battle aura
+  BATTLE_ENERGY_GLOW: '#ffaa44',     // Energy glow effects
+  BATTLE_FRAME_GOLD: '#ffd700',      // Gold frame highlights
+  BATTLE_SHADOW_DEEP: '#0d0603',     // Deep shadows for depth
 
   // Shadow and effects
   SHADOW_COLOR: '#000000',
   GLOW_COLOR: '#ffaa00',             // Golden glow effects
+  MYSTICAL_GLOW: '#ff9500',          // Mystical orange glow
+  EPIC_BORDER_GLOW: '#ffcc00',       // Epic border glow effect
 } as const;
 
 // Type-safe color access

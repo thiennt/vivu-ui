@@ -5,6 +5,7 @@ import { BaseScene } from "@/utils/BaseScene";
 import { app } from "@/app";
 import { gsap } from "gsap";
 import { CardDetailPopup, cardToBattleCard } from "@/popups/CardDetailPopup";
+import { VisualEffects } from "@/utils/visualEffects";
 
 
 export class HandZone extends Container {
@@ -36,35 +37,33 @@ export class HandZone extends Container {
   resize(width: number, height: number): void {
     this.handBg.clear();
     
-    // Create enhanced battle zone background directly
+    // Use the enhanced battle zone background
+    const battleBg = VisualEffects.createBattleZoneBackground(width, height);
+    
+    // Copy the battle background to our graphics object
+    this.handBg.rect(0, 0, width, height).fill({ color: Colors.BATTLEFIELD_PRIMARY, alpha: 0 }); // Transparent base
+    
+    // Manually recreate the battle zone styling for the hand zone
+    // Deep shadow for depth
+    this.handBg.roundRect(3, 3, width, height, 8)
+      .fill({ color: Colors.BATTLE_SHADOW_DEEP, alpha: 0.4 });
+    
+    // Main background
     this.handBg.roundRect(0, 0, width, height, 8)
       .fill(Colors.BATTLEFIELD_PRIMARY);
     
-    // Add decorative corner accents
-    const accentSize = 16;
+    // Inner mystical glow
+    this.handBg.roundRect(2, 2, width - 4, height - 4, 6)
+      .stroke({ width: 1, color: Colors.BATTLEFIELD_INNER_GLOW, alpha: 0.5 });
     
-    // Top-left corner accent
-    this.handBg.moveTo(0, accentSize)
-      .lineTo(0, 8)
-      .arc(8, 8, 8, Math.PI, 3 * Math.PI / 2)
-      .lineTo(accentSize, 0)
-      .fill({ color: Colors.BATTLEFIELD_ACCENT, alpha: 0.3 });
-    
-    // Top-right corner accent
-    this.handBg.moveTo(width - accentSize, 0)
-      .lineTo(width - 8, 0)
-      .arc(width - 8, 8, 8, 3 * Math.PI / 2, 0)
-      .lineTo(width, accentSize)
-      .fill({ color: Colors.BATTLEFIELD_ACCENT, alpha: 0.3 });
-    
-    // Border with glow effect
+    // Main border with epic glow
     this.handBg.roundRect(0, 0, width, height, 8)
-      .stroke({ width: 2, color: Colors.UI_BORDER_GLOW, alpha: 0.8 });
+      .stroke({ width: 2, color: Colors.BATTLEFIELD_BORDER, alpha: 0.8 });
     
-    // Add additional card zone styling
+    // Hand zone specific indicator (subtle inner frame)
     const padding = 4;
-    this.handBg.roundRect(padding, padding, width - padding * 2, height - padding * 2, 6)
-      .stroke({ width: 1, color: Colors.UI_BORDER_GLOW, alpha: 0.6 });
+    this.handBg.roundRect(padding, padding, width - padding * 2, height - padding * 2, 4)
+      .stroke({ width: 1, color: Colors.BATTLE_ENERGY_GLOW, alpha: 0.4 });
     
     // Redraw hand cards if we have player state
     if (this.playerState) {

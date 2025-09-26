@@ -32,30 +32,56 @@ export class VisualEffects {
   static createBattleZoneBackground(width: number, height: number): Graphics {
     const bg = new Graphics();
     
-    // Main background
+    // Deep shadow for depth
+    bg.roundRect(3, 3, width, height, 8)
+      .fill({ color: Colors.BATTLE_SHADOW_DEEP, alpha: 0.6 });
+    
+    // Main background with mystical gradient effect
     bg.roundRect(0, 0, width, height, 8)
       .fill(Colors.BATTLEFIELD_PRIMARY);
     
-    // Add decorative corner accents
-    const accentSize = 16;
+    // Add magical inner glow
+    bg.roundRect(2, 2, width - 4, height - 4, 6)
+      .stroke({ width: 1, color: Colors.BATTLEFIELD_INNER_GLOW, alpha: 0.4 });
     
-    // Top-left corner accent
+    // Add decorative corner accents with enhanced visuals
+    const accentSize = 20;
+    
+    // Top-left mystical corner
     bg.moveTo(0, accentSize)
       .lineTo(0, 8)
       .arc(8, 8, 8, Math.PI, 3 * Math.PI / 2)
       .lineTo(accentSize, 0)
-      .fill({ color: Colors.BATTLEFIELD_ACCENT, alpha: 0.3 });
+      .fill({ color: Colors.BATTLE_MAGIC_AURA, alpha: 0.5 });
     
-    // Top-right corner accent
+    // Top-right mystical corner  
     bg.moveTo(width - accentSize, 0)
       .lineTo(width - 8, 0)
       .arc(width - 8, 8, 8, 3 * Math.PI / 2, 0)
       .lineTo(width, accentSize)
-      .fill({ color: Colors.BATTLEFIELD_ACCENT, alpha: 0.3 });
+      .fill({ color: Colors.BATTLE_MAGIC_AURA, alpha: 0.5 });
     
-    // Border with glow effect
+    // Bottom-left mystical corner
+    bg.moveTo(0, height - accentSize)
+      .lineTo(0, height - 8)
+      .arc(8, height - 8, 8, Math.PI / 2, Math.PI)
+      .lineTo(accentSize, height)
+      .fill({ color: Colors.BATTLE_MAGIC_AURA, alpha: 0.5 });
+    
+    // Bottom-right mystical corner
+    bg.moveTo(width - accentSize, height)
+      .lineTo(width - 8, height)
+      .arc(width - 8, height - 8, 8, 0, Math.PI / 2)
+      .lineTo(width, height - accentSize)
+      .fill({ color: Colors.BATTLE_MAGIC_AURA, alpha: 0.5 });
+    
+    // Main border with epic glow effect
     bg.roundRect(0, 0, width, height, 8)
-      .stroke({ width: 2, color: Colors.UI_BORDER_GLOW, alpha: 0.8 });
+      .stroke({ width: 3, color: Colors.BATTLEFIELD_BORDER, alpha: 0.9 });
+    
+    // Outer glow for mystical effect
+    bg.roundRect(-1, -1, width + 2, height + 2, 9)
+      .stroke({ width: 1, color: Colors.EPIC_BORDER_GLOW, alpha: 0.6 });
     
     return bg;
   }
@@ -124,40 +150,142 @@ export class VisualEffects {
   }
 
   /**
+   * Creates an epic battle arena frame with mystical elements
+   */
+  static createEpicBattleFrame(width: number, height: number): Graphics {
+    const frame = new Graphics();
+    
+    // Deep shadow base
+    frame.roundRect(4, 4, width, height, 12)
+      .fill({ color: Colors.BATTLE_SHADOW_DEEP, alpha: 0.7 });
+    
+    // Main frame background with gradient effect
+    frame.roundRect(0, 0, width, height, 12)
+      .fill(Colors.BATTLEFIELD_PRIMARY);
+    
+    // Inner mystical glow
+    frame.roundRect(3, 3, width - 6, height - 6, 9)
+      .stroke({ width: 2, color: Colors.MYSTICAL_GLOW, alpha: 0.6 });
+    
+    // Golden battle frame
+    frame.roundRect(0, 0, width, height, 12)
+      .stroke({ width: 4, color: Colors.BATTLE_FRAME_GOLD });
+    
+    // Enhanced corner decorations with battle symbols
+    const cornerSize = 24;
+    const cornerThickness = 4;
+    
+    // Top corners with enhanced mystical design
+    frame.moveTo(cornerSize, 2)
+      .lineTo(2, 2)
+      .lineTo(2, cornerSize)
+      .stroke({ width: cornerThickness, color: Colors.EPIC_BORDER_GLOW });
+    
+    frame.moveTo(width - cornerSize, 2)
+      .lineTo(width - 2, 2)
+      .lineTo(width - 2, cornerSize)
+      .stroke({ width: cornerThickness, color: Colors.EPIC_BORDER_GLOW });
+    
+    // Bottom corners with enhanced mystical design
+    frame.moveTo(2, height - cornerSize)
+      .lineTo(2, height - 2)
+      .lineTo(cornerSize, height - 2)
+      .stroke({ width: cornerThickness, color: Colors.EPIC_BORDER_GLOW });
+    
+    frame.moveTo(width - 2, height - cornerSize)
+      .lineTo(width - 2, height - 2)
+      .lineTo(width - cornerSize, height - 2)
+      .stroke({ width: cornerThickness, color: Colors.EPIC_BORDER_GLOW });
+    
+    // Add mystical energy lines in corners
+    const energyOffset = 8;
+    
+    // Top-left energy lines
+    frame.moveTo(energyOffset, energyOffset + 8)
+      .lineTo(energyOffset + 8, energyOffset)
+      .stroke({ width: 2, color: Colors.BATTLE_ENERGY_GLOW, alpha: 0.8 });
+    
+    // Top-right energy lines
+    frame.moveTo(width - energyOffset - 8, energyOffset)
+      .lineTo(width - energyOffset, energyOffset + 8)
+      .stroke({ width: 2, color: Colors.BATTLE_ENERGY_GLOW, alpha: 0.8 });
+    
+    // Bottom-left energy lines
+    frame.moveTo(energyOffset, height - energyOffset - 8)
+      .lineTo(energyOffset + 8, height - energyOffset)
+      .stroke({ width: 2, color: Colors.BATTLE_ENERGY_GLOW, alpha: 0.8 });
+    
+    // Bottom-right energy lines
+    frame.moveTo(width - energyOffset - 8, height - energyOffset)
+      .lineTo(width - energyOffset, height - energyOffset - 8)
+      .stroke({ width: 2, color: Colors.BATTLE_ENERGY_GLOW, alpha: 0.8 });
+    
+    return frame;
+  }
+
+  /**
    * Creates a mystical battle log frame
    */
   static createMysticalFrame(width: number, height: number): Graphics {
     const frame = new Graphics();
     
-    // Main background 
+    // Shadow for depth
+    frame.roundRect(2, 2, width, height, 12)
+      .fill({ color: Colors.BATTLE_SHADOW_DEEP, alpha: 0.5 });
+    
+    // Main background with battle theme
     frame.roundRect(0, 0, width, height, 12)
-      .fill(Colors.BATTLEFIELD_PRIMARY)
-      .stroke({ width: 3, color: Colors.DECORATION_MAGIC });
+      .fill(Colors.BATTLEFIELD_PRIMARY);
     
-    // Add corner decorations
-    const cornerSize = 16;
+    // Inner mystical glow
+    frame.roundRect(2, 2, width - 4, height - 4, 10)
+      .stroke({ width: 1, color: Colors.MYSTICAL_GLOW, alpha: 0.7 });
     
-    // Top corners
+    // Main mystical border
+    frame.roundRect(0, 0, width, height, 12)
+      .stroke({ width: 3, color: Colors.BATTLE_MAGIC_AURA });
+    
+    // Add enhanced corner decorations
+    const cornerSize = 18;
+    
+    // Top corners with mystical energy
     frame.moveTo(cornerSize, 2)
       .lineTo(2, 2)
       .lineTo(2, cornerSize)
-      .stroke({ width: 2, color: Colors.DECORATION_FRAME });
+      .stroke({ width: 3, color: Colors.BATTLE_FRAME_GOLD });
     
     frame.moveTo(width - cornerSize, 2)
       .lineTo(width - 2, 2)
       .lineTo(width - 2, cornerSize)
-      .stroke({ width: 2, color: Colors.DECORATION_FRAME });
+      .stroke({ width: 3, color: Colors.BATTLE_FRAME_GOLD });
     
-    // Bottom corners
+    // Bottom corners with mystical energy
     frame.moveTo(2, height - cornerSize)
       .lineTo(2, height - 2)
       .lineTo(cornerSize, height - 2)
-      .stroke({ width: 2, color: Colors.DECORATION_FRAME });
+      .stroke({ width: 3, color: Colors.BATTLE_FRAME_GOLD });
     
     frame.moveTo(width - 2, height - cornerSize)
       .lineTo(width - 2, height - 2)
       .lineTo(width - cornerSize, height - 2)
-      .stroke({ width: 2, color: Colors.DECORATION_FRAME });
+      .stroke({ width: 3, color: Colors.BATTLE_FRAME_GOLD });
+    
+    // Add subtle energy orbs in corners
+    const orbSize = 4;
+    const orbOffset = 6;
+    
+    // Corner energy orbs
+    frame.circle(orbOffset, orbOffset, orbSize)
+      .fill({ color: Colors.BATTLE_ENERGY_GLOW, alpha: 0.8 });
+    
+    frame.circle(width - orbOffset, orbOffset, orbSize)
+      .fill({ color: Colors.BATTLE_ENERGY_GLOW, alpha: 0.8 });
+    
+    frame.circle(orbOffset, height - orbOffset, orbSize)
+      .fill({ color: Colors.BATTLE_ENERGY_GLOW, alpha: 0.8 });
+    
+    frame.circle(width - orbOffset, height - orbOffset, orbSize)
+      .fill({ color: Colors.BATTLE_ENERGY_GLOW, alpha: 0.8 });
     
     return frame;
   }
