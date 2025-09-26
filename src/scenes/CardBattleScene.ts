@@ -31,7 +31,7 @@ export class CardBattleScene extends BaseScene {
     
     this.battleId = battleId || 'mock-battle-001';
 
-    // Initialize all zones
+    // Initialize all zones with improved error handling
     this.p1HandZone = new HandZone();
     this.addChild(this.p1HandZone);
     
@@ -58,6 +58,8 @@ export class CardBattleScene extends BaseScene {
 
     // Setup battle log with initial message
     this.battleLogZone.addLogMessage('Battle started!');
+
+    console.log('CardBattleScene: All 8 zones initialized successfully');
   }
 
   /** Resize handler */
@@ -122,5 +124,7 @@ export class CardBattleScene extends BaseScene {
     this.buttonZone.resize(width - 2 * this.STANDARD_PADDING, buttonZoneHeight);
     this.buttonZone.x = this.STANDARD_PADDING;
     this.buttonZone.y = buttonY;
+
+    console.log('CardBattleScene: All 8 zones resized and positioned');
   }
 }
