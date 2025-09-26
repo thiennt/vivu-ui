@@ -1,5 +1,5 @@
 import { Colors } from "@/utils/colors";
-import { Container, Graphics, Text } from "pixi.js";
+import { Container, Graphics } from "pixi.js";
 import { CardInDeck } from "@/types";
 
 
