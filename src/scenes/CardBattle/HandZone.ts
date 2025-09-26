@@ -73,7 +73,6 @@ export class HandZone extends Container {
     const cardWidth = 60;
     const cardHeight = 80;
     const maxRotation = 25; // degrees
-    const cardSpacing = Math.min(50, Math.max(30, (width - 100) / Math.max(1, handCards.length - 1)));
     
     // Center point for the fan
     const centerX = width / 2;
@@ -212,7 +211,8 @@ export class HandZone extends Container {
     // Hide card tooltip
     this.hideCardTooltip();
     
-    // Use the externally set getDropTarget method if available - cast to any to bypass private method restriction
+    // Use the externally set getDropTarget method if available
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const getDropTargetMethod = (this as any).getDropTarget;
     const dropTarget = getDropTargetMethod ? getDropTargetMethod(event.global.x, event.global.y) : null;
     
@@ -231,6 +231,7 @@ export class HandZone extends Container {
     this.dragTarget = null;
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private getDropTarget(_globalX: number, _globalY: number): string | null {
     // This method needs to check global zones - will be called from CardBattleScene
     // For now, return null - the actual drop detection will be handled by CardBattleScene

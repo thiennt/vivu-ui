@@ -180,7 +180,7 @@ export class CardBattleScene extends BaseScene {
       this.handleCardDrop(card, dropTarget);
     });
     
-    // Override the getDropTarget method for HandZone - cast to any to bypass private method restriction
+    // Override the getDropTarget method for HandZone - eslint-disable-next-line @typescript-eslint/no-explicit-any
     (this.p1HandZone as any).getDropTarget = (globalX: number, globalY: number): string | null => {
       return this.getDropTarget(globalX, globalY);
     };
@@ -283,7 +283,7 @@ export class CardBattleScene extends BaseScene {
     // Card is already destroyed when this is called
   }
 
-  private animateCardPlay(_characterId: string): void {
+  private async animateCardPlay(_characterId: string): Promise<void> {
     // Animation will be handled by the drag/drop system
     // Card is already destroyed when this is called
   }

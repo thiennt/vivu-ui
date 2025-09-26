@@ -165,8 +165,8 @@ export class PlayerCharacterZone extends Container {
     
     // Calculate optimal card dimensions to fit within the zone
     const spacing = 10;
-    let cardWidth = Math.floor(width / characters.length);
-    let cardHeight = cardWidth * 1.3; // Assume 1:1.3 aspect ratio
+    const cardWidth = Math.floor(width / characters.length);
+    const cardHeight = cardWidth * 1.3; // Assume 1:1.3 aspect ratio
     
     const startX = spacing;
     
@@ -184,6 +184,7 @@ export class PlayerCharacterZone extends Container {
     });
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private createCharacterCard(character: any, x: number, y: number, width: number, height: number): Container {
     const scene = this.parent as BaseScene;
     const card = scene.createCharacterCard(character, x, y, width, height);
