@@ -279,7 +279,6 @@ export class HomeScene extends BaseScene {
       { text: '👥 Characters', screen: CharactersScene },
       { text: '⚔️ Battle Arena', screen: BattleScene },
       { text: '🃏 Card Battle', screen: CardBattleScene },
-      { text: '🃏 New Card Battle', screen: RefactoredCardBattleScene },
       { text: '🧑‍🤝‍🧑 Lineup', screen: LineupScene },
     ];
     
