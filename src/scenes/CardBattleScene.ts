@@ -121,38 +121,17 @@ export class CardBattleScene extends BaseScene {
     const maxWidth = this.gameWidth - (2 * this.STANDARD_PADDING);
     const adjustedWidth = Math.min(width, maxWidth);
     
-    // Epic battle button background with multiple layers
+    // Simplified battle button background
     const bg = new Graphics();
     
-    // Deep shadow for depth
-    bg.roundRect(3, 3, adjustedWidth, adjustedHeight, 12)
-      .fill({ color: Colors.BATTLE_SHADOW_DEEP, alpha: 0.8 });
+    // Simple button background with subtle depth
+    bg.roundRect(0, 0, adjustedWidth, adjustedHeight, 8)
+      .fill(Colors.BUTTON_PRIMARY)
+      .stroke({ width: 2, color: Colors.BUTTON_BORDER });
     
-    // Main button background
-    bg.roundRect(0, 0, adjustedWidth, adjustedHeight, 12)
-      .fill(Colors.BUTTON_PRIMARY);
-    
-    // Mystical inner glow
-    bg.roundRect(2, 2, adjustedWidth - 4, adjustedHeight - 4, 10)
-      .stroke({ width: 2, color: Colors.BATTLE_ENERGY_GLOW, alpha: 0.8 });
-    
-    // Golden battle border
-    bg.roundRect(0, 0, adjustedWidth, adjustedHeight, 12)
-      .stroke({ width: 3, color: Colors.BATTLE_FRAME_GOLD });
-    
-    // Corner accents
-    const cornerSize = 8;
-    const corners = [
-      { x: 4, y: 4 },
-      { x: adjustedWidth - cornerSize - 4, y: 4 },
-      { x: 4, y: adjustedHeight - cornerSize - 4 },
-      { x: adjustedWidth - cornerSize - 4, y: adjustedHeight - cornerSize - 4 }
-    ];
-    
-    corners.forEach(corner => {
-      bg.roundRect(corner.x, corner.y, cornerSize, cornerSize, 2)
-        .fill({ color: Colors.MYSTICAL_GLOW, alpha: 0.9 });
-    });
+    // Subtle inner highlight for depth
+    bg.roundRect(2, 2, adjustedWidth - 4, adjustedHeight - 4, 6)
+      .stroke({ width: 1, color: Colors.BUTTON_HOVER, alpha: 0.3 });
     
     // Calculate responsive font size
     const responsiveFontSize = this.calculateResponsiveFontSize(
@@ -163,21 +142,15 @@ export class CardBattleScene extends BaseScene {
       Math.min(22, adjustedHeight * 0.6)
     );
 
-    // Enhanced button text
+    // Simplified button text
     const buttonText = new Text({
       text: text,
       style: {
         fontFamily: 'Kalam',
         fontSize: responsiveFontSize,
         fontWeight: 'bold',
-        fill: Colors.BATTLE_FRAME_GOLD,
-        align: 'center',
-        dropShadow: {
-          color: Colors.SHADOW_COLOR,
-          blur: 3,
-          angle: Math.PI / 4,
-          distance: 2
-        }
+        fill: Colors.TEXT_BUTTON,
+        align: 'center'
       }
     });
     buttonText.anchor.set(0.5);
@@ -190,23 +163,21 @@ export class CardBattleScene extends BaseScene {
     button.interactive = true;
     button.cursor = 'pointer';
     
-    // Enhanced hover effects
+    // Simple hover effects
     button.on('pointerover', () => {
-      bg.tint = 0xffcc66; // Golden glow on hover
+      bg.tint = Colors.BUTTON_HOVER;
     });
     
     button.on('pointerout', () => {
       bg.tint = 0xffffff;
     });
     
-    // Enhanced click effect
+    // Simple click effect
     button.on('pointerdown', () => {
-      bg.tint = 0xff9900;
-      button.scale.set(0.95);
+      button.scale.set(0.98);
     });
     
     button.on('pointerup', () => {
-      bg.tint = 0xffffff;
       button.scale.set(1);
       if (onClick) onClick();
     });
@@ -521,53 +492,17 @@ export class CardBattleScene extends BaseScene {
     this.gameWidth = width;
     this.gameHeight = height;
     
-    // Create mystical battle arena background
+    // Create simplified battle arena background
     this.mysticalBackground.removeChildren();
     const arenaBackground = new Graphics();
     
-    // Create deep mystical background with multiple layers
-    // Deepest shadow layer
-    arenaBackground.roundRect(0, 0, width, height, 0)
-      .fill(Colors.BATTLE_SHADOW_DEEP);
-    
-    // Main mystical arena background
+    // Simple background with subtle gradient effect
     arenaBackground.roundRect(0, 0, width, height, 0)
       .fill(Colors.BATTLEFIELD_PRIMARY);
     
-    // Add mystical energy patterns
-    const centerX = width / 2;
-    const centerY = height / 2;
-    
-    // Central mystical glow
-    arenaBackground.circle(centerX, centerY, Math.min(width, height) * 0.4)
-      .fill({ color: Colors.BATTLE_MAGIC_AURA, alpha: 0.1 });
-    
-    // Outer mystical ring
-    arenaBackground.circle(centerX, centerY, Math.min(width, height) * 0.3)
-      .stroke({ width: 2, color: Colors.MYSTICAL_GLOW, alpha: 0.3 });
-    
-    // Inner mystical ring  
-    arenaBackground.circle(centerX, centerY, Math.min(width, height) * 0.2)
-      .stroke({ width: 1, color: Colors.BATTLE_ENERGY_GLOW, alpha: 0.4 });
-    
-    // Add corner mystical accents
-    const cornerSize = 40;
-    const corners = [
-      { x: 0, y: 0 },
-      { x: width - cornerSize, y: 0 },
-      { x: 0, y: height - cornerSize },
-      { x: width - cornerSize, y: height - cornerSize }
-    ];
-    
-    corners.forEach((corner, index) => {
-      // Corner mystical glow
-      arenaBackground.roundRect(corner.x, corner.y, cornerSize, cornerSize, 8)
-        .fill({ color: Colors.BATTLE_MAGIC_AURA, alpha: 0.2 });
-      
-      // Corner frame
-      arenaBackground.roundRect(corner.x + 2, corner.y + 2, cornerSize - 4, cornerSize - 4, 6)
-        .stroke({ width: 1, color: Colors.BATTLE_FRAME_GOLD, alpha: 0.5 });
-    });
+    // Add a simple subtle border for definition
+    arenaBackground.roundRect(0, 0, width, height, 0)
+      .stroke({ width: 1, color: Colors.BATTLEFIELD_BORDER, alpha: 0.3 });
     
     this.mysticalBackground.addChild(arenaBackground);
     

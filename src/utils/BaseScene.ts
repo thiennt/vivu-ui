@@ -311,11 +311,25 @@ export abstract class BaseScene extends Container {
 
     const cardContainer = new Container();
 
-    // Card background
-    const bg = new Graphics()
-      .roundRect(0, 0, width, height, 8)
-      .fill({ color: Colors.BACKGROUND_SECONDARY })
+    // Enhanced card background with card-like appearance
+    const bg = new Graphics();
+    
+    // Card shadow for depth
+    bg.roundRect(3, 3, width, height, 8)
+      .fill({ color: Colors.SHADOW_COLOR, alpha: 0.3 });
+    
+    // Main card background with subtle gradient
+    bg.roundRect(0, 0, width, height, 8)
+      .fill(Colors.CARD_BACKGROUND)
       .stroke({ width: 2, color: Colors.CARD_BORDER });
+    
+    // Inner card frame for that trading card look
+    bg.roundRect(4, 4, width - 8, height - 8, 4)
+      .stroke({ width: 1, color: Colors.TEXT_SECONDARY, alpha: 0.5 });
+    
+    // Top border accent for premium card feel
+    bg.roundRect(6, 6, width - 12, 12, 2)
+      .fill({ color: Colors.RARITY_COMMON, alpha: 0.3 });
 
     // Group icon at top right
     let groupIcon = '';
@@ -364,26 +378,32 @@ export abstract class BaseScene extends Container {
     cardName.x = width / 2;
     cardName.y = groupIconText.y + groupIconText.height + 10;
 
-    // Energy cost (top left)
-    const energyCircleRadius = Math.max(8, Math.round(14 * fontScale));
-    const energyCost = new Graphics()
-      .circle(18, 18, energyCircleRadius)
-      .fill({ color: Colors.BUTTON_PRIMARY })
-      .stroke({ width: 1, color: Colors.BUTTON_BORDER });
+    // Enhanced energy cost (top left) with card-like styling  
+    const energyCircleRadius = Math.max(10, Math.round(16 * fontScale));
+    const energyCostBg = new Graphics()
+      .circle(20, 20, energyCircleRadius)
+      .fill({ color: Colors.ENERGY_ACTIVE })
+      .stroke({ width: 2, color: Colors.BUTTON_BORDER });
+    
+    // Inner energy circle for depth
+    const energyCostInner = new Graphics()
+      .circle(20, 20, energyCircleRadius - 3)
+      .stroke({ width: 1, color: Colors.TEXT_WHITE, alpha: 0.5 });
+    
     const energyText = new Text({
       text: card.energy_cost.toString(),
       style: {
         fontFamily: 'Kalam',
-        fontSize: Math.max(8, Math.round(14 * fontScale)),
+        fontSize: Math.max(10, Math.round(16 * fontScale)),
         fontWeight: 'bold',
         fill: Colors.TEXT_WHITE
       }
     });
     energyText.anchor.set(0.5);
-    energyText.x = 18;
-    energyText.y = 18;
+    energyText.x = 20;
+    energyText.y = 20;
 
-    cardContainer.addChild(bg, groupIconText, cardName, energyCost, energyText);
+    cardContainer.addChild(bg, groupIconText, cardName, energyCostBg, energyCostInner, energyText);
 
     // Card description (optional)
     if (showDescription && card.description) {
@@ -434,56 +454,142 @@ export abstract class BaseScene extends Container {
   }
 
   public createCharacterCard(character: any, x: number, y: number, width: number, height: number): Container {
-    const card = this.createCard(x, y, width, height, character.rarity || 'common');
+    const cardContainer = new Container();
 
-    this.createAvatar(character, width, height, width/2, height * 0.2).then(avatarIcon => {
-      card.addChild(avatarIcon);
+    // Enhanced character card background with trading card appearance
+    const bg = new Graphics();
+    
+    // Card shadow for depth
+    bg.roundRect(3, 3, width, height, 8)
+      .fill({ color: Colors.SHADOW_COLOR, alpha: 0.4 });
+    
+    // Get rarity color for background
+    const rarityColors: { [key: string]: string } = {
+      common: Colors.RARITY_COMMON,
+      uncommon: Colors.RARITY_UNCOMMON,
+      rare: Colors.RARITY_RARE,
+      epic: Colors.RARITY_EPIC,
+      legendary: Colors.RARITY_LEGENDARY
+    };
+    const rarityColor = rarityColors[character.rarity] || rarityColors.common;
+    
+    // Main card background
+    bg.roundRect(0, 0, width, height, 8)
+      .fill(rarityColor)
+      .stroke({ width: 2, color: Colors.CARD_BORDER });
+    
+    // Inner card frame
+    bg.roundRect(3, 3, width - 6, height - 6, 5)
+      .stroke({ width: 1, color: Colors.TEXT_WHITE, alpha: 0.4 });
+    
+    // Character name area at top
+    bg.roundRect(6, 6, width - 12, height * 0.15, 3)
+      .fill({ color: Colors.TEXT_WHITE, alpha: 0.2 });
+
+    // Character name
+    const nameText = new Text({
+      text: character.name || character.ticker,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: Math.max(8, width * 0.12),
+        fontWeight: 'bold',
+        fill: Colors.TEXT_WHITE,
+        align: 'center',
+        wordWrap: true,
+        wordWrapWidth: width - 16
+      }
     });
+    nameText.anchor.set(0.5, 0.5);
+    nameText.x = width / 2;
+    nameText.y = height * 0.08;
 
-    // HP Bar (replaces hpText)
-    const hpBarWidth = width * 0.9;
-    const hpBarHeight = 10;
+    // Level indicator
+    const levelBg = new Graphics()
+      .circle(width - 15, 15, 10)
+      .fill(Colors.BUTTON_PRIMARY)
+      .stroke({ width: 1, color: Colors.BUTTON_BORDER });
+    
+    const levelText = new Text({
+      text: character.level?.toString() || '1',
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: Math.max(6, width * 0.08),
+        fontWeight: 'bold',
+        fill: Colors.TEXT_WHITE
+      }
+    });
+    levelText.anchor.set(0.5);
+    levelText.x = width - 15;
+    levelText.y = 15;
+
+    // HP Bar in the middle section
+    const hpBarWidth = width * 0.8;
+    const hpBarHeight = 8;
     const hpBarX = (width - hpBarWidth) / 2;
-    const hpBarY = y + height * 0.35;
+    const hpBarY = height * 0.45;
 
-    // Background bar
+    // HP Bar background
     const hpBarBg = new Graphics()
       .roundRect(hpBarX, hpBarY, hpBarWidth, hpBarHeight, 4)
       .fill(Colors.HP_BAR_BG);
 
-    // Foreground (current HP)
+    // HP Bar foreground
     const hpPercent = Math.max(0, Math.min(1, character.hp / (character.max_hp || character.hp || 1)));
     const hpBarFg = new Graphics()
       .roundRect(hpBarX, hpBarY, hpBarWidth * hpPercent, hpBarHeight, 4)
       .fill(Colors.HP_BAR_FILL);
-    
-    card.addChild(hpBarBg, hpBarFg);
 
-    const atkText = new Text({
-      text: `⚔️ ${character.atk}`,
+    // HP Text
+    const hpText = new Text({
+      text: `${character.hp}/${character.max_hp || character.hp}`,
       style: {
         fontFamily: 'Kalam',
-        fontSize: 14,
-        fill: Colors.TEXT_SECONDARY
+        fontSize: Math.max(6, width * 0.06),
+        fill: Colors.TEXT_WHITE,
+        align: 'center'
       }
     });
-    atkText.x = width * 0.2;
-    atkText.y = y + height * 0.5;
+    hpText.anchor.set(0.5);
+    hpText.x = width / 2;
+    hpText.y = hpBarY + hpBarHeight + 8;
+
+    // Stats area at bottom
+    const statsY = height * 0.7;
+    const atkText = new Text({
+      text: `⚔️${character.atk}`,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: Math.max(6, width * 0.08),
+        fontWeight: 'bold',
+        fill: Colors.TEXT_WHITE
+      }
+    });
+    atkText.x = width * 0.15;
+    atkText.y = statsY;
 
     const defText = new Text({
-      text: `🛡️ ${character.def}`,
+      text: `🛡️${character.def}`,
       style: {
         fontFamily: 'Kalam',
-        fontSize: 14,
-        fill: Colors.TEXT_SECONDARY
+        fontSize: Math.max(6, width * 0.08),
+        fontWeight: 'bold',
+        fill: Colors.TEXT_WHITE
       }
     });
-    defText.x = width * 0.2;
-    defText.y = y + height * 0.7;
+    defText.anchor.set(1, 0);
+    defText.x = width * 0.85;
+    defText.y = statsY;
 
-    card.addChild(atkText, defText);
+    cardContainer.addChild(bg, levelBg, nameText, levelText, hpBarBg, hpBarFg, hpText, atkText, defText);
+    cardContainer.x = x;
+    cardContainer.y = y;
 
-    return card;
+    // Add avatar/logo if needed
+    this.createAvatar(character, width, height, width/2, height * 0.28).then(avatarIcon => {
+      cardContainer.addChild(avatarIcon);
+    });
+
+    return cardContainer;
   }
 
   public createHeroCard(

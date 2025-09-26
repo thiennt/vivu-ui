@@ -27,67 +27,21 @@ export class VisualEffects {
   }
 
   /**
-   * Creates a battle zone background with enhanced visuals
+   * Creates a simplified battle zone background
    */
   static createBattleZoneBackground(width: number, height: number): Graphics {
     const bg = new Graphics();
     
-    // Deep shadow for depth
-    bg.roundRect(3, 3, width, height, 8)
-      .fill({ color: Colors.BATTLE_SHADOW_DEEP, alpha: 0.6 });
-    
-    // Main background with mystical gradient effect
+    // Simple background
     bg.roundRect(0, 0, width, height, 8)
-      .fill(Colors.BATTLEFIELD_PRIMARY);
-    
-    // Add magical inner glow
-    bg.roundRect(2, 2, width - 4, height - 4, 6)
-      .stroke({ width: 1, color: Colors.BATTLEFIELD_INNER_GLOW, alpha: 0.4 });
-    
-    // Add decorative corner accents with enhanced visuals
-    const accentSize = 20;
-    
-    // Top-left mystical corner
-    bg.moveTo(0, accentSize)
-      .lineTo(0, 8)
-      .arc(8, 8, 8, Math.PI, 3 * Math.PI / 2)
-      .lineTo(accentSize, 0)
-      .fill({ color: Colors.BATTLE_MAGIC_AURA, alpha: 0.5 });
-    
-    // Top-right mystical corner  
-    bg.moveTo(width - accentSize, 0)
-      .lineTo(width - 8, 0)
-      .arc(width - 8, 8, 8, 3 * Math.PI / 2, 0)
-      .lineTo(width, accentSize)
-      .fill({ color: Colors.BATTLE_MAGIC_AURA, alpha: 0.5 });
-    
-    // Bottom-left mystical corner
-    bg.moveTo(0, height - accentSize)
-      .lineTo(0, height - 8)
-      .arc(8, height - 8, 8, Math.PI / 2, Math.PI)
-      .lineTo(accentSize, height)
-      .fill({ color: Colors.BATTLE_MAGIC_AURA, alpha: 0.5 });
-    
-    // Bottom-right mystical corner
-    bg.moveTo(width - accentSize, height)
-      .lineTo(width - 8, height)
-      .arc(width - 8, height - 8, 8, 0, Math.PI / 2)
-      .lineTo(width, height - accentSize)
-      .fill({ color: Colors.BATTLE_MAGIC_AURA, alpha: 0.5 });
-    
-    // Main border with epic glow effect
-    bg.roundRect(0, 0, width, height, 8)
-      .stroke({ width: 3, color: Colors.BATTLEFIELD_BORDER, alpha: 0.9 });
-    
-    // Outer glow for mystical effect
-    bg.roundRect(-1, -1, width + 2, height + 2, 9)
-      .stroke({ width: 1, color: Colors.EPIC_BORDER_GLOW, alpha: 0.6 });
+      .fill(Colors.BATTLEFIELD_PRIMARY)
+      .stroke({ width: 1, color: Colors.BATTLEFIELD_BORDER, alpha: 0.5 });
     
     return bg;
   }
 
   /**
-   * Creates an enhanced card background
+   * Creates a simplified card background
    */
   static createEnhancedCardBackground(
     width: number, 
@@ -106,20 +60,18 @@ export class VisualEffects {
     };
     const rarityColor = rarityColors[rarity] || rarityColors.common;
     
-    // Drop shadow
+    // Subtle drop shadow
     card.roundRect(2, 2, width, height, 8)
-      .fill({ color: Colors.SHADOW_COLOR, alpha: 0.4 });
+      .fill({ color: Colors.SHADOW_COLOR, alpha: 0.2 });
     
     // Main card background
     card.roundRect(0, 0, width, height, 8)
       .fill(rarityColor)
       .stroke({ width: 2, color: Colors.CARD_BORDER });
     
-    // Inner glow based on rarity
-    if (rarity === 'legendary' || rarity === 'epic') {
-      card.roundRect(2, 2, width - 4, height - 4, 6)
-        .stroke({ width: 1, color: Colors.GLOW_COLOR, alpha: 0.7 });
-    }
+    // Simple inner border for premium feel
+    card.roundRect(3, 3, width - 6, height - 6, 5)
+      .stroke({ width: 1, color: Colors.TEXT_WHITE, alpha: 0.3 });
     
     return card;
   }
