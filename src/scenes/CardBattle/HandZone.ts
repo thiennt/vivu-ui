@@ -4,7 +4,7 @@ import { CardBattlePlayerState, Card } from "@/types";
 import { BaseScene } from "@/utils/BaseScene";
 import { app } from "@/app";
 import { gsap } from "gsap";
-import { VisualEffects } from "@/utils/visualEffects";
+import { CardDetailPopup, cardToBattleCard } from "@/popups/CardDetailPopup";
 
 
 export class HandZone extends Container {
@@ -16,6 +16,9 @@ export class HandZone extends Container {
   private dragTarget: Container | null = null;
   private dragOffset = { x: 0, y: 0 };
   private onCardDropCallback?: (card: Card, dropTarget: string) => void;
+
+  // Tooltip state
+  private cardTooltip: CardDetailPopup | null = null;
 
   constructor() {
     super();
@@ -82,9 +85,10 @@ export class HandZone extends Container {
   private updateHandDisplay(width: number, height: number): void {
     if (!this.playerState) return;
     
-    // Clear existing hand cards
+    // Clear existing hand cards and tooltip
     this.handCards.forEach(card => card.destroy());
     this.handCards = [];
+    this.hideCardTooltip(); // Clean up tooltip when updating display
     
     const handCards = this.playerState.deck.hand_cards || [];
     if (handCards.length === 0) return;
@@ -156,6 +160,9 @@ export class HandZone extends Container {
     cardContainer.alpha = 0.8;
     cardContainer.cursor = 'grabbing';
     
+    // Show card tooltip at top of screen
+    this.showCardTooltip(card);
+    
     // Calculate and store drag offset
     const globalCardPos = cardContainer.parent?.toGlobal({ x: cardContainer.x, y: cardContainer.y });
     this.dragOffset = {
@@ -197,6 +204,9 @@ export class HandZone extends Container {
     if (!this.dragTarget) return;
     
     const card = (this.dragTarget as Container & { card: Card }).card;
+    
+    // Hide card tooltip
+    this.hideCardTooltip();
     
     // Use the externally set getDropTarget method if available - cast to any to bypass private method restriction
     const getDropTargetMethod = (this as any).getDropTarget;
@@ -278,5 +288,33 @@ export class HandZone extends Container {
       const longestDelay = (this.handCards.length - 1) * 0.1 + 0.4;
       setTimeout(resolve, longestDelay * 1000);
     });
+  }
+
+  private showCardTooltip(card: Card): void {
+    // Remove existing tooltip if any
+    this.hideCardTooltip();
+    
+    // Convert Card to BattleCard for the popup
+    const battleCard = cardToBattleCard(card);
+    
+    // Create new tooltip in tooltip mode
+    this.cardTooltip = new CardDetailPopup({ card: battleCard, tooltipMode: true });
+    
+    // Add tooltip to app.stage so it appears above everything
+    app.stage.addChild(this.cardTooltip);
+    
+    // Position tooltip at top of screen
+    this.cardTooltip.positionAtTop(app.screen.width, app.screen.height);
+  }
+
+  private hideCardTooltip(): void {
+    if (this.cardTooltip) {
+      // Remove from app.stage
+      if (this.cardTooltip.parent) {
+        this.cardTooltip.parent.removeChild(this.cardTooltip);
+      }
+      this.cardTooltip.destroy();
+      this.cardTooltip = null;
+    }
   }
 }
