@@ -69,20 +69,48 @@ export class HandZone extends Container {
     const handCards = this.playerState.deck.hand_cards || [];
     if (handCards.length === 0) return;
     
-    // Calculate card layout
+    // Fan-shaped card layout
     const cardWidth = 60;
     const cardHeight = 80;
-    const spacing = 5;
-    const totalWidth = (cardWidth * handCards.length) + (spacing * Math.max(0, handCards.length - 1));
-    const startX = Math.max(10, (width - totalWidth) / 2);
-    const cardY = (height - cardHeight) / 2;
+    const maxRotation = 25; // degrees
+    const cardSpacing = Math.min(50, Math.max(30, (width - 100) / Math.max(1, handCards.length - 1)));
+    
+    // Center point for the fan
+    const centerX = width / 2;
+    const centerY = height * 0.6; // Position cards slightly above center
+    
+    // Calculate fan radius based on card count and available space
+    const fanRadius = Math.min(200, Math.max(100, width * 0.3));
     
     handCards.forEach((cardInDeck, index) => {
       if (cardInDeck.card) {
-        const x = startX + (index * (cardWidth + spacing));
         const handCard = this.createHandCard(cardInDeck.card, cardWidth, cardHeight);
-        handCard.x = x;
-        handCard.y = cardY;
+        
+        // Calculate angle for this card in the fan
+        const totalCards = handCards.length;
+        const angleStep = totalCards > 1 ? (2 * maxRotation) / (totalCards - 1) : 0;
+        const angle = totalCards > 1 ? -maxRotation + (index * angleStep) : 0;
+        const angleRad = angle * (Math.PI / 180);
+        
+        // Position cards in fan formation
+        if (totalCards === 1) {
+          // Single card centered
+          handCard.x = centerX;
+          handCard.y = centerY;
+          handCard.rotation = 0;
+        } else {
+          // Multiple cards in fan
+          const cardX = centerX + Math.sin(angleRad) * fanRadius * 0.3;
+          const cardY = centerY - Math.cos(angleRad) * fanRadius * 0.2;
+          
+          handCard.x = cardX;
+          handCard.y = cardY;
+          handCard.rotation = angleRad;
+        }
+        
+        // Set anchor to center for rotation
+        handCard.pivot.set(cardWidth / 2, cardHeight / 2);
+        
         this.addChild(handCard);
         this.handCards.push(handCard);
       }

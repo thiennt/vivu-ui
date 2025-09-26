@@ -2,6 +2,7 @@ import { Colors } from "@/utils/colors";
 import { Container, Graphics, Text } from "pixi.js";
 import { CardBattlePlayerState } from "@/types";
 import { BaseScene } from "@/utils/BaseScene";
+import { DiscardZone } from "./DiscardZone";
 
 export class PlayerCharacterZone extends Container {
   private zoneBg: Graphics;
@@ -13,6 +14,7 @@ export class PlayerCharacterZone extends Container {
   private energyCount: number = 0;
   private deckText: Text;
   private deckCount: number = 0;
+  private discardZone: DiscardZone;
 
   private charactersZone: Container;
   private characterCards: Container[] = [];
@@ -42,6 +44,9 @@ export class PlayerCharacterZone extends Container {
 
     this.deckText = new Text();
     this.playerInfoZone.addChild(this.deckText);
+
+    this.discardZone = new DiscardZone();
+    this.playerInfoZone.addChild(this.discardZone);
 
     this.charactersZone = new Container();
     this.addChild(this.charactersZone);
@@ -112,6 +117,13 @@ export class PlayerCharacterZone extends Container {
     this.deckText.anchor.set(0.5);
     this.deckText.x = infoWidth / 2;
     this.deckText.y = height * 0.75;
+
+    // Position DiscardZone below deck count in player info area
+    const discardZoneWidth = Math.min(60, infoWidth - 10);
+    const discardZoneHeight = Math.min(40, height * 0.15);
+    this.discardZone.resize(discardZoneWidth, discardZoneHeight);
+    this.discardZone.x = (infoWidth - discardZoneWidth) / 2;
+    this.discardZone.y = height * 0.85;
 
     // Layout characters zone to the right of player info
     const charactersWidth = width - infoWidth;
@@ -190,5 +202,10 @@ export class PlayerCharacterZone extends Container {
       }
     }
     return null;
+  }
+
+  // Getter to access the embedded DiscardZone
+  getDiscardZone(): DiscardZone {
+    return this.discardZone;
   }
 }
