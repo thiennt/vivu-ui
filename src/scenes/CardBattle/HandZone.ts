@@ -21,6 +21,12 @@ export class HandZone extends Container {
     
     this.handBg = new Graphics();
     this.addChild(this.handBg);
+
+    // Setup stage event handlers for drag and drop
+    app.stage.eventMode = 'static';
+    app.stage.on('pointerup', this.onCardDragEnd, this);
+    app.stage.on('pointerupoutside', this.onCardDragEnd, this);
+    app.stage.hitArea = app.screen;
   }
 
   resize(width: number, height: number): void {
@@ -56,8 +62,8 @@ export class HandZone extends Container {
     if (handCards.length === 0) return;
     
     // Calculate card layout
-    const cardWidth = 45;
-    const cardHeight = 60;
+    const cardWidth = 60;
+    const cardHeight = 80;
     const spacing = 5;
     const totalWidth = (cardWidth * handCards.length) + (spacing * Math.max(0, handCards.length - 1));
     const startX = Math.max(10, (width - totalWidth) / 2);
@@ -82,7 +88,7 @@ export class HandZone extends Container {
   private createHandCard(card: Card, width: number, height: number): Container {
     const scene = this.parent as BaseScene;
     const cardContainer = scene.createDeckCard(card, width, height, {
-      fontScale: 0.7,
+      fontScale: 0.8,
       showDescription: false,
       enableHover: true
     });
@@ -141,8 +147,6 @@ export class HandZone extends Container {
     
     // Attach pointer events to stage
     app.stage.on('pointermove', this.onCardDragMove, this);
-    app.stage.on('pointerup', this.onCardDragEnd, this);
-    app.stage.on('pointerupoutside', this.onCardDragEnd, this);
     
     event.stopPropagation();
   }
@@ -172,8 +176,6 @@ export class HandZone extends Container {
     
     // Remove drag events from stage
     app.stage.off('pointermove', this.onCardDragMove, this);
-    app.stage.off('pointerup', this.onCardDragEnd, this);
-    app.stage.off('pointerupoutside', this.onCardDragEnd, this);
     
     if (dropTarget && this.onCardDropCallback) {
       this.onCardDropCallback(card, dropTarget);

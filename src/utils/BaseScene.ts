@@ -1,4 +1,4 @@
-import { Assets, Container, Graphics, Sprite, Text } from 'pixi.js';
+import { Assets, Color, Container, Graphics, Sprite, Text } from 'pixi.js';
 import { app } from '@/app';
 import { navigation } from './navigation';
 import { Colors, Gradients } from './colors';
@@ -346,14 +346,14 @@ export abstract class BaseScene extends Container {
     });
     groupIconText.anchor.set(1, 0);
     groupIconText.x = width - 8;
-    groupIconText.y = 6;
+    groupIconText.y = height * 0.05;
 
     // Card name at top, below icon
     const cardName = new Text({
       text: card.name,
       style: {
         fontFamily: 'Kalam',
-        fontSize: Math.max(6, Math.round(12 * fontScale)),
+        fontSize: Math.max(6, Math.round(14 * fontScale)),
         fontWeight: 'bold',
         fill: Colors.TEXT_PRIMARY,
         wordWrap: true,
@@ -362,7 +362,7 @@ export abstract class BaseScene extends Container {
     });
     cardName.anchor.set(0.5, 0);
     cardName.x = width / 2;
-    cardName.y = groupIconText.y + groupIconText.height + 5;
+    cardName.y = groupIconText.y + groupIconText.height + 10;
 
     // Energy cost (top left)
     const energyCircleRadius = Math.max(8, Math.round(14 * fontScale));
@@ -431,6 +431,59 @@ export abstract class BaseScene extends Container {
     }
 
     return cardContainer;
+  }
+
+  public createCharacterCard(character: any, x: number, y: number, width: number, height: number): Container {
+    const card = this.createCard(x, y, width, height, character.rarity || 'common');
+
+    this.createAvatar(character, width, height, width/2, height * 0.2).then(avatarIcon => {
+      card.addChild(avatarIcon);
+    });
+
+    // HP Bar (replaces hpText)
+    const hpBarWidth = width * 0.9;
+    const hpBarHeight = 10;
+    const hpBarX = (width - hpBarWidth) / 2;
+    const hpBarY = y + height * 0.35;
+
+    // Background bar
+    const hpBarBg = new Graphics()
+      .roundRect(hpBarX, hpBarY, hpBarWidth, hpBarHeight, 4)
+      .fill(Colors.HP_BAR_BG);
+
+    // Foreground (current HP)
+    const hpPercent = Math.max(0, Math.min(1, character.hp / (character.max_hp || character.hp || 1)));
+    const hpBarFg = new Graphics()
+      .roundRect(hpBarX, hpBarY, hpBarWidth * hpPercent, hpBarHeight, 4)
+      .fill(Colors.HP_BAR_FILL);
+    
+    card.addChild(hpBarBg, hpBarFg);
+
+    const atkText = new Text({
+      text: `⚔️ ${character.atk}`,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 14,
+        fill: Colors.TEXT_SECONDARY
+      }
+    });
+    atkText.x = width * 0.2;
+    atkText.y = y + height * 0.5;
+
+    const defText = new Text({
+      text: `🛡️ ${character.def}`,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 14,
+        fill: Colors.TEXT_SECONDARY
+      }
+    });
+    defText.x = width * 0.2;
+    defText.y = y + height * 0.7;
+
+    card.addChild(atkText, defText);
+
+    return card;
   }
 
   public createHeroCard(
@@ -508,18 +561,23 @@ export abstract class BaseScene extends Container {
     return card;
   }
 
-  protected createAvatar(character: any, cardWidth: number, cardHeight: number): Promise<Sprite> {
+  protected createAvatar(character: any, cardWidth: number, cardHeight: number, x?: number, y?: number): Promise<Sprite> {
     return new Promise(async (resolve) => {
       const avatarTexture = await Assets.load(character?.avatar_url || 'https://pixijs.com/assets/bunny.png');
       const avatarIcon = new Sprite(avatarTexture);
       
       // Calculate avatar size based on card dimensions
-      const avatarSize = Math.min(cardWidth * 0.6, cardHeight * 0.4, 80);
+      const avatarSize = Math.min(cardWidth * 0.4, cardHeight * 0.4, 80);
       avatarIcon.width = avatarSize;
       avatarIcon.height = avatarSize;
       avatarIcon.anchor.set(0.5);
-      avatarIcon.x = cardWidth / 2;
-      avatarIcon.y = avatarSize - 10; // Position in lower half of card
+      if (x !== undefined && y !== undefined) {
+        avatarIcon.x = x;
+        avatarIcon.y = y;
+      } else {
+        avatarIcon.x = cardWidth / 2;
+        avatarIcon.y = avatarSize - 10; // Position in lower half of card
+      }
       resolve(avatarIcon);
     });
   }

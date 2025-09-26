@@ -3,11 +3,11 @@ import { Container, Graphics, Text } from "pixi.js";
 import { CardBattlePlayerState } from "@/types";
 import { BaseScene } from "@/utils/BaseScene";
 
-
 export class PlayerCharacterZone extends Container {
   private zoneBg: Graphics;
 
   private playerInfoZone: Container;
+  private playerInfoBg: Graphics;
   private playerInfoLabel: Text;
   private energyText: Text;
   private energyCount: number = 0;
@@ -31,6 +31,9 @@ export class PlayerCharacterZone extends Container {
     this.playerInfoZone = new Container();
     this.addChild(this.playerInfoZone);
 
+    this.playerInfoBg = new Graphics();
+    this.playerInfoZone.addChild(this.playerInfoBg);
+
     this.playerInfoLabel = new Text();
     this.playerInfoZone.addChild(this.playerInfoLabel);
 
@@ -51,39 +54,45 @@ export class PlayerCharacterZone extends Container {
       .stroke({ width: 2, color: Colors.UI_BORDER });
     
     // Layout player info zone at the left
-    const infoWidth = width * 0.3;
+    const infoWidth = width * 0.18;
     this.playerInfoZone.x = 0;
     this.playerInfoZone.y = 0;
+
+    const infoBgBorder = this.playerNo === 1 ? '#E67A1C' : '#4A90E2';
+    this.playerInfoBg.clear();
+    this.playerInfoBg.roundRect(0, 0, infoWidth, height, 10)
+      .fill('#ececece3')
+      .stroke({ width: 2, color: infoBgBorder });
 
     this.playerInfoLabel.text = this.playerNo === 1 ? 'P1' : 'P2';
     this.playerInfoLabel.style = {
       fontFamily: 'Kalam',
-      fontSize: 14,
-      fill: Colors.TEXT_PRIMARY,
+      fontSize: 18,
+      fill: infoBgBorder,
       align: 'left'
     };
-    this.playerInfoLabel.x = 10;
-    this.playerInfoLabel.y = 10;
+    this.playerInfoLabel.x = infoWidth * 0.4;
+    this.playerInfoLabel.y = height * 0.15;
 
-    this.energyText.text = `Energy: ${this.energyCount}`;
+    this.energyText.text = `⚡x ${this.energyCount}`;
     this.energyText.style = {
       fontFamily: 'Kalam',
-      fontSize: 12,
-      fill: Colors.TEXT_PRIMARY,
+      fontSize: 16,
+      fill: infoBgBorder,
       align: 'left'
     };
-    this.energyText.x = 10;
-    this.energyText.y = 30;
+    this.energyText.x = 5;
+    this.energyText.y = height * 0.45;
 
-    this.deckText.text = `Deck: ${this.deckCount}`;
+    this.deckText.text = `🃏x ${this.deckCount}`;
     this.deckText.style = {
       fontFamily: 'Kalam',
-      fontSize: 12,
-      fill: Colors.TEXT_PRIMARY,
+      fontSize: 16,
+      fill: infoBgBorder,
       align: 'left'
     };
-    this.deckText.x = 10;
-    this.deckText.y = 50;
+    this.deckText.x = 5;
+    this.deckText.y = height * 0.7;
 
     // Layout characters zone to the right of player info
     const charactersWidth = width - infoWidth;
@@ -101,8 +110,8 @@ export class PlayerCharacterZone extends Container {
     this.deckCount = playerState.deck.deck_cards?.length || 0;
     
     // Update text displays
-    this.energyText.text = `Energy: ${this.energyCount}`;
-    this.deckText.text = `Deck: ${this.deckCount}`;
+    this.energyText.text = `⚡x ${this.energyCount}`;
+    this.deckText.text = `🃏x ${this.deckCount}`;
     
     // Get current zone bounds for character update
     const bounds = this.zoneBg.getBounds();
@@ -125,33 +134,16 @@ export class PlayerCharacterZone extends Container {
     
     // Calculate optimal card dimensions to fit within the zone
     const spacing = 10;
-    const availableWidth = width - (spacing * Math.max(0, characters.length - 1)) - 10; // 10px total margins
-    let cardWidth = Math.floor(availableWidth / characters.length);
+    let cardWidth = Math.floor(width / characters.length);
+    let cardHeight = cardWidth * 1.3; // Assume 1:1.3 aspect ratio
     
-    // Ensure cards maintain reasonable aspect ratio and fit in height
-    const maxCardWidth = Math.min(100, cardWidth); // Cap at 100px like backup scene
-    const aspectRatio = 1.4; // Character cards are taller than wide
-    cardWidth = Math.min(maxCardWidth, cardWidth);
-    
-    let cardHeight = cardWidth * aspectRatio;
-    const maxCardHeight = height - 10; // Leave margin
-    
-    // If calculated height is too big, scale down proportionally
-    if (cardHeight > maxCardHeight) {
-      cardHeight = maxCardHeight;
-      cardWidth = cardHeight / aspectRatio;
-    }
-    
-    const totalWidth = (cardWidth * characters.length) + (spacing * Math.max(0, characters.length - 1));
-    const startX = Math.max(5, (width - totalWidth) / 2);
+    const startX = spacing;
     
     characters.forEach((character, index) => {
       const x = startX + (index * (cardWidth + spacing));
       const y = Math.max(5, (height - cardHeight) / 2); // Center vertically
       
-      const characterCard = this.createCharacterCard(character, cardWidth, cardHeight);
-      characterCard.x = x;
-      characterCard.y = y;
+      const characterCard = this.createCharacterCard(character, x, y, cardWidth, cardHeight);
       
       // Store character ID for drag/drop targeting
       (characterCard as Container & { characterId: string }).characterId = character.id;
@@ -161,9 +153,12 @@ export class PlayerCharacterZone extends Container {
     });
   }
 
-  private createCharacterCard(character: any, width: number, height: number): Container {
+  private createCharacterCard(character: any, x: number, y: number, width: number, height: number): Container {
     const scene = this.parent as BaseScene;
-    return scene.createHeroCard(character, width, height);
+    const card = scene.createCharacterCard(character, x, y, width, height);
+    card.width = width;
+    card.height = height;
+    return card;
   }
 
   // Method to check if coordinates are within a character card bounds
