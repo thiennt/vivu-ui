@@ -1,7 +1,7 @@
 import { Container, Graphics, Text, FederatedPointerEvent } from 'pixi.js';
 import { navigation } from '@/utils/navigation';
 import { BaseScene } from '@/utils/BaseScene';
-import { Colors, Gradients } from '@/utils/colors';
+import { Colors } from '@/utils/colors';
 import { HomeScene } from './HomeScene';
 import { gsap } from 'gsap';
 import { 
@@ -218,7 +218,7 @@ export class CardBattleScene extends BaseScene {
     
     const bg = new Graphics();
     bg.rect(0, 0, this.gameWidth, this.gameHeight)
-      .fill(Gradients.BACKGROUND_DARK);
+      .fill(0x2d1810);
     
     this.backgroundContainer.addChild(bg);
     this.container.addChild(this.backgroundContainer);

@@ -4,8 +4,6 @@
  * Orange theme with gradient support
  */
 
-import { FillGradient } from 'pixi.js';
-
 export const Colors = {
   // Background colors - Orange theme
   BACKGROUND_PRIMARY: '#4a1f0d',     // Very dark orange/brown
@@ -63,6 +61,7 @@ export const Colors = {
   // Card Battle UI colors
   UI_BACKGROUND: '#8b4513',          // UI panel background
   UI_BORDER: '#6b2e17',              // UI panel border
+  UI_BORDER_GLOW: '#ff8c00',         // Glowing border effect
   CARD_DISCARD: '#654321',           // Discard pile color
   TEAM_ALLY: '#4caf50',              // Player team color (green)
   TEAM_ENEMY: '#f44336',             // Enemy team color (red)
@@ -72,86 +71,18 @@ export const Colors = {
 
   // Decorative elements - Orange theme
   DECORATION_MAGIC: '#ff8c00',       // Dark orange for magical elements
+  DECORATION_FRAME: '#d4af37',       // Gold frame accents
+  DECORATION_INNER_GLOW: '#ffcc66',  // Inner glow effects
+  
+  // Battle zone specific colors
+  BATTLEFIELD_PRIMARY: '#5d2b0d',    // Darker battlefield background
+  BATTLEFIELD_SECONDARY: '#4a1f0d',  // Even darker zones
+  BATTLEFIELD_ACCENT: '#ff6a00',     // Accent highlights
 
   // Shadow and effects
   SHADOW_COLOR: '#000000',
+  GLOW_COLOR: '#ffaa00',             // Golden glow effects
 } as const;
 
 // Type-safe color access
 export type ColorKey = keyof typeof Colors;
-
-/**
- * Gradient utilities for orange theme
- */
-export const Gradients = {
-  /**
-   * Create a background gradient for panels and containers
-   */
-  createBackgroundGradient: (width: number, height: number): FillGradient => {
-    const gradient = new FillGradient({
-      start: { x: 0, y: 0 },
-      end: { x: 1, y: height },
-      type: "linear",  
-      colorStops: [
-        { offset: 0, color: Colors.BACKGROUND_PRIMARY },   // Very dark orange at top
-        { offset: 1, color: Colors.BACKGROUND_SECONDARY }  // Dark orange at bottom
-      ]
-    });
-    return gradient;
-  },
-
-  /**
-   * Create a button gradient
-   */
-  createButtonGradient: (width: number, height: number): FillGradient => {
-    const gradient = new FillGradient({
-      start: { x: 0, y: 0 },
-      end: { x: 0, y: height },
-      type: 'linear',
-      colorStops: [
-        { offset: 0, color: Colors.BUTTON_HOVER },    // Bright orange at top
-        { offset: 0.5, color: Colors.BUTTON_PRIMARY }, // Medium orange in middle
-        { offset: 1, color: Colors.BUTTON_BORDER }    // Dark orange at bottom
-      ]
-    });
-    return gradient;
-  },
-
-  /**
-   * Create a panel gradient
-   */
-  createPanelGradient: (width: number, height: number): FillGradient => {
-    const gradient = new FillGradient({
-      start: { x: 0, y: 0 },
-      end: { x: 0, y: height },
-      type: 'linear',
-      colorStops: [
-        { offset: 0, color: Colors.CONTAINER_BACKGROUND }, // Sienna at top
-        { offset: 1, color: Colors.PANEL_BACKGROUND }      // Saddle brown at bottom
-      ]
-    });
-    return gradient;
-  },
-
-  /**
-   * Create a mystical decoration gradient
-   */
-  createMagicGradient: (width: number, height: number): FillGradient => {
-    const gradient = new FillGradient({
-      start: { x: 0, y: 0 },
-      end: { x: width, y: height },
-      type: 'linear',
-      colorStops: [
-        { offset: 0, color: Colors.DECORATION_MAGIC },     // Dark orange
-        { offset: 0.5, color: 0xffa500 },                  // Orange
-        { offset: 1, color: Colors.DECORATION_MAGIC }      // Dark orange
-      ]
-    });
-    return gradient;
-  },
-
-  /**
-   * Dark background gradient for battle scenes
-   */
-  BACKGROUND_DARK: 0x2d1810,  // Dark brown color
-};

@@ -2,7 +2,7 @@ import { Container, Graphics, Text, Ticker } from 'pixi.js';
 import { navigation } from '@/utils/navigation';
 import { BaseScene } from '@/utils/BaseScene';
 import { HomeScene } from './HomeScene';
-import { Colors, Gradients } from '@/utils/colors';
+import { Colors } from '@/utils/colors';
 import { battleApi, isLikelyUsingMockData } from '@/services/api';
 import { Dungeon, Stage } from '@/types';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
@@ -114,7 +114,7 @@ export class TowerScene extends BaseScene {
     
     // Dark tower background with purple/blue gradient
     const bg = new Graphics();
-    const towerGradient = Gradients.createBackgroundGradient(this.gameWidth, availableHeight);
+    const towerGradient = Colors.BACKGROUND_PRIMARY;
     bg.fill(towerGradient).rect(0, 0, this.gameWidth, availableHeight);
     bgContainer.addChild(bg);
     

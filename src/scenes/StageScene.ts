@@ -5,7 +5,7 @@ import { DungeonScene } from './DungeonScene';
 import { CardBattleScene } from './CardBattleScene';
 import { PrepareScene } from './PrepareScene';
 import { HomeScene } from './HomeScene';
-import { Colors, Gradients } from '@/utils/colors';
+import { Colors } from '@/utils/colors';
 import { battleApi } from '@/services/api';
 import { Dungeon } from '@/types';
 import { LoadingStateManager } from '@/utils/loadingStateManager';

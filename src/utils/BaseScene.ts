@@ -1,7 +1,7 @@
 import { Assets, Color, Container, Graphics, Sprite, Text } from 'pixi.js';
 import { app } from '@/app';
 import { navigation } from './navigation';
-import { Colors, Gradients } from './colors';
+import { Colors } from './colors';
 import { BottomNavigationMenu } from './BottomNavigationMenu';
 import { Card, CardType } from '@/types';
 import { DropShadowFilter, GlowFilter } from 'pixi-filters';
@@ -53,7 +53,7 @@ export abstract class BaseScene extends Container {
     // Only create background if dimensions are properly set
     if (this.gameWidth && this.gameHeight) {
       const bg = new Graphics();
-      const backgroundGradient = Gradients.createBackgroundGradient(this.gameWidth, this.gameHeight);
+      const backgroundGradient = Colors.BACKGROUND_PRIMARY;
       bg.rect(0, 0, this.gameWidth, this.gameHeight).fill(backgroundGradient);
       this.addChild(bg);
     }
@@ -179,7 +179,7 @@ export abstract class BaseScene extends Container {
     
     // Button background with orange gradient styling
     const bg = new Graphics();
-    const buttonGradient = Gradients.createButtonGradient(adjustedWidth, adjustedHeight);
+    const buttonGradient = Colors.BUTTON_PRIMARY;
     bg.roundRect(0, 0, adjustedWidth, adjustedHeight, 8)
       .fill(buttonGradient)
       .stroke({ width: 2, color: Colors.BUTTON_BORDER }); // Reduced border thickness for small screens

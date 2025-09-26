@@ -3,7 +3,7 @@ import { BaseScene } from '@/utils/BaseScene';
 import { navigation } from '@/utils/navigation';
 import { HomeScene } from './HomeScene';
 import { StageScene } from './StageScene';
-import { Colors, Gradients } from '@/utils/colors';
+import { Colors } from '@/utils/colors';
 import { dungeonsApi, isLikelyUsingMockData } from '@/services/api';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
 
@@ -99,7 +99,7 @@ export class DungeonScene extends BaseScene {
   private createBackground(): void {
     // Main background with orange gradient
     const bg = new Graphics();
-    const backgroundGradient = Gradients.createBackgroundGradient(this.gameWidth, this.gameHeight);
+    const backgroundGradient = Colors.BACKGROUND_PRIMARY;
     bg.rect(0, 0, this.gameWidth, this.gameHeight).fill(backgroundGradient);
     this.backgroundContainer.addChild(bg);
 

@@ -6,7 +6,7 @@ import { LineupScene } from './LineupScene';
 import { BattleScene } from './BattleScene';
 import { CardBattleScene } from './CardBattleScene';
 import { TowerScene } from './TowerScene';
-import { Colors, Gradients } from '@/utils/colors';
+import { Colors } from '@/utils/colors';
 import { playerApi, isLikelyUsingMockData } from '@/services/api';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
 
@@ -156,7 +156,7 @@ export class HomeScene extends BaseScene {
     
     // Main background with orange gradient effect - only cover available height
     const bg = new Graphics();
-    const backgroundGradient = Gradients.createBackgroundGradient(this.gameWidth, availableHeight);
+    const backgroundGradient = Colors.BACKGROUND_PRIMARY;
     bg.fill(backgroundGradient).rect(0, 0, this.gameWidth, availableHeight);
     bgContainer.addChild(bg);
     
