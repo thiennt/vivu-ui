@@ -7,7 +7,8 @@ import { BattleLogZone } from './CardBattle/BattleLogZone';
 import { 
   CardBattleState, 
   TurnAction,
-  BattlePhaseName
+  BattlePhaseName,
+  Card
 } from '@/types';
 import { battleApi } from '@/services/api';
 
@@ -73,6 +74,7 @@ export class CardBattleScene extends BaseScene {
     this.addChild(this.buttonsContainer);
     
     this.setupButtons();
+    this.setupDragDropHandlers();
     
     // Initialize battle after zones are set up
     this.initializeBattle();
@@ -88,6 +90,120 @@ export class CardBattleScene extends BaseScene {
       }
     );
     this.buttonsContainer.addChild(endTurnButton);
+  }
+
+  private setupDragDropHandlers(): void {
+    // Set up drag/drop callbacks for player 1 hand (only player 1 can drag cards)
+    this.p1HandZone.setCardDropCallback((card: Card, dropTarget: string) => {
+      this.handleCardDrop(card, dropTarget);
+    });
+    
+    // Override the getDropTarget method for HandZone - cast to any to bypass private method restriction
+    (this.p1HandZone as any).getDropTarget = (globalX: number, globalY: number): string | null => {
+      return this.getDropTarget(globalX, globalY);
+    };
+  }
+
+  private getDropTarget(globalX: number, globalY: number): string | null {
+    // Check if dropped on player 1 character
+    const p1CharacterTarget = this.p1CharacterZone.getCharacterDropTarget(globalX, globalY);
+    if (p1CharacterTarget) {
+      return p1CharacterTarget;
+    }
+
+    // Check if dropped on player 1 discard pile
+    if (this.p1DiscardZone.isPointInside(globalX, globalY)) {
+      return 'discard';
+    }
+    
+    return null;
+  }
+
+  private async handleCardDrop(card: Card, dropTarget: string): Promise<void> {
+    if (!this.battleState) return;
+    
+    this.isAnimating = true;
+    
+    try {
+      if (dropTarget === 'discard') {
+        // Discard card for energy
+        await this.discardCardForEnergy(card);
+      } else if (dropTarget.startsWith('character:')) {
+        const characterId = dropTarget.replace('character:', '');
+        await this.playCardOnCharacter(card, characterId);
+      }
+    } catch (error) {
+      console.error('Error handling card drop:', error);
+    }
+    
+    this.isAnimating = false;
+  }
+
+  private async discardCardForEnergy(card: Card): Promise<void> {
+    if (!this.battleState) return;
+    
+    const turnAction: TurnAction = {
+      type: 'discard_card',
+      player_team: this.battleState.current_player,
+      card_id: card.id
+    };
+    
+    try {
+      const response = await battleApi.discardCard(this.battleId, turnAction);
+      if (response.success && response.data) {
+        console.log('Discard card logs:', response.data);
+        
+        // Remove card from player's hand
+        const currentPlayer = this.battleState.players.find(p => p.team === this.battleState!.current_player);
+        if (currentPlayer && currentPlayer.deck.hand_cards) {
+          currentPlayer.deck.hand_cards = currentPlayer.deck.hand_cards.filter((c: { card?: Card }) => c.card?.id !== card.id);
+        }
+        
+        this.updateAllZones();
+        this.animateCardToDiscard();
+      }
+    } catch (error) {
+      console.error('Failed to discard card:', error);
+    }
+  }
+
+  private async playCardOnCharacter(card: Card, characterId: string): Promise<void> {
+    if (!this.battleState) return;
+    
+    const turnAction: TurnAction = {
+      type: 'play_card',
+      player_team: this.battleState.current_player,
+      card_id: card.id,
+      character_id: characterId
+    };
+    
+    try {
+      const response = await battleApi.playCard(this.battleId, turnAction);
+      if (response.success && response.data) {
+        console.log('Play card logs:', response.data);
+        
+        // Remove card from player's hand
+        const currentPlayer = this.battleState.players.find(p => p.team === this.battleState!.current_player);
+        if (currentPlayer && currentPlayer.deck.hand_cards) {
+          currentPlayer.deck.hand_cards = currentPlayer.deck.hand_cards.filter((c: { card?: Card }) => c.card?.id !== card.id);
+        }
+        
+        this.updateAllZones();
+        this.animateCardPlay(characterId);
+      }
+    } catch (error) {
+      console.error('Failed to play card:', error);
+    }
+  }
+
+  private animateCardToDiscard(): void {
+    // Animation will be handled by the drag/drop system
+    // Card is already destroyed when this is called
+  }
+
+  private animateCardPlay(_characterId: string): void {
+    // Animation will be handled by the drag/drop system
+    // Card is already destroyed when this is called
   }
 
   // Battle initialization and game logic
@@ -172,13 +288,18 @@ export class CardBattleScene extends BaseScene {
             if (currentPlayer) {
               currentPlayer.deck.hand_cards = currentPlayer.deck.hand_cards || [];
               drawnCards.forEach((card: unknown) => {
-                currentPlayer.deck.hand_cards.push({ card: card as any });
+                currentPlayer.deck.hand_cards.push({ card: card as Card });
               });
             }
           }
         }
         
         this.updateAllZones();
+        
+        // Add draw card animation for current player
+        if (this.battleState.current_player === 1) {
+          await this.p1HandZone.animateCardDraw();
+        }
       }
     } catch (error) {
       console.error('Failed to draw cards:', error);
