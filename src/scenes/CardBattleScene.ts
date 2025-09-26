@@ -4,12 +4,24 @@ import { HandZone } from './CardBattle/HandZone';
 import { DiscardZone } from './CardBattle/DiscardZone';
 import { PlayerCharacterZone } from './CardBattle/PlayerCharacterZone';
 import { BattleLogZone } from './CardBattle/BattleLogZone';
+import { 
+  CardBattleState, 
+  TurnAction,
+  BattlePhaseName
+} from '@/types';
+import { battleApi } from '@/services/api';
 
 export class CardBattleScene extends BaseScene {
   /** Assets bundles required by this screen */
   public static assetBundles = [];
 
   private battleId: string;
+  
+  // Battle state management
+  private battleState: CardBattleState | null = null;
+  private currentPhase: BattlePhaseName = 'start_turn';
+  private isAnimating: boolean = false;
+  private mainPhaseResolve?: () => void;
   
   // Zone components following the layout order:
   // PLAYER 2 DISCARD ZONE
@@ -61,6 +73,9 @@ export class CardBattleScene extends BaseScene {
     this.addChild(this.buttonsContainer);
     
     this.setupButtons();
+    
+    // Initialize battle after zones are set up
+    this.initializeBattle();
   }
 
   private setupButtons(): void {
@@ -69,10 +84,193 @@ export class CardBattleScene extends BaseScene {
       'End Turn',
       0, 0, 200, 50,
       () => {
-        console.log('End Turn clicked');
+        this.endTurn();
       }
     );
     this.buttonsContainer.addChild(endTurnButton);
+  }
+
+  // Battle initialization and game logic
+  private async initializeBattle(): Promise<void> {
+    try {
+      // Load battle state from API
+      const response = await battleApi.getBattleState(this.battleId);
+      this.battleState = response.data;
+      
+      console.log('Battle initialized with state:', this.battleState);
+      
+      if (this.battleState && this.battleState.players) {
+        this.updateAllZones();
+        this.startGameLoop();
+      }
+    } catch (error) {
+      console.error('Failed to initialize battle:', error);
+    }
+  }
+
+  private async startGameLoop(): Promise<void> {
+    while (this.battleState && this.battleState.status === 'ongoing') {
+      // Turn Start
+      await this.processTurnStart();
+      
+      // Draw Phase  
+      await this.processDrawPhase();
+      
+      // Main Phase
+      await this.processMainPhase();
+      
+      // End Turn
+      await this.processEndTurn();
+      
+      // Check win condition
+      if (this.checkGameEnd()) {
+        break;
+      }
+    }
+  }
+
+  private async processTurnStart(): Promise<void> {
+    this.currentPhase = 'start_turn';
+    console.log(`Turn Start - Player ${this.battleState?.current_player}`);
+    
+    try {
+      const response = await battleApi.startTurn(this.battleId);
+      if (response.success && response.data) {
+        console.log('Turn start logs:', response.data);
+        this.updateAllZones();
+      }
+    } catch (error) {
+      console.error('Failed to process turn start:', error);
+    }
+  }
+
+  private async processDrawPhase(): Promise<void> {
+    if (!this.battleState) return;
+    
+    this.currentPhase = 'draw_phase';
+    console.log('Draw Phase');
+    
+    const turnAction: TurnAction = {
+      type: 'draw_card',
+      player_team: this.battleState.current_player
+    };
+    
+    try {
+      const response = await battleApi.drawCards(this.battleId, turnAction);
+      if (response.success && response.data) {
+        const logs = response.data;
+        console.log('Draw phase logs:', logs);
+        
+        // Update hand cards from drawn_cards if available
+        if (logs.length > 0 && logs[0].drawn_cards) {
+          const drawnCards = logs[0].drawn_cards;
+          console.log('Cards drawn:', drawnCards);
+          
+          // Add cards to player's hand in battleState
+          if (this.battleState) {
+            const currentPlayer = this.battleState.players.find(p => p.team === this.battleState!.current_player);
+            if (currentPlayer) {
+              currentPlayer.deck.hand_cards = currentPlayer.deck.hand_cards || [];
+              drawnCards.forEach((card: unknown) => {
+                currentPlayer.deck.hand_cards.push({ card: card as any });
+              });
+            }
+          }
+        }
+        
+        this.updateAllZones();
+      }
+    } catch (error) {
+      console.error('Failed to draw cards:', error);
+    }
+  }
+
+  private async processMainPhase(): Promise<void> {
+    this.currentPhase = 'main_phase';
+    console.log('Main Phase - Player can take actions');
+    
+    // For player 1: Enable interactions and wait for player input
+    if (this.battleState?.current_player === 1) {
+      // Return Promise that resolves when player ends turn
+      return new Promise((resolve) => {
+        this.mainPhaseResolve = resolve;
+      });
+    } else {
+      // For AI: Skip main phase (could add AI logic here)
+      return Promise.resolve();
+    }
+  }
+
+  private async processEndTurn(): Promise<void> {
+    this.currentPhase = 'end_turn';
+    console.log('End Turn - Processing end turn effects');
+    
+    const turnAction: TurnAction = {
+      type: 'end_turn',
+      player_team: this.battleState!.current_player
+    };
+    
+    try {
+      const response = await battleApi.endTurn(this.battleId, turnAction);
+      if (response.success && response.data) {
+        const logs = response.data;
+        console.log('End turn logs:', logs);
+        
+        // Update battle state from the logs if available
+        if (logs.length > 0 && logs[0].after_state && this.battleState) {
+          const afterState = logs[0].after_state;
+          if (afterState.current_player !== undefined) {
+            this.battleState.current_player = afterState.current_player;
+          }
+          if (afterState.turn !== undefined) {
+            this.battleState.current_turn = afterState.turn;
+          }
+        }
+        
+        this.updateAllZones();
+      }
+    } catch (error) {
+      console.error('Failed to process end turn:', error);
+    }
+  }
+
+  private checkGameEnd(): boolean {
+    if (!this.battleState || !this.battleState.players) return false;
+    
+    if (this.battleState.status === 'completed') {
+      console.log(`Game ended. Winner: Team ${this.battleState.winner_team}`);
+      return true;
+    }
+    
+    return false;
+  }
+
+  private endTurn(): void {
+    if (this.mainPhaseResolve) {
+      this.mainPhaseResolve();
+      this.mainPhaseResolve = undefined;
+    }
+  }
+
+  private updateAllZones(): void {
+    if (!this.battleState) return;
+    
+    // Update player zones with battle state
+    const player1 = this.battleState.players.find(p => p.team === 1);
+    const player2 = this.battleState.players.find(p => p.team === 2);
+    
+    if (player1) {
+      this.p1CharacterZone.updateBattleState(player1);
+      this.p1HandZone.updateBattleState(player1);
+    }
+    
+    if (player2) {
+      this.p2CharacterZone.updateBattleState(player2);
+      this.p2HandZone.updateBattleState(player2);
+    }
+    
+    // Update battle log
+    this.battleLogZone.updatePhase(this.currentPhase, this.battleState.current_player);
   }
   
   /** Resize handler */
