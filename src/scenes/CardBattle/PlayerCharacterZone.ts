@@ -123,19 +123,39 @@ export class PlayerCharacterZone extends Container {
     const characters = this.playerState.characters.slice(0, 3); // Max 3 characters
     if (characters.length === 0) return;
     
-    const cardWidth = 80;
-    const cardHeight = height - 10;
+    // Calculate optimal card dimensions to fit within the zone
     const spacing = 10;
+    const availableWidth = width - (spacing * Math.max(0, characters.length - 1)) - 10; // 10px total margins
+    let cardWidth = Math.floor(availableWidth / characters.length);
+    
+    // Ensure cards maintain reasonable aspect ratio and fit in height
+    const maxCardWidth = Math.min(100, cardWidth); // Cap at 100px like backup scene
+    const aspectRatio = 1.4; // Character cards are taller than wide
+    cardWidth = Math.min(maxCardWidth, cardWidth);
+    
+    let cardHeight = cardWidth * aspectRatio;
+    const maxCardHeight = height - 10; // Leave margin
+    
+    // If calculated height is too big, scale down proportionally
+    if (cardHeight > maxCardHeight) {
+      cardHeight = maxCardHeight;
+      cardWidth = cardHeight / aspectRatio;
+    }
+    
     const totalWidth = (cardWidth * characters.length) + (spacing * Math.max(0, characters.length - 1));
     const startX = Math.max(5, (width - totalWidth) / 2);
     
     characters.forEach((character, index) => {
       const x = startX + (index * (cardWidth + spacing));
-      const y = 5;
+      const y = Math.max(5, (height - cardHeight) / 2); // Center vertically
       
-      const characterCard = this.createCharacterCard(character, cardWidth, cardHeight - 10);
+      const characterCard = this.createCharacterCard(character, cardWidth, cardHeight);
       characterCard.x = x;
       characterCard.y = y;
+      
+      // Store character ID for drag/drop targeting
+      (characterCard as Container & { characterId: string }).characterId = character.id;
+      
       this.charactersZone.addChild(characterCard);
       this.characterCards.push(characterCard);
     });
@@ -144,5 +164,17 @@ export class PlayerCharacterZone extends Container {
   private createCharacterCard(character: any, width: number, height: number): Container {
     const scene = this.parent as BaseScene;
     return scene.createHeroCard(character, width, height);
+  }
+
+  // Method to check if coordinates are within a character card bounds
+  getCharacterDropTarget(globalX: number, globalY: number): string | null {
+    for (const characterCard of this.characterCards) {
+      const bounds = characterCard.getBounds();
+      if (globalX >= bounds.x && globalX <= bounds.x + bounds.width &&
+          globalY >= bounds.y && globalY <= bounds.y + bounds.height) {
+        return `character:${(characterCard as Container & { characterId: string }).characterId}`;
+      }
+    }
+    return null;
   }
 }
