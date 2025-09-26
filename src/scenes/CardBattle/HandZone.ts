@@ -134,12 +134,12 @@ export class HandZone extends Container {
     return cardContainer;
   }
 
-  private makeHandCardDraggable(cardContainer: Container, _card: Card): void {
+  private makeHandCardDraggable(cardContainer: Container, card: Card): void {
     cardContainer.interactive = true;
     cardContainer.cursor = 'grab';
     
     cardContainer.on('pointerdown', (event: FederatedPointerEvent) => {
-      this.onCardDragStart(event, cardContainer, _card);
+      this.onCardDragStart(event, cardContainer, card);
     });
     
     cardContainer.on('pointerover', () => {
