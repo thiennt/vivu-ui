@@ -1,6 +1,6 @@
 import { Colors, Gradients } from "@/utils/colors";
 import { Container, Graphics, Text } from "pixi.js";
-import { CardBattlePlayerState } from "@/types";
+import { CardBattlePlayerState, Character } from "@/types";
 import { BaseScene } from "@/utils/BaseScene";
 
 
@@ -264,7 +264,7 @@ export class PlayerCharacterZone extends Container {
     });
   }
 
-  private createCharacterCard(character: any, width: number, height: number): Container {
+  private createCharacterCard(character: Character, width: number, height: number): Container {
     const scene = this.parent as BaseScene;
     return scene.createHeroCard(character, width, height);
   }
