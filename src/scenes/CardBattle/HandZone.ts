@@ -4,7 +4,7 @@ import { CardBattlePlayerState, Card } from "@/types";
 import { BaseScene } from "@/utils/BaseScene";
 import { app } from "@/app";
 import { gsap } from "gsap";
-import { CardTooltip } from "@/components/CardTooltip";
+import { CardDetailPopup, cardToBattleCard } from "@/popups/CardDetailPopup";
 
 
 export class HandZone extends Container {
@@ -18,7 +18,7 @@ export class HandZone extends Container {
   private onCardDropCallback?: (card: Card, dropTarget: string) => void;
 
   // Tooltip state
-  private cardTooltip: CardTooltip | null = null;
+  private cardTooltip: CardDetailPopup | null = null;
 
   constructor() {
     super();
@@ -134,12 +134,12 @@ export class HandZone extends Container {
     return cardContainer;
   }
 
-  private makeHandCardDraggable(cardContainer: Container, card: Card): void {
+  private makeHandCardDraggable(cardContainer: Container, _card: Card): void {
     cardContainer.interactive = true;
     cardContainer.cursor = 'grab';
     
     cardContainer.on('pointerdown', (event: FederatedPointerEvent) => {
-      this.onCardDragStart(event, cardContainer, card);
+      this.onCardDragStart(event, cardContainer, _card);
     });
     
     cardContainer.on('pointerover', () => {
@@ -268,31 +268,6 @@ export class HandZone extends Container {
     }
   }
 
-  private showCardTooltip(card: Card): void {
-    // Remove existing tooltip if any
-    this.hideCardTooltip();
-    
-    // Create new tooltip
-    this.cardTooltip = new CardTooltip(card);
-    
-    // Add tooltip to app.stage so it appears above everything
-    app.stage.addChild(this.cardTooltip);
-    
-    // Position tooltip at top of screen
-    this.cardTooltip.positionAtTop(app.screen.width, app.screen.height);
-  }
-
-  private hideCardTooltip(): void {
-    if (this.cardTooltip) {
-      // Remove from app.stage
-      if (this.cardTooltip.parent) {
-        this.cardTooltip.parent.removeChild(this.cardTooltip);
-      }
-      this.cardTooltip.destroy();
-      this.cardTooltip = null;
-    }
-  }
-
   animateCardDraw(): Promise<void> {
     // Animate cards being drawn from deck
     this.handCards.forEach((card, index) => {
@@ -313,5 +288,33 @@ export class HandZone extends Container {
       const longestDelay = (this.handCards.length - 1) * 0.1 + 0.4;
       setTimeout(resolve, longestDelay * 1000);
     });
+  }
+
+  private showCardTooltip(card: Card): void {
+    // Remove existing tooltip if any
+    this.hideCardTooltip();
+    
+    // Convert Card to BattleCard for the popup
+    const battleCard = cardToBattleCard(card);
+    
+    // Create new tooltip in tooltip mode
+    this.cardTooltip = new CardDetailPopup({ card: battleCard, tooltipMode: true });
+    
+    // Add tooltip to app.stage so it appears above everything
+    app.stage.addChild(this.cardTooltip);
+    
+    // Position tooltip at top of screen
+    this.cardTooltip.positionAtTop(app.screen.width, app.screen.height);
+  }
+
+  private hideCardTooltip(): void {
+    if (this.cardTooltip) {
+      // Remove from app.stage
+      if (this.cardTooltip.parent) {
+        this.cardTooltip.parent.removeChild(this.cardTooltip);
+      }
+      this.cardTooltip.destroy();
+      this.cardTooltip = null;
+    }
   }
 }

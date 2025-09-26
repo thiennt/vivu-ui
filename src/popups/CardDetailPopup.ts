@@ -1,7 +1,21 @@
 import { Container, Graphics, Text } from 'pixi.js';
 import { navigation } from '@/utils/navigation';
 import { Colors } from '@/utils/colors';
-import { BattleCard } from '@/types';
+import { BattleCard, Card, CardType, CardRarity } from '@/types';
+
+// Utility function to convert Card to BattleCard for tooltip display
+export function cardToBattleCard(card: Card): BattleCard {
+  return {
+    id: card.id,
+    name: card.name,
+    description: card.description,
+    energyCost: card.energy_cost,
+    group: card.group as CardType,
+    rarity: (card.rarity as CardRarity) || CardRarity.COMMON,
+    effects: [], // Card type doesn't have effects, so empty array
+    cardType: card.card_type
+  };
+}
 
 export class CardDetailPopup extends Container {
   private dialogBg!: Graphics;
@@ -9,16 +23,102 @@ export class CardDetailPopup extends Container {
   private card: BattleCard;
   private gameWidth: number;
   private gameHeight: number;
+  private isTooltipMode: boolean;
 
-  constructor(params: { card: BattleCard }) {
+  constructor(params: { card: BattleCard, tooltipMode?: boolean }) {
     super();
     this.card = params.card;
+    this.isTooltipMode = params.tooltipMode || false;
     this.gameWidth = navigation.width;
     this.gameHeight = navigation.height;
     this.createDialog();
   }
 
   private createDialog(): void {
+    if (this.isTooltipMode) {
+      this.createTooltipMode();
+    } else {
+      this.createPopupMode();
+    }
+  }
+
+  private createTooltipMode(): void {
+    // For tooltip mode, create a compact display without full-screen background
+    const tooltipWidth = 300;
+    const tooltipHeight = 150;
+    
+    // Create tooltip panel (no full-screen background in tooltip mode)
+    this.dialogPanel = new Graphics();
+    this.dialogPanel.roundRect(0, 0, tooltipWidth, tooltipHeight, 8)
+      .fill({ color: Colors.PANEL_BACKGROUND, alpha: 0.95 })
+      .stroke({ width: 2, color: Colors.BUTTON_PRIMARY });
+
+    this.addChild(this.dialogPanel);
+
+    // Card name
+    const cardNameText = new Text({
+      text: this.card.name,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 16,
+        fontWeight: 'bold',
+        fill: Colors.RARITY_LEGENDARY,
+        align: 'left'
+      }
+    });
+    cardNameText.x = 10;
+    cardNameText.y = 10;
+    this.addChild(cardNameText);
+
+    // Energy cost
+    const energyCostText = new Text({
+      text: `Energy: ${this.card.energyCost}`,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 12,
+        fill: Colors.TEXT_PRIMARY,
+        align: 'left'
+      }
+    });
+    energyCostText.x = 10;
+    energyCostText.y = 35;
+    this.addChild(energyCostText);
+
+    // Card type
+    if (this.card.cardType || this.card.group) {
+      const typeText = new Text({
+        text: `Type: ${this.card.cardType || this.card.group}`,
+        style: {
+          fontFamily: 'Kalam',
+          fontSize: 12,
+          fill: Colors.TEXT_PRIMARY,
+          align: 'left'
+        }
+      });
+      typeText.x = 10;
+      typeText.y = 55;
+      this.addChild(typeText);
+    }
+
+    // Card description
+    const cardDescText = new Text({
+      text: this.card.description,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 10,
+        fill: Colors.TEXT_SECONDARY,
+        align: 'left',
+        wordWrap: true,
+        wordWrapWidth: tooltipWidth - 20
+      }
+    });
+    cardDescText.x = 10;
+    cardDescText.y = 80;
+    this.addChild(cardDescText);
+  }
+
+  private createPopupMode(): void {
+    // Original popup mode implementation
     // Create semi-transparent background
     this.dialogBg = new Graphics();
     this.dialogBg.rect(0, 0, this.gameWidth, this.gameHeight)
@@ -69,7 +169,7 @@ export class CardDetailPopup extends Container {
     let cardTypeBadge: Container | null = null;
     if (this.card.cardType || this.card.group) {
       cardTypeBadge = this.createCardTypeBadge(
-        (this.card.cardType || this.card.group).toUpperCase(),
+        (this.card.cardType || this.card.group).toString().toUpperCase(),
         this.gameWidth / 2 - 40,
         dialogY + 90
       );
@@ -250,5 +350,13 @@ export class CardDetailPopup extends Container {
     // Recreate dialog with new dimensions
     this.removeChildren();
     this.createDialog();
+  }
+
+  public positionAtTop(screenWidth: number, screenHeight: number, padding: number = 20): void {
+    if (this.isTooltipMode) {
+      // Position tooltip at top center of screen
+      this.x = (screenWidth - 300) / 2; // 300 is tooltipWidth
+      this.y = padding;
+    }
   }
 }
