@@ -51,9 +51,30 @@ export class PlayerCharacterZone extends Container {
   resize(width: number, height: number): void {
     this.zoneBg.clear();
     
-    // Use enhanced battle zone background
-    const battleBg = VisualEffects.createBattleZoneBackground(width, height);
-    this.zoneBg.addChild(battleBg);
+    // Create enhanced battle zone background directly
+    this.zoneBg.roundRect(0, 0, width, height, 8)
+      .fill(Colors.BATTLEFIELD_PRIMARY);
+    
+    // Add decorative corner accents
+    const accentSize = 16;
+    
+    // Top-left corner accent
+    this.zoneBg.moveTo(0, accentSize)
+      .lineTo(0, 8)
+      .arc(8, 8, 8, Math.PI, 3 * Math.PI / 2)
+      .lineTo(accentSize, 0)
+      .fill({ color: Colors.BATTLEFIELD_ACCENT, alpha: 0.3 });
+    
+    // Top-right corner accent
+    this.zoneBg.moveTo(width - accentSize, 0)
+      .lineTo(width - 8, 0)
+      .arc(width - 8, 8, 8, 3 * Math.PI / 2, 0)
+      .lineTo(width, accentSize)
+      .fill({ color: Colors.BATTLEFIELD_ACCENT, alpha: 0.3 });
+    
+    // Border with glow effect
+    this.zoneBg.roundRect(0, 0, width, height, 8)
+      .stroke({ width: 2, color: Colors.UI_BORDER_GLOW, alpha: 0.8 });
     
     // Layout player info zone at the left
     const infoWidth = width * 0.18;
@@ -65,16 +86,20 @@ export class PlayerCharacterZone extends Container {
     
     this.playerInfoBg.clear();
     
-    // Create enhanced player info background
-    const infoFrame = VisualEffects.createDecorativeFrame(infoWidth, height, 8);
-    this.playerInfoBg.addChild(infoFrame);
+    // Create enhanced player info background directly
+    this.playerInfoBg.roundRect(0, 0, infoWidth, height, 8)
+      .fill(Colors.UI_BACKGROUND)
+      .stroke({ width: 3, color: Colors.DECORATION_FRAME });
+    
+    // Add inner highlight
+    const innerPadding = 3;
+    this.playerInfoBg.roundRect(innerPadding, innerPadding, infoWidth - innerPadding * 2, height - innerPadding * 2, 5)
+      .stroke({ width: 1, color: Colors.DECORATION_INNER_GLOW, alpha: 0.6 });
     
     // Add inner background
-    const innerBg = new Graphics();
-    innerBg.roundRect(3, 3, infoWidth - 6, height - 6, 5)
+    this.playerInfoBg.roundRect(3, 3, infoWidth - 6, height - 6, 5)
       .fill(infoBgColor)
       .stroke({ width: 1, color: infoBgBorder, alpha: 0.8 });
-    this.playerInfoBg.addChild(innerBg);
 
     // Enhanced player label
     this.playerInfoLabel.text = this.playerNo === 1 ? 'P1' : 'P2';

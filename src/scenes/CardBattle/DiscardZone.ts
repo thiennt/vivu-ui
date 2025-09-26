@@ -21,16 +21,20 @@ export class DiscardZone extends Container {
   resize(width: number, height: number): void {
     this.discardBg.clear();
     
-    // Use enhanced frame instead of simple rectangle
-    const frame = VisualEffects.createDecorativeFrame(width, height, 12);
-    this.discardBg.addChild(frame);
+    // Create enhanced frame background directly without using addChild on Graphics
+    this.discardBg.roundRect(0, 0, width, height, 12)
+      .fill(Colors.UI_BACKGROUND)
+      .stroke({ width: 3, color: Colors.DECORATION_FRAME });
+    
+    // Add inner highlight
+    const innerPadding = 3;
+    this.discardBg.roundRect(innerPadding, innerPadding, width - innerPadding * 2, height - innerPadding * 2, 8)
+      .stroke({ width: 1, color: Colors.DECORATION_INNER_GLOW, alpha: 0.6 });
     
     // Add darker inner area
-    const innerBg = new Graphics();
-    innerBg.roundRect(4, 4, width - 8, height - 8, 8)
+    this.discardBg.roundRect(4, 4, width - 8, height - 8, 8)
       .fill(Colors.CARD_DISCARD)
       .stroke({ width: 1, color: Colors.UI_BORDER_GLOW, alpha: 0.5 });
-    this.discardBg.addChild(innerBg);
   
     // Update label with enhanced styling
     this.discardLabel.text = 'DISCARD PILE';

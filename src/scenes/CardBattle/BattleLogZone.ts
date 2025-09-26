@@ -24,9 +24,35 @@ export class BattleLogZone extends Container {
   resize(width: number, height: number): void {
     this.logBg.clear();
     
-    // Use enhanced mystical frame instead of simple rectangle
-    const mysticalFrame = VisualEffects.createMysticalFrame(width, height);
-    this.logBg.addChild(mysticalFrame);
+    // Create enhanced mystical frame directly
+    this.logBg.roundRect(0, 0, width, height, 12)
+      .fill(Colors.BATTLEFIELD_PRIMARY)
+      .stroke({ width: 3, color: Colors.DECORATION_MAGIC });
+    
+    // Add corner decorations
+    const cornerSize = 16;
+    
+    // Top corners
+    this.logBg.moveTo(cornerSize, 2)
+      .lineTo(2, 2)
+      .lineTo(2, cornerSize)
+      .stroke({ width: 2, color: Colors.DECORATION_FRAME });
+    
+    this.logBg.moveTo(width - cornerSize, 2)
+      .lineTo(width - 2, 2)
+      .lineTo(width - 2, cornerSize)
+      .stroke({ width: 2, color: Colors.DECORATION_FRAME });
+    
+    // Bottom corners
+    this.logBg.moveTo(2, height - cornerSize)
+      .lineTo(2, height - 2)
+      .lineTo(cornerSize, height - 2)
+      .stroke({ width: 2, color: Colors.DECORATION_FRAME });
+    
+    this.logBg.moveTo(width - 2, height - cornerSize)
+      .lineTo(width - 2, height - 2)
+      .lineTo(width - cornerSize, height - 2)
+      .stroke({ width: 2, color: Colors.DECORATION_FRAME });
 
     this.logTitle.text = 'Battle Log';
     this.logTitle.style = {

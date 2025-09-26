@@ -33,16 +33,35 @@ export class HandZone extends Container {
   resize(width: number, height: number): void {
     this.handBg.clear();
     
-    // Use enhanced battle zone background for hands
-    const handBg = VisualEffects.createBattleZoneBackground(width, height);
-    this.handBg.addChild(handBg);
+    // Create enhanced battle zone background directly
+    this.handBg.roundRect(0, 0, width, height, 8)
+      .fill(Colors.BATTLEFIELD_PRIMARY);
+    
+    // Add decorative corner accents
+    const accentSize = 16;
+    
+    // Top-left corner accent
+    this.handBg.moveTo(0, accentSize)
+      .lineTo(0, 8)
+      .arc(8, 8, 8, Math.PI, 3 * Math.PI / 2)
+      .lineTo(accentSize, 0)
+      .fill({ color: Colors.BATTLEFIELD_ACCENT, alpha: 0.3 });
+    
+    // Top-right corner accent
+    this.handBg.moveTo(width - accentSize, 0)
+      .lineTo(width - 8, 0)
+      .arc(width - 8, 8, 8, 3 * Math.PI / 2, 0)
+      .lineTo(width, accentSize)
+      .fill({ color: Colors.BATTLEFIELD_ACCENT, alpha: 0.3 });
+    
+    // Border with glow effect
+    this.handBg.roundRect(0, 0, width, height, 8)
+      .stroke({ width: 2, color: Colors.UI_BORDER_GLOW, alpha: 0.8 });
     
     // Add additional card zone styling
-    const innerArea = new Graphics();
     const padding = 4;
-    innerArea.roundRect(padding, padding, width - padding * 2, height - padding * 2, 6)
+    this.handBg.roundRect(padding, padding, width - padding * 2, height - padding * 2, 6)
       .stroke({ width: 1, color: Colors.UI_BORDER_GLOW, alpha: 0.6 });
-    this.handBg.addChild(innerArea);
     
     // Redraw hand cards if we have player state
     if (this.playerState) {
