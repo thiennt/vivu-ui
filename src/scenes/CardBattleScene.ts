@@ -1,4 +1,4 @@
-import { Container, Graphics, Text } from 'pixi.js';
+import { Container } from 'pixi.js';
 import { BaseScene } from '@/utils/BaseScene';
 import { HandZone } from './CardBattle/HandZone';
 import { PlayerCharacterZone } from './CardBattle/PlayerCharacterZone';
@@ -10,7 +10,6 @@ import {
   Card
 } from '@/types';
 import { battleApi } from '@/services/api';
-import { Colors } from '@/utils/colors';
 
 export class CardBattleScene extends BaseScene {
   /** Assets bundles required by this screen */
@@ -63,152 +62,10 @@ export class CardBattleScene extends BaseScene {
     this.buttonsContainer = new Container();
     this.addChild(this.buttonsContainer);
     
-    this.setupButtons();
     this.setupDragDropHandlers();
     
     // Initialize battle after zones are set up
     this.initializeBattle();
-  }
-
-  private setupButtons(): void {
-    // Create enhanced End Turn button with battle styling
-    const endTurnButton = this.createEpicBattleButton(
-      '⚔️ END TURN ⚔️',
-      0, 0, 200, 50,
-      () => {
-        this.endTurn();
-      }
-    );
-    this.buttonsContainer.addChild(endTurnButton);
-  }
-
-  private createEpicBattleButton(
-    text: string, 
-    x: number, 
-    y: number, 
-    width: number = 200, 
-    height: number = 50,
-    onClick?: () => void
-  ): Container {
-    const button = new Container();
-    
-    // For the End Turn button, make it circular
-    const isEndTurnButton = text.includes('END TURN');
-    
-    if (isEndTurnButton) {
-      // Create circular end turn button
-      const radius = Math.min(60, Math.min(this.gameWidth, this.gameHeight) * 0.08);
-      const bg = new Graphics();
-      
-      // Main circular background
-      bg.circle(0, 0, radius)
-        .fill(Colors.BUTTON_PRIMARY)
-        .stroke({ width: 3, color: Colors.BUTTON_BORDER });
-      
-      // Inner highlight for depth
-      bg.circle(0, 0, radius - 4)
-        .stroke({ width: 2, color: Colors.BUTTON_HOVER, alpha: 0.4 });
-      
-      // Simplified button text for circular design
-      const buttonText = new Text({
-        text: 'END\nTURN',
-        style: {
-          fontFamily: 'Kalam',
-          fontSize: Math.min(16, radius * 0.25),
-          fontWeight: 'bold',
-          fill: Colors.TEXT_BUTTON,
-          align: 'center'
-        }
-      });
-      buttonText.anchor.set(0.5);
-      
-      button.addChild(bg, buttonText);
-      button.x = x + radius; // Adjust for circle center
-      button.y = y + radius;
-      
-      // Circular hover effects
-      button.on('pointerover', () => {
-        bg.tint = Colors.BUTTON_HOVER;
-        button.scale.set(1.05);
-      });
-      
-      button.on('pointerout', () => {
-        bg.tint = 0xffffff;
-        button.scale.set(1);
-      });
-      
-    } else {
-      // Original rectangular button logic for other buttons
-      // Adjust dimensions for mobile
-      const minHeight = Math.min(44, this.gameHeight * 0.08);
-      const adjustedHeight = Math.max(minHeight, height);
-      const maxWidth = this.gameWidth - (2 * this.STANDARD_PADDING);
-      const adjustedWidth = Math.min(width, maxWidth);
-      
-      // Simplified battle button background
-      const bg = new Graphics();
-      
-      // Simple button background with subtle depth
-      bg.roundRect(0, 0, adjustedWidth, adjustedHeight, 8)
-        .fill(Colors.BUTTON_PRIMARY)
-        .stroke({ width: 2, color: Colors.BUTTON_BORDER });
-      
-      // Subtle inner highlight for depth
-      bg.roundRect(2, 2, adjustedWidth - 4, adjustedHeight - 4, 6)
-        .stroke({ width: 1, color: Colors.BUTTON_HOVER, alpha: 0.3 });
-      
-      // Calculate responsive font size
-      const responsiveFontSize = this.calculateResponsiveFontSize(
-        18,
-        adjustedWidth,
-        this.gameWidth,
-        Math.max(12, adjustedHeight * 0.25),
-        Math.min(22, adjustedHeight * 0.6)
-      );
-
-      // Simplified button text
-      const buttonText = new Text({
-        text: text,
-        style: {
-          fontFamily: 'Kalam',
-          fontSize: responsiveFontSize,
-          fontWeight: 'bold',
-          fill: Colors.TEXT_BUTTON,
-          align: 'center'
-        }
-      });
-      buttonText.anchor.set(0.5);
-      buttonText.x = adjustedWidth / 2;
-      buttonText.y = adjustedHeight / 2;
-      
-      button.addChild(bg, buttonText);
-      button.x = x;
-      button.y = y;
-      
-      // Simple hover effects
-      button.on('pointerover', () => {
-        bg.tint = Colors.BUTTON_HOVER;
-      });
-      
-      button.on('pointerout', () => {
-        bg.tint = 0xffffff;
-      });
-    }
-    
-    button.interactive = true;
-    button.cursor = 'pointer';
-    
-    // Simple click effect
-    button.on('pointerdown', () => {
-      button.scale.set(0.98);
-    });
-    
-    button.on('pointerup', () => {
-      button.scale.set(1);
-      if (onClick) onClick();
-    });
-    
-    return button;
   }
 
   private setupDragDropHandlers(): void {
@@ -222,8 +79,19 @@ export class CardBattleScene extends BaseScene {
       () => this.p1CharacterZone.updateDiscardHighlight(true),
       () => this.p1CharacterZone.updateDiscardHighlight(false)
     );
+
+    // Set up character hover callback for zoom effects
+    this.p1HandZone.setCharacterHoverCallback((globalX: number, globalY: number, isDragging: boolean) => {
+      this.p1CharacterZone.updateCharacterHover(globalX, globalY, isDragging);
+    });
+
+    // Set up end turn callback
+    this.p1HandZone.setEndTurnCallback(() => {
+      this.endTurn();
+    });
     
-    // Override the getDropTarget method for HandZone - eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // Override the getDropTarget method for HandZone 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (this.p1HandZone as any).getDropTarget = (globalX: number, globalY: number): string | null => {
       return this.getDropTarget(globalX, globalY);
     };
@@ -572,12 +440,5 @@ export class CardBattleScene extends BaseScene {
     this.p1HandZone.x = this.STANDARD_PADDING;
     this.p1HandZone.y = currentY;
     currentY += handZoneHeight + BETWEEN_AREAS + extraSpacing;
-    
-    // CIRCULAR END TURN BUTTON (positioned within the hand zone area)
-    // Position the button in the center of the hand zone where cards will form semicircle around it
-    const handZoneCenterX = this.p1HandZone.x + (this.p1HandZone.width || (width - 2 * this.STANDARD_PADDING)) / 2;
-    const handZoneCenterY = this.p1HandZone.y + handZoneHeight * 0.4; // Upper part of hand zone
-    this.buttonsContainer.x = handZoneCenterX - 60; // Offset for button radius
-    this.buttonsContainer.y = handZoneCenterY - 60; // Offset for button radius
   }
 }
