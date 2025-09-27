@@ -54,7 +54,9 @@ export const Colors = {
   ENERGY_ACTIVE: '#ffa500',          // Active energy color
   ENERGY_INACTIVE: '#808080',        // Inactive energy color
   HP_BAR_BACKGROUND: '#666666',      // HP bar background
-  HP_BAR_FILL: '#ff4500',           // HP bar fill
+
+  // use green as fill for HP bar to indicate health
+  HP_BAR_FILL: '#4caf50',           // HP bar fill
   HP_BAR_BG: '#666666',              // HP bar background (alias)
   TEXT_ON_DARK: '#ffffff',          // Text on dark backgrounds
   

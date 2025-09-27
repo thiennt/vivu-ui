@@ -398,13 +398,12 @@ export class CardBattleScene extends BaseScene {
     const BOTTOM_PADDING = this.STANDARD_PADDING * 2;
     
     // Zone heights (proportional) - removed discardZoneHeight as it's now embedded
-    const handZoneHeight = 100;
+    const handZoneHeight = 120;
     const characterZoneHeight = 120;
-    const battleLogHeight = 80;
-    const buttonsHeight = 60;
+    const battleLogHeight = 120;
     
     // Calculate available height and distribute remaining space
-    const fixedHeight = handZoneHeight * 2 + characterZoneHeight * 2 + battleLogHeight + buttonsHeight;
+    const fixedHeight = handZoneHeight * 2 + characterZoneHeight * 2 + battleLogHeight;
     const totalPadding = TOP_PADDING + BETWEEN_AREAS * 5 + BOTTOM_PADDING; // Reduced from 7 to 5 areas
     const remainingHeight = height - fixedHeight - totalPadding;
     const extraSpacing = Math.max(0, remainingHeight / 6); // Reduced from 8 to 6 sections

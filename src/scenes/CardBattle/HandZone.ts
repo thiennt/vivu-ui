@@ -139,7 +139,7 @@ export class HandZone extends Container {
     }
     
     // Create circular end turn button
-    const radius = Math.min(60, Math.min(width, height) * 0.08);
+    const radius = Math.min(60, Math.min(width, height) * 0.4);
     const button = new Container();
     
     const bg = new Graphics();
@@ -155,10 +155,10 @@ export class HandZone extends Container {
     
     // Simplified button text for circular design
     const buttonText = new Text({
-      text: 'END\nTURN',
+      text: 'END TURN',
       style: {
         fontFamily: 'Kalam',
-        fontSize: Math.min(16, radius * 0.25),
+        fontSize: 16,
         fontWeight: 'bold',
         fill: Colors.TEXT_BUTTON,
         align: 'center'

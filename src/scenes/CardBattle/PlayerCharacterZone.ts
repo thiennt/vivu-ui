@@ -2,6 +2,7 @@ import { Colors } from "@/utils/colors";
 import { Container, Graphics, Text } from "pixi.js";
 import { CardBattlePlayerState } from "@/types";
 import { BaseScene } from "@/utils/BaseScene";
+import { info } from "console";
 
 export class PlayerCharacterZone extends Container {
   private zoneBg: Graphics;
@@ -20,13 +21,13 @@ export class PlayerCharacterZone extends Container {
   private playerNo: number = 1;
   private playerState: CardBattlePlayerState | null = null;
 
-  // Discard zone functionality - playerInfoBg will act as discard drop target
-  private isDiscardHighlighted: boolean = false;
-  private discardTooltip: Text | null = null;
+  private infoWidth: number = 0;
+  private infoHeight: number = 0;
+  private charactersWidth: number = 0;
+  private charactersHeight: number = 0;
 
-  // Fixed dimensions to prevent size changes during highlighting
-  private fixedInfoWidth: number = 0;
-  private fixedHeight: number = 0;
+  // Discard zone functionality - playerInfoBg will act as discard drop target
+  private discardTooltip: Text | null = null;
 
   constructor(params?: { playerNo: number }) {
     super();
@@ -59,9 +60,9 @@ export class PlayerCharacterZone extends Container {
     this.zoneBg.clear();
     
     // Store fixed dimensions to prevent changes during highlighting
-    this.fixedInfoWidth = width * 0.18;
-    this.fixedHeight = height;
-    
+    this.infoWidth = width * 0.18;
+    this.infoHeight = height;
+
     // Simplified character zone background
     // Main background
     this.zoneBg.roundRect(0, 0, width, height, 8)
@@ -81,7 +82,7 @@ export class PlayerCharacterZone extends Container {
     this.playerInfoBg.clear();
     
     // Simplified player info background
-    this.playerInfoBg.roundRect(0, 0, this.fixedInfoWidth, this.fixedHeight, 6)
+    this.playerInfoBg.roundRect(0, 0, this.infoWidth, this.height, 6)
       .fill(Colors.PANEL_BACKGROUND)
       .stroke({ width: 1, color: infoBgBorder, alpha: 0.8 });
 
@@ -95,8 +96,8 @@ export class PlayerCharacterZone extends Container {
       align: 'center'
     };
     this.playerInfoLabel.anchor.set(0.5);
-    this.playerInfoLabel.x = this.fixedInfoWidth / 2;
-    this.playerInfoLabel.y = this.fixedHeight * 0.2;
+    this.playerInfoLabel.x = this.infoWidth / 2;
+    this.playerInfoLabel.y = this.infoHeight * 0.2;
 
     // Simplified energy display
     this.energyText.text = `⚡${this.energyCount}`;
@@ -108,8 +109,8 @@ export class PlayerCharacterZone extends Container {
       align: 'center'
     };
     this.energyText.anchor.set(0.5);
-    this.energyText.x = this.fixedInfoWidth / 2;
-    this.energyText.y = this.fixedHeight * 0.5;
+    this.energyText.x = this.infoWidth / 2;
+    this.energyText.y = this.infoHeight * 0.5;
 
     // Simplified deck display
     this.deckText.text = `🃏${this.deckCount}`;
@@ -121,19 +122,20 @@ export class PlayerCharacterZone extends Container {
       align: 'center'
     };
     this.deckText.anchor.set(0.5);
-    this.deckText.x = this.fixedInfoWidth / 2;
-    this.deckText.y = this.fixedHeight * 0.75;
+    this.deckText.x = this.infoWidth / 2;
+    this.deckText.y = this.infoHeight * 0.75;
 
     // Make playerInfoBg interactive for discard functionality
     this.playerInfoBg.interactive = true;
     this.updateDiscardHighlight(false); // Initialize without highlight
 
     // Layout characters zone to the right of player info
-    const charactersWidth = width - this.fixedInfoWidth;
-    this.charactersZone.x = this.fixedInfoWidth;
+    this.charactersWidth = width - this.infoWidth;
+    this.charactersHeight = height;
+    this.charactersZone.x = this.infoWidth;
     this.charactersZone.y = 0;
 
-    this.updateCharactersDisplay(charactersWidth, height);
+    this.updateCharactersDisplay();
   }
 
   updateBattleState(playerState: CardBattlePlayerState): void {
@@ -146,16 +148,12 @@ export class PlayerCharacterZone extends Container {
     // Update text displays
     this.energyText.text = `⚡x ${this.energyCount}`;
     this.deckText.text = `🃏x ${this.deckCount}`;
-    
-    // Use fixed dimensions for character update to maintain consistency
-    if (this.fixedInfoWidth > 0 && this.fixedHeight > 0) {
-      const totalWidth = this.fixedInfoWidth / 0.18; // Reverse calculate total width
-      const charactersWidth = totalWidth - this.fixedInfoWidth;
-      this.updateCharactersDisplay(charactersWidth, this.fixedHeight);
-    }
+
+
+    this.updateCharactersDisplay();
   }
 
-  private updateCharactersDisplay(width: number, height: number): void {
+  private updateCharactersDisplay(): void {
     // Clear existing character cards
     this.characterCards.forEach(card => card.destroy());
     this.characterCards = [];
@@ -167,14 +165,14 @@ export class PlayerCharacterZone extends Container {
     
     // Calculate optimal card dimensions to fit within the zone
     const spacing = 10;
-    const cardWidth = Math.floor(width / characters.length);
-    const cardHeight = cardWidth * 1.3; // Assume 1:1.3 aspect ratio
+    const cardWidth = Math.floor(this.charactersWidth / characters.length) - 10;
+    const cardHeight = this.charactersHeight * 0.95;
     
     const startX = spacing;
     
     characters.forEach((character, index) => {
-      const x = startX + (index * (cardWidth + spacing));
-      const y = Math.max(5, (height - cardHeight) / 2); // Center vertically
+      const x = startX + (index * (cardWidth + spacing)) + cardWidth / 2; // Center horizontally
+      const y = Math.max(5, (this.charactersHeight - cardHeight) / 2) + cardHeight / 2; // Center vertically
       
       const characterCard = this.createCharacterCard(character, x, y, cardWidth, cardHeight);
       
@@ -190,6 +188,8 @@ export class PlayerCharacterZone extends Container {
   private createCharacterCard(character: any, x: number, y: number, width: number, height: number): Container {
     const scene = this.parent as BaseScene;
     const card = scene.createCharacterCard(character, x, y, width, height);
+    card.pivot.x = card.width / 2;
+    card.pivot.y = card.height / 2;
     card.width = width;
     card.height = height;
     return card;
@@ -237,17 +237,15 @@ export class PlayerCharacterZone extends Container {
   isPointInPlayerInfo(globalX: number, globalY: number): boolean {
     // Use fixed dimensions and position for consistent hit detection
     const globalPos = this.toGlobal({ x: 0, y: 0 });
-    return globalX >= globalPos.x && globalX <= globalPos.x + this.fixedInfoWidth &&
-           globalY >= globalPos.y && globalY <= globalPos.y + this.fixedHeight;
+    return globalX >= globalPos.x && globalX <= globalPos.x + this.infoWidth &&
+           globalY >= globalPos.y && globalY <= globalPos.y + this.infoHeight;
   }
 
   // Method to highlight/unhighlight player info zone for discard
-  updateDiscardHighlight(highlight: boolean): void {
-    this.isDiscardHighlighted = highlight;
-    
+  updateDiscardHighlight(highlight: boolean): void {    
     // Use fixed dimensions instead of getBounds to prevent size changes
-    const infoWidth = this.fixedInfoWidth;
-    const height = this.fixedHeight;
+    const infoWidth = this.infoWidth;
+    const height = this.infoHeight;
     
     const infoBgBorder = this.playerNo === 1 ? Colors.TEAM_ALLY : Colors.TEAM_ENEMY;
     

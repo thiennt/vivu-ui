@@ -481,46 +481,6 @@ export abstract class BaseScene extends Container {
     // Inner card frame
     bg.roundRect(3, 3, width - 6, height - 6, 5)
       .stroke({ width: 1, color: Colors.TEXT_WHITE, alpha: 0.4 });
-    
-    // Character name area at top
-    bg.roundRect(6, 6, width - 12, height * 0.15, 3)
-      .fill({ color: Colors.TEXT_WHITE, alpha: 0.2 });
-
-    // Character name
-    const nameText = new Text({
-      text: character.name || character.ticker,
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: Math.max(8, width * 0.12),
-        fontWeight: 'bold',
-        fill: Colors.TEXT_WHITE,
-        align: 'center',
-        wordWrap: true,
-        wordWrapWidth: width - 16
-      }
-    });
-    nameText.anchor.set(0.5, 0.5);
-    nameText.x = width / 2;
-    nameText.y = height * 0.08;
-
-    // Level indicator
-    const levelBg = new Graphics()
-      .circle(width - 15, 15, 10)
-      .fill(Colors.BUTTON_PRIMARY)
-      .stroke({ width: 1, color: Colors.BUTTON_BORDER });
-    
-    const levelText = new Text({
-      text: character.level?.toString() || '1',
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: Math.max(6, width * 0.08),
-        fontWeight: 'bold',
-        fill: Colors.TEXT_WHITE
-      }
-    });
-    levelText.anchor.set(0.5);
-    levelText.x = width - 15;
-    levelText.y = 15;
 
     // HP Bar in the middle section
     const hpBarWidth = width * 0.8;
@@ -539,53 +499,39 @@ export abstract class BaseScene extends Container {
       .roundRect(hpBarX, hpBarY, hpBarWidth * hpPercent, hpBarHeight, 4)
       .fill(Colors.HP_BAR_FILL);
 
-    // HP Text
-    const hpText = new Text({
-      text: `${character.hp}/${character.max_hp || character.hp}`,
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: Math.max(6, width * 0.06),
-        fill: Colors.TEXT_WHITE,
-        align: 'center'
-      }
-    });
-    hpText.anchor.set(0.5);
-    hpText.x = width / 2;
-    hpText.y = hpBarY + hpBarHeight + 8;
-
     // Stats area at bottom
-    const statsY = height * 0.7;
     const atkText = new Text({
       text: `⚔️${character.atk}`,
       style: {
         fontFamily: 'Kalam',
-        fontSize: Math.max(6, width * 0.08),
+        fontSize: 14,
         fontWeight: 'bold',
         fill: Colors.TEXT_WHITE
       }
     });
-    atkText.x = width * 0.15;
-    atkText.y = statsY;
+    atkText.anchor.set(0.5);
+    atkText.x = width / 2;
+    atkText.y = height * 0.65;
 
     const defText = new Text({
       text: `🛡️${character.def}`,
       style: {
         fontFamily: 'Kalam',
-        fontSize: Math.max(6, width * 0.08),
+        fontSize: 14,
         fontWeight: 'bold',
         fill: Colors.TEXT_WHITE
       }
     });
-    defText.anchor.set(1, 0);
-    defText.x = width * 0.85;
-    defText.y = statsY;
+    defText.anchor.set(0.5);
+    defText.x = width / 2;
+    defText.y = height * 0.85;
 
-    cardContainer.addChild(bg, levelBg, nameText, levelText, hpBarBg, hpBarFg, hpText, atkText, defText);
+    cardContainer.addChild(bg, hpBarBg, hpBarFg, atkText, defText);
     cardContainer.x = x;
     cardContainer.y = y;
 
     // Add avatar/logo if needed
-    this.createAvatar(character, width, height, width/2, height * 0.28).then(avatarIcon => {
+    this.createAvatar(character, width, height, width/2, height * 0.25).then(avatarIcon => {
       cardContainer.addChild(avatarIcon);
     });
 
