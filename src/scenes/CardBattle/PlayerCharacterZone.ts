@@ -24,6 +24,10 @@ export class PlayerCharacterZone extends Container {
   private isDiscardHighlighted: boolean = false;
   private discardTooltip: Text | null = null;
 
+  // Fixed dimensions to prevent size changes during highlighting
+  private fixedInfoWidth: number = 0;
+  private fixedHeight: number = 0;
+
   constructor(params?: { playerNo: number }) {
     super();
 
@@ -54,6 +58,10 @@ export class PlayerCharacterZone extends Container {
   resize(width: number, height: number): void {
     this.zoneBg.clear();
     
+    // Store fixed dimensions to prevent changes during highlighting
+    this.fixedInfoWidth = width * 0.18;
+    this.fixedHeight = height;
+    
     // Simplified character zone background
     // Main background
     this.zoneBg.roundRect(0, 0, width, height, 8)
@@ -65,7 +73,6 @@ export class PlayerCharacterZone extends Container {
       .stroke({ width: 2, color: accentColor, alpha: 0.7 });
     
     // Layout player info zone at the left
-    const infoWidth = width * 0.18;
     this.playerInfoZone.x = 0;
     this.playerInfoZone.y = 0;
 
@@ -74,7 +81,7 @@ export class PlayerCharacterZone extends Container {
     this.playerInfoBg.clear();
     
     // Simplified player info background
-    this.playerInfoBg.roundRect(0, 0, infoWidth, height, 6)
+    this.playerInfoBg.roundRect(0, 0, this.fixedInfoWidth, this.fixedHeight, 6)
       .fill(Colors.PANEL_BACKGROUND)
       .stroke({ width: 1, color: infoBgBorder, alpha: 0.8 });
 
@@ -88,8 +95,8 @@ export class PlayerCharacterZone extends Container {
       align: 'center'
     };
     this.playerInfoLabel.anchor.set(0.5);
-    this.playerInfoLabel.x = infoWidth / 2;
-    this.playerInfoLabel.y = height * 0.2;
+    this.playerInfoLabel.x = this.fixedInfoWidth / 2;
+    this.playerInfoLabel.y = this.fixedHeight * 0.2;
 
     // Simplified energy display
     this.energyText.text = `⚡${this.energyCount}`;
@@ -101,8 +108,8 @@ export class PlayerCharacterZone extends Container {
       align: 'center'
     };
     this.energyText.anchor.set(0.5);
-    this.energyText.x = infoWidth / 2;
-    this.energyText.y = height * 0.5;
+    this.energyText.x = this.fixedInfoWidth / 2;
+    this.energyText.y = this.fixedHeight * 0.5;
 
     // Simplified deck display
     this.deckText.text = `🃏${this.deckCount}`;
@@ -114,16 +121,16 @@ export class PlayerCharacterZone extends Container {
       align: 'center'
     };
     this.deckText.anchor.set(0.5);
-    this.deckText.x = infoWidth / 2;
-    this.deckText.y = height * 0.75;
+    this.deckText.x = this.fixedInfoWidth / 2;
+    this.deckText.y = this.fixedHeight * 0.75;
 
     // Make playerInfoBg interactive for discard functionality
     this.playerInfoBg.interactive = true;
     this.updateDiscardHighlight(false); // Initialize without highlight
 
     // Layout characters zone to the right of player info
-    const charactersWidth = width - infoWidth;
-    this.charactersZone.x = infoWidth;
+    const charactersWidth = width - this.fixedInfoWidth;
+    this.charactersZone.x = this.fixedInfoWidth;
     this.charactersZone.y = 0;
 
     this.updateCharactersDisplay(charactersWidth, height);
@@ -212,10 +219,9 @@ export class PlayerCharacterZone extends Container {
   updateDiscardHighlight(highlight: boolean): void {
     this.isDiscardHighlighted = highlight;
     
-    // Redraw playerInfoBg with appropriate styling
-    const bounds = this.playerInfoBg.getBounds();
-    const infoWidth = bounds.width;
-    const height = bounds.height;
+    // Use fixed dimensions instead of getBounds to prevent size changes
+    const infoWidth = this.fixedInfoWidth;
+    const height = this.fixedHeight;
     
     const infoBgBorder = this.playerNo === 1 ? Colors.TEAM_ALLY : Colors.TEAM_ENEMY;
     

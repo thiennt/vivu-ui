@@ -77,9 +77,10 @@ export class HandZone extends Container {
     const cardHeight = 100; // Increased from 80
     const maxRotation = 40; // Increased rotation range for better semicircle
     
-    // Center point for the semicircle (this is where the end turn button will be)
+    // Center point for the semicircle - match the end turn button position
+    // Button is positioned at handZoneHeight * 0.4, so cards should center around that
     const centerX = width / 2;
-    const centerY = height * 0.75; // Position lower to leave space for end turn button
+    const centerY = height * 0.4; // Match button position instead of 0.75
     
     // Calculate semicircle radius based on card count and available space
     const baseRadius = Math.min(150, Math.max(120, width * 0.25));
@@ -97,16 +98,16 @@ export class HandZone extends Container {
         const angle = totalCards > 1 ? -maxRotation + (index * angleStep) : 0;
         const angleRad = angle * (Math.PI / 180);
         
-        // Position cards in semicircle formation
+        // Position cards in semicircle formation around the button center
         if (totalCards === 1) {
           // Single card positioned in front of center
           handCard.x = centerX;
-          handCard.y = centerY + semicircleRadius * 0.4;
+          handCard.y = centerY + semicircleRadius * 0.6; // Push further down for button space
           handCard.rotation = 0;
         } else {
           // Multiple cards in semicircle
           const cardX = centerX + Math.sin(angleRad) * semicircleRadius;
-          const cardY = centerY + Math.cos(angleRad) * semicircleRadius * 0.4;
+          const cardY = centerY + Math.cos(angleRad) * semicircleRadius * 0.6; // Adjust for button
           
           handCard.x = cardX;
           handCard.y = cardY;
