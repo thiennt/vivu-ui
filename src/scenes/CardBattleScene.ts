@@ -24,9 +24,6 @@ export class CardBattleScene extends BaseScene {
   private isAnimating: boolean = false;
   private mainPhaseResolve?: () => void;
   
-  // Background
-  private mysticalBackground!: Container;
-  
   // Zone components following the layout order:
   // PLAYER 2 HAND ZONE (Skill Cards)  
   // PLAYER 2 INFO (P2 + Energy count + Deck count + DISCARD ZONE) + 3 CHARACTERS ZONE
@@ -46,9 +43,6 @@ export class CardBattleScene extends BaseScene {
     super();
 
     this.battleId = params?.battleId || 'mock-battle-001';
-
-    // Create and add mystical battle arena background
-    this.createMysticalBackground();
 
     // Initialize all zones
     this.p2HandZone = new HandZone();
@@ -74,12 +68,6 @@ export class CardBattleScene extends BaseScene {
     
     // Initialize battle after zones are set up
     this.initializeBattle();
-  }
-
-  private createMysticalBackground(): void {
-    // Create mystical battle arena background container
-    this.mysticalBackground = new Container();
-    this.addChildAt(this.mysticalBackground, 0); // Add at bottom layer
   }
 
   private setupButtons(): void {
@@ -535,20 +523,6 @@ export class CardBattleScene extends BaseScene {
   resize(width: number, height: number): void {
     this.gameWidth = width;
     this.gameHeight = height;
-    
-    // Create simplified battle arena background
-    this.mysticalBackground.removeChildren();
-    const arenaBackground = new Graphics();
-    
-    // Simple background with subtle gradient effect
-    arenaBackground.roundRect(0, 0, width, height, 0)
-      .fill(Colors.BATTLEFIELD_PRIMARY);
-    
-    // Add a simple subtle border for definition
-    arenaBackground.roundRect(0, 0, width, height, 0)
-      .stroke({ width: 1, color: Colors.BATTLEFIELD_BORDER, alpha: 0.3 });
-    
-    this.mysticalBackground.addChild(arenaBackground);
     
     // Calculate layout based on backup structure
     const TOP_PADDING = this.STANDARD_PADDING * 2;

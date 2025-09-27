@@ -356,7 +356,7 @@ export class CardDetailPopup extends Container {
     if (this.isTooltipMode) {
       // Position tooltip at top center of screen
       this.x = (screenWidth - 300) / 2; // 300 is tooltipWidth
-      this.y = padding;
+      this.y = screenHeight * 0.30; // 30% from top
     }
   }
 }
