@@ -1,7 +1,6 @@
 import { Container, Graphics, Text } from 'pixi.js';
 import { BaseScene } from '@/utils/BaseScene';
 import { HandZone } from './CardBattle/HandZone';
-import { DiscardZone } from './CardBattle/DiscardZone';
 import { PlayerCharacterZone } from './CardBattle/PlayerCharacterZone';
 import { BattleLogZone } from './CardBattle/BattleLogZone';
 import { 
@@ -29,22 +28,18 @@ export class CardBattleScene extends BaseScene {
   private mysticalBackground!: Container;
   
   // Zone components following the layout order:
-  // PLAYER 2 DISCARD ZONE
   // PLAYER 2 HAND ZONE (Skill Cards)  
-  // PLAYER 2 INFO (P2 + Energy count + Deck count) + 3 CHARACTERS ZONE
+  // PLAYER 2 INFO (P2 + Energy count + Deck count + DISCARD ZONE) + 3 CHARACTERS ZONE
   // BATTLE LOG ZONE
-  // PLAYER 1 INFO (P1 + Energy count + Deck count) + 3 CHARACTERS ZONE
+  // PLAYER 1 INFO (P1 + Energy count + Deck count + DISCARD ZONE) + 3 CHARACTERS ZONE
   // PLAYER 1 HAND ZONE (Skill Cards)
-  // PLAYER 1 DISCARD ZONE
   // BUTTONS ZONE
 
-  private p2DiscardZone: DiscardZone;
   private p2HandZone: HandZone;
   private p2CharacterZone: PlayerCharacterZone;
   private battleLogZone: BattleLogZone;
   private p1CharacterZone: PlayerCharacterZone;
   private p1HandZone: HandZone;
-  private p1DiscardZone: DiscardZone;
   private buttonsContainer: Container;
 
   constructor(params?: { battleId?: string }) {
@@ -56,9 +51,6 @@ export class CardBattleScene extends BaseScene {
     this.createMysticalBackground();
 
     // Initialize all zones
-    this.p2DiscardZone = new DiscardZone();
-    this.addChild(this.p2DiscardZone);
-    
     this.p2HandZone = new HandZone();
     this.addChild(this.p2HandZone);
     
@@ -73,9 +65,6 @@ export class CardBattleScene extends BaseScene {
     
     this.p1HandZone = new HandZone();
     this.addChild(this.p1HandZone);
-    
-    this.p1DiscardZone = new DiscardZone();
-    this.addChild(this.p1DiscardZone);
     
     this.buttonsContainer = new Container();
     this.addChild(this.buttonsContainer);
@@ -191,7 +180,7 @@ export class CardBattleScene extends BaseScene {
       this.handleCardDrop(card, dropTarget);
     });
     
-    // Override the getDropTarget method for HandZone - cast to any to bypass private method restriction
+    // Override the getDropTarget method for HandZone - eslint-disable-next-line @typescript-eslint/no-explicit-any
     (this.p1HandZone as any).getDropTarget = (globalX: number, globalY: number): string | null => {
       return this.getDropTarget(globalX, globalY);
     };
@@ -204,8 +193,8 @@ export class CardBattleScene extends BaseScene {
       return p1CharacterTarget;
     }
 
-    // Check if dropped on player 1 discard pile
-    if (this.p1DiscardZone.isPointInside(globalX, globalY)) {
+    // Check if dropped on player 1 discard pile (now embedded in character zone)
+    if (this.p1CharacterZone.getDiscardZone().isPointInside(globalX, globalY)) {
       return 'discard';
     }
     
@@ -294,7 +283,7 @@ export class CardBattleScene extends BaseScene {
     // Card is already destroyed when this is called
   }
 
-  private animateCardPlay(_characterId: string): void {
+  private async animateCardPlay(_characterId: string): Promise<void> {
     // Animation will be handled by the drag/drop system
     // Card is already destroyed when this is called
   }
@@ -511,26 +500,19 @@ export class CardBattleScene extends BaseScene {
     const BETWEEN_AREAS = this.STANDARD_PADDING * 2;
     const BOTTOM_PADDING = this.STANDARD_PADDING * 2;
     
-    // Zone heights (proportional)
-    const discardZoneHeight = 75;
+    // Zone heights (proportional) - removed discardZoneHeight as it's now embedded
     const handZoneHeight = 100;
     const characterZoneHeight = 120;
     const battleLogHeight = 80;
     const buttonsHeight = 60;
     
     // Calculate available height and distribute remaining space
-    const fixedHeight = discardZoneHeight * 2 + handZoneHeight * 2 + characterZoneHeight * 2 + battleLogHeight + buttonsHeight;
-    const totalPadding = TOP_PADDING + BETWEEN_AREAS * 7 + BOTTOM_PADDING;
+    const fixedHeight = handZoneHeight * 2 + characterZoneHeight * 2 + battleLogHeight + buttonsHeight;
+    const totalPadding = TOP_PADDING + BETWEEN_AREAS * 5 + BOTTOM_PADDING; // Reduced from 7 to 5 areas
     const remainingHeight = height - fixedHeight - totalPadding;
-    const extraSpacing = Math.max(0, remainingHeight / 8);
+    const extraSpacing = Math.max(0, remainingHeight / 6); // Reduced from 8 to 6 sections
     
     let currentY = TOP_PADDING;
-    
-    // PLAYER 2 DISCARD ZONE (top)
-    this.p2DiscardZone.resize(75, discardZoneHeight);
-    this.p2DiscardZone.x = (width - 75) / 2;
-    this.p2DiscardZone.y = currentY;
-    currentY += discardZoneHeight + BETWEEN_AREAS + extraSpacing;
     
     // PLAYER 2 HAND ZONE (Skill Cards)
     this.p2HandZone.resize(width - 2 * this.STANDARD_PADDING, handZoneHeight);
@@ -538,7 +520,7 @@ export class CardBattleScene extends BaseScene {
     this.p2HandZone.y = currentY;
     currentY += handZoneHeight + BETWEEN_AREAS + extraSpacing;
     
-    // PLAYER 2 INFO + 3 CHARACTERS ZONE
+    // PLAYER 2 INFO + 3 CHARACTERS ZONE (now includes DiscardZone)
     this.p2CharacterZone.resize(width - 2 * this.STANDARD_PADDING, characterZoneHeight);
     this.p2CharacterZone.x = this.STANDARD_PADDING;
     this.p2CharacterZone.y = currentY;
@@ -561,12 +543,6 @@ export class CardBattleScene extends BaseScene {
     this.p1HandZone.x = this.STANDARD_PADDING;
     this.p1HandZone.y = currentY;
     currentY += handZoneHeight + BETWEEN_AREAS + extraSpacing;
-    
-    // PLAYER 1 DISCARD ZONE
-    this.p1DiscardZone.resize(75, discardZoneHeight);
-    this.p1DiscardZone.x = (width - 75) / 2;
-    this.p1DiscardZone.y = currentY;
-    currentY += discardZoneHeight + BETWEEN_AREAS + extraSpacing;
     
     // BUTTONS ZONE (bottom)
     this.buttonsContainer.x = (width - 200) / 2; // Center the 200px wide button
