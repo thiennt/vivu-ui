@@ -2,7 +2,6 @@ import { Colors } from "@/utils/colors";
 import { Container, Graphics, Text } from "pixi.js";
 import { CardBattlePlayerState } from "@/types";
 import { BaseScene } from "@/utils/BaseScene";
-import { DiscardZone } from "./DiscardZone";
 
 export class PlayerCharacterZone extends Container {
   private zoneBg: Graphics;
@@ -14,13 +13,16 @@ export class PlayerCharacterZone extends Container {
   private energyCount: number = 0;
   private deckText: Text;
   private deckCount: number = 0;
-  private discardZone: DiscardZone;
 
   private charactersZone: Container;
   private characterCards: Container[] = [];
   
   private playerNo: number = 1;
   private playerState: CardBattlePlayerState | null = null;
+
+  // Discard zone functionality - playerInfoBg will act as discard drop target
+  private isDiscardHighlighted: boolean = false;
+  private discardTooltip: Text | null = null;
 
   constructor(params?: { playerNo: number }) {
     super();
@@ -44,9 +46,6 @@ export class PlayerCharacterZone extends Container {
 
     this.deckText = new Text();
     this.playerInfoZone.addChild(this.deckText);
-
-    this.discardZone = new DiscardZone();
-    this.playerInfoZone.addChild(this.discardZone);
 
     this.charactersZone = new Container();
     this.addChild(this.charactersZone);
@@ -118,12 +117,9 @@ export class PlayerCharacterZone extends Container {
     this.deckText.x = infoWidth / 2;
     this.deckText.y = height * 0.75;
 
-    // Position DiscardZone below deck count in player info area
-    const discardZoneWidth = Math.min(60, infoWidth - 10);
-    const discardZoneHeight = Math.min(40, height * 0.15);
-    this.discardZone.resize(discardZoneWidth, discardZoneHeight);
-    this.discardZone.x = (infoWidth - discardZoneWidth) / 2;
-    this.discardZone.y = height * 0.85;
+    // Make playerInfoBg interactive for discard functionality
+    this.playerInfoBg.interactive = true;
+    this.updateDiscardHighlight(false); // Initialize without highlight
 
     // Layout characters zone to the right of player info
     const charactersWidth = width - infoWidth;
@@ -205,8 +201,80 @@ export class PlayerCharacterZone extends Container {
     return null;
   }
 
-  // Getter to access the embedded DiscardZone
-  getDiscardZone(): DiscardZone {
-    return this.discardZone;
+  // Method to check if coordinates are within player info zone bounds (discard functionality)
+  isPointInPlayerInfo(globalX: number, globalY: number): boolean {
+    const bounds = this.playerInfoBg.getBounds();
+    return globalX >= bounds.x && globalX <= bounds.x + bounds.width &&
+           globalY >= bounds.y && globalY <= bounds.y + bounds.height;
+  }
+
+  // Method to highlight/unhighlight player info zone for discard
+  updateDiscardHighlight(highlight: boolean): void {
+    this.isDiscardHighlighted = highlight;
+    
+    // Redraw playerInfoBg with appropriate styling
+    const bounds = this.playerInfoBg.getBounds();
+    const infoWidth = bounds.width;
+    const height = bounds.height;
+    
+    const infoBgBorder = this.playerNo === 1 ? Colors.TEAM_ALLY : Colors.TEAM_ENEMY;
+    
+    this.playerInfoBg.clear();
+    
+    if (highlight) {
+      // Dashed border when highlighted for discard
+      this.playerInfoBg.roundRect(0, 0, infoWidth, height, 6)
+        .fill(Colors.PANEL_BACKGROUND)
+        .stroke({ width: 3, color: Colors.CARD_DISCARD, alpha: 0.8 });
+        
+      // Add dashed border effect by drawing small rectangles
+      const dashLength = 8;
+      const spacing = 4;
+      for (let i = 0; i < infoWidth; i += dashLength + spacing) {
+        this.playerInfoBg.roundRect(i + 2, 2, Math.min(dashLength, infoWidth - i - 4), 2, 1)
+          .fill(Colors.CARD_DISCARD);
+      }
+      for (let i = 0; i < height; i += dashLength + spacing) {
+        this.playerInfoBg.roundRect(2, i + 2, 2, Math.min(dashLength, height - i - 4), 1)
+          .fill(Colors.CARD_DISCARD);
+        this.playerInfoBg.roundRect(infoWidth - 4, i + 2, 2, Math.min(dashLength, height - i - 4), 1)
+          .fill(Colors.CARD_DISCARD);
+      }
+      for (let i = 0; i < infoWidth; i += dashLength + spacing) {
+        this.playerInfoBg.roundRect(i + 2, height - 4, Math.min(dashLength, infoWidth - i - 4), 2, 1)
+          .fill(Colors.CARD_DISCARD);
+      }
+
+      // Add "Discard here" tooltip
+      if (!this.discardTooltip) {
+        this.discardTooltip = new Text({
+          text: 'Discard here',
+          style: {
+            fontFamily: 'Kalam',
+            fontSize: 12,
+            fontWeight: 'bold',
+            fill: Colors.TEXT_PRIMARY,
+            align: 'center'
+          }
+        });
+        this.discardTooltip.anchor.set(0.5);
+        this.playerInfoZone.addChild(this.discardTooltip);
+      }
+      
+      this.discardTooltip.visible = true;
+      this.discardTooltip.x = infoWidth / 2;
+      this.discardTooltip.y = height - 20;
+      
+    } else {
+      // Normal styling
+      this.playerInfoBg.roundRect(0, 0, infoWidth, height, 6)
+        .fill(Colors.PANEL_BACKGROUND)
+        .stroke({ width: 1, color: infoBgBorder, alpha: 0.8 });
+        
+      // Hide tooltip
+      if (this.discardTooltip) {
+        this.discardTooltip.visible = false;
+      }
+    }
   }
 }
