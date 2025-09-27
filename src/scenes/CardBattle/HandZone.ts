@@ -81,44 +81,45 @@ export class HandZone extends Container {
     
     if (handCards.length === 0) return;
     
-    // Improved semicircle layout with bigger cards
+    // Fan shape layout with bigger cards
     const cardWidth = 80;  // Increased from 60
     const cardHeight = 100; // Increased from 80
-    const maxRotation = 40; // Increased rotation range for better semicircle
+    const maxRotation = 40; // Rotation range for fan
     
-    // Center point for the semicircle (this is where the end turn button will be)
-    const centerX = width / 2;
-    const centerY = height * 0.75; // Position lower to leave space for end turn button
+    // Virtual pivot point above the End Turn button
+    const pivotX = width / 2;
+    const pivotY = height * 0.3; // Above the End Turn button which is at height * 0.4
     
-    // Calculate semicircle radius based on card count and available space
-    const baseRadius = Math.min(150, Math.max(120, width * 0.25));
-    // Increase distance between cards
-    const radiusMultiplier = Math.max(1.2, 1 + handCards.length * 0.1);
-    const semicircleRadius = baseRadius * radiusMultiplier;
+    // Calculate fan radius based on card count and available space
+    const baseRadius = Math.min(180, Math.max(140, width * 0.3));
+    // Increase distance between cards for better spacing
+    const radiusMultiplier = Math.max(1.3, 1 + handCards.length * 0.08);
+    const fanRadius = baseRadius * radiusMultiplier;
     
     handCards.forEach((cardInDeck, index) => {
       if (cardInDeck.card) {
         const handCard = this.createHandCard(cardInDeck.card, cardWidth, cardHeight);
         
-        // Calculate angle for this card in the semicircle
+        // Calculate angle for this card in the fan
         const totalCards = handCards.length;
         const angleStep = totalCards > 1 ? (2 * maxRotation) / (totalCards - 1) : 0;
         const angle = totalCards > 1 ? -maxRotation + (index * angleStep) : 0;
         const angleRad = angle * (Math.PI / 180);
         
-        // Position cards in semicircle formation
+        // Position cards in fan formation around the virtual pivot point
         if (totalCards === 1) {
-          // Single card positioned in front of center
-          handCard.x = centerX;
-          handCard.y = centerY + semicircleRadius * 0.4;
+          // Single card positioned below pivot point
+          handCard.x = pivotX;
+          handCard.y = pivotY + fanRadius * 0.8;
           handCard.rotation = 0;
         } else {
-          // Multiple cards in semicircle
-          const cardX = centerX + Math.sin(angleRad) * semicircleRadius;
-          const cardY = centerY + Math.cos(angleRad) * semicircleRadius * 0.4;
+          // Multiple cards in fan formation
+          const cardX = pivotX + Math.sin(angleRad) * fanRadius;
+          const cardY = pivotY + Math.cos(angleRad) * fanRadius;
           
           handCard.x = cardX;
           handCard.y = cardY;
+          // Rotate card to point toward the virtual pivot point
           handCard.rotation = angleRad;
         }
         
