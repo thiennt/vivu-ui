@@ -16,6 +16,9 @@ export class HandZone extends Container {
   private dragTarget: Container | null = null;
   private dragOffset = { x: 0, y: 0 };
   private onCardDropCallback?: (card: Card, dropTarget: string) => void;
+  private onDragEnterDiscardCallback?: () => void;
+  private onDragLeaveDiscardCallback?: () => void;
+  private currentDropTarget: string | null = null;
 
   // Tooltip state
   private cardTooltip: CardDetailPopup | null = null;
@@ -69,38 +72,41 @@ export class HandZone extends Container {
     const handCards = this.playerState.deck.hand_cards || [];
     if (handCards.length === 0) return;
     
-    // Fan-shaped card layout
-    const cardWidth = 60;
-    const cardHeight = 80;
-    const maxRotation = 25; // degrees
+    // Improved semicircle layout with bigger cards
+    const cardWidth = 80;  // Increased from 60
+    const cardHeight = 100; // Increased from 80
+    const maxRotation = 40; // Increased rotation range for better semicircle
     
-    // Center point for the fan
+    // Center point for the semicircle (this is where the end turn button will be)
     const centerX = width / 2;
-    const centerY = height * 0.6; // Position cards slightly above center
+    const centerY = height * 0.75; // Position lower to leave space for end turn button
     
-    // Calculate fan radius based on card count and available space
-    const fanRadius = Math.min(200, Math.max(100, width * 0.3));
+    // Calculate semicircle radius based on card count and available space
+    const baseRadius = Math.min(150, Math.max(120, width * 0.25));
+    // Increase distance between cards
+    const radiusMultiplier = Math.max(1.2, 1 + handCards.length * 0.1);
+    const semicircleRadius = baseRadius * radiusMultiplier;
     
     handCards.forEach((cardInDeck, index) => {
       if (cardInDeck.card) {
         const handCard = this.createHandCard(cardInDeck.card, cardWidth, cardHeight);
         
-        // Calculate angle for this card in the fan
+        // Calculate angle for this card in the semicircle
         const totalCards = handCards.length;
         const angleStep = totalCards > 1 ? (2 * maxRotation) / (totalCards - 1) : 0;
         const angle = totalCards > 1 ? -maxRotation + (index * angleStep) : 0;
         const angleRad = angle * (Math.PI / 180);
         
-        // Position cards in fan formation
+        // Position cards in semicircle formation
         if (totalCards === 1) {
-          // Single card centered
+          // Single card positioned in front of center
           handCard.x = centerX;
-          handCard.y = centerY;
+          handCard.y = centerY + semicircleRadius * 0.4;
           handCard.rotation = 0;
         } else {
-          // Multiple cards in fan
-          const cardX = centerX + Math.sin(angleRad) * fanRadius * 0.3;
-          const cardY = centerY - Math.cos(angleRad) * fanRadius * 0.2;
+          // Multiple cards in semicircle
+          const cardX = centerX + Math.sin(angleRad) * semicircleRadius;
+          const cardY = centerY + Math.cos(angleRad) * semicircleRadius * 0.4;
           
           handCard.x = cardX;
           handCard.y = cardY;
@@ -118,6 +124,14 @@ export class HandZone extends Container {
 
   setCardDropCallback(callback: (card: Card, dropTarget: string) => void): void {
     this.onCardDropCallback = callback;
+  }
+
+  setDiscardHighlightCallbacks(
+    onDragEnter: () => void, 
+    onDragLeave: () => void
+  ): void {
+    this.onDragEnterDiscardCallback = onDragEnter;
+    this.onDragLeaveDiscardCallback = onDragLeave;
   }
 
   private createHandCard(card: Card, width: number, height: number): Container {
@@ -201,6 +215,25 @@ export class HandZone extends Container {
       });
       this.dragTarget.position.set(newPos.x, newPos.y);
     }
+
+    // Check for discard zone highlighting
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const getDropTargetMethod = (this as any).getDropTarget;
+    const dropTarget = getDropTargetMethod ? getDropTargetMethod(event.global.x, event.global.y) : null;
+    
+    if (dropTarget !== this.currentDropTarget) {
+      // Left previous drop target
+      if (this.currentDropTarget === 'discard' && this.onDragLeaveDiscardCallback) {
+        this.onDragLeaveDiscardCallback();
+      }
+      
+      // Entered new drop target
+      if (dropTarget === 'discard' && this.onDragEnterDiscardCallback) {
+        this.onDragEnterDiscardCallback();
+      }
+      
+      this.currentDropTarget = dropTarget;
+    }
   };
 
   private onCardDragEnd = (event: FederatedPointerEvent): void => {
@@ -210,6 +243,12 @@ export class HandZone extends Container {
     
     // Hide card tooltip
     this.hideCardTooltip();
+    
+    // Clear discard highlight
+    if (this.currentDropTarget === 'discard' && this.onDragLeaveDiscardCallback) {
+      this.onDragLeaveDiscardCallback();
+    }
+    this.currentDropTarget = null;
     
     // Use the externally set getDropTarget method if available
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
