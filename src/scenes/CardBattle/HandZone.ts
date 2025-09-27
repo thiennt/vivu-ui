@@ -1,5 +1,5 @@
 import { Colors } from "@/utils/colors";
-import { Container, Graphics, FederatedPointerEvent } from "pixi.js";
+import { Container, Graphics, FederatedPointerEvent, Text } from "pixi.js";
 import { CardBattlePlayerState, Card } from "@/types";
 import { BaseScene } from "@/utils/BaseScene";
 import { app } from "@/app";
@@ -18,10 +18,15 @@ export class HandZone extends Container {
   private onCardDropCallback?: (card: Card, dropTarget: string) => void;
   private onDragEnterDiscardCallback?: () => void;
   private onDragLeaveDiscardCallback?: () => void;
+  private onCharacterHoverCallback?: (globalX: number, globalY: number, isDragging: boolean) => void;
   private currentDropTarget: string | null = null;
 
   // Tooltip state
   private cardTooltip: CardDetailPopup | null = null;
+  
+  // End Turn Button state
+  private endTurnButton: Container | null = null;
+  private endTurnCallback?: () => void;
 
   constructor() {
     super();
@@ -70,6 +75,10 @@ export class HandZone extends Container {
     this.hideCardTooltip(); // Clean up tooltip when updating display
     
     const handCards = this.playerState.deck.hand_cards || [];
+    
+    // Create or update end turn button
+    this.createOrUpdateEndTurnButton(width, height);
+    
     if (handCards.length === 0) return;
     
     // Improved semicircle layout with bigger cards
@@ -122,6 +131,77 @@ export class HandZone extends Container {
     });
   }
 
+  private createOrUpdateEndTurnButton(width: number, height: number): void {
+    // Remove existing button if any
+    if (this.endTurnButton) {
+      this.endTurnButton.destroy();
+      this.endTurnButton = null;
+    }
+    
+    // Create circular end turn button
+    const radius = Math.min(60, Math.min(width, height) * 0.08);
+    const button = new Container();
+    
+    const bg = new Graphics();
+    
+    // Main circular background
+    bg.circle(0, 0, radius)
+      .fill(Colors.BUTTON_PRIMARY)
+      .stroke({ width: 3, color: Colors.BUTTON_BORDER });
+    
+    // Inner highlight for depth
+    bg.circle(0, 0, radius - 4)
+      .stroke({ width: 2, color: Colors.BUTTON_HOVER, alpha: 0.4 });
+    
+    // Simplified button text for circular design
+    const buttonText = new Text({
+      text: 'END\nTURN',
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: Math.min(16, radius * 0.25),
+        fontWeight: 'bold',
+        fill: Colors.TEXT_BUTTON,
+        align: 'center'
+      }
+    });
+    buttonText.anchor.set(0.5);
+    
+    button.addChild(bg, buttonText);
+    
+    // Position button in center of semicircle
+    button.x = width / 2;
+    button.y = height * 0.4; // Upper part of hand zone
+    
+    // Circular hover effects
+    button.on('pointerover', () => {
+      bg.tint = Colors.BUTTON_HOVER;
+      button.scale.set(1.05);
+    });
+    
+    button.on('pointerout', () => {
+      bg.tint = 0xffffff;
+      button.scale.set(1);
+    });
+    
+    button.interactive = true;
+    button.cursor = 'pointer';
+    
+    // Simple click effect
+    button.on('pointerdown', () => {
+      button.scale.set(0.98);
+    });
+    
+    button.on('pointerup', () => {
+      button.scale.set(1);
+      if (this.endTurnCallback) {
+        this.endTurnCallback();
+      }
+    });
+    
+    this.addChild(button);
+    this.endTurnButton = button;
+  }
+
   setCardDropCallback(callback: (card: Card, dropTarget: string) => void): void {
     this.onCardDropCallback = callback;
   }
@@ -132,6 +212,14 @@ export class HandZone extends Container {
   ): void {
     this.onDragEnterDiscardCallback = onDragEnter;
     this.onDragLeaveDiscardCallback = onDragLeave;
+  }
+
+  setCharacterHoverCallback(callback: (globalX: number, globalY: number, isDragging: boolean) => void): void {
+    this.onCharacterHoverCallback = callback;
+  }
+
+  setEndTurnCallback(callback: () => void): void {
+    this.endTurnCallback = callback;
   }
 
   private createHandCard(card: Card, width: number, height: number): Container {
@@ -216,6 +304,11 @@ export class HandZone extends Container {
       this.dragTarget.position.set(newPos.x, newPos.y);
     }
 
+    // Update character card hover effects
+    if (this.onCharacterHoverCallback) {
+      this.onCharacterHoverCallback(event.global.x, event.global.y, true);
+    }
+
     // Check for discard zone highlighting
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const getDropTargetMethod = (this as any).getDropTarget;
@@ -243,6 +336,11 @@ export class HandZone extends Container {
     
     // Hide card tooltip
     this.hideCardTooltip();
+
+    // Reset character hover effects
+    if (this.onCharacterHoverCallback) {
+      this.onCharacterHoverCallback(0, 0, false);
+    }
     
     // Clear discard highlight
     if (this.currentDropTarget === 'discard' && this.onDragLeaveDiscardCallback) {

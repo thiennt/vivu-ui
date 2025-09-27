@@ -207,6 +207,32 @@ export class PlayerCharacterZone extends Container {
     return null;
   }
 
+  // Method to highlight character cards when dragging cards over them
+  updateCharacterHover(globalX: number, globalY: number, isDragging: boolean): void {
+    if (!isDragging) {
+      // Reset all character cards to normal scale
+      this.characterCards.forEach(card => {
+        card.scale.set(1.0);
+      });
+      return;
+    }
+
+    // Check which character card is being hovered
+    for (const characterCard of this.characterCards) {
+      const bounds = characterCard.getBounds();
+      const isHovering = globalX >= bounds.x && globalX <= bounds.x + bounds.width &&
+                        globalY >= bounds.y && globalY <= bounds.y + bounds.height;
+      
+      if (isHovering) {
+        // Zoom in the hovered character card
+        characterCard.scale.set(1.15);
+      } else {
+        // Reset non-hovered cards
+        characterCard.scale.set(1.0);
+      }
+    }
+  }
+
   // Method to check if coordinates are within player info zone bounds (discard functionality)
   isPointInPlayerInfo(globalX: number, globalY: number): boolean {
     // Use fixed dimensions and position for consistent hit detection
