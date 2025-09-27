@@ -1,4 +1,4 @@
-import { Container, Graphics, Text } from 'pixi.js';
+import { Container } from 'pixi.js';
 import { BaseScene } from '@/utils/BaseScene';
 import { HandZone } from './CardBattle/HandZone';
 import { PlayerCharacterZone } from './CardBattle/PlayerCharacterZone';
@@ -10,7 +10,6 @@ import {
   Card
 } from '@/types';
 import { battleApi } from '@/services/api';
-import { Colors } from '@/utils/colors';
 
 export class CardBattleScene extends BaseScene {
   /** Assets bundles required by this screen */
@@ -91,7 +90,8 @@ export class CardBattleScene extends BaseScene {
       this.endTurn();
     });
     
-    // Override the getDropTarget method for HandZone - eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // Override the getDropTarget method for HandZone 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (this.p1HandZone as any).getDropTarget = (globalX: number, globalY: number): string | null => {
       return this.getDropTarget(globalX, globalY);
     };
