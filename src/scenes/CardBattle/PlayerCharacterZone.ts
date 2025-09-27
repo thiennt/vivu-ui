@@ -147,12 +147,11 @@ export class PlayerCharacterZone extends Container {
     this.energyText.text = `⚡x ${this.energyCount}`;
     this.deckText.text = `🃏x ${this.deckCount}`;
     
-    // Get current zone bounds for character update
-    const bounds = this.zoneBg.getBounds();
-    if (bounds.width > 0 && bounds.height > 0) {
-      const infoWidth = bounds.width * 0.3;
-      const charactersWidth = bounds.width - infoWidth;
-      this.updateCharactersDisplay(charactersWidth, bounds.height);
+    // Use fixed dimensions for character update to maintain consistency
+    if (this.fixedInfoWidth > 0 && this.fixedHeight > 0) {
+      const totalWidth = this.fixedInfoWidth / 0.18; // Reverse calculate total width
+      const charactersWidth = totalWidth - this.fixedInfoWidth;
+      this.updateCharactersDisplay(charactersWidth, this.fixedHeight);
     }
   }
 
@@ -210,9 +209,10 @@ export class PlayerCharacterZone extends Container {
 
   // Method to check if coordinates are within player info zone bounds (discard functionality)
   isPointInPlayerInfo(globalX: number, globalY: number): boolean {
-    const bounds = this.playerInfoBg.getBounds();
-    return globalX >= bounds.x && globalX <= bounds.x + bounds.width &&
-           globalY >= bounds.y && globalY <= bounds.y + bounds.height;
+    // Use fixed dimensions and position for consistent hit detection
+    const globalPos = this.toGlobal({ x: 0, y: 0 });
+    return globalX >= globalPos.x && globalX <= globalPos.x + this.fixedInfoWidth &&
+           globalY >= globalPos.y && globalY <= globalPos.y + this.fixedHeight;
   }
 
   // Method to highlight/unhighlight player info zone for discard
