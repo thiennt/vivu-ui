@@ -2,7 +2,6 @@ import { Colors } from "@/utils/colors";
 import { Container, Graphics, Text } from "pixi.js";
 import { CardBattlePlayerState } from "@/types";
 import { BaseScene } from "@/utils/BaseScene";
-import { info } from "console";
 
 export class PlayerCharacterZone extends Container {
   private zoneBg: Graphics;
@@ -187,7 +186,8 @@ export class PlayerCharacterZone extends Container {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private createCharacterCard(character: any, x: number, y: number, width: number, height: number): Container {
     const scene = this.parent as BaseScene;
-    const card = scene.createCharacterCard(character, x, y, width, height);
+    // Use createHeroCard with 'preview' card type to get hero card visuals
+    const card = scene.createHeroCard(character, x, y, 'preview', undefined, width);
     card.pivot.x = card.width / 2;
     card.pivot.y = card.height / 2;
     card.width = width;
