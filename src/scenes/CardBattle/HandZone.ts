@@ -1,5 +1,5 @@
 import { Colors } from "@/utils/colors";
-import { Container, Graphics, FederatedPointerEvent, Text, Color } from "pixi.js";
+import { Container, Graphics, FederatedPointerEvent } from "pixi.js";
 import { CardBattlePlayerState, Card } from "@/types";
 import { BaseScene } from "@/utils/BaseScene";
 import { app } from "@/app";
@@ -83,32 +83,57 @@ export class HandZone extends Container {
     this.hideCardTooltip();
 
     const handCards = this.playerState.deck.hand_cards || [];
-
-    const cardWidth = 60;
-    const cardHeight = 90;
     if (handCards.length === 0) return;
+
+    // Calculate responsive card dimensions and spacing
+    const availableWidth = width - 20; // Padding on both sides
+    const maxCards = handCards.length;
+    const minCardWidth = 40;
+    const maxCardWidth = 60;
+    const minSpacing = 2; // Minimum spacing, can go negative for overlap
+    const maxSpacing = 10;
+
+    // Calculate optimal card width and spacing
+    let cardWidth = (availableWidth - (maxSpacing * (maxCards - 1))) / maxCards;
+    cardWidth = Math.max(minCardWidth, Math.min(maxCardWidth, cardWidth));
     
-    const spacing = 5;
-    const totalWidth = (cardWidth * handCards.length) + (spacing * Math.max(0, handCards.length - 1));
+    // Calculate spacing - this can go negative for overlap
+    let cardSpacing = (availableWidth - (cardWidth * maxCards)) / Math.max(1, maxCards - 1);
+    cardSpacing = Math.max(minSpacing, Math.min(maxSpacing, cardSpacing));
+    
+    // If cards still don't fit, use overlap (negative spacing)
+    const totalWidthWithMinSpacing = (cardWidth * maxCards) + (minSpacing * Math.max(0, maxCards - 1));
+    if (totalWidthWithMinSpacing > availableWidth) {
+      // Calculate overlap amount needed
+      cardSpacing = (availableWidth - (cardWidth * maxCards)) / Math.max(1, maxCards - 1);
+      // Ensure minimum overlap of 10 pixels between cards for readability
+      cardSpacing = Math.max(cardSpacing, -cardWidth + 10);
+    }
+    
+    const totalWidth = (cardWidth * maxCards) + (cardSpacing * Math.max(0, maxCards - 1));
     const startX = Math.max(10, (width - totalWidth) / 2);
-    const cardY = (height - cardHeight) / 2;
+    const cardY = (height - 90) / 2; // Fixed card height of 90
     
     handCards.forEach((cardInDeck, index) => {
       if (cardInDeck.card) {
-        const x = startX + (index * (cardWidth + spacing));
-        const handCard = this.createHandCard(cardInDeck.card, cardWidth, cardHeight);
+        const x = startX + (index * (cardWidth + cardSpacing));
+        const handCard = this.createHandCard(cardInDeck.card, cardWidth, 90);
         handCard.x = x;
         handCard.y = cardY;
         this.addChild(handCard);
         this.handCards.push(handCard);
       }
     });
-    
   }
 
   private updateEndTurnButton(width: number, height: number): void {
     // Remove existing button if any
     this.endTurnButton.removeChildren();
+
+    // Only show end turn button for player 1
+    if (this.playerNo !== 1) {
+      return;
+    }
 
     const scene = this.parent as BaseScene;
     // Responsive button sizing - improved for small screens

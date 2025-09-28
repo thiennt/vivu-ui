@@ -1507,7 +1507,20 @@ export const mockCardBattleState: CardBattleState = {
         "id": "f8266161-72a2-48a9-b232-82907b03b37e",
         "player_team": 1,
         "deck_cards": [],
-        "hand_cards": [],
+        "hand_cards": [
+          { "card": mockCards[0] },
+          { "card": mockCards[1] },
+          { "card": mockCards[2] },
+          { "card": mockCards[3] },
+          { "card": mockCards[4] },
+          { "card": mockCards[5] },
+          { "card": mockCards[6] },
+          { "card": mockCards[7] },
+          { "card": mockCards[8] },
+          { "card": mockCards[9] },
+          { "card": mockCards[10] },
+          { "card": mockCards[11] }
+        ],
         "discard_cards": [],
         "current_energy": 0,
         "cards_drawn": 0
@@ -1521,7 +1534,16 @@ export const mockCardBattleState: CardBattleState = {
         "id": "b9e86a2b-f861-4608-bb6c-e25fd49916fa",
         "player_team": 2,
         "deck_cards": [],
-        "hand_cards": [],
+        "hand_cards": [
+          { "card": mockCards[0] },
+          { "card": mockCards[1] },
+          { "card": mockCards[2] },
+          { "card": mockCards[3] },
+          { "card": mockCards[4] },
+          { "card": mockCards[5] },
+          { "card": mockCards[6] },
+          { "card": mockCards[7] }
+        ],
         "discard_cards": [],
         "current_energy": 0,
         "cards_drawn": 0

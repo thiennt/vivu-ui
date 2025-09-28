@@ -1,4 +1,3 @@
-import { Container } from 'pixi.js';
 import { BaseScene } from '@/utils/BaseScene';
 import { HandZone } from './CardBattle/HandZone';
 import { PlayerCharacterZone } from './CardBattle/PlayerCharacterZone';
@@ -190,9 +189,10 @@ export class CardBattleScene extends BaseScene {
     // Card is already destroyed when this is called
   }
 
-  private async animateCardPlay(_characterId: string): Promise<void> {
+  private async animateCardPlay(characterId: string): Promise<void> {
     // Animation will be handled by the drag/drop system
     // Card is already destroyed when this is called
+    console.log(`Card played on character: ${characterId}`);
   }
 
   // Battle initialization and game logic
