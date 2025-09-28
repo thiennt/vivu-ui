@@ -43,17 +43,100 @@ export class CardDetailPopup extends Container {
   }
 
   private createTooltipMode(): void {
-    // For tooltip mode, create a compact display without full-screen background
-    const tooltipWidth = 300;
-    const tooltipHeight = 150;
+    // For tooltip mode, create a compact card-like display
+    const tooltipWidth = 320;
+    const tooltipHeight = 180;
     
-    // Create tooltip panel (no full-screen background in tooltip mode)
+    // Create card-like background with enhanced trading card appearance (smaller version)
     this.dialogPanel = new Graphics();
+    
+    // Card shadow for depth
+    this.dialogPanel.roundRect(3, 3, tooltipWidth, tooltipHeight, 8)
+      .fill({ color: Colors.SHADOW_COLOR, alpha: 0.4 });
+    
+    // Get rarity color for background
+    const rarityColors: { [key: string]: string } = {
+      common: Colors.RARITY_COMMON,
+      uncommon: Colors.RARITY_UNCOMMON,
+      rare: Colors.RARITY_RARE,
+      epic: Colors.RARITY_EPIC,
+      legendary: Colors.RARITY_LEGENDARY
+    };
+    const rarityColor = rarityColors[this.card.rarity] || rarityColors.common;
+    
+    // Main card background with rarity color
     this.dialogPanel.roundRect(0, 0, tooltipWidth, tooltipHeight, 8)
-      .fill({ color: Colors.PANEL_BACKGROUND, alpha: 0.95 })
-      .stroke({ width: 2, color: Colors.BUTTON_PRIMARY });
+      .fill(Colors.CARD_BACKGROUND)
+      .stroke({ width: 2, color: rarityColor });
+    
+    // Inner card frame for that trading card look
+    this.dialogPanel.roundRect(4, 4, tooltipWidth - 8, tooltipHeight - 8, 4)
+      .stroke({ width: 1, color: Colors.CARD_BORDER, alpha: 0.3 });
+    
+    // Top border accent for premium card feel
+    this.dialogPanel.roundRect(6, 6, tooltipWidth - 12, 8, 2)
+      .fill({ color: rarityColor, alpha: 0.3 });
 
     this.addChild(this.dialogPanel);
+
+    // Enhanced energy cost (top left) with card-like styling - smaller version
+    const energyCircleRadius = 12;
+    const energyCostBg = new Graphics()
+      .circle(20, 20, energyCircleRadius)
+      .fill({ color: Colors.ENERGY_ACTIVE })
+      .stroke({ width: 2, color: Colors.BUTTON_BORDER });
+    
+    // Inner energy circle for depth
+    const energyCostInner = new Graphics()
+      .circle(20, 20, energyCircleRadius - 2)
+      .stroke({ width: 1, color: Colors.TEXT_WHITE, alpha: 0.5 });
+    
+    const energyText = new Text({
+      text: this.card.energyCost.toString(),
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 12,
+        fontWeight: 'bold',
+        fill: Colors.TEXT_WHITE
+      }
+    });
+    energyText.anchor.set(0.5);
+    energyText.x = 20;
+    energyText.y = 20;
+
+    this.addChild(energyCostBg, energyCostInner, energyText);
+
+    // Group icon at top right - smaller version
+    let groupIcon = '';
+    switch (this.card.group) {
+      case CardType.ATTACK:
+        groupIcon = '⚔️';
+        break;
+      case CardType.HEAL:
+        groupIcon = '✨';
+        break;
+      case CardType.DEBUFF:
+        groupIcon = '🌀';
+        break;
+      case CardType.BUFF:
+        groupIcon = '🔼';
+        break;
+      default:
+        groupIcon = '⭐';
+    }
+    const groupIconText = new Text({
+      text: groupIcon,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 16,
+        align: 'center',
+        fill: Colors.CARD_BORDER // Use dark color for visibility
+      }
+    });
+    groupIconText.anchor.set(1, 0);
+    groupIconText.x = tooltipWidth - 8;
+    groupIconText.y = 8;
+    this.addChild(groupIconText);
 
     // Card name
     const cardNameText = new Text({
@@ -62,27 +145,15 @@ export class CardDetailPopup extends Container {
         fontFamily: 'Kalam',
         fontSize: 16,
         fontWeight: 'bold',
-        fill: Colors.RARITY_LEGENDARY,
-        align: 'left'
+        fill: Colors.CARD_BORDER, // Use dark color for readability
+        align: 'left',
+        wordWrap: true,
+        wordWrapWidth: tooltipWidth - 60
       }
     });
     cardNameText.x = 10;
-    cardNameText.y = 10;
+    cardNameText.y = 40;
     this.addChild(cardNameText);
-
-    // Energy cost
-    const energyCostText = new Text({
-      text: `Energy: ${this.card.energyCost}`,
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 12,
-        fill: Colors.TEXT_PRIMARY,
-        align: 'left'
-      }
-    });
-    energyCostText.x = 10;
-    energyCostText.y = 35;
-    this.addChild(energyCostText);
 
     // Card type
     if (this.card.cardType || this.card.group) {
@@ -90,13 +161,13 @@ export class CardDetailPopup extends Container {
         text: `Type: ${this.card.cardType || this.card.group}`,
         style: {
           fontFamily: 'Kalam',
-          fontSize: 12,
-          fill: Colors.TEXT_PRIMARY,
+          fontSize: 10,
+          fill: Colors.BACKGROUND_SECONDARY, // Use darker color for readability
           align: 'left'
         }
       });
       typeText.x = 10;
-      typeText.y = 55;
+      typeText.y = 65;
       this.addChild(typeText);
     }
 
@@ -106,14 +177,14 @@ export class CardDetailPopup extends Container {
       style: {
         fontFamily: 'Kalam',
         fontSize: 10,
-        fill: Colors.TEXT_SECONDARY,
+        fill: Colors.BACKGROUND_SECONDARY, // Use darker color for readability
         align: 'left',
         wordWrap: true,
         wordWrapWidth: tooltipWidth - 20
       }
     });
     cardDescText.x = 10;
-    cardDescText.y = 80;
+    cardDescText.y = 85;
     this.addChild(cardDescText);
   }
 
@@ -466,7 +537,7 @@ export class CardDetailPopup extends Container {
   public positionAtTop(screenWidth: number, screenHeight: number, _padding: number = 20): void {
     if (this.isTooltipMode) {
       // Position tooltip at top center of screen
-      this.x = (screenWidth - 300) / 2; // 300 is tooltipWidth
+      this.x = (screenWidth - 320) / 2; // 320 is updated tooltipWidth
       this.y = screenHeight * 0.30; // 30% from top
     }
   }

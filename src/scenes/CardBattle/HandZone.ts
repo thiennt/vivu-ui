@@ -5,6 +5,7 @@ import { BaseScene } from "@/utils/BaseScene";
 import { app } from "@/app";
 import { gsap } from "gsap";
 import { CardDetailPopup, cardToBattleCard } from "@/popups/CardDetailPopup";
+import { navigation } from "@/utils/navigation";
 
 
 export class HandZone extends Container {
@@ -169,7 +170,8 @@ export class HandZone extends Container {
     const cardContainer = scene.createDeckCard(card, width, height, {
       fontScale: 0.8,
       showDescription: false,
-      enableHover: true
+      enableHover: true,
+      onClick: (clickedCard) => this.showCardFullPopup(clickedCard)
     });
 
     // Store card reference for drag/drop
@@ -400,5 +402,17 @@ export class HandZone extends Container {
       this.cardTooltip.destroy();
       this.cardTooltip = null;
     }
+  }
+
+  private showCardFullPopup(card: Card): void {
+    // Convert Card to BattleCard for the popup
+    const battleCard = cardToBattleCard(card);
+    
+    // Show full popup (not tooltip mode)
+    navigation.presentPopup(class extends CardDetailPopup {
+      constructor() {
+        super({ card: battleCard });
+      }
+    });
   }
 }
