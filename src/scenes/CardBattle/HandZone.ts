@@ -1,5 +1,5 @@
 import { Colors } from "@/utils/colors";
-import { Container, Graphics, FederatedPointerEvent, Text, Color } from "pixi.js";
+import { Container, Graphics, FederatedPointerEvent } from "pixi.js";
 import { CardBattlePlayerState, Card } from "@/types";
 import { BaseScene } from "@/utils/BaseScene";
 import { app } from "@/app";
@@ -83,19 +83,32 @@ export class HandZone extends Container {
     this.hideCardTooltip();
 
     const handCards = this.playerState.deck.hand_cards || [];
+    if (handCards.length === 0) return;
 
+    // Keep card size fixed as requested
     const cardWidth = 60;
     const cardHeight = 90;
-    if (handCards.length === 0) return;
+    const availableWidth = width - 20; // Padding on both sides
     
-    const spacing = 5;
-    const totalWidth = (cardWidth * handCards.length) + (spacing * Math.max(0, handCards.length - 1));
+    // Calculate spacing - start with preferred spacing
+    let cardSpacing = 5;
+    let totalWidth = (cardWidth * handCards.length) + (cardSpacing * Math.max(0, handCards.length - 1));
+    
+    // If cards don't fit with normal spacing, reduce spacing until they overlap to fit
+    if (totalWidth > availableWidth && handCards.length > 1) {
+      // Calculate required spacing (can be negative for overlap)
+      cardSpacing = (availableWidth - (cardWidth * handCards.length)) / Math.max(1, handCards.length - 1);
+      // Ensure minimum 10px visible per card for readability
+      cardSpacing = Math.max(cardSpacing, -cardWidth + 10);
+      totalWidth = (cardWidth * handCards.length) + (cardSpacing * Math.max(0, handCards.length - 1));
+    }
+    
     const startX = Math.max(10, (width - totalWidth) / 2);
     const cardY = (height - cardHeight) / 2;
     
     handCards.forEach((cardInDeck, index) => {
       if (cardInDeck.card) {
-        const x = startX + (index * (cardWidth + spacing));
+        const x = startX + (index * (cardWidth + cardSpacing));
         const handCard = this.createHandCard(cardInDeck.card, cardWidth, cardHeight);
         handCard.x = x;
         handCard.y = cardY;
@@ -103,12 +116,16 @@ export class HandZone extends Container {
         this.handCards.push(handCard);
       }
     });
-    
   }
 
   private updateEndTurnButton(width: number, height: number): void {
     // Remove existing button if any
     this.endTurnButton.removeChildren();
+
+    // Only show end turn button for player 1
+    if (this.playerNo !== 1) {
+      return;
+    }
 
     const scene = this.parent as BaseScene;
     // Responsive button sizing - improved for small screens
