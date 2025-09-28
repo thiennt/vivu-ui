@@ -14,8 +14,8 @@ export abstract class BaseScene extends Container {
   protected gameHeight: number = navigation.height;
   
   // Standard layout constants
-  protected readonly STANDARD_PADDING = 10;
-  protected readonly STANDARD_SPACING = 10;
+  public readonly STANDARD_PADDING = 10;
+  public readonly STANDARD_SPACING = 10;
 
   // Bottom navigation
   protected bottomNavigation: BottomNavigationMenu | null = null;
@@ -158,7 +158,7 @@ export abstract class BaseScene extends Container {
     return Math.max(minSize, Math.min(maxSize, scaledSize));
   }
 
-  protected createButton(
+  public createButton(
     text: string, 
     x: number, 
     y: number, 

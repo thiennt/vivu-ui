@@ -3,8 +3,8 @@ import { BaseScene } from '@/utils/BaseScene';
 import { HandZone } from './CardBattle/HandZone';
 import { PlayerCharacterZone } from './CardBattle/PlayerCharacterZone';
 import { BattleLogZone } from './CardBattle/BattleLogZone';
-import { 
-  CardBattleState, 
+import {
+  CardBattleState,
   TurnAction,
   BattlePhaseName,
   Card
@@ -16,13 +16,13 @@ export class CardBattleScene extends BaseScene {
   public static assetBundles = [];
 
   private battleId: string;
-  
+
   // Battle state management
   private battleState: CardBattleState | null = null;
   private currentPhase: BattlePhaseName = 'start_turn';
   private isAnimating: boolean = false;
   private mainPhaseResolve?: () => void;
-  
+
   // Zone components following the layout order:
   // PLAYER 2 HAND ZONE (Skill Cards)  
   // PLAYER 2 INFO (P2 + Energy count + Deck count + DISCARD ZONE) + 3 CHARACTERS ZONE
@@ -36,7 +36,6 @@ export class CardBattleScene extends BaseScene {
   private battleLogZone: BattleLogZone;
   private p1CharacterZone: PlayerCharacterZone;
   private p1HandZone: HandZone;
-  private buttonsContainer: Container;
 
   constructor(params?: { battleId?: string }) {
     super();
@@ -44,26 +43,23 @@ export class CardBattleScene extends BaseScene {
     this.battleId = params?.battleId || 'mock-battle-001';
 
     // Initialize all zones
-    this.p2HandZone = new HandZone();
+    this.p2HandZone = new HandZone({ playerNo: 2 });
     this.addChild(this.p2HandZone);
-    
+
     this.p2CharacterZone = new PlayerCharacterZone({ playerNo: 2 });
     this.addChild(this.p2CharacterZone);
-    
+
     this.battleLogZone = new BattleLogZone();
     this.addChild(this.battleLogZone);
-    
+
     this.p1CharacterZone = new PlayerCharacterZone({ playerNo: 1 });
     this.addChild(this.p1CharacterZone);
-    
-    this.p1HandZone = new HandZone();
+
+    this.p1HandZone = new HandZone(  { playerNo: 1 });
     this.addChild(this.p1HandZone);
-    
-    this.buttonsContainer = new Container();
-    this.addChild(this.buttonsContainer);
-    
+
     this.setupDragDropHandlers();
-    
+
     // Initialize battle after zones are set up
     this.initializeBattle();
   }
@@ -73,7 +69,7 @@ export class CardBattleScene extends BaseScene {
     this.p1HandZone.setCardDropCallback((card: Card, dropTarget: string) => {
       this.handleCardDrop(card, dropTarget);
     });
-    
+
     // Set up discard highlighting callbacks
     this.p1HandZone.setDiscardHighlightCallbacks(
       () => this.p1CharacterZone.updateDiscardHighlight(true),
@@ -89,7 +85,7 @@ export class CardBattleScene extends BaseScene {
     this.p1HandZone.setEndTurnCallback(() => {
       this.endTurn();
     });
-    
+
     // Override the getDropTarget method for HandZone 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (this.p1HandZone as any).getDropTarget = (globalX: number, globalY: number): string | null => {
@@ -108,15 +104,15 @@ export class CardBattleScene extends BaseScene {
     if (this.p1CharacterZone.isPointInPlayerInfo(globalX, globalY)) {
       return 'discard';
     }
-    
+
     return null;
   }
 
   private async handleCardDrop(card: Card, dropTarget: string): Promise<void> {
     if (!this.battleState) return;
-    
+
     this.isAnimating = true;
-    
+
     try {
       if (dropTarget === 'discard') {
         // Discard card for energy
@@ -128,30 +124,30 @@ export class CardBattleScene extends BaseScene {
     } catch (error) {
       console.error('Error handling card drop:', error);
     }
-    
+
     this.isAnimating = false;
   }
 
   private async discardCardForEnergy(card: Card): Promise<void> {
     if (!this.battleState) return;
-    
+
     const turnAction: TurnAction = {
       type: 'discard_card',
       player_team: this.battleState.current_player,
       card_id: card.id
     };
-    
+
     try {
       const response = await battleApi.discardCard(this.battleId, turnAction);
       if (response.success && response.data) {
         console.log('Discard card logs:', response.data);
-        
+
         // Remove card from player's hand
         const currentPlayer = this.battleState.players.find(p => p.team === this.battleState!.current_player);
         if (currentPlayer && currentPlayer.deck.hand_cards) {
           currentPlayer.deck.hand_cards = currentPlayer.deck.hand_cards.filter((c: { card?: Card }) => c.card?.id !== card.id);
         }
-        
+
         this.updateAllZones();
         this.animateCardToDiscard();
       }
@@ -162,25 +158,25 @@ export class CardBattleScene extends BaseScene {
 
   private async playCardOnCharacter(card: Card, characterId: string): Promise<void> {
     if (!this.battleState) return;
-    
+
     const turnAction: TurnAction = {
       type: 'play_card',
       player_team: this.battleState.current_player,
       card_id: card.id,
       character_id: characterId
     };
-    
+
     try {
       const response = await battleApi.playCard(this.battleId, turnAction);
       if (response.success && response.data) {
         console.log('Play card logs:', response.data);
-        
+
         // Remove card from player's hand
         const currentPlayer = this.battleState.players.find(p => p.team === this.battleState!.current_player);
         if (currentPlayer && currentPlayer.deck.hand_cards) {
           currentPlayer.deck.hand_cards = currentPlayer.deck.hand_cards.filter((c: { card?: Card }) => c.card?.id !== card.id);
         }
-        
+
         this.updateAllZones();
         this.animateCardPlay(characterId);
       }
@@ -205,9 +201,9 @@ export class CardBattleScene extends BaseScene {
       // Load battle state from API
       const response = await battleApi.getBattleState(this.battleId);
       this.battleState = response.data;
-      
+
       console.log('Battle initialized with state:', this.battleState);
-      
+
       if (this.battleState && this.battleState.players) {
         this.updateAllZones();
         this.startGameLoop();
@@ -221,16 +217,16 @@ export class CardBattleScene extends BaseScene {
     while (this.battleState && this.battleState.status === 'ongoing') {
       // Turn Start
       await this.processTurnStart();
-      
+
       // Draw Phase  
       await this.processDrawPhase();
-      
+
       // Main Phase
       await this.processMainPhase();
-      
+
       // End Turn
       await this.processEndTurn();
-      
+
       // Check win condition
       if (this.checkGameEnd()) {
         break;
@@ -241,7 +237,7 @@ export class CardBattleScene extends BaseScene {
   private async processTurnStart(): Promise<void> {
     this.currentPhase = 'start_turn';
     console.log(`Turn Start - Player ${this.battleState?.current_player}`);
-    
+
     try {
       const response = await battleApi.startTurn(this.battleId);
       if (response.success && response.data) {
@@ -255,26 +251,26 @@ export class CardBattleScene extends BaseScene {
 
   private async processDrawPhase(): Promise<void> {
     if (!this.battleState) return;
-    
+
     this.currentPhase = 'draw_phase';
     console.log('Draw Phase');
-    
+
     const turnAction: TurnAction = {
       type: 'draw_card',
       player_team: this.battleState.current_player
     };
-    
+
     try {
       const response = await battleApi.drawCards(this.battleId, turnAction);
       if (response.success && response.data) {
         const logs = response.data;
         console.log('Draw phase logs:', logs);
-        
+
         // Update hand cards from drawn_cards if available
         if (logs.length > 0 && logs[0].drawn_cards) {
           const drawnCards = logs[0].drawn_cards;
           console.log('Cards drawn:', drawnCards);
-          
+
           // Add cards to player's hand in battleState
           if (this.battleState) {
             const currentPlayer = this.battleState.players.find(p => p.team === this.battleState!.current_player);
@@ -286,9 +282,9 @@ export class CardBattleScene extends BaseScene {
             }
           }
         }
-        
+
         this.updateAllZones();
-        
+
         // Add draw card animation for current player
         if (this.battleState.current_player === 1) {
           await this.p1HandZone.animateCardDraw();
@@ -302,7 +298,7 @@ export class CardBattleScene extends BaseScene {
   private async processMainPhase(): Promise<void> {
     this.currentPhase = 'main_phase';
     console.log('Main Phase - Player can take actions');
-    
+
     // For player 1: Enable interactions and wait for player input
     if (this.battleState?.current_player === 1) {
       // Return Promise that resolves when player ends turn
@@ -318,18 +314,18 @@ export class CardBattleScene extends BaseScene {
   private async processEndTurn(): Promise<void> {
     this.currentPhase = 'end_turn';
     console.log('End Turn - Processing end turn effects');
-    
+
     const turnAction: TurnAction = {
       type: 'end_turn',
       player_team: this.battleState!.current_player
     };
-    
+
     try {
       const response = await battleApi.endTurn(this.battleId, turnAction);
       if (response.success && response.data) {
         const logs = response.data;
         console.log('End turn logs:', logs);
-        
+
         // Update battle state from the logs if available
         if (logs.length > 0 && logs[0].after_state && this.battleState) {
           const afterState = logs[0].after_state;
@@ -340,7 +336,7 @@ export class CardBattleScene extends BaseScene {
             this.battleState.current_turn = afterState.turn;
           }
         }
-        
+
         this.updateAllZones();
       }
     } catch (error) {
@@ -350,12 +346,12 @@ export class CardBattleScene extends BaseScene {
 
   private checkGameEnd(): boolean {
     if (!this.battleState || !this.battleState.players) return false;
-    
+
     if (this.battleState.status === 'completed') {
       console.log(`Game ended. Winner: Team ${this.battleState.winner_team}`);
       return true;
     }
-    
+
     return false;
   }
 
@@ -368,76 +364,74 @@ export class CardBattleScene extends BaseScene {
 
   private updateAllZones(): void {
     if (!this.battleState) return;
-    
+
     // Update player zones with battle state
     const player1 = this.battleState.players.find(p => p.team === 1);
     const player2 = this.battleState.players.find(p => p.team === 2);
-    
+
     if (player1) {
       this.p1CharacterZone.updateBattleState(player1);
       this.p1HandZone.updateBattleState(player1);
     }
-    
+
     if (player2) {
       this.p2CharacterZone.updateBattleState(player2);
       this.p2HandZone.updateBattleState(player2);
     }
-    
+
     // Update battle log
     this.battleLogZone.updatePhase(this.currentPhase, this.battleState.current_player);
   }
-  
+
   /** Resize handler */
   resize(width: number, height: number): void {
     this.gameWidth = width;
     this.gameHeight = height;
-    
+
     // Calculate layout based on backup structure
     const TOP_PADDING = this.STANDARD_PADDING * 2;
     const BETWEEN_AREAS = this.STANDARD_PADDING * 2;
     const BOTTOM_PADDING = this.STANDARD_PADDING * 2;
-    
-    // Zone heights (proportional) - removed discardZoneHeight as it's now embedded
-    const handZoneHeight = 120;
+
     const characterZoneHeight = 120;
     const battleLogHeight = 120;
-    
+    const handZoneHeight = (height - characterZoneHeight * 2 - battleLogHeight - TOP_PADDING - BOTTOM_PADDING - BETWEEN_AREAS * 5) / 2;
+
     // Calculate available height and distribute remaining space
     const fixedHeight = handZoneHeight * 2 + characterZoneHeight * 2 + battleLogHeight;
     const totalPadding = TOP_PADDING + BETWEEN_AREAS * 5 + BOTTOM_PADDING; // Reduced from 7 to 5 areas
     const remainingHeight = height - fixedHeight - totalPadding;
     const extraSpacing = Math.max(0, remainingHeight / 6); // Reduced from 8 to 6 sections
-    
+
     let currentY = TOP_PADDING;
-    
+
     // PLAYER 2 HAND ZONE (Skill Cards)
-    this.p2HandZone.resize(width - 2 * this.STANDARD_PADDING, handZoneHeight);
     this.p2HandZone.x = this.STANDARD_PADDING;
     this.p2HandZone.y = currentY;
+    this.p2HandZone.resize(width - 2 * this.STANDARD_PADDING, handZoneHeight);
     currentY += handZoneHeight + BETWEEN_AREAS + extraSpacing;
-    
+
     // PLAYER 2 INFO + 3 CHARACTERS ZONE (now includes DiscardZone)
     this.p2CharacterZone.resize(width - 2 * this.STANDARD_PADDING, characterZoneHeight);
     this.p2CharacterZone.x = this.STANDARD_PADDING;
     this.p2CharacterZone.y = currentY;
     currentY += characterZoneHeight + BETWEEN_AREAS + extraSpacing;
-    
+
     // BATTLE LOG ZONE (center)
     this.battleLogZone.resize(width - 2 * this.STANDARD_PADDING, battleLogHeight);
     this.battleLogZone.x = this.STANDARD_PADDING;
     this.battleLogZone.y = currentY;
     currentY += battleLogHeight + BETWEEN_AREAS + extraSpacing;
-    
+
     // PLAYER 1 INFO + 3 CHARACTERS ZONE
     this.p1CharacterZone.resize(width - 2 * this.STANDARD_PADDING, characterZoneHeight);
     this.p1CharacterZone.x = this.STANDARD_PADDING;
     this.p1CharacterZone.y = currentY;
     currentY += characterZoneHeight + BETWEEN_AREAS + extraSpacing;
-    
-    // PLAYER 1 HAND ZONE (Skill Cards)
-    this.p1HandZone.resize(width - 2 * this.STANDARD_PADDING, handZoneHeight);
+
+    // PLAYER 1 HAND ZONE anchored to bottom
     this.p1HandZone.x = this.STANDARD_PADDING;
     this.p1HandZone.y = currentY;
-    currentY += handZoneHeight + BETWEEN_AREAS + extraSpacing;
+    this.p1HandZone.resize(width - 2 * this.STANDARD_PADDING, handZoneHeight);
   }
 }

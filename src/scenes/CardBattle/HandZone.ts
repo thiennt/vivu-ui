@@ -1,5 +1,5 @@
 import { Colors } from "@/utils/colors";
-import { Container, Graphics, FederatedPointerEvent, Text } from "pixi.js";
+import { Container, Graphics, FederatedPointerEvent, Text, Color } from "pixi.js";
 import { CardBattlePlayerState, Card } from "@/types";
 import { BaseScene } from "@/utils/BaseScene";
 import { app } from "@/app";
@@ -11,7 +11,12 @@ export class HandZone extends Container {
   private handBg: Graphics;
   private handCards: Container[] = [];
   private playerState: CardBattlePlayerState | null = null;
+  private playerNo: number = 1; // Default to player 1
   
+  // End Turn Button state
+  private endTurnButton: Container;
+  private endTurnCallback?: () => void;
+
   // Drag/drop state
   private dragTarget: Container | null = null;
   private dragOffset = { x: 0, y: 0 };
@@ -23,16 +28,17 @@ export class HandZone extends Container {
 
   // Tooltip state
   private cardTooltip: CardDetailPopup | null = null;
-  
-  // End Turn Button state
-  private endTurnButton: Container | null = null;
-  private endTurnCallback?: () => void;
 
-  constructor() {
+  constructor(params?: { playerNo?: number }) {
     super();
-    
+
+    this.playerNo = params?.playerNo || 1;
+
     this.handBg = new Graphics();
     this.addChild(this.handBg);
+
+    this.endTurnButton = new Container();
+    this.addChild(this.endTurnButton);
 
     // Setup stage event handlers for drag and drop
     app.stage.eventMode = 'static';
@@ -43,13 +49,15 @@ export class HandZone extends Container {
 
   resize(width: number, height: number): void {
     this.handBg.clear();
-    
+
     // Create simplified hand zone background
     // Main background
-    this.handBg.roundRect(0, 0, width, height, 8)
+    this.handBg.roundRect(0, 0, width, height * 0.7, 8)
       .fill(Colors.UI_BACKGROUND)
       .stroke({ width: 1, color: Colors.UI_BORDER, alpha: 0.6 });
     
+    this.updateEndTurnButton(width, height);
+
     // Redraw hand cards if we have player state
     if (this.playerState) {
       this.updateHandDisplay(width, height);
@@ -58,7 +66,7 @@ export class HandZone extends Container {
 
   updateBattleState(playerState: CardBattlePlayerState): void {
     this.playerState = playerState;
-    
+
     // Get the current size from the background
     const bounds = this.handBg.getBounds();
     if (bounds.width > 0 && bounds.height > 0) {
@@ -68,138 +76,55 @@ export class HandZone extends Container {
 
   private updateHandDisplay(width: number, height: number): void {
     if (!this.playerState) return;
-    
-    // Clear existing hand cards and tooltip
+
+    // Clear existing
     this.handCards.forEach(card => card.destroy());
     this.handCards = [];
-    this.hideCardTooltip(); // Clean up tooltip when updating display
-    
+    this.hideCardTooltip();
+
     const handCards = this.playerState.deck.hand_cards || [];
-    
-    // Create or update end turn button
-    this.createOrUpdateEndTurnButton(width, height);
-    
+
+    const cardWidth = 60;
+    const cardHeight = 90;
     if (handCards.length === 0) return;
     
-    // Improved semicircle layout with bigger cards
-    const cardWidth = 80;  // Increased from 60
-    const cardHeight = 100; // Increased from 80
-    const maxRotation = 40; // Increased rotation range for better semicircle
-    
-    // Center point for the semicircle (this is where the end turn button will be)
-    const centerX = width / 2;
-    const centerY = height * 0.75; // Position lower to leave space for end turn button
-    
-    // Calculate semicircle radius based on card count and available space
-    const baseRadius = Math.min(150, Math.max(120, width * 0.25));
-    // Increase distance between cards
-    const radiusMultiplier = Math.max(1.2, 1 + handCards.length * 0.1);
-    const semicircleRadius = baseRadius * radiusMultiplier;
+    const spacing = 5;
+    const totalWidth = (cardWidth * handCards.length) + (spacing * Math.max(0, handCards.length - 1));
+    const startX = Math.max(10, (width - totalWidth) / 2);
+    const cardY = (height - cardHeight) / 2;
     
     handCards.forEach((cardInDeck, index) => {
       if (cardInDeck.card) {
+        const x = startX + (index * (cardWidth + spacing));
         const handCard = this.createHandCard(cardInDeck.card, cardWidth, cardHeight);
-        
-        // Calculate angle for this card in the semicircle
-        const totalCards = handCards.length;
-        const angleStep = totalCards > 1 ? (2 * maxRotation) / (totalCards - 1) : 0;
-        const angle = totalCards > 1 ? -maxRotation + (index * angleStep) : 0;
-        const angleRad = angle * (Math.PI / 180);
-        
-        // Position cards in semicircle formation
-        if (totalCards === 1) {
-          // Single card positioned in front of center
-          handCard.x = centerX;
-          handCard.y = centerY + semicircleRadius * 0.4;
-          handCard.rotation = 0;
-        } else {
-          // Multiple cards in semicircle
-          const cardX = centerX + Math.sin(angleRad) * semicircleRadius;
-          const cardY = centerY + Math.cos(angleRad) * semicircleRadius * 0.4;
-          
-          handCard.x = cardX;
-          handCard.y = cardY;
-          handCard.rotation = angleRad;
-        }
-        
-        // Set anchor to center for rotation
-        handCard.pivot.set(cardWidth / 2, cardHeight / 2);
-        
+        handCard.x = x;
+        handCard.y = cardY;
         this.addChild(handCard);
         this.handCards.push(handCard);
       }
     });
+    
   }
 
-  private createOrUpdateEndTurnButton(width: number, height: number): void {
+  private updateEndTurnButton(width: number, height: number): void {
     // Remove existing button if any
-    if (this.endTurnButton) {
-      this.endTurnButton.destroy();
-      this.endTurnButton = null;
-    }
-    
-    // Create circular end turn button
-    const radius = Math.min(60, Math.min(width, height) * 0.4);
-    const button = new Container();
-    
-    const bg = new Graphics();
-    
-    // Main circular background
-    bg.circle(0, 0, radius)
-      .fill(Colors.BUTTON_PRIMARY)
-      .stroke({ width: 3, color: Colors.BUTTON_BORDER });
-    
-    // Inner highlight for depth
-    bg.circle(0, 0, radius - 4)
-      .stroke({ width: 2, color: Colors.BUTTON_HOVER, alpha: 0.4 });
-    
-    // Simplified button text for circular design
-    const buttonText = new Text({
-      text: 'END TURN',
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 16,
-        fontWeight: 'bold',
-        fill: Colors.TEXT_BUTTON,
-        align: 'center'
-      }
-    });
-    buttonText.anchor.set(0.5);
-    
-    button.addChild(bg, buttonText);
-    
-    // Position button in center of semicircle
-    button.x = width / 2;
-    button.y = height * 0.4; // Upper part of hand zone
-    
-    // Circular hover effects
-    button.on('pointerover', () => {
-      bg.tint = Colors.BUTTON_HOVER;
-      button.scale.set(1.05);
-    });
-    
-    button.on('pointerout', () => {
-      bg.tint = 0xffffff;
-      button.scale.set(1);
-    });
-    
-    button.interactive = true;
-    button.cursor = 'pointer';
-    
-    // Simple click effect
-    button.on('pointerdown', () => {
-      button.scale.set(0.98);
-    });
-    
-    button.on('pointerup', () => {
-      button.scale.set(1);
-      if (this.endTurnCallback) {
-        this.endTurnCallback();
-      }
-    });
-    
-    this.addChild(button);
-    this.endTurnButton = button;
+    this.endTurnButton.removeChildren();
+
+    const scene = this.parent as BaseScene;
+    // Responsive button sizing - improved for small screens
+    const buttonWidth = Math.min(180, width - 2 * scene.STANDARD_PADDING);
+    const buttonHeight = Math.max(40, Math.min(46, height * 0.07));
+
+    const endTurnButton = scene.createButton(
+      'END TURN',
+      (width - buttonWidth - scene.STANDARD_PADDING) / 2,
+      height - buttonHeight - scene.STANDARD_PADDING,
+      buttonWidth,
+      buttonHeight,
+      () => this.endTurnCallback && this.endTurnCallback(),
+      14 // Reduced base font size
+    );
+    this.endTurnButton.addChild(endTurnButton);
   }
 
   setCardDropCallback(callback: (card: Card, dropTarget: string) => void): void {
@@ -207,7 +132,7 @@ export class HandZone extends Container {
   }
 
   setDiscardHighlightCallbacks(
-    onDragEnter: () => void, 
+    onDragEnter: () => void,
     onDragLeave: () => void
   ): void {
     this.onDragEnterDiscardCallback = onDragEnter;
@@ -229,30 +154,30 @@ export class HandZone extends Container {
       showDescription: false,
       enableHover: true
     });
-    
+
     // Store card reference for drag/drop
     (cardContainer as Container & { card: Card }).card = card;
-    
+
     // Make draggable
     this.makeHandCardDraggable(cardContainer, card);
-    
+
     return cardContainer;
   }
 
   private makeHandCardDraggable(cardContainer: Container, _card: Card): void {
     cardContainer.interactive = true;
     cardContainer.cursor = 'grab';
-    
+
     cardContainer.on('pointerdown', (event: FederatedPointerEvent) => {
       this.onCardDragStart(event, cardContainer, _card);
     });
-    
+
     cardContainer.on('pointerover', () => {
       if (!this.dragTarget) {
         cardContainer.scale.set(1.05);
       }
     });
-    
+
     cardContainer.on('pointerout', () => {
       if (!this.dragTarget) {
         cardContainer.scale.set(1.0);
@@ -264,17 +189,17 @@ export class HandZone extends Container {
     this.dragTarget = cardContainer;
     cardContainer.alpha = 0.8;
     cardContainer.cursor = 'grabbing';
-    
+
     // Show card tooltip at top of screen
     this.showCardTooltip(card);
-    
+
     // Calculate and store drag offset
     const globalCardPos = cardContainer.parent?.toGlobal({ x: cardContainer.x, y: cardContainer.y });
     this.dragOffset = {
       x: event.global.x - (globalCardPos?.x || 0),
       y: event.global.y - (globalCardPos?.y || 0)
     };
-    
+
     // Move card to top layer (app.stage) for dragging above all
     const globalPos = cardContainer.parent?.toGlobal({ x: cardContainer.x, y: cardContainer.y });
     if (cardContainer.parent) {
@@ -284,16 +209,16 @@ export class HandZone extends Container {
     if (globalPos) {
       cardContainer.position.set(globalPos.x, globalPos.y);
     }
-    
+
     // Attach pointer events to stage
     app.stage.on('pointermove', this.onCardDragMove, this);
-    
+
     event.stopPropagation();
   }
 
   private onCardDragMove = (event: FederatedPointerEvent): void => {
     if (!this.dragTarget) return;
-    
+
     // Use dragOffset to keep the pointer at the same relative position on the card
     const parent = this.dragTarget.parent;
     if (parent) {
@@ -313,27 +238,27 @@ export class HandZone extends Container {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const getDropTargetMethod = (this as any).getDropTarget;
     const dropTarget = getDropTargetMethod ? getDropTargetMethod(event.global.x, event.global.y) : null;
-    
+
     if (dropTarget !== this.currentDropTarget) {
       // Left previous drop target
       if (this.currentDropTarget === 'discard' && this.onDragLeaveDiscardCallback) {
         this.onDragLeaveDiscardCallback();
       }
-      
+
       // Entered new drop target
       if (dropTarget === 'discard' && this.onDragEnterDiscardCallback) {
         this.onDragEnterDiscardCallback();
       }
-      
+
       this.currentDropTarget = dropTarget;
     }
   };
 
   private onCardDragEnd = (event: FederatedPointerEvent): void => {
     if (!this.dragTarget) return;
-    
+
     const card = (this.dragTarget as Container & { card: Card }).card;
-    
+
     // Hide card tooltip
     this.hideCardTooltip();
 
@@ -341,28 +266,28 @@ export class HandZone extends Container {
     if (this.onCharacterHoverCallback) {
       this.onCharacterHoverCallback(0, 0, false);
     }
-    
+
     // Clear discard highlight
     if (this.currentDropTarget === 'discard' && this.onDragLeaveDiscardCallback) {
       this.onDragLeaveDiscardCallback();
     }
     this.currentDropTarget = null;
-    
+
     // Use the externally set getDropTarget method if available
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const getDropTargetMethod = (this as any).getDropTarget;
     const dropTarget = getDropTargetMethod ? getDropTargetMethod(event.global.x, event.global.y) : null;
-    
+
     // Remove drag events from stage
     app.stage.off('pointermove', this.onCardDragMove, this);
-    
+
     if (dropTarget && this.onCardDropCallback) {
       this.onCardDropCallback(card, dropTarget);
     } else {
       // Return card to hand
       this.returnCardToHand(this.dragTarget);
     }
-    
+
     this.dragTarget.alpha = 1.0;
     this.dragTarget.cursor = 'grab';
     this.dragTarget = null;
@@ -380,10 +305,10 @@ export class HandZone extends Container {
     if (cardContainer.parent) {
       cardContainer.parent.removeChild(cardContainer);
     }
-    
+
     // Add back to hand container
     this.addChild(cardContainer);
-    
+
     // Find the card in the handCards array and restore position
     const cardIndex = this.handCards.indexOf(cardContainer);
     if (cardIndex !== -1) {
@@ -415,7 +340,7 @@ export class HandZone extends Container {
     this.handCards.forEach((card, index) => {
       card.alpha = 0;
       card.scale.set(0);
-      
+
       gsap.to(card, {
         alpha: 1,
         scale: 1,
@@ -424,7 +349,7 @@ export class HandZone extends Container {
         ease: 'back.out(1.7)'
       });
     });
-    
+
     // Return promise that resolves when animation completes
     return new Promise(resolve => {
       const longestDelay = (this.handCards.length - 1) * 0.1 + 0.4;
@@ -435,16 +360,16 @@ export class HandZone extends Container {
   private showCardTooltip(card: Card): void {
     // Remove existing tooltip if any
     this.hideCardTooltip();
-    
+
     // Convert Card to BattleCard for the popup
     const battleCard = cardToBattleCard(card);
-    
+
     // Create new tooltip in tooltip mode
     this.cardTooltip = new CardDetailPopup({ card: battleCard, tooltipMode: true });
-    
+
     // Add tooltip to app.stage so it appears above everything
     app.stage.addChild(this.cardTooltip);
-    
+
     // Position tooltip at top of screen
     this.cardTooltip.positionAtTop(app.screen.width, app.screen.height);
   }
