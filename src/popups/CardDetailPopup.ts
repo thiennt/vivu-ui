@@ -207,7 +207,7 @@ export class CardDetailPopup extends Container {
         fontFamily: 'Kalam',
         fontSize: 32,
         align: 'center',
-        fill: Colors.TEXT_PRIMARY
+        fill: Colors.CARD_BORDER // Use dark color for better visibility on light background
       }
     });
     groupIconText.anchor.set(1, 0);
@@ -221,7 +221,7 @@ export class CardDetailPopup extends Container {
         fontFamily: 'Kalam',
         fontSize: 28,
         fontWeight: 'bold',
-        fill: Colors.TEXT_PRIMARY,
+        fill: Colors.CARD_BORDER, // Use dark color for readability on light background
         align: 'center',
         wordWrap: true,
         wordWrapWidth: cardWidth - 80
@@ -254,7 +254,7 @@ export class CardDetailPopup extends Container {
       style: {
         fontFamily: 'Kalam',
         fontSize: 16,
-        fill: Colors.TEXT_SECONDARY,
+        fill: Colors.BACKGROUND_SECONDARY, // Use darker color for better readability
         align: 'center',
         wordWrap: true,
         wordWrapWidth: cardWidth - 60
@@ -273,7 +273,7 @@ export class CardDetailPopup extends Container {
           fontFamily: 'Kalam',
           fontSize: 18,
           fontWeight: 'bold',
-          fill: Colors.TEXT_PRIMARY,
+          fill: Colors.CARD_BORDER, // Use dark color for readability
           align: 'center'
         }
       });
@@ -290,7 +290,7 @@ export class CardDetailPopup extends Container {
           style: {
             fontFamily: 'Kalam',
             fontSize: 14,
-            fill: Colors.TEXT_SECONDARY,
+            fill: Colors.BACKGROUND_SECONDARY, // Use darker color for better readability
             align: 'center'
           }
         });
