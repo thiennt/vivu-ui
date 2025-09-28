@@ -85,39 +85,31 @@ export class HandZone extends Container {
     const handCards = this.playerState.deck.hand_cards || [];
     if (handCards.length === 0) return;
 
-    // Calculate responsive card dimensions and spacing
+    // Keep card size fixed as requested
+    const cardWidth = 60;
+    const cardHeight = 90;
     const availableWidth = width - 20; // Padding on both sides
-    const maxCards = handCards.length;
-    const minCardWidth = 40;
-    const maxCardWidth = 60;
-    const minSpacing = 2; // Minimum spacing, can go negative for overlap
-    const maxSpacing = 10;
-
-    // Calculate optimal card width and spacing
-    let cardWidth = (availableWidth - (maxSpacing * (maxCards - 1))) / maxCards;
-    cardWidth = Math.max(minCardWidth, Math.min(maxCardWidth, cardWidth));
     
-    // Calculate spacing - this can go negative for overlap
-    let cardSpacing = (availableWidth - (cardWidth * maxCards)) / Math.max(1, maxCards - 1);
-    cardSpacing = Math.max(minSpacing, Math.min(maxSpacing, cardSpacing));
+    // Calculate spacing - start with preferred spacing
+    let cardSpacing = 5;
+    let totalWidth = (cardWidth * handCards.length) + (cardSpacing * Math.max(0, handCards.length - 1));
     
-    // If cards still don't fit, use overlap (negative spacing)
-    const totalWidthWithMinSpacing = (cardWidth * maxCards) + (minSpacing * Math.max(0, maxCards - 1));
-    if (totalWidthWithMinSpacing > availableWidth) {
-      // Calculate overlap amount needed
-      cardSpacing = (availableWidth - (cardWidth * maxCards)) / Math.max(1, maxCards - 1);
-      // Ensure minimum overlap of 10 pixels between cards for readability
+    // If cards don't fit with normal spacing, reduce spacing until they overlap to fit
+    if (totalWidth > availableWidth && handCards.length > 1) {
+      // Calculate required spacing (can be negative for overlap)
+      cardSpacing = (availableWidth - (cardWidth * handCards.length)) / Math.max(1, handCards.length - 1);
+      // Ensure minimum 10px visible per card for readability
       cardSpacing = Math.max(cardSpacing, -cardWidth + 10);
+      totalWidth = (cardWidth * handCards.length) + (cardSpacing * Math.max(0, handCards.length - 1));
     }
     
-    const totalWidth = (cardWidth * maxCards) + (cardSpacing * Math.max(0, maxCards - 1));
     const startX = Math.max(10, (width - totalWidth) / 2);
-    const cardY = (height - 90) / 2; // Fixed card height of 90
+    const cardY = (height - cardHeight) / 2;
     
     handCards.forEach((cardInDeck, index) => {
       if (cardInDeck.card) {
         const x = startX + (index * (cardWidth + cardSpacing));
-        const handCard = this.createHandCard(cardInDeck.card, cardWidth, 90);
+        const handCard = this.createHandCard(cardInDeck.card, cardWidth, cardHeight);
         handCard.x = x;
         handCard.y = cardY;
         this.addChild(handCard);
