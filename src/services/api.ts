@@ -253,6 +253,14 @@ export const battleApi = {
     }, mockEndTurnResult);
   },
 
+  async aiTurn(battleId: string): Promise<any> {
+    console.log('🤖 aiTurn API called for battle:', battleId);
+    const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
+    return apiRequest(`/players/${playerId}/card-battle/${battleId}/ai-turn`, {
+      method: 'POST',
+    }, mockActionResult);
+  },
+
   async getBattleLogs(battleId: string, turn?: number): Promise<any> {
     console.log('📋 getBattleLogs API called for battle:', battleId, 'turn:', turn);
     const endpoint = turn ? `/card-battle/${battleId}/logs?turn=${turn}` : `/card-battle/${battleId}/logs`;
