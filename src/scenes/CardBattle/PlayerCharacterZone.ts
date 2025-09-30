@@ -2,7 +2,6 @@ import { Colors } from "@/utils/colors";
 import { Container, Graphics, Text } from "pixi.js";
 import { CardBattlePlayerState } from "@/types";
 import { BaseScene } from "@/utils/BaseScene";
-import { info } from "console";
 
 export class PlayerCharacterZone extends Container {
   private zoneBg: Graphics;
@@ -306,5 +305,12 @@ export class PlayerCharacterZone extends Container {
         this.discardTooltip.visible = false;
       }
     }
+  }
+
+  // Method to find character card by ID for animations
+  public findCharacterCard(characterId: string): Container | null {
+    return this.characterCards.find(card => 
+      (card as Container & { characterId: string }).characterId === characterId
+    ) || null;
   }
 }
