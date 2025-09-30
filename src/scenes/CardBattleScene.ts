@@ -443,29 +443,32 @@ export class CardBattleScene extends BaseScene {
   }
 
   private async startGameLoop(): Promise<void> {
-    while (this.battleState && this.battleState.status === 'ongoing') {
-      // Turn Start
-      await this.processTurnStart();
-
-      // Draw Phase  
-      await this.processDrawPhase();
-
-      // Main Phase
-      await this.processMainPhase();
-
-      // End Turn
-      await this.processEndTurn();
-
-      // AI Turn (auto) - if next player is AI
-      if (this.battleState.current_player === 2) {
+    //while (this.battleState && this.battleState.status === 'ongoing') {
+      
+      if (this.battleState?.current_player === 1) {
+        await this.processPlayerTurn();
+      } else {
+        // AI Turn (auto) - if next player is AI
         await this.processAITurn();
       }
 
       // Check win condition
       if (this.checkGameEnd()) {
-        break;
+        //break;
       }
-    }
+    //}
+  }
+
+  private async processPlayerTurn(): Promise<void> {
+    // Player 1 turn
+    // Turn Start
+    await this.processTurnStart();
+
+    // Draw Phase  
+    await this.processDrawPhase();
+
+    // Main Phase
+    await this.processMainPhase();
   }
 
   private async processTurnStart(): Promise<void> {
@@ -572,6 +575,7 @@ export class CardBattleScene extends BaseScene {
         }
 
         this.updateAllZones();
+        this.processAITurn();
       }
     } catch (error) {
       console.error('Failed to process end turn:', error);
@@ -610,6 +614,7 @@ export class CardBattleScene extends BaseScene {
         }
 
         this.updateAllZones();
+        this.processPlayerTurn();
       }
     } catch (error) {
       console.error('Failed to process AI turn:', error);
@@ -628,10 +633,7 @@ export class CardBattleScene extends BaseScene {
   }
 
   private endTurn(): void {
-    if (this.mainPhaseResolve) {
-      this.mainPhaseResolve();
-      this.mainPhaseResolve = undefined;
-    }
+    this.processEndTurn();
   }
 
   private updateAllZones(): void {

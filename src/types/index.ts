@@ -308,7 +308,7 @@ export interface CardBattlePlayerState {
 
 export interface CardBattleState {
   id: string;                               // Battle ID
-  status: "ongoing" | "completed" | "surrendered" | "timeout";
+  status: "open" | "ongoing" | "completed" | "surrendered" | "timeout";
   battle_type: "pvp" | "pve" | "training";
   current_turn: number;                     // Current turn number
   current_player: number;                   // 1 or 2 (team number)

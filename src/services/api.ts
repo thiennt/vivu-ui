@@ -8,7 +8,8 @@ import { config } from '@/config';
 import { 
   mockPlayer, mockSkills, mockDungeons, mockStages, mockCardBattleState,  
   mockBattleStage, mockPlayer1Characters, mockActionResult, mockDrawCardResult,
-  mockPlayCardResult, mockEndTurnResult 
+  mockPlayCardResult, mockEndTurnResult, 
+  mockAiTurnResult
 } from '@/utils/mockData';
 import { 
   TurnAction, 
@@ -258,7 +259,7 @@ export const battleApi = {
     const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
     return apiRequest(`/players/${playerId}/card-battle/${battleId}/ai-turn`, {
       method: 'POST',
-    }, mockActionResult);
+    }, mockAiTurnResult);
   },
 
   async getBattleLogs(battleId: string, turn?: number): Promise<any> {
