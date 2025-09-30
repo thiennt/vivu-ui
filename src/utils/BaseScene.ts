@@ -289,6 +289,53 @@ export abstract class BaseScene extends Container {
     return card;
   }
 
+  public createFaceDownCard(width: number, height: number): Container {
+    const cardContainer = new Container();
+
+    // Card shadow for depth
+    const bg = new Graphics();
+    bg.roundRect(3, 3, width, height, 8)
+      .fill({ color: Colors.SHADOW_COLOR, alpha: 0.3 });
+    
+    // Main card background - use a darker color for card back
+    bg.roundRect(0, 0, width, height, 8)
+      .fill(0x2c3e50) // Dark blue-gray for card back
+      .stroke({ width: 2, color: Colors.CARD_BORDER });
+    
+    // Inner card frame
+    bg.roundRect(4, 4, width - 8, height - 8, 4)
+      .stroke({ width: 1, color: Colors.CARD_BORDER, alpha: 0.5 });
+    
+    // Decorative pattern in center - a simple diamond/star pattern
+    const centerX = width / 2;
+    const centerY = height / 2;
+    const patternSize = Math.min(width, height) * 0.4;
+    
+    const pattern = new Graphics();
+    // Draw a decorative diamond pattern
+    pattern.poly([
+      centerX, centerY - patternSize / 2,
+      centerX + patternSize / 4, centerY,
+      centerX, centerY + patternSize / 2,
+      centerX - patternSize / 4, centerY
+    ])
+      .fill({ color: 0x34495e, alpha: 0.5 })
+      .stroke({ width: 1, color: Colors.CARD_BORDER, alpha: 0.3 });
+    
+    // Add a smaller inner diamond
+    pattern.poly([
+      centerX, centerY - patternSize / 4,
+      centerX + patternSize / 8, centerY,
+      centerX, centerY + patternSize / 4,
+      centerX - patternSize / 8, centerY
+    ])
+      .fill({ color: 0x3d566e, alpha: 0.5 });
+
+    cardContainer.addChild(bg, pattern);
+
+    return cardContainer;
+  }
+
   public createDeckCard(
     card: Card, 
     width: number, 
