@@ -5,13 +5,14 @@
  */
 
 import { config } from '@/config';
-import { mockPlayer, mockSkills, mockDungeons, mockStages, mockCardBattleState,  mockBattleStage, mockPlayer1Characters, mockActionResult, mockDrawCardResult, mockPlayCardResult } from '@/utils/mockData';
+import { 
+  mockPlayer, mockSkills, mockDungeons, mockStages, mockCardBattleState,  
+  mockBattleStage, mockPlayer1Characters, mockActionResult, mockDrawCardResult,
+  mockPlayCardResult, mockEndTurnResult 
+} from '@/utils/mockData';
 import { 
   TurnAction, 
 } from '@/types';
-import { drawCards } from '@/utils/cardData';
-
-
 
 // Loading state interface
 interface LoadingState {
@@ -249,7 +250,7 @@ export const battleApi = {
     return apiRequest(`/players/${playerId}/card-battle/${battleId}/end-turn`, {
       method: 'POST',
       body: JSON.stringify(turnAction),
-    }, mockActionResult);
+    }, mockEndTurnResult);
   },
 
   async getBattleLogs(battleId: string, turn?: number): Promise<any> {

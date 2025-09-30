@@ -1628,10 +1628,10 @@ export const mockPlayCardResult = {
           },
           "targets": [
               {
-                  "id": "c40255a7-fd56-48d3-8d39-c4ad052d1a3e",
+                  "id": mockPlayer2Characters[0].id,
                   "team": 2,
                   "before": {
-                      "characterId": "c40255a7-fd56-48d3-8d39-c4ad052d1a3e",
+                      "characterId": mockPlayer2Characters[0].id,
                       "team": 2,
                       "max_hp": 367,
                       "hp": 0,
@@ -1716,7 +1716,7 @@ export const mockPlayCardResult = {
                       "immunities": []
                   },
                   "after": {
-                      "characterId": "c40255a7-fd56-48d3-8d39-c4ad052d1a3e",
+                      "characterId": mockPlayer2Characters[0].id,
                       "team": 2,
                       "max_hp": 367,
                       "hp": 0,
@@ -2418,6 +2418,37 @@ export const mockPlayCardResult = {
   "errors": null
 }
 
+export const mockEndTurnResult = {
+  "success": true,
+  "code": 200,
+  "message": "Turn ended successfully",
+  "data": [
+      {
+          "id": "5de9b77d-e748-41c5-bfb7-16c4f29acad4",
+          "card_battle_id": "b205a2bd-4e64-4336-85c5-c950c70d0ca3",
+          "turn": 1,
+          "phase": "end_turn",
+          "action_type": "end_turn",
+          "actor": {
+              "team": 1,
+              "character_id": null
+          },
+          "targets": [],
+          "drawn_cards": [],
+          "impacts": [],
+          "result": {
+              "success": true,
+              "reason": "Turn ended, switching to player 2"
+          },
+          "before_state": null,
+          "after_state": null,
+          "animation_hint": "turn_transition",
+          "created_at": "2025-09-30T06:58:15.473Z",
+          "updated_at": "2025-09-30T06:58:15.473Z"
+      }
+  ],
+  "errors": null
+}
 
 // ---- Battle Log Data ----
 export const mockBattleLogs: BattleLogEntry[] = [
