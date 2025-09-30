@@ -456,6 +456,11 @@ export class CardBattleScene extends BaseScene {
       // End Turn
       await this.processEndTurn();
 
+      // AI Turn (auto) - if next player is AI
+      if (this.battleState.current_player === 2) {
+        await this.processAITurn();
+      }
+
       // Check win condition
       if (this.checkGameEnd()) {
         break;
@@ -570,6 +575,44 @@ export class CardBattleScene extends BaseScene {
       }
     } catch (error) {
       console.error('Failed to process end turn:', error);
+    }
+  }
+
+  private async processAITurn(): Promise<void> {
+    this.currentPhase = 'ai_turn';
+    console.log('AI Turn - Processing AI actions');
+
+    try {
+      const response = await battleApi.aiTurn(this.battleId);
+      if (response.success && response.data) {
+        const logs = response.data;
+        console.log('AI turn logs:', logs);
+
+        // Update battle state from the logs if available
+        if (logs.length > 0 && logs[0].after_state && this.battleState) {
+          const afterState = logs[0].after_state;
+          if (afterState.current_player !== undefined) {
+            this.battleState.current_player = afterState.current_player;
+          }
+          if (afterState.turn !== undefined) {
+            this.battleState.current_turn = afterState.turn;
+          }
+          if (afterState.characters) {
+            this.battleState.players.forEach(player => {
+              const teamCharacters = afterState.characters!.filter((c: unknown) => 
+                (c as { team: number }).team === player.team
+              );
+              if (teamCharacters.length > 0) {
+                player.characters = teamCharacters;
+              }
+            });
+          }
+        }
+
+        this.updateAllZones();
+      }
+    } catch (error) {
+      console.error('Failed to process AI turn:', error);
     }
   }
 
