@@ -1602,6 +1602,822 @@ export const mockDrawCardResult = {
     "errors": null
 }
 
+export const mockPlayCardResult = {
+  "success": true,
+  "code": 200,
+  "message": "Card played successfully",
+  "data": [
+      {
+          "id": "eab0b24e-3ec4-4f10-9597-ded35ebf0106",
+          "card_battle_id": "b205a2bd-4e64-4336-85c5-c950c70d0ca3",
+          "turn": 1,
+          "phase": "main_phase",
+          "action_type": "play_card",
+          "actor": {
+              "team": 1,
+              "character_id": "b8986789-aaa6-4d83-a259-cee923c91069"
+          },
+          "card": {
+              "id": "87e0c450-39a0-4e43-b97c-bd15ba793d22",
+              "name": "Ignite Strike",
+              "group": "High Damage",
+              "description": "Deals 250-300% damage to a single enemy. Damage increases by 50% if the target is under [Burning].",
+              "icon_url": "",
+              "card_type": "active",
+              "energy_cost": 2
+          },
+          "targets": [
+              {
+                  "id": "c40255a7-fd56-48d3-8d39-c4ad052d1a3e",
+                  "team": 2,
+                  "before": {
+                      "characterId": "c40255a7-fd56-48d3-8d39-c4ad052d1a3e",
+                      "team": 2,
+                      "max_hp": 367,
+                      "hp": 0,
+                      "atk": 131,
+                      "def": 70,
+                      "agi": 46,
+                      "crit_rate": 6,
+                      "crit_dmg": 155,
+                      "res": 8,
+                      "damage": 0,
+                      "mitigation": 6,
+                      "hit_rate": 96,
+                      "dodge": 8,
+                      "has_acted": false,
+                      "active_effects": [
+                          {
+                              "name": "Cleanse",
+                              "source": {
+                                  "type": "skill",
+                                  "characterId": "c3eefca3-dd92-4114-99eb-3255937cb111"
+                              },
+                              "stacks": 1,
+                              "effectId": "Cleanse",
+                              "customData": {},
+                              "instanceId": "effect_1759202486459_wenw6y7",
+                              "remainingDuration": 1
+                          },
+                          {
+                              "name": "Cleanse",
+                              "source": {
+                                  "type": "skill",
+                                  "characterId": "c3eefca3-dd92-4114-99eb-3255937cb111"
+                              },
+                              "stacks": 1,
+                              "effectId": "Cleanse",
+                              "customData": {},
+                              "instanceId": "effect_1759202486459_azc1404",
+                              "remainingDuration": 1
+                          },
+                          {
+                              "name": "Cleanse",
+                              "source": {
+                                  "type": "skill",
+                                  "characterId": "c3eefca3-dd92-4114-99eb-3255937cb111"
+                              },
+                              "stacks": 1,
+                              "effectId": "Cleanse",
+                              "customData": {},
+                              "instanceId": "effect_1759203449163_sy6n001",
+                              "remainingDuration": 1
+                          },
+                          {
+                              "name": "Cleanse",
+                              "source": {
+                                  "type": "skill",
+                                  "characterId": "c3eefca3-dd92-4114-99eb-3255937cb111"
+                              },
+                              "stacks": 1,
+                              "effectId": "Cleanse",
+                              "customData": {},
+                              "instanceId": "effect_1759203449163_7m5jmfg",
+                              "remainingDuration": 1
+                          },
+                          {
+                              "name": "Cleanse",
+                              "source": {
+                                  "type": "skill",
+                                  "characterId": "c3eefca3-dd92-4114-99eb-3255937cb111"
+                              },
+                              "stacks": 1,
+                              "effectId": "Cleanse",
+                              "customData": {},
+                              "instanceId": "effect_1759208100279_zs3jh4n",
+                              "remainingDuration": 1
+                          }
+                      ],
+                      "equipped_skills": [
+                          "462dcab7-036b-40fc-bab1-6f75b1a40686",
+                          "da389554-8aa3-4edc-9452-9606c7cfb728"
+                      ],
+                      "shields": {},
+                      "immunities": []
+                  },
+                  "after": {
+                      "characterId": "c40255a7-fd56-48d3-8d39-c4ad052d1a3e",
+                      "team": 2,
+                      "max_hp": 367,
+                      "hp": 0,
+                      "atk": 131,
+                      "def": 70,
+                      "agi": 46,
+                      "crit_rate": 6,
+                      "crit_dmg": 155,
+                      "res": 8,
+                      "damage": 0,
+                      "mitigation": 6,
+                      "hit_rate": 96,
+                      "dodge": 8,
+                      "has_acted": false,
+                      "active_effects": [
+                          {
+                              "name": "Cleanse",
+                              "source": {
+                                  "type": "skill",
+                                  "characterId": "c3eefca3-dd92-4114-99eb-3255937cb111"
+                              },
+                              "stacks": 1,
+                              "effectId": "Cleanse",
+                              "customData": {},
+                              "instanceId": "effect_1759202486459_wenw6y7",
+                              "remainingDuration": 1
+                          },
+                          {
+                              "name": "Cleanse",
+                              "source": {
+                                  "type": "skill",
+                                  "characterId": "c3eefca3-dd92-4114-99eb-3255937cb111"
+                              },
+                              "stacks": 1,
+                              "effectId": "Cleanse",
+                              "customData": {},
+                              "instanceId": "effect_1759202486459_azc1404",
+                              "remainingDuration": 1
+                          },
+                          {
+                              "name": "Cleanse",
+                              "source": {
+                                  "type": "skill",
+                                  "characterId": "c3eefca3-dd92-4114-99eb-3255937cb111"
+                              },
+                              "stacks": 1,
+                              "effectId": "Cleanse",
+                              "customData": {},
+                              "instanceId": "effect_1759203449163_sy6n001",
+                              "remainingDuration": 1
+                          },
+                          {
+                              "name": "Cleanse",
+                              "source": {
+                                  "type": "skill",
+                                  "characterId": "c3eefca3-dd92-4114-99eb-3255937cb111"
+                              },
+                              "stacks": 1,
+                              "effectId": "Cleanse",
+                              "customData": {},
+                              "instanceId": "effect_1759203449163_7m5jmfg",
+                              "remainingDuration": 1
+                          },
+                          {
+                              "name": "Cleanse",
+                              "source": {
+                                  "type": "skill",
+                                  "characterId": "c3eefca3-dd92-4114-99eb-3255937cb111"
+                              },
+                              "stacks": 1,
+                              "effectId": "Cleanse",
+                              "customData": {},
+                              "instanceId": "effect_1759208100279_zs3jh4n",
+                              "remainingDuration": 1
+                          }
+                      ],
+                      "equipped_skills": [
+                          "462dcab7-036b-40fc-bab1-6f75b1a40686",
+                          "da389554-8aa3-4edc-9452-9606c7cfb728"
+                      ],
+                      "shields": {},
+                      "immunities": []
+                  },
+                  "impacts": [
+                      {
+                          "type": "damage",
+                          "value": 7478,
+                          "meta": {
+                              "isCritical": true
+                          }
+                      }
+                  ]
+              }
+          ],
+          "drawn_cards": [],
+          "impacts": [
+              {
+                  "type": "damage",
+                  "target_id": "c40255a7-fd56-48d3-8d39-c4ad052d1a3e",
+                  "value": 7478
+              }
+          ],
+          "result": {
+              "success": true
+          },
+          "before_state": {
+              "player1": {
+                  "characters": [
+                      {
+                          "id": "b8986789-aaa6-4d83-a259-cee923c91069",
+                          "character_id": "198074bc-f3d6-4a2a-a41f-6721352341d4",
+                          "name": "Bitcoin",
+                          "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/1.png",
+                          "team": 1,
+                          "position": 1,
+                          "max_hp": 6085,
+                          "hp": 6085,
+                          "atk": 2713,
+                          "def": 1539,
+                          "agi": 797,
+                          "crit_rate": 19,
+                          "crit_dmg": 330,
+                          "res": 25,
+                          "damage": 0,
+                          "mitigation": 12,
+                          "hit_rate": 102,
+                          "dodge": 17,
+                          "has_acted": false,
+                          "active_effects": [],
+                          "equipped_skills": [
+                              "462dcab7-036b-40fc-bab1-6f75b1a40686",
+                              "e9c25efc-8de5-4d7e-9882-1b370613ac88"
+                          ]
+                      },
+                      {
+                          "id": "a22f95fc-41cd-45eb-84fd-b0aba2423a78",
+                          "character_id": "cdef6617-ef0d-4f07-b4f8-19c4861d3cb2",
+                          "name": "Ethereum",
+                          "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png",
+                          "team": 1,
+                          "position": 2,
+                          "max_hp": 5888,
+                          "hp": 5888,
+                          "atk": 2629,
+                          "def": 1490,
+                          "agi": 774,
+                          "crit_rate": 18,
+                          "crit_dmg": 323,
+                          "res": 24,
+                          "damage": 0,
+                          "mitigation": 12,
+                          "hit_rate": 102,
+                          "dodge": 16,
+                          "has_acted": false,
+                          "active_effects": [],
+                          "equipped_skills": [
+                              "462dcab7-036b-40fc-bab1-6f75b1a40686",
+                              "e9c25efc-8de5-4d7e-9882-1b370613ac88"
+                          ]
+                      },
+                      {
+                          "id": "c3eefca3-dd92-4114-99eb-3255937cb111",
+                          "character_id": "dceb0300-3a8e-48b7-8bf3-78a7647cb6bb",
+                          "name": "BNB",
+                          "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/1839.png",
+                          "team": 1,
+                          "position": 3,
+                          "max_hp": 5890,
+                          "hp": 5890,
+                          "atk": 2629,
+                          "def": 1490,
+                          "agi": 773,
+                          "crit_rate": 18,
+                          "crit_dmg": 323,
+                          "res": 24,
+                          "damage": 0,
+                          "mitigation": 12,
+                          "hit_rate": 102,
+                          "dodge": 16,
+                          "has_acted": true,
+                          "active_effects": [],
+                          "equipped_skills": [
+                              "462dcab7-036b-40fc-bab1-6f75b1a40686",
+                              "7ef20f51-06fa-477b-a68b-1bb074f73802"
+                          ]
+                      }
+                  ],
+                  "hand_count": 4,
+                  "deck_count": 50,
+                  "energy": 97
+              },
+              "player2": {
+                  "characters": [
+                      {
+                          "id": "c40255a7-fd56-48d3-8d39-c4ad052d1a3e",
+                          "character_id": "593cf55b-b289-47e8-b319-982ec4d05ee3",
+                          "name": "Ontology Gas",
+                          "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/3217.png",
+                          "team": 2,
+                          "position": 1,
+                          "max_hp": 367,
+                          "hp": 367,
+                          "atk": 131,
+                          "def": 70,
+                          "agi": 46,
+                          "crit_rate": 6,
+                          "crit_dmg": 155,
+                          "res": 8,
+                          "damage": 0,
+                          "mitigation": 6,
+                          "hit_rate": 96,
+                          "dodge": 8,
+                          "has_acted": false,
+                          "active_effects": [
+                              {
+                                  "name": "Cleanse",
+                                  "source": {
+                                      "type": "skill",
+                                      "characterId": "c3eefca3-dd92-4114-99eb-3255937cb111"
+                                  },
+                                  "stacks": 1,
+                                  "effectId": "Cleanse",
+                                  "customData": {},
+                                  "instanceId": "effect_1759202486459_wenw6y7",
+                                  "remainingDuration": 1
+                              },
+                              {
+                                  "name": "Cleanse",
+                                  "source": {
+                                      "type": "skill",
+                                      "characterId": "c3eefca3-dd92-4114-99eb-3255937cb111"
+                                  },
+                                  "stacks": 1,
+                                  "effectId": "Cleanse",
+                                  "customData": {},
+                                  "instanceId": "effect_1759202486459_azc1404",
+                                  "remainingDuration": 1
+                              },
+                              {
+                                  "name": "Cleanse",
+                                  "source": {
+                                      "type": "skill",
+                                      "characterId": "c3eefca3-dd92-4114-99eb-3255937cb111"
+                                  },
+                                  "stacks": 1,
+                                  "effectId": "Cleanse",
+                                  "customData": {},
+                                  "instanceId": "effect_1759203449163_sy6n001",
+                                  "remainingDuration": 1
+                              },
+                              {
+                                  "name": "Cleanse",
+                                  "source": {
+                                      "type": "skill",
+                                      "characterId": "c3eefca3-dd92-4114-99eb-3255937cb111"
+                                  },
+                                  "stacks": 1,
+                                  "effectId": "Cleanse",
+                                  "customData": {},
+                                  "instanceId": "effect_1759203449163_7m5jmfg",
+                                  "remainingDuration": 1
+                              },
+                              {
+                                  "name": "Cleanse",
+                                  "source": {
+                                      "type": "skill",
+                                      "characterId": "c3eefca3-dd92-4114-99eb-3255937cb111"
+                                  },
+                                  "stacks": 1,
+                                  "effectId": "Cleanse",
+                                  "customData": {},
+                                  "instanceId": "effect_1759208100279_zs3jh4n",
+                                  "remainingDuration": 1
+                              }
+                          ],
+                          "equipped_skills": [
+                              "462dcab7-036b-40fc-bab1-6f75b1a40686",
+                              "da389554-8aa3-4edc-9452-9606c7cfb728"
+                          ]
+                      },
+                      {
+                          "id": "aa5fc107-814d-4c42-9090-5bdf3aef9f73",
+                          "character_id": "92c5a2ca-3d55-4f14-8010-3ef207ed2f15",
+                          "name": "Telcoin",
+                          "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/2394.png",
+                          "team": 2,
+                          "position": 2,
+                          "max_hp": 374,
+                          "hp": 374,
+                          "atk": 135,
+                          "def": 74,
+                          "agi": 43,
+                          "crit_rate": 6,
+                          "crit_dmg": 155,
+                          "res": 8,
+                          "damage": 0,
+                          "mitigation": 6,
+                          "hit_rate": 96,
+                          "dodge": 8,
+                          "has_acted": false,
+                          "active_effects": [
+                              {
+                                  "name": "Cleanse",
+                                  "source": {
+                                      "type": "skill",
+                                      "characterId": "c3eefca3-dd92-4114-99eb-3255937cb111"
+                                  },
+                                  "stacks": 1,
+                                  "effectId": "Cleanse",
+                                  "customData": {},
+                                  "instanceId": "effect_1759202486459_7nzi66j",
+                                  "remainingDuration": 1
+                              },
+                              {
+                                  "name": "Cleanse",
+                                  "source": {
+                                      "type": "skill",
+                                      "characterId": "c3eefca3-dd92-4114-99eb-3255937cb111"
+                                  },
+                                  "stacks": 1,
+                                  "effectId": "Cleanse",
+                                  "customData": {},
+                                  "instanceId": "effect_1759202486459_1osnmjg",
+                                  "remainingDuration": 1
+                              },
+                              {
+                                  "name": "Cleanse",
+                                  "source": {
+                                      "type": "skill",
+                                      "characterId": "c3eefca3-dd92-4114-99eb-3255937cb111"
+                                  },
+                                  "stacks": 1,
+                                  "effectId": "Cleanse",
+                                  "customData": {},
+                                  "instanceId": "effect_1759203449163_y0ec77m",
+                                  "remainingDuration": 1
+                              },
+                              {
+                                  "name": "Cleanse",
+                                  "source": {
+                                      "type": "skill",
+                                      "characterId": "c3eefca3-dd92-4114-99eb-3255937cb111"
+                                  },
+                                  "stacks": 1,
+                                  "effectId": "Cleanse",
+                                  "customData": {},
+                                  "instanceId": "effect_1759203449163_zurgyiw",
+                                  "remainingDuration": 1
+                              },
+                              {
+                                  "name": "Cleanse",
+                                  "source": {
+                                      "type": "skill",
+                                      "characterId": "c3eefca3-dd92-4114-99eb-3255937cb111"
+                                  },
+                                  "stacks": 1,
+                                  "effectId": "Cleanse",
+                                  "customData": {},
+                                  "instanceId": "effect_1759208100280_exz0l1u",
+                                  "remainingDuration": 1
+                              }
+                          ],
+                          "equipped_skills": [
+                              "462dcab7-036b-40fc-bab1-6f75b1a40686",
+                              "e8c71e5d-c48d-41ff-9cd9-fd501ccf1e89"
+                          ]
+                      },
+                      {
+                          "id": "6a45f1fc-6fdb-4963-8b2f-8946a55a7e9e",
+                          "character_id": "195b96ff-32cc-4af1-82cc-388c89c835c2",
+                          "name": "Celer Network",
+                          "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/3814.png",
+                          "team": 2,
+                          "position": 3,
+                          "max_hp": 367,
+                          "hp": 367,
+                          "atk": 131,
+                          "def": 70,
+                          "agi": 44,
+                          "crit_rate": 6,
+                          "crit_dmg": 155,
+                          "res": 8,
+                          "damage": 0,
+                          "mitigation": 6,
+                          "hit_rate": 96,
+                          "dodge": 8,
+                          "has_acted": false,
+                          "active_effects": [],
+                          "equipped_skills": [
+                              "462dcab7-036b-40fc-bab1-6f75b1a40686",
+                              "e8c71e5d-c48d-41ff-9cd9-fd501ccf1e89"
+                          ]
+                      }
+                  ],
+                  "hand_count": 0,
+                  "deck_count": 50,
+                  "energy": 100
+              }
+          },
+          "after_state": {
+              "player1": {
+                  "characters": [
+                      {
+                          "id": "b8986789-aaa6-4d83-a259-cee923c91069",
+                          "character_id": "198074bc-f3d6-4a2a-a41f-6721352341d4",
+                          "name": "Bitcoin",
+                          "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/1.png",
+                          "team": 1,
+                          "position": 1,
+                          "max_hp": 6085,
+                          "hp": 6085,
+                          "atk": 2713,
+                          "def": 1539,
+                          "agi": 797,
+                          "crit_rate": 19,
+                          "crit_dmg": 330,
+                          "res": 25,
+                          "damage": 0,
+                          "mitigation": 12,
+                          "hit_rate": 102,
+                          "dodge": 17,
+                          "has_acted": true,
+                          "active_effects": [],
+                          "equipped_skills": [
+                              "462dcab7-036b-40fc-bab1-6f75b1a40686",
+                              "e9c25efc-8de5-4d7e-9882-1b370613ac88"
+                          ]
+                      },
+                      {
+                          "id": "a22f95fc-41cd-45eb-84fd-b0aba2423a78",
+                          "character_id": "cdef6617-ef0d-4f07-b4f8-19c4861d3cb2",
+                          "name": "Ethereum",
+                          "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png",
+                          "team": 1,
+                          "position": 2,
+                          "max_hp": 5888,
+                          "hp": 5888,
+                          "atk": 2629,
+                          "def": 1490,
+                          "agi": 774,
+                          "crit_rate": 18,
+                          "crit_dmg": 323,
+                          "res": 24,
+                          "damage": 0,
+                          "mitigation": 12,
+                          "hit_rate": 102,
+                          "dodge": 16,
+                          "has_acted": false,
+                          "active_effects": [],
+                          "equipped_skills": [
+                              "462dcab7-036b-40fc-bab1-6f75b1a40686",
+                              "e9c25efc-8de5-4d7e-9882-1b370613ac88"
+                          ]
+                      },
+                      {
+                          "id": "c3eefca3-dd92-4114-99eb-3255937cb111",
+                          "character_id": "dceb0300-3a8e-48b7-8bf3-78a7647cb6bb",
+                          "name": "BNB",
+                          "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/1839.png",
+                          "team": 1,
+                          "position": 3,
+                          "max_hp": 5890,
+                          "hp": 5890,
+                          "atk": 2629,
+                          "def": 1490,
+                          "agi": 773,
+                          "crit_rate": 18,
+                          "crit_dmg": 323,
+                          "res": 24,
+                          "damage": 0,
+                          "mitigation": 12,
+                          "hit_rate": 102,
+                          "dodge": 16,
+                          "has_acted": true,
+                          "active_effects": [],
+                          "equipped_skills": [
+                              "462dcab7-036b-40fc-bab1-6f75b1a40686",
+                              "7ef20f51-06fa-477b-a68b-1bb074f73802"
+                          ]
+                      }
+                  ],
+                  "hand_count": 2,
+                  "deck_count": 50,
+                  "energy": 95
+              },
+              "player2": {
+                  "characters": [
+                      {
+                          "id": "c40255a7-fd56-48d3-8d39-c4ad052d1a3e",
+                          "character_id": "593cf55b-b289-47e8-b319-982ec4d05ee3",
+                          "name": "Ontology Gas",
+                          "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/3217.png",
+                          "team": 2,
+                          "position": 1,
+                          "max_hp": 367,
+                          "hp": 0,
+                          "atk": 131,
+                          "def": 70,
+                          "agi": 46,
+                          "crit_rate": 6,
+                          "crit_dmg": 155,
+                          "res": 8,
+                          "damage": 0,
+                          "mitigation": 6,
+                          "hit_rate": 96,
+                          "dodge": 8,
+                          "has_acted": false,
+                          "active_effects": [
+                              {
+                                  "name": "Cleanse",
+                                  "source": {
+                                      "type": "skill",
+                                      "characterId": "c3eefca3-dd92-4114-99eb-3255937cb111"
+                                  },
+                                  "stacks": 1,
+                                  "effectId": "Cleanse",
+                                  "customData": {},
+                                  "instanceId": "effect_1759202486459_wenw6y7",
+                                  "remainingDuration": 1
+                              },
+                              {
+                                  "name": "Cleanse",
+                                  "source": {
+                                      "type": "skill",
+                                      "characterId": "c3eefca3-dd92-4114-99eb-3255937cb111"
+                                  },
+                                  "stacks": 1,
+                                  "effectId": "Cleanse",
+                                  "customData": {},
+                                  "instanceId": "effect_1759202486459_azc1404",
+                                  "remainingDuration": 1
+                              },
+                              {
+                                  "name": "Cleanse",
+                                  "source": {
+                                      "type": "skill",
+                                      "characterId": "c3eefca3-dd92-4114-99eb-3255937cb111"
+                                  },
+                                  "stacks": 1,
+                                  "effectId": "Cleanse",
+                                  "customData": {},
+                                  "instanceId": "effect_1759203449163_sy6n001",
+                                  "remainingDuration": 1
+                              },
+                              {
+                                  "name": "Cleanse",
+                                  "source": {
+                                      "type": "skill",
+                                      "characterId": "c3eefca3-dd92-4114-99eb-3255937cb111"
+                                  },
+                                  "stacks": 1,
+                                  "effectId": "Cleanse",
+                                  "customData": {},
+                                  "instanceId": "effect_1759203449163_7m5jmfg",
+                                  "remainingDuration": 1
+                              },
+                              {
+                                  "name": "Cleanse",
+                                  "source": {
+                                      "type": "skill",
+                                      "characterId": "c3eefca3-dd92-4114-99eb-3255937cb111"
+                                  },
+                                  "stacks": 1,
+                                  "effectId": "Cleanse",
+                                  "customData": {},
+                                  "instanceId": "effect_1759208100279_zs3jh4n",
+                                  "remainingDuration": 1
+                              }
+                          ],
+                          "equipped_skills": [
+                              "462dcab7-036b-40fc-bab1-6f75b1a40686",
+                              "da389554-8aa3-4edc-9452-9606c7cfb728"
+                          ]
+                      },
+                      {
+                          "id": "aa5fc107-814d-4c42-9090-5bdf3aef9f73",
+                          "character_id": "92c5a2ca-3d55-4f14-8010-3ef207ed2f15",
+                          "name": "Telcoin",
+                          "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/2394.png",
+                          "team": 2,
+                          "position": 2,
+                          "max_hp": 374,
+                          "hp": 374,
+                          "atk": 135,
+                          "def": 74,
+                          "agi": 43,
+                          "crit_rate": 6,
+                          "crit_dmg": 155,
+                          "res": 8,
+                          "damage": 0,
+                          "mitigation": 6,
+                          "hit_rate": 96,
+                          "dodge": 8,
+                          "has_acted": false,
+                          "active_effects": [
+                              {
+                                  "name": "Cleanse",
+                                  "source": {
+                                      "type": "skill",
+                                      "characterId": "c3eefca3-dd92-4114-99eb-3255937cb111"
+                                  },
+                                  "stacks": 1,
+                                  "effectId": "Cleanse",
+                                  "customData": {},
+                                  "instanceId": "effect_1759202486459_7nzi66j",
+                                  "remainingDuration": 1
+                              },
+                              {
+                                  "name": "Cleanse",
+                                  "source": {
+                                      "type": "skill",
+                                      "characterId": "c3eefca3-dd92-4114-99eb-3255937cb111"
+                                  },
+                                  "stacks": 1,
+                                  "effectId": "Cleanse",
+                                  "customData": {},
+                                  "instanceId": "effect_1759202486459_1osnmjg",
+                                  "remainingDuration": 1
+                              },
+                              {
+                                  "name": "Cleanse",
+                                  "source": {
+                                      "type": "skill",
+                                      "characterId": "c3eefca3-dd92-4114-99eb-3255937cb111"
+                                  },
+                                  "stacks": 1,
+                                  "effectId": "Cleanse",
+                                  "customData": {},
+                                  "instanceId": "effect_1759203449163_y0ec77m",
+                                  "remainingDuration": 1
+                              },
+                              {
+                                  "name": "Cleanse",
+                                  "source": {
+                                      "type": "skill",
+                                      "characterId": "c3eefca3-dd92-4114-99eb-3255937cb111"
+                                  },
+                                  "stacks": 1,
+                                  "effectId": "Cleanse",
+                                  "customData": {},
+                                  "instanceId": "effect_1759203449163_zurgyiw",
+                                  "remainingDuration": 1
+                              },
+                              {
+                                  "name": "Cleanse",
+                                  "source": {
+                                      "type": "skill",
+                                      "characterId": "c3eefca3-dd92-4114-99eb-3255937cb111"
+                                  },
+                                  "stacks": 1,
+                                  "effectId": "Cleanse",
+                                  "customData": {},
+                                  "instanceId": "effect_1759208100280_exz0l1u",
+                                  "remainingDuration": 1
+                              }
+                          ],
+                          "equipped_skills": [
+                              "462dcab7-036b-40fc-bab1-6f75b1a40686",
+                              "e8c71e5d-c48d-41ff-9cd9-fd501ccf1e89"
+                          ]
+                      },
+                      {
+                          "id": "6a45f1fc-6fdb-4963-8b2f-8946a55a7e9e",
+                          "character_id": "195b96ff-32cc-4af1-82cc-388c89c835c2",
+                          "name": "Celer Network",
+                          "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/3814.png",
+                          "team": 2,
+                          "position": 3,
+                          "max_hp": 367,
+                          "hp": 367,
+                          "atk": 131,
+                          "def": 70,
+                          "agi": 44,
+                          "crit_rate": 6,
+                          "crit_dmg": 155,
+                          "res": 8,
+                          "damage": 0,
+                          "mitigation": 6,
+                          "hit_rate": 96,
+                          "dodge": 8,
+                          "has_acted": false,
+                          "active_effects": [],
+                          "equipped_skills": [
+                              "462dcab7-036b-40fc-bab1-6f75b1a40686",
+                              "e8c71e5d-c48d-41ff-9cd9-fd501ccf1e89"
+                          ]
+                      }
+                  ],
+                  "hand_count": 0,
+                  "deck_count": 50,
+                  "energy": 100
+              }
+          },
+          "animation_hint": "skill_cast",
+          "created_at": "2025-09-30T04:58:04.051Z",
+          "updated_at": "2025-09-30T04:58:04.051Z"
+      }
+  ],
+  "errors": null
+}
+
 
 // ---- Battle Log Data ----
 export const mockBattleLogs: BattleLogEntry[] = [

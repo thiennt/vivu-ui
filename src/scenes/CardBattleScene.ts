@@ -40,7 +40,7 @@ export class CardBattleScene extends BaseScene {
   constructor(params?: { battleId?: string }) {
     super();
 
-    this.battleId = params?.battleId || 'mock-battle-001';
+    this.battleId = params?.battleId || 'b205a2bd-4e64-4336-85c5-c950c70d0ca3';
 
     // Initialize all zones
     this.p2HandZone = new HandZone({ playerNo: 2 });
