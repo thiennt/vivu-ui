@@ -1,4 +1,4 @@
-import { Container } from 'pixi.js';
+import { Container, Text } from 'pixi.js';
 import { BaseScene } from '@/utils/BaseScene';
 import { HandZone } from './CardBattle/HandZone';
 import { PlayerCharacterZone } from './CardBattle/PlayerCharacterZone';
@@ -7,9 +7,12 @@ import {
   CardBattleState,
   TurnAction,
   BattlePhaseName,
-  Card
+  Card,
+  CardBattleLog,
+  CardBattleLogTarget
 } from '@/types';
 import { battleApi } from '@/services/api';
+import { gsap } from 'gsap';
 
 export class CardBattleScene extends BaseScene {
   /** Assets bundles required by this screen */
@@ -177,8 +180,22 @@ export class CardBattleScene extends BaseScene {
           currentPlayer.deck.hand_cards = currentPlayer.deck.hand_cards.filter((c: { card?: Card }) => c.card?.id !== card.id);
         }
 
+        // Update character states from log targets if available
+        if (response.data.length > 0 && response.data[0].targets) {
+          response.data[0].targets.forEach((target: CardBattleLogTarget) => {
+            const player = this.battleState!.players.find(p => p.team === target.team);
+            if (player) {
+              const character = player.characters.find(c => c.id === target.id);
+              if (character) {
+                // Update character with after state
+                Object.assign(character, target.after);
+              }
+            }
+          });
+        }
+
         this.updateAllZones();
-        this.animateCardPlay(characterId);
+        await this.animateCardPlay(characterId, response.data);
       }
     } catch (error) {
       console.error('Failed to play card:', error);
@@ -190,9 +207,221 @@ export class CardBattleScene extends BaseScene {
     // Card is already destroyed when this is called
   }
 
-  private async animateCardPlay(_characterId: string): Promise<void> {
-    // Animation will be handled by the drag/drop system
-    // Card is already destroyed when this is called
+  private async animateCardPlay(characterId: string, battleLogs?: CardBattleLog[]): Promise<void> {
+    if (!battleLogs || battleLogs.length === 0) {
+      // Fallback: simple character glow if no battle log data
+      await this.animateSimpleCharacterEffect(characterId);
+      return;
+    }
+
+    const playCardLog = battleLogs[0];
+    if (!playCardLog) return;
+
+    // 1. Animate character performing skill
+    await this.animateCharacterPerformSkill(characterId);
+
+    // 2. Animate effects on targets
+    if (playCardLog.targets && playCardLog.targets.length > 0) {
+      // Process all targets simultaneously for visual impact
+      const targetAnimations = playCardLog.targets.map(target => 
+        this.animateTargetEffects(target)
+      );
+      await Promise.all(targetAnimations);
+    }
+
+    // 3. Final update to refresh UI after all animations
+    this.updateAllZones();
+  }
+
+  private async animateCharacterPerformSkill(characterId: string): Promise<void> {
+    const characterCard = this.findCharacterCard(characterId);
+    if (!characterCard) return;
+
+    // Skill performance animation: glow + scale + brief movement
+    return new Promise((resolve) => {
+      const timeline = gsap.timeline({
+        onComplete: resolve
+      });
+
+      // Add skill glow effect
+      timeline.to(characterCard, {
+        duration: 0.2,
+        scale: 1.15,
+        ease: 'power2.out'
+      })
+      // Brief skill cast movement/shake
+      .to(characterCard, {
+        duration: 0.1,
+        x: characterCard.x + 5,
+        ease: 'power2.inOut'
+      })
+      .to(characterCard, {
+        duration: 0.1,
+        x: characterCard.x - 5,
+        ease: 'power2.inOut'
+      })
+      .to(characterCard, {
+        duration: 0.1,
+        x: characterCard.x,
+        ease: 'power2.inOut'
+      })
+      // Return to normal scale
+      .to(characterCard, {
+        duration: 0.3,
+        scale: 1.0,
+        ease: 'power2.inOut'
+      });
+    });
+  }
+
+  private async animateTargetEffects(target: CardBattleLogTarget): Promise<void> {
+    const targetCard = this.findCharacterCard(target.id);
+    if (!targetCard) return;
+
+    // Extract damage from impacts
+    const damageImpact = target.impacts?.find(impact => impact.type === 'damage');
+    const damage = typeof damageImpact?.value === 'number' ? damageImpact.value : 0;
+    const isCritical = (damageImpact?.meta as { isCritical?: boolean })?.isCritical || false;
+
+    return new Promise((resolve) => {
+      const timeline = gsap.timeline({
+        onComplete: resolve
+      });
+
+      if (damage > 0) {
+        // Damage animation: flash red + shake + scale
+        timeline.to(targetCard, {
+          duration: 0.1,
+          tint: 0xFF6666, // Red tint for damage
+          ease: 'power2.out'
+        })
+        // Critical hit gets more dramatic effect
+        .to(targetCard, {
+          duration: isCritical ? 0.2 : 0.15,
+          scale: isCritical ? 0.85 : 0.9,
+          rotation: isCritical ? 0.1 : 0.05,
+          ease: 'power2.inOut'
+        })
+        // Shake effect for impact
+        .to(targetCard, {
+          duration: 0.05,
+          x: targetCard.x + (isCritical ? 8 : 4),
+          ease: 'power2.inOut'
+        })
+        .to(targetCard, {
+          duration: 0.05,
+          x: targetCard.x - (isCritical ? 8 : 4),
+          ease: 'power2.inOut'
+        })
+        .to(targetCard, {
+          duration: 0.05,
+          x: targetCard.x,
+          ease: 'power2.inOut'
+        })
+        // Return to normal
+        .to(targetCard, {
+          duration: 0.3,
+          tint: 0xFFFFFF, // Back to normal color
+          scale: 1.0,
+          rotation: 0,
+          ease: 'power2.out'
+        });
+
+        // Show damage number if significant damage
+        if (damage > 0) {
+          this.showDamageNumber(targetCard, damage, isCritical);
+        }
+      } else {
+        // Non-damage effect (heal, buff, etc.) - gentle glow
+        timeline.to(targetCard, {
+          duration: 0.2,
+          tint: 0x66FF66, // Green tint for positive effects
+          scale: 1.1,
+          ease: 'power2.out'
+        })
+        .to(targetCard, {
+          duration: 0.4,
+          tint: 0xFFFFFF,
+          scale: 1.0,
+          ease: 'power2.inOut'
+        });
+      }
+    });
+  }
+
+  private showDamageNumber(targetCard: Container, damage: number, isCritical: boolean): void {
+    // Create floating damage text
+    const damageText = new Text({
+      text: `-${damage}`,
+      style: {
+        fontFamily: 'Arial',
+        fontSize: isCritical ? 20 : 16,
+        fill: isCritical ? 0xFF3333 : 0xFF6666,
+        fontWeight: isCritical ? 'bold' : 'normal',
+        stroke: { color: 0x000000, width: 2 }
+      }
+    });
+
+    // Position above the target card
+    damageText.x = targetCard.x;
+    damageText.y = targetCard.y - 30;
+    damageText.anchor.set(0.5);
+    damageText.alpha = 0;
+
+    this.addChild(damageText);
+
+    // Animate damage number
+    gsap.timeline()
+      .to(damageText, {
+        duration: 0.2,
+        alpha: 1,
+        y: damageText.y - 20,
+        scale: isCritical ? 1.2 : 1.0,
+        ease: 'power2.out'
+      })
+      .to(damageText, {
+        duration: 0.8,
+        alpha: 0,
+        y: damageText.y - 40,
+        ease: 'power2.in',
+        onComplete: () => {
+          damageText.destroy();
+        }
+      });
+  }
+
+  private findCharacterCard(characterId: string): Container | null {
+    // Search in player 1 character zone
+    const p1Card = this.p1CharacterZone.findCharacterCard(characterId);
+    if (p1Card) return p1Card;
+
+    // Search in player 2 character zone
+    const p2Card = this.p2CharacterZone.findCharacterCard(characterId);
+    if (p2Card) return p2Card;
+
+    return null;
+  }
+
+  private async animateSimpleCharacterEffect(characterId: string): Promise<void> {
+    const characterCard = this.findCharacterCard(characterId);
+    if (!characterCard) return;
+
+    // Simple glow effect fallback
+    return new Promise((resolve) => {
+      gsap.timeline({
+        onComplete: resolve
+      })
+      .to(characterCard, {
+        duration: 0.2,
+        scale: 1.1,
+        ease: 'power2.inOut'
+      })
+      .to(characterCard, {
+        duration: 0.2,
+        scale: 1.0,
+        ease: 'power2.inOut'
+      });
+    });
   }
 
   // Battle initialization and game logic
