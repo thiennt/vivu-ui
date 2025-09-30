@@ -586,15 +586,25 @@ export class CardBattleScene extends BaseScene {
     this.currentPhase = 'ai_turn';
     console.log('AI Turn - Processing AI actions');
 
+    this.isAnimating = true;
+
     try {
       const response = await battleApi.aiTurn(this.battleId);
       if (response.success && response.data) {
         const logs = response.data;
         console.log('AI turn logs:', logs);
 
-        // Update battle state from the logs if available
-        if (logs.length > 0 && logs[0].after_state && this.battleState) {
-          const afterState = logs[0].after_state;
+        // Process each log sequentially with animations
+        for (const log of logs) {
+          await this.processAIActionLog(log);
+          
+          // Add delay between AI actions for better visual clarity
+          await new Promise(resolve => setTimeout(resolve, 500));
+        }
+
+        // Update battle state from the last log's after_state if available
+        if (logs.length > 0 && logs[logs.length - 1].after_state && this.battleState) {
+          const afterState = logs[logs.length - 1].after_state;
           if (afterState.current_player !== undefined) {
             this.battleState.current_player = afterState.current_player;
           }
@@ -614,10 +624,47 @@ export class CardBattleScene extends BaseScene {
         }
 
         this.updateAllZones();
+        this.isAnimating = false;
         this.processPlayerTurn();
       }
     } catch (error) {
       console.error('Failed to process AI turn:', error);
+      this.isAnimating = false;
+    }
+  }
+
+  private async processAIActionLog(log: CardBattleLog): Promise<void> {
+    if (log.action_type === 'draw_card') {
+      // Handle draw card animation for AI
+      console.log('AI drew cards:', log.drawn_cards?.length || 0);
+      // AI hand is hidden, so we just add a brief delay
+      await new Promise(resolve => setTimeout(resolve, 300));
+    } else if (log.action_type === 'play_card' && log.card && log.targets) {
+      // Handle play card animation for AI
+      console.log(`AI played card: ${log.card.name}`);
+      
+      // Update character states from log targets
+      if (this.battleState) {
+        log.targets.forEach((target: CardBattleLogTarget) => {
+          const player = this.battleState!.players.find(p => p.team === target.team);
+          if (player) {
+            const character = player.characters.find(c => c.id === target.id);
+            if (character) {
+              // Update character with after state
+              Object.assign(character, target.after);
+            }
+          }
+        });
+      }
+
+      // Update UI before animation
+      this.updateAllZones();
+
+      // Animate the card play - using actor's character_id if available
+      const actorCharacterId = log.actor.character_id;
+      if (actorCharacterId) {
+        await this.animateCardPlay(actorCharacterId, [log]);
+      }
     }
   }
 
