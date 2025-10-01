@@ -69,7 +69,7 @@ export class CardBattleScene extends BaseScene {
     this.p1CharacterZone = new PlayerCharacterZone({ playerNo: 1 });
     this.addChild(this.p1CharacterZone);
 
-    this.p1HandZone = new HandZone(  { playerNo: 1 });
+    this.p1HandZone = new HandZone({ playerNo: 1 });
     this.addChild(this.p1HandZone);
 
     this.setupDragDropHandlers();

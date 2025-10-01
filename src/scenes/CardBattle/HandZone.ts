@@ -139,7 +139,7 @@ export class HandZone extends Container {
     const endTurnButton = scene.createButton(
       'END TURN',
       (width - buttonWidth - scene.STANDARD_PADDING) / 2,
-      height - buttonHeight - scene.STANDARD_PADDING,
+      height + scene.STANDARD_PADDING,
       buttonWidth,
       buttonHeight,
       () => {
