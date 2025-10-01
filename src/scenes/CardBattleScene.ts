@@ -586,6 +586,16 @@ export class CardBattleScene extends BaseScene {
           if (afterState.turn !== undefined) {
             this.battleState.current_turn = afterState.turn;
           }
+          if (afterState.characters) {
+            this.battleState.players.forEach(player => {
+              const teamCharacters = afterState.characters!.filter((c: unknown) => 
+                (c as { team: number }).team === player.team
+              );
+              if (teamCharacters.length > 0) {
+                player.characters = teamCharacters;
+              }
+            });
+          }
         }
 
         this.updateAllZones();
@@ -707,6 +717,20 @@ export class CardBattleScene extends BaseScene {
       console.log(`Game ended. Winner: Team ${this.battleState.winner_team}`);
       this.showBattleResult();
       return true;
+    }
+
+    // Check if any team has no characters with HP > 0
+    for (const player of this.battleState.players) {
+      if (!player.characters) continue;
+
+      const aliveCharacters = player.characters.filter(c => c.hp > 0);
+      if (aliveCharacters.length === 0) {
+        this.battleState.status = 'completed';
+        this.battleState.winner_team = player.team === 1 ? 2 : 1;
+        console.log(`Game ended. Winner: Team ${this.battleState.winner_team}`);
+        this.showBattleResult();
+        return true;
+      }
     }
 
     return false;
