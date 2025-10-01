@@ -12,11 +12,12 @@ import {
   CardBattleLogTarget,
   LogImpact
 } from '@/types';
-import { battleApi } from '@/services/api';
+import { battleApi, ApiError } from '@/services/api';
 import { gsap } from 'gsap';
 import { Colors } from '@/utils/colors';
 import { navigation } from '@/utils/navigation';
 import { HomeScene } from './HomeScene';
+import { LoadingStateManager } from '@/utils/loadingStateManager';
 
 export class CardBattleScene extends BaseScene {
   /** Assets bundles required by this screen */
@@ -29,6 +30,9 @@ export class CardBattleScene extends BaseScene {
   private currentPhase: BattlePhaseName = 'start_turn';
   private isAnimating: boolean = false;
   private mainPhaseResolve?: () => void;
+
+  // Loading and error state management
+  private loadingManager: LoadingStateManager;
 
   // Zone components following the layout order:
   // PLAYER 2 HAND ZONE (Skill Cards)  
@@ -48,6 +52,9 @@ export class CardBattleScene extends BaseScene {
     super();
 
     this.battleId = params?.battleId || 'b205a2bd-4e64-4336-85c5-c950c70d0ca3';
+
+    // Initialize loading manager
+    this.loadingManager = new LoadingStateManager(this, this.gameWidth, this.gameHeight);
 
     // Initialize all zones
     this.p2HandZone = new HandZone({ playerNo: 2 });
@@ -117,8 +124,14 @@ export class CardBattleScene extends BaseScene {
 
   private async handleCardDrop(card: Card, dropTarget: string): Promise<void> {
     if (!this.battleState) return;
+    
+    // Prevent actions if not interactable
+    if (this.isAnimating || this.battleState.current_player !== 1) {
+      return;
+    }
 
     this.isAnimating = true;
+    this.disablePlayerUI();
 
     try {
       if (dropTarget === 'discard') {
@@ -133,6 +146,7 @@ export class CardBattleScene extends BaseScene {
     }
 
     this.isAnimating = false;
+    this.enablePlayerUI();
   }
 
   private async discardCardForEnergy(card: Card): Promise<void> {
@@ -185,6 +199,10 @@ export class CardBattleScene extends BaseScene {
       }
     } catch (error) {
       console.error('Failed to discard card:', error);
+      const errorMessage = error instanceof ApiError 
+        ? error.message 
+        : 'Failed to discard card. Please try again.';
+      this.battleLogZone.showNotification(errorMessage, Colors.ERROR, 3000);
     }
   }
 
@@ -228,6 +246,10 @@ export class CardBattleScene extends BaseScene {
       }
     } catch (error) {
       console.error('Failed to play card:', error);
+      const errorMessage = error instanceof ApiError 
+        ? error.message 
+        : 'Failed to play card. Please try again.';
+      this.battleLogZone.showNotification(errorMessage, Colors.ERROR, 3000);
     }
   }
 
@@ -257,7 +279,7 @@ export class CardBattleScene extends BaseScene {
     });
   }
 
-  private async animateEnergyIncrease(playerTeam: number, previousEnergy: number, newEnergy: number): Promise<void> {
+  private async animateEnergyIncrease(playerTeam: number, _previousEnergy: number, _newEnergy: number): Promise<void> {
     // Get the appropriate character zone based on player team
     const characterZone = playerTeam === 1 ? this.p1CharacterZone : this.p2CharacterZone;
     const energyText = characterZone.getEnergyText();
@@ -515,6 +537,8 @@ export class CardBattleScene extends BaseScene {
 
   // Battle initialization and game logic
   private async initializeBattle(): Promise<void> {
+    this.loadingManager.showLoading();
+    
     try {
       // Load battle state from API
       const response = await battleApi.getBattleState(this.battleId);
@@ -524,10 +548,20 @@ export class CardBattleScene extends BaseScene {
 
       if (this.battleState && this.battleState.players) {
         this.updateAllZones();
+        this.loadingManager.hideLoading();
         this.startGameLoop();
+      } else {
+        throw new Error('Invalid battle state received');
       }
     } catch (error) {
       console.error('Failed to initialize battle:', error);
+      const errorMessage = error instanceof ApiError 
+        ? error.message 
+        : 'Failed to load battle. Please try again.';
+      this.loadingManager.showError(errorMessage, () => {
+        this.loadingManager.hideError();
+        this.initializeBattle();
+      });
     }
   }
 
@@ -572,6 +606,14 @@ export class CardBattleScene extends BaseScene {
       }
     } catch (error) {
       console.error('Failed to process turn start:', error);
+      const errorMessage = error instanceof ApiError 
+        ? error.message 
+        : 'Failed to start turn. Please try again.';
+      this.loadingManager.showError(errorMessage, () => {
+        this.loadingManager.hideError();
+        this.processTurnStart();
+      });
+      throw error; // Re-throw to stop turn processing
     }
   }
 
@@ -619,6 +661,14 @@ export class CardBattleScene extends BaseScene {
       }
     } catch (error) {
       console.error('Failed to draw cards:', error);
+      const errorMessage = error instanceof ApiError 
+        ? error.message 
+        : 'Failed to draw cards. Please try again.';
+      this.loadingManager.showError(errorMessage, () => {
+        this.loadingManager.hideError();
+        this.processDrawPhase();
+      });
+      throw error; // Re-throw to stop turn processing
     }
   }
 
@@ -683,6 +733,13 @@ export class CardBattleScene extends BaseScene {
       }
     } catch (error) {
       console.error('Failed to process end turn:', error);
+      const errorMessage = error instanceof ApiError 
+        ? error.message 
+        : 'Failed to end turn. Please try again.';
+      this.loadingManager.showError(errorMessage, () => {
+        this.loadingManager.hideError();
+        this.processEndTurn();
+      });
     }
   }
 
@@ -691,6 +748,7 @@ export class CardBattleScene extends BaseScene {
     console.log('AI Turn - Processing AI actions');
 
     this.isAnimating = true;
+    this.disablePlayerUI();
 
     try {
       const response = await battleApi.aiTurn(this.battleId);
@@ -729,6 +787,7 @@ export class CardBattleScene extends BaseScene {
 
         this.updateAllZones();
         this.isAnimating = false;
+        this.enablePlayerUI();
 
         // Check if battle is completed before processing next turn
         if (!this.checkGameEnd()) {
@@ -738,6 +797,15 @@ export class CardBattleScene extends BaseScene {
     } catch (error) {
       console.error('Failed to process AI turn:', error);
       this.isAnimating = false;
+      this.enablePlayerUI();
+      
+      const errorMessage = error instanceof ApiError 
+        ? error.message 
+        : 'Failed to process AI turn. Please try again.';
+      this.loadingManager.showError(errorMessage, () => {
+        this.loadingManager.hideError();
+        this.processAITurn();
+      });
     }
   }
 
@@ -955,12 +1023,39 @@ export class CardBattleScene extends BaseScene {
 
     // Update battle log with turn number
     this.battleLogZone.updatePhase(this.currentPhase, this.battleState.current_player, this.battleState.current_turn);
+    
+    // Enable/disable UI based on current player and animation state
+    this.updateUIState();
+  }
+
+  private updateUIState(): void {
+    // Disable UI during animations or if it's not player 1's turn
+    if (this.isAnimating || !this.battleState || this.battleState.current_player !== 1 || this.currentPhase === 'ai_turn') {
+      this.disablePlayerUI();
+    } else {
+      this.enablePlayerUI();
+    }
+  }
+
+  private disablePlayerUI(): void {
+    // Disable hand zone interactions
+    this.p1HandZone.setInteractable(false);
+  }
+
+  private enablePlayerUI(): void {
+    // Enable hand zone interactions only if it's player 1's turn
+    if (this.battleState && this.battleState.current_player === 1 && !this.isAnimating) {
+      this.p1HandZone.setInteractable(true);
+    }
   }
 
   /** Resize handler */
   resize(width: number, height: number): void {
     this.gameWidth = width;
     this.gameHeight = height;
+
+    // Update loading manager dimensions
+    this.loadingManager.updateDimensions(width, height);
 
     // Calculate layout based on backup structure
     const TOP_PADDING = this.STANDARD_PADDING * 2;
