@@ -242,6 +242,14 @@ export class CardBattleScene extends BaseScene {
           });
         }
 
+        // Update player energy from impacts if available
+        if (response.data.length > 0 && response.data[0].impacts && currentPlayer) {
+          const energyImpact = response.data[0].impacts.find((impact: LogImpact) => impact.type === 'energy');
+          if (energyImpact && typeof energyImpact.value === 'number') {
+            currentPlayer.deck.current_energy = energyImpact.value;
+          }
+        }
+
         this.updateAllZones();
         await this.animateCardPlay(characterId, response.data);
       }
@@ -909,6 +917,15 @@ export class CardBattleScene extends BaseScene {
             }
           }
         });
+      }
+
+      // Update player energy from impacts if available
+      const aiPlayer = this.battleState?.players.find(p => p.team === 2);
+      if (log.impacts && aiPlayer) {
+        const energyImpact = log.impacts.find((impact: LogImpact) => impact.type === 'energy');
+        if (energyImpact && typeof energyImpact.value === 'number') {
+          aiPlayer.deck.current_energy = energyImpact.value;
+        }
       }
 
       // Update UI before animation
