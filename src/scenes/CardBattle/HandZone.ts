@@ -107,14 +107,15 @@ export class HandZone extends Container {
     const cardY = (height - cardHeight) / 2;
     
     handCards.forEach((cardInDeck, index) => {
-      if (cardInDeck.card) {
-        const x = startX + (index * (cardWidth + cardSpacing));
-        const handCard = this.createHandCard(cardInDeck.card, cardWidth, cardHeight);
-        handCard.x = x;
-        handCard.y = cardY;
-        this.addChild(handCard);
-        this.handCards.push(handCard);
-      }
+      // For Player 2 (AI), show face-down cards instead of actual card details
+      const x = startX + (index * (cardWidth + cardSpacing));
+      const handCard = this.playerNo === 2 
+        ? this.createFaceDownHandCard(cardWidth, cardHeight)
+        : this.createHandCard(cardInDeck.card!, cardWidth, cardHeight);
+      handCard.x = x;
+      handCard.y = cardY;
+      this.addChild(handCard);
+      this.handCards.push(handCard);
     });
   }
 
@@ -177,6 +178,16 @@ export class HandZone extends Container {
 
     // Make draggable
     this.makeHandCardDraggable(cardContainer, card);
+
+    return cardContainer;
+  }
+
+  private createFaceDownHandCard(width: number, height: number): Container {
+    const scene = this.parent as BaseScene;
+    const cardContainer = scene.createFaceDownCard(width, height);
+
+    // Face-down cards are not interactive for AI player
+    cardContainer.interactive = false;
 
     return cardContainer;
   }
