@@ -18,6 +18,7 @@ import { Colors } from '@/utils/colors';
 import { navigation } from '@/utils/navigation';
 import { HomeScene } from './HomeScene';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
+import { ErrorPopup } from '@/popups/ErrorPopup';
 
 export class CardBattleScene extends BaseScene {
   /** Assets bundles required by this screen */
@@ -558,9 +559,11 @@ export class CardBattleScene extends BaseScene {
       const errorMessage = error instanceof ApiError 
         ? error.message 
         : 'Failed to load battle. Please try again.';
-      this.loadingManager.showError(errorMessage, () => {
-        this.loadingManager.hideError();
-        this.initializeBattle();
+      navigation.presentPopup(ErrorPopup, {
+        message: errorMessage,
+        onRetry: () => {
+          this.initializeBattle();
+        }
       });
     }
   }
@@ -609,9 +612,11 @@ export class CardBattleScene extends BaseScene {
       const errorMessage = error instanceof ApiError 
         ? error.message 
         : 'Failed to start turn. Please try again.';
-      this.loadingManager.showError(errorMessage, () => {
-        this.loadingManager.hideError();
-        this.processTurnStart();
+      navigation.presentPopup(ErrorPopup, {
+        message: errorMessage,
+        onRetry: () => {
+          this.processTurnStart();
+        }
       });
       throw error; // Re-throw to stop turn processing
     }
@@ -664,9 +669,11 @@ export class CardBattleScene extends BaseScene {
       const errorMessage = error instanceof ApiError 
         ? error.message 
         : 'Failed to draw cards. Please try again.';
-      this.loadingManager.showError(errorMessage, () => {
-        this.loadingManager.hideError();
-        this.processDrawPhase();
+      navigation.presentPopup(ErrorPopup, {
+        message: errorMessage,
+        onRetry: () => {
+          this.processDrawPhase();
+        }
       });
       throw error; // Re-throw to stop turn processing
     }
@@ -736,9 +743,11 @@ export class CardBattleScene extends BaseScene {
       const errorMessage = error instanceof ApiError 
         ? error.message 
         : 'Failed to end turn. Please try again.';
-      this.loadingManager.showError(errorMessage, () => {
-        this.loadingManager.hideError();
-        this.processEndTurn();
+      navigation.presentPopup(ErrorPopup, {
+        message: errorMessage,
+        onRetry: () => {
+          this.processEndTurn();
+        }
       });
     }
   }
@@ -802,9 +811,11 @@ export class CardBattleScene extends BaseScene {
       const errorMessage = error instanceof ApiError 
         ? error.message 
         : 'Failed to process AI turn. Please try again.';
-      this.loadingManager.showError(errorMessage, () => {
-        this.loadingManager.hideError();
-        this.processAITurn();
+      navigation.presentPopup(ErrorPopup, {
+        message: errorMessage,
+        onRetry: () => {
+          this.processAITurn();
+        }
       });
     }
   }
