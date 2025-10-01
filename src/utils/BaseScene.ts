@@ -577,6 +577,16 @@ export abstract class BaseScene extends Container {
     cardContainer.x = x;
     cardContainer.y = y;
 
+    // Apply visual effect if character has acted this turn
+    if (character.has_acted) {
+      cardContainer.alpha = 0.5;
+      // Add a grayscale/desaturated effect by overlaying a gray tint
+      const overlay = new Graphics();
+      overlay.roundRect(0, 0, width, height, 8)
+        .fill({ color: 0x000000, alpha: 0.3 });
+      cardContainer.addChild(overlay);
+    }
+
     // Add avatar/logo if needed
     this.createAvatar(character, width, height, width/2, height * 0.25).then(avatarIcon => {
       cardContainer.addChild(avatarIcon);
