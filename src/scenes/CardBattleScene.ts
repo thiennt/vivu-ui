@@ -446,20 +446,12 @@ export class CardBattleScene extends BaseScene {
   }
 
   private async startGameLoop(): Promise<void> {
-    //while (this.battleState && this.battleState.status === 'ongoing') {
-      
-      if (this.battleState?.current_player === 1) {
-        await this.processPlayerTurn();
-      } else {
-        // AI Turn (auto) - if next player is AI
-        await this.processAITurn();
-      }
-
-      // Check win condition
-      if (this.checkGameEnd()) {
-        //break;
-      }
-    //}
+    if (this.battleState?.current_player === 1) {
+      await this.processPlayerTurn();
+    } else {
+      // AI Turn (auto) - if next player is AI
+      await this.processAITurn();
+    }
   }
 
   private async processPlayerTurn(): Promise<void> {
@@ -472,6 +464,8 @@ export class CardBattleScene extends BaseScene {
 
     // Main Phase
     await this.processMainPhase();
+
+    this.checkGameEnd();
   }
 
   private async processTurnStart(): Promise<void> {
@@ -535,11 +529,7 @@ export class CardBattleScene extends BaseScene {
         }
 
         this.updateAllZones();
-
-        // Add draw card animation for current player
-        if (this.battleState.current_player === 1) {
-          await this.p1HandZone.animateCardDraw();
-        }
+        await this.p1HandZone.animateCardDraw();
       }
     } catch (error) {
       console.error('Failed to draw cards:', error);
@@ -674,6 +664,19 @@ export class CardBattleScene extends BaseScene {
       // Show notification
       this.battleLogZone.showNotification(`AI drew ${cardCount} card${cardCount !== 1 ? 's' : ''}`, 0x6699FF);
 
+      const drawnCards = log.drawn_cards || [];
+      // Add cards to AI's hand
+      if (this.battleState) {
+        const aiPlayer = this.battleState.players.find(p => p.team === 2);
+        if (aiPlayer) {
+          aiPlayer.deck.hand_cards = aiPlayer.deck.hand_cards || [];
+          drawnCards.forEach((card: unknown) => {
+            aiPlayer.deck.hand_cards.push({ card: card as Card });
+          });
+        }
+      }
+
+      this.updateAllZones();
       await this.p2HandZone.animateCardDraw();
 
       // Brief delay
