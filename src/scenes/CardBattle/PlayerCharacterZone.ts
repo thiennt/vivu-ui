@@ -313,4 +313,9 @@ export class PlayerCharacterZone extends Container {
       (card as Container & { characterId: string }).characterId === characterId
     ) || null;
   }
+
+  // Method to get energy text for animations
+  public getEnergyText(): Text {
+    return this.energyText;
+  }
 }

@@ -412,4 +412,33 @@ export class HandZone extends Container {
       this.cardTooltip = null;
     }
   }
+
+  // Method to get the current drag target for animations
+  getDragTarget(): Container | null {
+    return this.dragTarget;
+  }
+
+  // Method to get a random hand card for AI discard animation
+  getRandomHandCard(): Container | null {
+    if (this.handCards.length === 0) return null;
+    
+    // Get the last card (or random) for animation
+    const cardIndex = this.handCards.length - 1;
+    const card = this.handCards[cardIndex];
+    
+    // Remove from hand cards array
+    this.handCards.splice(cardIndex, 1);
+    
+    // Remove from parent but don't destroy yet (animation will handle it)
+    if (card.parent) {
+      card.parent.removeChild(card);
+    }
+    
+    // Move to app.stage for animation
+    app.stage.addChild(card);
+    const globalPos = this.toGlobal({ x: card.x, y: card.y });
+    card.position.set(globalPos.x, globalPos.y);
+    
+    return card;
+  }
 }
