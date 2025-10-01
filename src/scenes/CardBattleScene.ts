@@ -9,7 +9,8 @@ import {
   BattlePhaseName,
   Card,
   CardBattleLog,
-  CardBattleLogTarget
+  CardBattleLogTarget,
+  LogImpact
 } from '@/types';
 import { battleApi } from '@/services/api';
 import { gsap } from 'gsap';
@@ -164,6 +165,14 @@ export class CardBattleScene extends BaseScene {
         if (cardContainer) {
           const discardTarget = this.p1CharacterZone.toGlobal({ x: 0, y: 0 });
           await this.animateCardToDiscard(cardContainer, discardTarget);
+        }
+
+        // Update energy from impacts if available
+        if (response.data.length > 0 && response.data[0].impacts && currentPlayer) {
+          const energyImpact = response.data[0].impacts.find((impact: LogImpact) => impact.type === 'energy');
+          if (energyImpact && typeof energyImpact.value === 'number') {
+            currentPlayer.deck.current_energy = energyImpact.value;
+          }
         }
 
         this.updateAllZones();
@@ -781,6 +790,14 @@ export class CardBattleScene extends BaseScene {
         if (cardToAnimate) {
           const discardTarget = this.p2CharacterZone.toGlobal({ x: 0, y: 0 });
           await this.animateCardToDiscard(cardToAnimate, discardTarget);
+        }
+      }
+
+      // Update energy from impacts if available
+      if (log.impacts && aiPlayer) {
+        const energyImpact = log.impacts.find((impact: LogImpact) => impact.type === 'energy');
+        if (energyImpact && typeof energyImpact.value === 'number') {
+          aiPlayer.deck.current_energy = energyImpact.value;
         }
       }
 
