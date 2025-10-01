@@ -9,7 +9,8 @@ import {
   BattlePhaseName,
   Card,
   CardBattleLog,
-  CardBattleLogTarget
+  CardBattleLogTarget,
+  LogImpact
 } from '@/types';
 import { battleApi } from '@/services/api';
 import { gsap } from 'gsap';
@@ -137,6 +138,10 @@ export class CardBattleScene extends BaseScene {
   private async discardCardForEnergy(card: Card): Promise<void> {
     if (!this.battleState) return;
 
+    // Store previous energy count for animation
+    const currentPlayer = this.battleState.players.find(p => p.team === this.battleState!.current_player);
+    const previousEnergy = currentPlayer?.deck.current_energy || 0;
+
     const turnAction: TurnAction = {
       type: 'discard_card',
       player_team: this.battleState.current_player,
@@ -149,13 +154,34 @@ export class CardBattleScene extends BaseScene {
         console.log('Discard card logs:', response.data);
 
         // Remove card from player's hand
-        const currentPlayer = this.battleState.players.find(p => p.team === this.battleState!.current_player);
         if (currentPlayer && currentPlayer.deck.hand_cards) {
           currentPlayer.deck.hand_cards = currentPlayer.deck.hand_cards.filter((c: { card?: Card }) => c.card?.id !== card.id);
         }
 
+        // Get the card container from hand zone before updating zones
+        const cardContainer = this.p1HandZone.getDragTarget();
+        
+        // Animate card to discard zone before updating UI
+        if (cardContainer) {
+          const discardTarget = this.p1CharacterZone.toGlobal({ x: 0, y: 0 });
+          await this.animateCardToDiscard(cardContainer, discardTarget);
+        }
+
+        // Update energy from impacts if available
+        if (response.data.length > 0 && response.data[0].impacts && currentPlayer) {
+          const energyImpact = response.data[0].impacts.find((impact: LogImpact) => impact.type === 'energy');
+          if (energyImpact && typeof energyImpact.value === 'number') {
+            currentPlayer.deck.current_energy = energyImpact.value;
+          }
+        }
+
         this.updateAllZones();
-        this.animateCardToDiscard();
+
+        // Animate energy count increase after updating zones
+        const newEnergy = currentPlayer?.deck.current_energy || 0;
+        if (newEnergy > previousEnergy) {
+          await this.animateEnergyIncrease(1, previousEnergy, newEnergy);
+        }
       }
     } catch (error) {
       console.error('Failed to discard card:', error);
@@ -205,9 +231,69 @@ export class CardBattleScene extends BaseScene {
     }
   }
 
-  private animateCardToDiscard(): void {
-    // Animation will be handled by the drag/drop system
-    // Card is already destroyed when this is called
+  private async animateCardToDiscard(cardContainer: Container, discardTarget: { x: number; y: number }): Promise<void> {
+    // Animate card flying to discard zone (player info area)
+    return new Promise((resolve) => {
+      gsap.timeline({
+        onComplete: () => {
+          // Destroy the card after animation
+          cardContainer.destroy();
+          resolve();
+        }
+      })
+      .to(cardContainer, {
+        x: discardTarget.x + 40, // Center of player info zone
+        y: discardTarget.y + 60,
+        duration: 0.5,
+        ease: 'power2.inOut'
+      }, 0)
+      .to(cardContainer, {
+        scale: 0.3,
+        rotation: Math.PI * 2, // Full rotation
+        alpha: 0,
+        duration: 0.5,
+        ease: 'power2.in'
+      }, 0);
+    });
+  }
+
+  private async animateEnergyIncrease(playerTeam: number, previousEnergy: number, newEnergy: number): Promise<void> {
+    // Get the appropriate character zone based on player team
+    const characterZone = playerTeam === 1 ? this.p1CharacterZone : this.p2CharacterZone;
+    const energyText = characterZone.getEnergyText();
+    
+    if (!energyText) return;
+
+    // Animate the energy text with a bounce and glow effect
+    return new Promise((resolve) => {
+      gsap.timeline({
+        onComplete: resolve
+      })
+      // Bounce effect
+      .to(energyText, {
+        scale: 1.4,
+        duration: 0.2,
+        ease: 'back.out(2)'
+      })
+      // Glow effect by changing tint
+      .to(energyText, {
+        tint: 0xFFFF00, // Yellow glow
+        duration: 0.2,
+        ease: 'power2.out'
+      }, 0)
+      // Return to normal scale
+      .to(energyText, {
+        scale: 1.0,
+        duration: 0.3,
+        ease: 'elastic.out(1, 0.5)'
+      })
+      // Return to normal color
+      .to(energyText, {
+        tint: 0xFFFFFF,
+        duration: 0.3,
+        ease: 'power2.inOut'
+      }, '-=0.3');
+    });
   }
 
   private async animateCardPlay(characterId: string, battleLogs?: CardBattleLog[]): Promise<void> {
@@ -678,6 +764,50 @@ export class CardBattleScene extends BaseScene {
 
       this.updateAllZones();
       await this.p2HandZone.animateCardDraw();
+
+      // Brief delay
+      await new Promise(resolve => setTimeout(resolve, 300));
+    } else if (log.action_type === 'discard_card') {
+      // Handle discard card animation for AI
+      console.log('AI discarded a card');
+      
+      // Store previous energy count for animation
+      const aiPlayer = this.battleState?.players.find(p => p.team === 2);
+      const previousEnergy = aiPlayer?.deck.current_energy || 0;
+      
+      // Show notification
+      this.battleLogZone.showNotification('AI discarded a card', 0xFF6666);
+
+      // Update AI's hand - remove one card
+      if (aiPlayer && aiPlayer.deck.hand_cards && aiPlayer.deck.hand_cards.length > 0) {
+        // Animate the last card in AI's hand (or random)
+        const cardToAnimate = this.p2HandZone.getRandomHandCard();
+        
+        // Remove one card from hand
+        aiPlayer.deck.hand_cards.pop();
+        
+        // Animate card to AI's discard zone before updating zones
+        if (cardToAnimate) {
+          const discardTarget = this.p2CharacterZone.toGlobal({ x: 0, y: 0 });
+          await this.animateCardToDiscard(cardToAnimate, discardTarget);
+        }
+      }
+
+      // Update energy from impacts if available
+      if (log.impacts && aiPlayer) {
+        const energyImpact = log.impacts.find((impact: LogImpact) => impact.type === 'energy');
+        if (energyImpact && typeof energyImpact.value === 'number') {
+          aiPlayer.deck.current_energy = energyImpact.value;
+        }
+      }
+
+      this.updateAllZones();
+
+      // Animate energy count increase after updating zones
+      const newEnergy = aiPlayer?.deck.current_energy || 0;
+      if (newEnergy > previousEnergy) {
+        await this.animateEnergyIncrease(2, previousEnergy, newEnergy);
+      }
 
       // Brief delay
       await new Promise(resolve => setTimeout(resolve, 300));
