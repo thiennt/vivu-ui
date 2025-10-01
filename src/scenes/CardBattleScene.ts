@@ -663,12 +663,9 @@ export class CardBattleScene extends BaseScene {
       
       // Show notification
       this.battleLogZone.showNotification(`AI drew ${cardCount} card${cardCount !== 1 ? 's' : ''}`, 0x6699FF);
-      
-      // Add visual feedback - animate AI hand zone
-      if (this.battleState?.current_player === 2) {
-        await this.p2HandZone.animateCardDraw();
-      }
-      
+
+      await this.p2HandZone.animateCardDraw();
+
       // Brief delay
       await new Promise(resolve => setTimeout(resolve, 300));
     } else if (log.action_type === 'play_card' && log.card && log.targets) {
