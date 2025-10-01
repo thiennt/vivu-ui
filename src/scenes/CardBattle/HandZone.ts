@@ -29,6 +29,9 @@ export class HandZone extends Container {
   // Tooltip state
   private cardTooltip: CardDetailPopup | null = null;
 
+  // Interactable state
+  private isInteractable: boolean = true;
+
   constructor(params?: { playerNo?: number }) {
     super();
 
@@ -139,9 +142,19 @@ export class HandZone extends Container {
       height - buttonHeight - scene.STANDARD_PADDING,
       buttonWidth,
       buttonHeight,
-      () => this.endTurnCallback && this.endTurnCallback(),
+      () => {
+        if (this.isInteractable && this.endTurnCallback) {
+          this.endTurnCallback();
+        }
+      },
       14 // Reduced base font size
     );
+    
+    // Set button interactivity based on isInteractable state
+    endTurnButton.interactive = this.isInteractable;
+    endTurnButton.alpha = this.isInteractable ? 1.0 : 0.5;
+    endTurnButton.cursor = this.isInteractable ? 'pointer' : 'default';
+    
     this.endTurnButton.addChild(endTurnButton);
   }
 
@@ -193,15 +206,17 @@ export class HandZone extends Container {
   }
 
   private makeHandCardDraggable(cardContainer: Container, _card: Card): void {
-    cardContainer.interactive = true;
-    cardContainer.cursor = 'grab';
+    cardContainer.interactive = this.isInteractable;
+    cardContainer.cursor = this.isInteractable ? 'grab' : 'default';
 
     cardContainer.on('pointerdown', (event: FederatedPointerEvent) => {
-      this.onCardDragStart(event, cardContainer, _card);
+      if (this.isInteractable) {
+        this.onCardDragStart(event, cardContainer, _card);
+      }
     });
 
     cardContainer.on('pointerover', () => {
-      if (!this.dragTarget) {
+      if (!this.dragTarget && this.isInteractable) {
         cardContainer.scale.set(1.05);
       }
     });
@@ -440,5 +455,22 @@ export class HandZone extends Container {
     card.position.set(globalPos.x, globalPos.y);
     
     return card;
+  }
+
+  // Method to enable/disable interactions
+  public setInteractable(interactable: boolean): void {
+    this.isInteractable = interactable;
+    
+    // Update all hand cards
+    this.handCards.forEach(cardContainer => {
+      cardContainer.interactive = interactable;
+      cardContainer.cursor = interactable ? 'grab' : 'default';
+    });
+    
+    // Update end turn button state
+    const bounds = this.handBg.getBounds();
+    if (bounds.width > 0 && bounds.height > 0) {
+      this.updateEndTurnButton(bounds.width, bounds.height);
+    }
   }
 }
