@@ -529,20 +529,6 @@ export abstract class BaseScene extends Container {
     bg.roundRect(3, 3, width - 6, height - 6, 5)
       .stroke({ width: 1, color: Colors.TEXT_WHITE, alpha: 0.4 });
 
-    // HP Text above HP bar
-    const hpText = new Text({
-      text: `HP: ${character.hp}/${character.max_hp || character.hp}`,
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 12,
-        fontWeight: 'bold',
-        fill: Colors.TEXT_WHITE
-      }
-    });
-    hpText.anchor.set(0.5);
-    hpText.x = width / 2;
-    hpText.y = height * 0.35;
-
     // HP Bar in the middle section
     const hpBarWidth = width * 0.8;
     const hpBarHeight = 8;
@@ -587,7 +573,7 @@ export abstract class BaseScene extends Container {
     defText.x = width / 2;
     defText.y = height * 0.85;
 
-    cardContainer.addChild(bg, hpBarBg, hpBarFg, hpText, atkText, defText);
+    cardContainer.addChild(bg, hpBarBg, hpBarFg, atkText, defText);
     cardContainer.x = x;
     cardContainer.y = y;
 
