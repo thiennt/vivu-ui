@@ -1,4 +1,4 @@
-import { Container, Text } from 'pixi.js';
+import { Container, Text, Graphics } from 'pixi.js';
 import { BaseScene } from '@/utils/BaseScene';
 import { HandZone } from './CardBattle/HandZone';
 import { PlayerCharacterZone } from './CardBattle/PlayerCharacterZone';
@@ -13,6 +13,9 @@ import {
 } from '@/types';
 import { battleApi } from '@/services/api';
 import { gsap } from 'gsap';
+import { Colors } from '@/utils/colors';
+import { navigation } from '@/utils/navigation';
+import { HomeScene } from './HomeScene';
 
 export class CardBattleScene extends BaseScene {
   /** Assets bundles required by this screen */
@@ -475,6 +478,12 @@ export class CardBattleScene extends BaseScene {
     this.currentPhase = 'start_turn';
     console.log(`Turn Start - Player ${this.battleState?.current_player}`);
 
+    // Show turn start notification
+    if (this.battleState) {
+      const playerName = this.battleState.current_player === 1 ? 'Your' : 'AI';
+      this.battleLogZone.showNotification(`${playerName} Turn!`, Colors.TEXT_PRIMARY, 1500);
+    }
+
     try {
       const response = await battleApi.startTurn(this.battleId);
       if (response.success && response.data) {
@@ -507,6 +516,11 @@ export class CardBattleScene extends BaseScene {
         if (logs.length > 0 && logs[0].drawn_cards) {
           const drawnCards = logs[0].drawn_cards;
           console.log('Cards drawn:', drawnCards);
+
+          // Show notification for player
+          if (this.battleState.current_player === 1) {
+            this.battleLogZone.showNotification(`Drew ${drawnCards.length} card${drawnCards.length !== 1 ? 's' : ''}`, 0x66FF66);
+          }
 
           // Add cards to player's hand in battleState
           if (this.battleState) {
@@ -575,7 +589,11 @@ export class CardBattleScene extends BaseScene {
         }
 
         this.updateAllZones();
-        this.processAITurn();
+
+        // Check if battle is completed before processing next turn
+        if (!this.checkGameEnd()) {
+          this.processAITurn();
+        }
       }
     } catch (error) {
       console.error('Failed to process end turn:', error);
@@ -625,7 +643,11 @@ export class CardBattleScene extends BaseScene {
 
         this.updateAllZones();
         this.isAnimating = false;
-        this.processPlayerTurn();
+
+        // Check if battle is completed before processing next turn
+        if (!this.checkGameEnd()) {
+          this.processPlayerTurn();
+        }
       }
     } catch (error) {
       console.error('Failed to process AI turn:', error);
@@ -636,12 +658,25 @@ export class CardBattleScene extends BaseScene {
   private async processAIActionLog(log: CardBattleLog): Promise<void> {
     if (log.action_type === 'draw_card') {
       // Handle draw card animation for AI
-      console.log('AI drew cards:', log.drawn_cards?.length || 0);
-      // AI hand is hidden, so we just add a brief delay
+      const cardCount = log.drawn_cards?.length || 0;
+      console.log('AI drew cards:', cardCount);
+      
+      // Show notification
+      this.battleLogZone.showNotification(`AI drew ${cardCount} card${cardCount !== 1 ? 's' : ''}`, 0x6699FF);
+      
+      // Add visual feedback - animate AI hand zone
+      if (this.battleState?.current_player === 2) {
+        await this.p2HandZone.animateCardDraw();
+      }
+      
+      // Brief delay
       await new Promise(resolve => setTimeout(resolve, 300));
     } else if (log.action_type === 'play_card' && log.card && log.targets) {
       // Handle play card animation for AI
       console.log(`AI played card: ${log.card.name}`);
+      
+      // Show notification
+      this.battleLogZone.showNotification(`AI played: ${log.card.name}`, 0xFF9966);
       
       // Update character states from log targets
       if (this.battleState) {
@@ -673,10 +708,74 @@ export class CardBattleScene extends BaseScene {
 
     if (this.battleState.status === 'completed') {
       console.log(`Game ended. Winner: Team ${this.battleState.winner_team}`);
+      this.showBattleResult();
       return true;
     }
 
     return false;
+  }
+
+  private showBattleResult(): void {
+    if (!this.battleState) return;
+    
+    const resultContainer = new Container();
+    
+    const overlay = new Graphics();
+    overlay.rect(0, 0, this.gameWidth, this.gameHeight)
+      .fill(0x000000, 0.7);
+    
+    const resultBg = new Graphics();
+    resultBg.roundRect(0, 0, 300, 200, 20)
+      .fill(Colors.UI_BACKGROUND)
+      .stroke({ width: 3, color: Colors.UI_BORDER });
+    resultBg.x = (this.gameWidth - 300) / 2;
+    resultBg.y = (this.gameHeight - 200) / 2;
+    
+    const isVictory = this.battleState.winner_team === 1;
+    const resultText = new Text({
+      text: isVictory ? 'VICTORY!' : 'DEFEAT!',
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 32,
+        fill: isVictory ? Colors.SUCCESS : Colors.ERROR,
+        align: 'center'
+      }
+    });
+    resultText.anchor.set(0.5);
+    resultText.x = this.gameWidth / 2;
+    resultText.y = this.gameHeight / 2 - 30;
+    
+    const backButton = new Container();
+    const backBg = new Graphics();
+    backBg.roundRect(0, 0, 100, 40, 8)
+      .fill(Colors.BUTTON_PRIMARY)
+      .stroke({ width: 2, color: Colors.BUTTON_BORDER });
+    
+    const backText = new Text({
+      text: 'BACK',
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 14,
+        fill: Colors.TEXT_PRIMARY,
+        align: 'center'
+      }
+    });
+    backText.anchor.set(0.5);
+    backText.x = 50;
+    backText.y = 20;
+    
+    backButton.addChild(backBg, backText);
+    backButton.x = this.gameWidth / 2 - 50;
+    backButton.y = this.gameHeight / 2 + 40;
+    
+    backButton.interactive = true;
+    backButton.cursor = 'pointer';
+    backButton.on('pointertap', () => {
+      navigation.showScreen(HomeScene);
+    });
+    
+    resultContainer.addChild(overlay, resultBg, resultText, backButton);
+    this.addChild(resultContainer);
   }
 
   private endTurn(): void {
@@ -700,8 +799,8 @@ export class CardBattleScene extends BaseScene {
       this.p2HandZone.updateBattleState(player2);
     }
 
-    // Update battle log
-    this.battleLogZone.updatePhase(this.currentPhase, this.battleState.current_player);
+    // Update battle log with turn number
+    this.battleLogZone.updatePhase(this.currentPhase, this.battleState.current_player, this.battleState.current_turn);
   }
 
   /** Resize handler */
