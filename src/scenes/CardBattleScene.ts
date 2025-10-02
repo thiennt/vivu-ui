@@ -9,8 +9,7 @@ import {
   BattlePhaseName,
   Card,
   CardBattleLog,
-  CardBattleLogTarget,
-  LogImpact
+  CardBattleLogTarget
 } from '@/types';
 import { battleApi, ApiError } from '@/services/api';
 import { gsap } from 'gsap';
@@ -166,12 +165,8 @@ export class CardBattleScene extends BaseScene {
     try {
       const response = await battleApi.discardCard(this.battleId, turnAction);
       if (response.success && response.data) {
-        console.log('Discard card logs:', response.data);
-
-        // Remove card from player's hand
-        if (currentPlayer && currentPlayer.deck.hand_cards) {
-          currentPlayer.deck.hand_cards = currentPlayer.deck.hand_cards.filter((c: { card?: Card }) => c.card?.id !== card.id);
-        }
+        const logs = response.data;
+        console.log('Discard card logs:', logs);
 
         // Get the card container from hand zone before updating zones
         const cardContainer = this.p1HandZone.getDragTarget();
@@ -182,12 +177,9 @@ export class CardBattleScene extends BaseScene {
           await this.animateCardToDiscard(cardContainer, discardTarget);
         }
 
-        // Update energy from impacts if available
-        if (response.data.length > 0 && response.data[0].impacts && currentPlayer) {
-          const energyImpact = response.data[0].impacts.find((impact: LogImpact) => impact.type === 'energy');
-          if (energyImpact && typeof energyImpact.value === 'number') {
-            currentPlayer.deck.current_energy = energyImpact.value;
-          }
+        // Update battle state from after_state if available
+        if (logs.length > 0 && logs[0].after_state) {
+          this.updateBattleStateFromAfterState(logs[0].after_state);
         }
 
         this.updateAllZones();
@@ -195,7 +187,7 @@ export class CardBattleScene extends BaseScene {
         // Animate energy count increase after updating zones
         const newEnergy = currentPlayer?.deck.current_energy || 0;
         if (newEnergy > previousEnergy) {
-          await this.animateEnergyIncrease(1, previousEnergy, newEnergy);
+          await this.animateEnergyIncrease(1);
         }
       }
     } catch (error) {
@@ -220,24 +212,16 @@ export class CardBattleScene extends BaseScene {
     try {
       const response = await battleApi.playCard(this.battleId, turnAction);
       if (response.success && response.data) {
-        console.log('Play card logs:', response.data);
+        const logs = response.data;
+        console.log('Play card logs:', logs);
 
-        // Remove card from player's hand
-        const currentPlayer = this.battleState.players.find(p => p.team === this.battleState!.current_player);
-        if (currentPlayer && currentPlayer.deck.hand_cards) {
-          currentPlayer.deck.hand_cards = currentPlayer.deck.hand_cards.filter((c: { card?: Card }) => c.card?.id !== card.id);
-        }
-
-        // Update player energy from impacts if available
-        if (response.data.length > 0 && response.data[0].impacts && currentPlayer) {
-          const energyImpact = response.data[0].impacts.find((impact: LogImpact) => impact.type === 'energy');
-          if (energyImpact && typeof energyImpact.value === 'number') {
-            currentPlayer.deck.current_energy = energyImpact.value;
-          }
+        // Update battle state from after_state if available
+        if (logs.length > 0 && logs[0].after_state) {
+          this.updateBattleStateFromAfterState(logs[0].after_state);
         }
 
         this.updateAllZones();
-        await this.animateCardPlay(characterId, response.data);
+        await this.animateCardPlay(characterId, logs);
       }
     } catch (error) {
       console.error('Failed to play card:', error);
@@ -274,7 +258,7 @@ export class CardBattleScene extends BaseScene {
     });
   }
 
-  private async animateEnergyIncrease(playerTeam: number, _previousEnergy: number, _newEnergy: number): Promise<void> {
+  private async animateEnergyIncrease(playerTeam: number): Promise<void> {
     // Get the appropriate character zone based on player team
     const characterZone = playerTeam === 1 ? this.p1CharacterZone : this.p2CharacterZone;
     const energyText = characterZone.getEnergyText();
@@ -530,6 +514,63 @@ export class CardBattleScene extends BaseScene {
     });
   }
 
+  // Helper method to update battle state from after_state in battle logs
+  private updateBattleStateFromAfterState(afterState: Partial<CardBattleState>): void {
+    if (!this.battleState) return;
+
+    // Use type assertion to handle the after_state structure which may have additional properties
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const state = afterState as any;
+
+    // Update current player if available
+    if (state.current_player !== undefined) {
+      this.battleState.current_player = state.current_player;
+    }
+
+    // Update turn number if available (after_state uses 'turn' instead of 'current_turn')
+    if (state.turn !== undefined) {
+      this.battleState.current_turn = state.turn;
+    }
+
+    // Update characters if available (after_state has a flat list of characters)
+    if (state.characters) {
+      this.battleState.players.forEach(player => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const teamCharacters = state.characters.filter((c: any) => 
+          c.team === player.team
+        );
+        if (teamCharacters.length > 0) {
+          player.characters = teamCharacters;
+        }
+      });
+    }
+
+    // Update player deck states if available
+    if (afterState.players) {
+      afterState.players.forEach(updatedPlayer => {
+        const player = this.battleState!.players.find(p => p.team === updatedPlayer.team);
+        if (player && updatedPlayer.deck) {
+          // Update energy
+          if (updatedPlayer.deck.current_energy !== undefined) {
+            player.deck.current_energy = updatedPlayer.deck.current_energy;
+          }
+          // Update remaining cards count
+          if (updatedPlayer.deck.remaining_cards !== undefined) {
+            player.deck.remaining_cards = updatedPlayer.deck.remaining_cards;
+          }
+          // Update hand cards if available
+          if (updatedPlayer.deck.hand_cards !== undefined) {
+            player.deck.hand_cards = updatedPlayer.deck.hand_cards;
+          }
+          // Update discard cards if available
+          if (updatedPlayer.deck.discard_cards !== undefined) {
+            player.deck.discard_cards = updatedPlayer.deck.discard_cards;
+          }
+        }
+      });
+    }
+  }
+
   // Battle initialization and game logic
   private async initializeBattle(): Promise<void> {
     this.loadingManager.showLoading();
@@ -633,26 +674,17 @@ export class CardBattleScene extends BaseScene {
         const logs = response.data;
         console.log('Draw phase logs:', logs);
 
-        // Update hand cards from drawn_cards if available
+        // Show notification for player
         if (logs.length > 0 && logs[0].drawn_cards) {
           const drawnCards = logs[0].drawn_cards;
-          console.log('Cards drawn:', drawnCards);
-
-          // Show notification for player
           if (this.battleState.current_player === 1) {
             this.battleLogZone.showNotification(`Drew ${drawnCards.length} card${drawnCards.length !== 1 ? 's' : ''}`, 0x66FF66);
           }
+        }
 
-          // Add cards to player's hand in battleState
-          if (this.battleState) {
-            const currentPlayer = this.battleState.players.find(p => p.team === this.battleState!.current_player);
-            if (currentPlayer) {
-              currentPlayer.deck.hand_cards = currentPlayer.deck.hand_cards || [];
-              drawnCards.forEach((card: unknown) => {
-                currentPlayer.deck.hand_cards.push({ card: card as Card });
-              });
-            }
-          }
+        // Update battle state from after_state if available
+        if (logs.length > 0 && logs[0].after_state) {
+          this.updateBattleStateFromAfterState(logs[0].after_state);
         }
 
         this.updateAllZones();
@@ -704,25 +736,9 @@ export class CardBattleScene extends BaseScene {
         const logs = response.data;
         console.log('End turn logs:', logs);
 
-        // Update battle state from the logs if available
-        if (logs.length > 0 && logs[0].after_state && this.battleState) {
-          const afterState = logs[0].after_state;
-          if (afterState.current_player !== undefined) {
-            this.battleState.current_player = afterState.current_player;
-          }
-          if (afterState.turn !== undefined) {
-            this.battleState.current_turn = afterState.turn;
-          }
-          if (afterState.characters) {
-            this.battleState.players.forEach(player => {
-              const teamCharacters = afterState.characters!.filter((c: unknown) => 
-                (c as { team: number }).team === player.team
-              );
-              if (teamCharacters.length > 0) {
-                player.characters = teamCharacters;
-              }
-            });
-          }
+        // Update battle state from after_state if available
+        if (logs.length > 0 && logs[0].after_state) {
+          this.updateBattleStateFromAfterState(logs[0].after_state);
         }
 
         this.updateAllZones();
@@ -768,24 +784,8 @@ export class CardBattleScene extends BaseScene {
         }
 
         // Update battle state from the last log's after_state if available
-        if (logs.length > 0 && logs[logs.length - 1].after_state && this.battleState) {
-          const afterState = logs[logs.length - 1].after_state;
-          if (afterState.current_player !== undefined) {
-            this.battleState.current_player = afterState.current_player;
-          }
-          if (afterState.turn !== undefined) {
-            this.battleState.current_turn = afterState.turn;
-          }
-          if (afterState.characters) {
-            this.battleState.players.forEach(player => {
-              const teamCharacters = afterState.characters!.filter((c: unknown) => 
-                (c as { team: number }).team === player.team
-              );
-              if (teamCharacters.length > 0) {
-                player.characters = teamCharacters;
-              }
-            });
-          }
+        if (logs.length > 0 && logs[logs.length - 1].after_state) {
+          this.updateBattleStateFromAfterState(logs[logs.length - 1].after_state);
         }
 
         this.updateAllZones();
@@ -823,16 +823,9 @@ export class CardBattleScene extends BaseScene {
       // Show notification
       this.battleLogZone.showNotification(`AI drew ${cardCount} card${cardCount !== 1 ? 's' : ''}`, 0x6699FF);
 
-      const drawnCards = log.drawn_cards || [];
-      // Add cards to AI's hand
-      if (this.battleState) {
-        const aiPlayer = this.battleState.players.find(p => p.team === 2);
-        if (aiPlayer) {
-          aiPlayer.deck.hand_cards = aiPlayer.deck.hand_cards || [];
-          drawnCards.forEach((card: unknown) => {
-            aiPlayer.deck.hand_cards.push({ card: card as Card });
-          });
-        }
+      // Update battle state from after_state if available
+      if (log.after_state) {
+        this.updateBattleStateFromAfterState(log.after_state);
       }
 
       this.updateAllZones();
@@ -851,27 +844,18 @@ export class CardBattleScene extends BaseScene {
       // Show notification
       this.battleLogZone.showNotification('AI discarded a card', 0xFF6666);
 
-      // Update AI's hand - remove one card
-      if (aiPlayer && aiPlayer.deck.hand_cards && aiPlayer.deck.hand_cards.length > 0) {
-        // Animate the last card in AI's hand (or random)
-        const cardToAnimate = this.p2HandZone.getRandomHandCard();
-        
-        // Remove one card from hand
-        aiPlayer.deck.hand_cards.pop();
-        
-        // Animate card to AI's discard zone before updating zones
-        if (cardToAnimate) {
-          const discardTarget = this.p2CharacterZone.toGlobal({ x: 0, y: 0 });
-          await this.animateCardToDiscard(cardToAnimate, discardTarget);
-        }
+      // Animate the last card in AI's hand (or random)
+      const cardToAnimate = this.p2HandZone.getRandomHandCard();
+      
+      // Animate card to AI's discard zone before updating zones
+      if (cardToAnimate) {
+        const discardTarget = this.p2CharacterZone.toGlobal({ x: 0, y: 0 });
+        await this.animateCardToDiscard(cardToAnimate, discardTarget);
       }
 
-      // Update energy from impacts if available
-      if (log.impacts && aiPlayer) {
-        const energyImpact = log.impacts.find((impact: LogImpact) => impact.type === 'energy');
-        if (energyImpact && typeof energyImpact.value === 'number') {
-          aiPlayer.deck.current_energy = energyImpact.value;
-        }
+      // Update battle state from after_state if available
+      if (log.after_state) {
+        this.updateBattleStateFromAfterState(log.after_state);
       }
 
       this.updateAllZones();
@@ -879,7 +863,7 @@ export class CardBattleScene extends BaseScene {
       // Animate energy count increase after updating zones
       const newEnergy = aiPlayer?.deck.current_energy || 0;
       if (newEnergy > previousEnergy) {
-        await this.animateEnergyIncrease(2, previousEnergy, newEnergy);
+        await this.animateEnergyIncrease(2);
       }
 
       // Brief delay
@@ -891,13 +875,9 @@ export class CardBattleScene extends BaseScene {
       // Show notification
       this.battleLogZone.showNotification(`AI played: ${log.card.name}`, 0xFF9966);
       
-      // Update player energy from impacts if available
-      const aiPlayer = this.battleState?.players.find(p => p.team === 2);
-      if (log.impacts && aiPlayer) {
-        const energyImpact = log.impacts.find((impact: LogImpact) => impact.type === 'energy');
-        if (energyImpact && typeof energyImpact.value === 'number') {
-          aiPlayer.deck.current_energy = energyImpact.value;
-        }
+      // Update battle state from after_state if available
+      if (log.after_state) {
+        this.updateBattleStateFromAfterState(log.after_state);
       }
 
       // Update UI before animation
