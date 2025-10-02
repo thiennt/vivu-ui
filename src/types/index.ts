@@ -404,6 +404,7 @@ export interface CardBattleLog {
   result?: LogResult;
   before_state?: Partial<CardBattleState>;
   after_state?: Partial<CardBattleState>;
+  drawn_cards?: Card[];                   // Cards drawn in draw_card action
   animation_hint?: string;
   created_at: string;
   updated_at?: string;
