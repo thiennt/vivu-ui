@@ -28,7 +28,6 @@ export class CardBattleScene extends BaseScene {
   // Battle state management
   private battleState: CardBattleState | null = null;
   private currentPhase: BattlePhaseName = 'start_turn';
-  private isAnimating: boolean = false;
   private mainPhaseResolve?: () => void;
 
   // Loading and error state management
@@ -126,11 +125,10 @@ export class CardBattleScene extends BaseScene {
     if (!this.battleState) return;
     
     // Prevent actions if not interactable
-    if (this.isAnimating || this.battleState.current_player !== 1) {
+    if (this.battleState.current_player !== 1) {
       return;
     }
 
-    this.isAnimating = true;
     this.disablePlayerUI();
 
     try {
@@ -145,7 +143,6 @@ export class CardBattleScene extends BaseScene {
       console.error('Error handling card drop:', error);
     }
 
-    this.isAnimating = false;
     this.enablePlayerUI();
   }
 
@@ -214,14 +211,19 @@ export class CardBattleScene extends BaseScene {
       if (response.success && response.data) {
         const logs = response.data;
         console.log('Play card logs:', logs);
+        
+        await this.animateCardPlay(characterId, logs);
 
         // Update battle state from after_state if available
         if (logs.length > 0 && logs[0].after_state) {
           this.updateBattleStateFromAfterState(logs[0].after_state);
+          this.updateAllZones();
         }
 
-        this.updateAllZones();
-        await this.animateCardPlay(characterId, logs);
+        if (logs[1] && logs[1].after_state) {
+          this.updateBattleStateFromAfterState(logs[1].after_state);
+          this.checkGameEnd(logs[1]);
+        }
       }
     } catch (error) {
       console.error('Failed to play card:', error);
@@ -458,7 +460,7 @@ export class CardBattleScene extends BaseScene {
     damageText.anchor.set(0.5);
     damageText.alpha = 0;
 
-    this.addChild(damageText);
+    targetCard.addChild(damageText);
 
     // Animate damage number
     gsap.timeline()
@@ -515,60 +517,8 @@ export class CardBattleScene extends BaseScene {
   }
 
   // Helper method to update battle state from after_state in battle logs
-  private updateBattleStateFromAfterState(afterState: Partial<CardBattleState>): void {
-    if (!this.battleState) return;
-
-    // Use type assertion to handle the after_state structure which may have additional properties
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const state = afterState as any;
-
-    // Update current player if available
-    if (state.current_player !== undefined) {
-      this.battleState.current_player = state.current_player;
-    }
-
-    // Update turn number if available (after_state uses 'turn' instead of 'current_turn')
-    if (state.turn !== undefined) {
-      this.battleState.current_turn = state.turn;
-    }
-
-    // Update characters if available (after_state has a flat list of characters)
-    if (state.characters) {
-      this.battleState.players.forEach(player => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const teamCharacters = state.characters.filter((c: any) => 
-          c.team === player.team
-        );
-        if (teamCharacters.length > 0) {
-          player.characters = teamCharacters;
-        }
-      });
-    }
-
-    // Update player deck states if available
-    if (afterState.players) {
-      afterState.players.forEach(updatedPlayer => {
-        const player = this.battleState!.players.find(p => p.team === updatedPlayer.team);
-        if (player && updatedPlayer.deck) {
-          // Update energy
-          if (updatedPlayer.deck.current_energy !== undefined) {
-            player.deck.current_energy = updatedPlayer.deck.current_energy;
-          }
-          // Update remaining cards count
-          if (updatedPlayer.deck.remaining_cards !== undefined) {
-            player.deck.remaining_cards = updatedPlayer.deck.remaining_cards;
-          }
-          // Update hand cards if available
-          if (updatedPlayer.deck.hand_cards !== undefined) {
-            player.deck.hand_cards = updatedPlayer.deck.hand_cards;
-          }
-          // Update discard cards if available
-          if (updatedPlayer.deck.discard_cards !== undefined) {
-            player.deck.discard_cards = updatedPlayer.deck.discard_cards;
-          }
-        }
-      });
-    }
+  private updateBattleStateFromAfterState(afterState: CardBattleState): void {
+    this.battleState = afterState;
   }
 
   // Battle initialization and game logic
@@ -622,8 +572,6 @@ export class CardBattleScene extends BaseScene {
 
     // Main Phase
     await this.processMainPhase();
-
-    this.checkGameEnd();
   }
 
   private async processTurnStart(): Promise<void> {
@@ -640,6 +588,12 @@ export class CardBattleScene extends BaseScene {
       const response = await battleApi.startTurn(this.battleId);
       if (response.success && response.data) {
         console.log('Turn start logs:', response.data);
+        
+        const data = response.data[0];
+        if (data.after_state) {
+          this.updateBattleStateFromAfterState(data.after_state);
+        }
+
         this.updateAllZones();
       }
     } catch (error) {
@@ -739,14 +693,10 @@ export class CardBattleScene extends BaseScene {
         // Update battle state from after_state if available
         if (logs.length > 0 && logs[0].after_state) {
           this.updateBattleStateFromAfterState(logs[0].after_state);
+          this.updateAllZones();
         }
 
-        this.updateAllZones();
-
-        // Check if battle is completed before processing next turn
-        if (!this.checkGameEnd()) {
-          this.processAITurn();
-        }
+        this.processAITurn();
       }
     } catch (error) {
       console.error('Failed to process end turn:', error);
@@ -766,7 +716,6 @@ export class CardBattleScene extends BaseScene {
     this.currentPhase = 'ai_turn';
     console.log('AI Turn - Processing AI actions');
 
-    this.isAnimating = true;
     this.disablePlayerUI();
 
     try {
@@ -783,23 +732,15 @@ export class CardBattleScene extends BaseScene {
           await new Promise(resolve => setTimeout(resolve, 500));
         }
 
-        // Update battle state from the last log's after_state if available
-        if (logs.length > 0 && logs[logs.length - 1].after_state) {
-          this.updateBattleStateFromAfterState(logs[logs.length - 1].after_state);
-        }
-
-        this.updateAllZones();
-        this.isAnimating = false;
         this.enablePlayerUI();
 
         // Check if battle is completed before processing next turn
-        if (!this.checkGameEnd()) {
+        if (!this.checkGameEnd(logs[logs.length - 1])) {
           this.processPlayerTurn();
         }
       }
     } catch (error) {
       console.error('Failed to process AI turn:', error);
-      this.isAnimating = false;
       this.enablePlayerUI();
       
       const errorMessage = error instanceof ApiError 
@@ -838,7 +779,7 @@ export class CardBattleScene extends BaseScene {
       console.log('AI discarded a card');
       
       // Store previous energy count for animation
-      const aiPlayer = this.battleState?.players.find(p => p.team === 2);
+      let aiPlayer = this.battleState?.players.find(p => p.team === 2);
       const previousEnergy = aiPlayer?.deck.current_energy || 0;
       
       // Show notification
@@ -861,6 +802,7 @@ export class CardBattleScene extends BaseScene {
       this.updateAllZones();
 
       // Animate energy count increase after updating zones
+      aiPlayer = this.battleState?.players.find(p => p.team === 2)
       const newEnergy = aiPlayer?.deck.current_energy || 0;
       if (newEnergy > previousEnergy) {
         await this.animateEnergyIncrease(2);
@@ -891,27 +833,10 @@ export class CardBattleScene extends BaseScene {
     }
   }
 
-  private checkGameEnd(): boolean {
-    if (!this.battleState || !this.battleState.players) return false;
-
-    if (this.battleState.status === 'completed') {
-      console.log(`Game ended. Winner: Team ${this.battleState.winner_team}`);
+  private checkGameEnd(log: CardBattleLog): boolean {
+    if (log.action_type === 'battle_end') {
       this.showBattleResult();
       return true;
-    }
-
-    // Check if any team has no characters with HP > 0
-    for (const player of this.battleState.players) {
-      if (!player.characters) continue;
-
-      const aliveCharacters = player.characters.filter(c => c.hp > 0);
-      if (aliveCharacters.length === 0) {
-        this.battleState.status = 'completed';
-        this.battleState.winner_team = player.team === 1 ? 2 : 1;
-        console.log(`Game ended. Winner: Team ${this.battleState.winner_team}`);
-        this.showBattleResult();
-        return true;
-      }
     }
 
     return false;
@@ -1004,13 +929,13 @@ export class CardBattleScene extends BaseScene {
     // Update battle log with turn number
     this.battleLogZone.updatePhase(this.currentPhase, this.battleState.current_player, this.battleState.current_turn);
     
-    // Enable/disable UI based on current player and animation state
+    // Enable/disable UI based on current player
     this.updateUIState();
   }
 
   private updateUIState(): void {
-    // Disable UI during animations or if it's not player 1's turn
-    if (this.isAnimating || !this.battleState || this.battleState.current_player !== 1 || this.currentPhase === 'ai_turn') {
+    // Disable UI if it's not player 1's turn
+    if (this.battleState?.current_player !== 1) {
       this.disablePlayerUI();
     } else {
       this.enablePlayerUI();
@@ -1018,15 +943,11 @@ export class CardBattleScene extends BaseScene {
   }
 
   private disablePlayerUI(): void {
-    // Disable hand zone interactions
     this.p1HandZone.setInteractable(false);
   }
 
   private enablePlayerUI(): void {
-    // Enable hand zone interactions only if it's player 1's turn
-    if (this.battleState && this.battleState.current_player === 1 && !this.isAnimating) {
-      this.p1HandZone.setInteractable(true);
-    }
+    this.p1HandZone.setInteractable(true);
   }
 
   /** Resize handler */

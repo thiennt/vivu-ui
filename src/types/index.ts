@@ -402,8 +402,8 @@ export interface CardBattleLog {
   targets?: CardBattleLogTarget[];
   impacts?: LogImpact[];                  // Top-level impacts for non-target actions
   result?: LogResult;
-  before_state?: Partial<CardBattleState>;
-  after_state?: Partial<CardBattleState>;
+  before_state?: CardBattleState;
+  after_state?: CardBattleState;
   drawn_cards?: Card[];                   // Cards drawn in draw_card action
   animation_hint?: string;
   created_at: string;
