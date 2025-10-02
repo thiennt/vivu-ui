@@ -1510,7 +1510,8 @@ export const mockCardBattleState: CardBattleState = {
         "hand_cards": [],
         "discard_cards": [],
         "current_energy": 0,
-        "cards_drawn": 0
+        "cards_drawn": 0,
+        "remaining_cards": 50
       }
     },
     {
@@ -1524,7 +1525,8 @@ export const mockCardBattleState: CardBattleState = {
         "hand_cards": [],
         "discard_cards": [],
         "current_energy": 0,
-        "cards_drawn": 0
+        "cards_drawn": 0,
+        "remaining_cards": 50
       }
     }
   ]

@@ -297,6 +297,7 @@ export interface CardBattleDeck {
   discard_cards: CardInDeck[];
   current_energy: number;
   cards_drawn: number;
+  remaining_cards: number;
 }
 
 export interface CardBattlePlayerState {
@@ -382,8 +383,6 @@ export interface LogImpact {
 export interface CardBattleLogTarget {
   id: string;
   team: number;
-  before: CharacterState; // State before effect
-  after: CharacterState;  // State after effect
   impacts: LogImpact[];
 }
 
@@ -391,15 +390,6 @@ export interface CardBattleLogTarget {
 export interface LogResult {
   success: boolean;
   reason?: string; // 'insufficient_energy', 'controlled', etc.
-}
-
-// Battle state snapshot for debugging/replay
-export interface CardBattleLogBattleSnapshot {
-  // For debugging/replay - can be a shallow snapshot
-  characters: CharacterState[];
-  turn: number;
-  phase: string;
-  current_player: number;
 }
 
 // Main CardBattleLog interface with enhanced structure
@@ -410,20 +400,13 @@ export interface CardBattleLog {
   actor: CardBattleLogPlayer;
   card?: CardBattleLogCard;
   targets?: CardBattleLogTarget[];
-  drawn_cards?: CardBattleLogCard[];      // For draw actions - array of cards drawn
   impacts?: LogImpact[];                  // Top-level impacts for non-target actions
   result?: LogResult;
-  before_state?: Partial<CardBattleLogBattleSnapshot>;
-  after_state?: Partial<CardBattleLogBattleSnapshot>;
+  before_state?: Partial<CardBattleState>;
+  after_state?: Partial<CardBattleState>;
   animation_hint?: string;
   created_at: string;
   updated_at?: string;
-}
-
-export interface CardBattlePhaseResponse {
-  phase: BattlePhaseName;
-  logs: CardBattleLog[];                  // Ordered array for step-by-step animation
-  after_state?: CardBattleLogBattleSnapshot; // (Optional) Partial/full battle state after all logs
 }
 
 export interface BattleStageResponse {

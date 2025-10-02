@@ -142,7 +142,7 @@ export class PlayerCharacterZone extends Container {
     
     // Update energy and deck counts
     this.energyCount = playerState.deck.current_energy || 0;
-    this.deckCount = playerState.deck.deck_cards?.length || 0;
+    this.deckCount = playerState.deck.remaining_cards || 0;
     
     // Update text displays
     this.energyText.text = `⚡x ${this.energyCount}`;

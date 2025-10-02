@@ -228,20 +228,6 @@ export class CardBattleScene extends BaseScene {
           currentPlayer.deck.hand_cards = currentPlayer.deck.hand_cards.filter((c: { card?: Card }) => c.card?.id !== card.id);
         }
 
-        // Update character states from log targets if available
-        if (response.data.length > 0 && response.data[0].targets) {
-          response.data[0].targets.forEach((target: CardBattleLogTarget) => {
-            const player = this.battleState!.players.find(p => p.team === target.team);
-            if (player) {
-              const character = player.characters.find(c => c.id === target.id);
-              if (character) {
-                // Update character with after state
-                Object.assign(character, target.after);
-              }
-            }
-          });
-        }
-
         // Update player energy from impacts if available
         if (response.data.length > 0 && response.data[0].impacts && currentPlayer) {
           const energyImpact = response.data[0].impacts.find((impact: LogImpact) => impact.type === 'energy');
@@ -905,20 +891,6 @@ export class CardBattleScene extends BaseScene {
       // Show notification
       this.battleLogZone.showNotification(`AI played: ${log.card.name}`, 0xFF9966);
       
-      // Update character states from log targets
-      if (this.battleState) {
-        log.targets.forEach((target: CardBattleLogTarget) => {
-          const player = this.battleState!.players.find(p => p.team === target.team);
-          if (player) {
-            const character = player.characters.find(c => c.id === target.id);
-            if (character) {
-              // Update character with after state
-              Object.assign(character, target.after);
-            }
-          }
-        });
-      }
-
       // Update player energy from impacts if available
       const aiPlayer = this.battleState?.players.find(p => p.team === 2);
       if (log.impacts && aiPlayer) {
