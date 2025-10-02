@@ -1,7 +1,8 @@
 import { Container, Graphics, Text } from 'pixi.js';
 import { navigation } from '@/utils/navigation';
 import { mockCharacters } from '@/utils/mockData';
-import { BaseScene } from '@/utils/BaseScene';
+import { BaseScene } from '@/ui/BaseScene';
+import { UICard } from '@/ui/UICard';
 import { HomeScene } from './HomeScene';
 import { Colors } from '@/utils/colors';
 import { gsap } from 'gsap';
@@ -311,7 +312,7 @@ export class BattleScene extends BaseScene {
     statsText.y = 95;
     
     // Add avatar/logo
-    this.createAvatar(character, cardWidth, cardHeight).then(avatarIcon => {
+    UICard.createAvatar(character, cardWidth, cardHeight).then((avatarIcon) => {
       card.addChild(avatarIcon);
     });
     

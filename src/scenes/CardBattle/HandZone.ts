@@ -1,7 +1,7 @@
 import { Colors } from "@/utils/colors";
 import { Container, Graphics, FederatedPointerEvent } from "pixi.js";
 import { CardBattlePlayerState, Card } from "@/types";
-import { BaseScene } from "@/utils/BaseScene";
+import { BaseScene } from "@/ui/BaseScene";
 import { app } from "@/app";
 import { gsap } from "gsap";
 import { CardDetailPopup, cardToBattleCard } from "@/popups/CardDetailPopup";

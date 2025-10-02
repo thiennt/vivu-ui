@@ -1,7 +1,7 @@
 import { Assets, Container, Graphics, Sprite, Text } from 'pixi.js';
 import { navigation } from '@/utils/navigation';
 import { HomeScene } from './HomeScene';
-import { BaseScene } from '@/utils/BaseScene';
+import { BaseScene } from '@/ui/BaseScene';
 import { CharactersScene } from './CharactersScene';
 import { charactersApi, isLikelyUsingMockData } from '@/services/api';
 import { LoadingStateManager } from '@/utils/loadingStateManager';

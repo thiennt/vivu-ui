@@ -1,5 +1,5 @@
 import { Container, Text, Graphics } from 'pixi.js';
-import { BaseScene } from '@/utils/BaseScene';
+import { BaseScene } from '@/ui/BaseScene';
 import { HandZone } from './CardBattle/HandZone';
 import { PlayerCharacterZone } from './CardBattle/PlayerCharacterZone';
 import { BattleLogZone } from './CardBattle/BattleLogZone';

@@ -1,7 +1,7 @@
 import { Container, Graphics, Text } from 'pixi.js';
 import { navigation } from '@/utils/navigation';
 import { HomeScene } from './HomeScene';
-import { BaseScene } from '@/utils/BaseScene';
+import { BaseScene } from '@/ui/BaseScene';
 import { Colors } from '@/utils/colors';
 import { CharacterDetailScene } from './CharacterDetailScene';
 import { ScrollBox } from '@pixi/ui';
