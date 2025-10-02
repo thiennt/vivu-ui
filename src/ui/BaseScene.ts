@@ -5,8 +5,11 @@ import { Colors } from '@/utils/colors';
 import { BottomNavigationMenu } from './BottomNavigationMenu';
 import { Card, CardType } from '@/types';
 import { DropShadowFilter, GlowFilter } from 'pixi-filters';
-import { UIButton } from './UIButton';
-import { UICard } from './UICard';
+import { Button } from './Button';
+import { FaceDownCard } from './FaceDownCard';
+import { DeckCard } from './DeckCard';
+import { CharacterCard } from './CharacterCard';
+import { HeroCard } from './HeroCard';
 
 export abstract class BaseScene extends Container {
   /** Assets bundles required by this screen */
@@ -168,19 +171,20 @@ export abstract class BaseScene extends Container {
     height: number = 50,
     onClick?: () => void,
     baseFontSize: number = 18
-  ): Container {
-    return UIButton.create(
-      text, 
-      x, 
-      y, 
-      width, 
-      height, 
-      onClick, 
-      baseFontSize, 
-      this.gameWidth, 
-      this.gameHeight, 
-      this.STANDARD_PADDING
-    );
+  ): Button {
+    const button = new Button({
+      text,
+      width,
+      height,
+      onClick,
+      baseFontSize,
+      gameWidth: this.gameWidth,
+      gameHeight: this.gameHeight,
+      standardPadding: this.STANDARD_PADDING
+    });
+    button.x = x;
+    button.y = y;
+    return button;
   }
 
   protected createTitle(text: string, x: number, y: number): Text {
@@ -210,8 +214,8 @@ export abstract class BaseScene extends Container {
     return title;
   }
 
-  public createFaceDownCard(width: number, height: number): Container {
-    return UICard.createFaceDownCard(width, height);
+  public createFaceDownCard(width: number, height: number): FaceDownCard {
+    return new FaceDownCard({ width, height });
   }
 
   public createDeckCard(
@@ -225,12 +229,19 @@ export abstract class BaseScene extends Container {
       onClick?: (card: Card) => void;
       enableHover?: boolean;
     } = {}
-  ): Container {
-    return UICard.createDeckCard(card, width, height, options);
+  ): DeckCard {
+    return new DeckCard(card, {
+      width,
+      height,
+      ...options
+    });
   }
 
-  public createCharacterCard(character: any, x: number, y: number, width: number, height: number): Container {
-    return UICard.createCharacterCard(character, x, y, width, height);
+  public createCharacterCard(character: any, x: number, y: number, width: number, height: number): CharacterCard {
+    const card = new CharacterCard(character, { width, height });
+    card.x = x;
+    card.y = y;
+    return card;
   }
 
   public createHeroCard(
@@ -240,8 +251,15 @@ export abstract class BaseScene extends Container {
     cardType: 'preview' | 'detailed' | 'lineup' | 'pool' = 'detailed',
     positionIndex?: number,
     customWidth?: number
-  ): Container {
-    return UICard.createHeroCard(character, x, y, cardType, positionIndex, customWidth, this.gameWidth);
+  ): HeroCard {
+    const card = new HeroCard(character, {
+      cardType,
+      customWidth,
+      gameWidth: this.gameWidth
+    });
+    card.x = x;
+    card.y = y;
+    return card;
   }
 
 }
