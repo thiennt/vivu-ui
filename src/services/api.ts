@@ -100,7 +100,7 @@ export const playerApi = {
   async updateLineup(playerId: string, lineup: any[]): Promise<any> {
     return apiRequest(`/players/${playerId}/lineup`, {
       method: 'POST',
-      body: JSON.stringify({ lineup }),
+      body: JSON.stringify(lineup),
     }, { success: true, lineup });
   },
 };

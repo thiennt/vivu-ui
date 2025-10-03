@@ -1,7 +1,6 @@
 import { Graphics, Text, Container } from 'pixi.js';
 import { ScrollBox } from '@pixi/ui';
 import { BaseScene } from '@/ui/BaseScene';
-import { mockPlayer } from '@/utils/mockData';
 import { navigation } from '@/utils/navigation';
 import { HomeScene } from './HomeScene';
 import { Colors } from '@/utils/colors';
@@ -9,6 +8,7 @@ import { app } from '../app';
 import { playerApi } from '@/services/api';
 
 export class LineupScene extends BaseScene {
+  private player : any = null;
   private lineupPositions: (any | null)[] = [];
   private availableCharacters: any[] = [];
 
@@ -29,11 +29,14 @@ export class LineupScene extends BaseScene {
 
   constructor() {
     super();
-    this.lineupPositions = mockPlayer.lineup;
-
+    this.player = sessionStorage.getItem('player') ? JSON.parse(sessionStorage.getItem('player') as string) : null;
+    this.lineupPositions = this.player.lineup || [];
+    const lineUpIds = this.lineupPositions.map((char: any) => char ? char.id : null);
+    console.log('Initial lineup:', this.lineupPositions);
+    this.availableCharacters = this.player?.characters || [];
     // Get available characters (all characters not in lineup)
-    this.availableCharacters = mockPlayer.characters;
-    
+    this.availableCharacters = this.availableCharacters.filter(char => !lineUpIds.includes(char.id));
+
     // Create containers once
     this.container = new Container();
     this.backgroundContainer = new Container();
@@ -309,7 +312,7 @@ export class LineupScene extends BaseScene {
 
   private createPoolCharacterCard(character: any, x: number, y: number): Container {
     // Pool cards use the default width/height from parent
-    const card = this.createCharacterCard(character, x, y, 80, 80);
+    const card = this.createCharacterCard(character, x, y, 90, 120);
     card.interactive = true;
     card.cursor = 'pointer';
     card.on('pointertap', () => {

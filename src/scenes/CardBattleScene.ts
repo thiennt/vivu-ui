@@ -50,7 +50,7 @@ export class CardBattleScene extends BaseScene {
   constructor(params?: { battleId?: string }) {
     super();
 
-    this.battleId = params?.battleId || 'b205a2bd-4e64-4336-85c5-c950c70d0ca3';
+    this.battleId = params?.battleId || 'f91bb046-78d3-449e-bd2b-7e35f92dd9ea';
 
     // Initialize loading manager
     this.loadingManager = new LoadingStateManager(this, this.gameWidth, this.gameHeight);
