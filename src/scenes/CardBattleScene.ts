@@ -939,7 +939,10 @@ export class CardBattleScene extends BaseScene {
           this.updateAllZones();
         }
 
-        this.processAITurn();
+        // Check if battle ended during end turn (e.g., from end-of-turn effects)
+        if (!this.checkGameEnd(logs[logs.length - 1])) {
+          this.processAITurn();
+        }
       }
     } catch (error) {
       console.error('Failed to process end turn:', error);
