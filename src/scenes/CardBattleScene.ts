@@ -217,8 +217,10 @@ export class CardBattleScene extends BaseScene {
         // Update battle state from after_state if available
         if (logs.length > 0 && logs[0].after_state) {
           this.updateBattleStateFromAfterState(logs[0].after_state);
+          // New flow: refresh hand & player info -> animation -> update characters
+          this.updateHandAndPlayerInfoZones();
           await this.animateCardPlay(characterId, logs);
-          this.updateAllZones();
+          this.updateCharacterZones();
         }
 
         if (logs[1] && logs[1].after_state) {
@@ -310,70 +312,187 @@ export class CardBattleScene extends BaseScene {
     const playCardLog = battleLogs[0];
     if (!playCardLog) return;
 
-    // 1. Animate character performing skill
-    await this.animateCharacterPerformSkill(characterId);
+    // Determine card group for animation style
+    const cardGroup = this.getCardGroup(playCardLog.card);
 
-    // 2. Animate effects on targets
+    // 1. Animate character performing skill based on card group
+    await this.animateCharacterPerformSkill(characterId, cardGroup);
+
+    // 2. Animate effects on targets based on card group
     if (playCardLog.targets && playCardLog.targets.length > 0) {
       // Process all targets simultaneously for visual impact
       const targetAnimations = playCardLog.targets.map(target => 
-        this.animateTargetEffects(target)
+        this.animateTargetEffects(target, cardGroup)
       );
       await Promise.all(targetAnimations);
     }
-
-    // 3. Final update to refresh UI after all animations
-    this.updateAllZones();
   }
 
-  private async animateCharacterPerformSkill(characterId: string): Promise<void> {
+  private getCardGroup(card?: Card): 'damage' | 'healing' | 'debuff' | 'other' {
+    if (!card || !card.group) return 'other';
+    
+    const group = card.group.toLowerCase();
+    
+    // Map card groups to animation types
+    if (group.includes('attack') || group.includes('high damage')) {
+      return 'damage';
+    } else if (group.includes('heal') || group.includes('healing') || group.includes('support')) {
+      return 'healing';
+    } else if (group.includes('control') || group.includes('debuff')) {
+      return 'debuff';
+    }
+    
+    return 'other';
+  }
+
+  private async animateCharacterPerformSkill(characterId: string, cardGroup: 'damage' | 'healing' | 'debuff' | 'other' = 'other'): Promise<void> {
     const characterCard = this.findCharacterCard(characterId);
     if (!characterCard) return;
 
-    // Skill performance animation: glow + scale + brief movement
     return new Promise((resolve) => {
       const timeline = gsap.timeline({
         onComplete: resolve
       });
 
-      // Add skill glow effect
-      timeline.to(characterCard, {
-        duration: 0.2,
-        scale: 1.15,
-        ease: 'power2.out'
-      })
-      // Brief skill cast movement/shake
-      .to(characterCard, {
-        duration: 0.1,
-        x: characterCard.x + 5,
-        ease: 'power2.inOut'
-      })
-      .to(characterCard, {
-        duration: 0.1,
-        x: characterCard.x - 5,
-        ease: 'power2.inOut'
-      })
-      .to(characterCard, {
-        duration: 0.1,
-        x: characterCard.x,
-        ease: 'power2.inOut'
-      })
-      // Return to normal scale
-      .to(characterCard, {
-        duration: 0.3,
-        scale: 1.0,
-        ease: 'power2.inOut'
-      });
+      if (cardGroup === 'damage') {
+        // High Damage animation: aggressive forward lunge
+        timeline.to(characterCard, {
+          duration: 0.15,
+          scale: 1.2,
+          tint: 0xFF4444, // Red tint for attack
+          ease: 'power2.out'
+        })
+        // Forward thrust
+        .to(characterCard, {
+          duration: 0.15,
+          x: characterCard.x + 15,
+          rotation: 0.1,
+          ease: 'power2.out'
+        })
+        .to(characterCard, {
+          duration: 0.1,
+          x: characterCard.x + 10,
+          ease: 'power2.inOut'
+        })
+        // Return to position
+        .to(characterCard, {
+          duration: 0.3,
+          x: characterCard.x,
+          rotation: 0,
+          scale: 1.0,
+          tint: 0xFFFFFF,
+          ease: 'power2.inOut'
+        });
+      } else if (cardGroup === 'healing') {
+        // Healing & Support animation: gentle glow and pulse
+        timeline.to(characterCard, {
+          duration: 0.3,
+          scale: 1.1,
+          tint: 0x44FF44, // Green tint for healing
+          ease: 'sine.inOut'
+        })
+        // Gentle pulse
+        .to(characterCard, {
+          duration: 0.2,
+          scale: 1.15,
+          ease: 'sine.inOut'
+        })
+        .to(characterCard, {
+          duration: 0.2,
+          scale: 1.1,
+          ease: 'sine.inOut'
+        })
+        // Return to normal
+        .to(characterCard, {
+          duration: 0.4,
+          scale: 1.0,
+          tint: 0xFFFFFF,
+          ease: 'sine.inOut'
+        });
+      } else if (cardGroup === 'debuff') {
+        // Control & Debuff animation: dark energy and shake
+        timeline.to(characterCard, {
+          duration: 0.2,
+          scale: 1.15,
+          tint: 0x8844FF, // Purple tint for debuff
+          ease: 'power2.out'
+        })
+        // Shake effect
+        .to(characterCard, {
+          duration: 0.08,
+          x: characterCard.x - 6,
+          ease: 'power2.inOut'
+        })
+        .to(characterCard, {
+          duration: 0.08,
+          x: characterCard.x + 6,
+          ease: 'power2.inOut'
+        })
+        .to(characterCard, {
+          duration: 0.08,
+          x: characterCard.x - 4,
+          ease: 'power2.inOut'
+        })
+        .to(characterCard, {
+          duration: 0.08,
+          x: characterCard.x + 4,
+          ease: 'power2.inOut'
+        })
+        .to(characterCard, {
+          duration: 0.08,
+          x: characterCard.x,
+          ease: 'power2.inOut'
+        })
+        // Return to normal
+        .to(characterCard, {
+          duration: 0.3,
+          scale: 1.0,
+          tint: 0xFFFFFF,
+          ease: 'power2.inOut'
+        });
+      } else {
+        // Default animation: simple glow + scale + brief movement
+        timeline.to(characterCard, {
+          duration: 0.2,
+          scale: 1.15,
+          ease: 'power2.out'
+        })
+        .to(characterCard, {
+          duration: 0.1,
+          x: characterCard.x + 5,
+          ease: 'power2.inOut'
+        })
+        .to(characterCard, {
+          duration: 0.1,
+          x: characterCard.x - 5,
+          ease: 'power2.inOut'
+        })
+        .to(characterCard, {
+          duration: 0.1,
+          x: characterCard.x,
+          ease: 'power2.inOut'
+        })
+        .to(characterCard, {
+          duration: 0.3,
+          scale: 1.0,
+          ease: 'power2.inOut'
+        });
+      }
     });
   }
 
-  private async animateTargetEffects(target: CardBattleLogTarget): Promise<void> {
+  private async animateTargetEffects(target: CardBattleLogTarget, cardGroup: 'damage' | 'healing' | 'debuff' | 'other' = 'other'): Promise<void> {
     const targetCard = this.findCharacterCard(target.id);
     if (!targetCard) return;
 
-    // Extract damage from impacts
+    // Extract impact types from impacts
     const damageImpact = target.impacts?.find(impact => impact.type === 'damage');
+    const healImpact = target.impacts?.find(impact => impact.type === 'heal');
+    const effectImpact = target.impacts?.find(impact => impact.type === 'effect');
+    const statusImpact = target.impacts?.find(impact => impact.type === 'status');
+    
     const damage = typeof damageImpact?.value === 'number' ? damageImpact.value : 0;
+    const healing = typeof healImpact?.value === 'number' ? healImpact.value : 0;
     const isCritical = (damageImpact?.meta as { isCritical?: boolean })?.isCritical || false;
 
     return new Promise((resolve) => {
@@ -381,54 +500,139 @@ export class CardBattleScene extends BaseScene {
         onComplete: resolve
       });
 
-      if (damage > 0) {
-        // Damage animation: flash red + shake + scale
+      if (cardGroup === 'damage' || damage > 0) {
+        // High Damage animation: explosive impact with recoil
         timeline.to(targetCard, {
-          duration: 0.1,
-          tint: 0xFF6666, // Red tint for damage
+          duration: 0.08,
+          tint: 0xFF3333, // Bright red tint for damage
           ease: 'power2.out'
         })
-        // Critical hit gets more dramatic effect
+        // Strong recoil effect
         .to(targetCard, {
-          duration: isCritical ? 0.2 : 0.15,
-          scale: isCritical ? 0.85 : 0.9,
-          rotation: isCritical ? 0.1 : 0.05,
-          ease: 'power2.inOut'
+          duration: isCritical ? 0.15 : 0.12,
+          scale: isCritical ? 0.8 : 0.85,
+          rotation: isCritical ? 0.15 : 0.08,
+          ease: 'power2.out'
         })
-        // Shake effect for impact
+        // Intense shake effect
         .to(targetCard, {
-          duration: 0.05,
-          x: targetCard.x + (isCritical ? 8 : 4),
-          ease: 'power2.inOut'
-        })
-        .to(targetCard, {
-          duration: 0.05,
-          x: targetCard.x - (isCritical ? 8 : 4),
+          duration: 0.04,
+          x: targetCard.x + (isCritical ? 10 : 6),
           ease: 'power2.inOut'
         })
         .to(targetCard, {
-          duration: 0.05,
+          duration: 0.04,
+          x: targetCard.x - (isCritical ? 10 : 6),
+          ease: 'power2.inOut'
+        })
+        .to(targetCard, {
+          duration: 0.04,
+          x: targetCard.x + (isCritical ? 6 : 3),
+          ease: 'power2.inOut'
+        })
+        .to(targetCard, {
+          duration: 0.04,
+          x: targetCard.x - (isCritical ? 6 : 3),
+          ease: 'power2.inOut'
+        })
+        .to(targetCard, {
+          duration: 0.04,
           x: targetCard.x,
           ease: 'power2.inOut'
         })
         // Return to normal
         .to(targetCard, {
           duration: 0.3,
-          tint: 0xFFFFFF, // Back to normal color
+          tint: 0xFFFFFF,
           scale: 1.0,
           rotation: 0,
-          ease: 'power2.out'
+          ease: 'elastic.out(1, 0.5)'
         });
 
-        // Show damage number if significant damage
+        // Show damage number
         if (damage > 0) {
           this.showDamageNumber(targetCard, damage, isCritical);
         }
-      } else {
-        // Non-damage effect (heal, buff, etc.) - gentle glow
+      } else if (cardGroup === 'healing' || healing > 0) {
+        // Healing & Support animation: gentle restore with sparkle
+        timeline.to(targetCard, {
+          duration: 0.25,
+          tint: 0x44FF88, // Bright green tint for healing
+          scale: 1.15,
+          ease: 'sine.out'
+        })
+        // Gentle pulse for healing energy
+        .to(targetCard, {
+          duration: 0.2,
+          scale: 1.2,
+          ease: 'sine.inOut'
+        })
+        .to(targetCard, {
+          duration: 0.2,
+          scale: 1.15,
+          ease: 'sine.inOut'
+        })
+        // Return to normal
+        .to(targetCard, {
+          duration: 0.4,
+          tint: 0xFFFFFF,
+          scale: 1.0,
+          ease: 'sine.inOut'
+        });
+
+        // Show healing number
+        if (healing > 0) {
+          this.showHealingNumber(targetCard, healing);
+        }
+      } else if (cardGroup === 'debuff' || effectImpact || statusImpact) {
+        // Control & Debuff animation: pulsing dark energy
+        const isDebuff = cardGroup === 'debuff';
+        const effectColor = isDebuff ? 0x8844FF : 0x44AAFF; // Purple for debuff, blue for effect/status
+        
         timeline.to(targetCard, {
           duration: 0.2,
-          tint: 0x66FF66, // Green tint for positive effects
+          tint: effectColor,
+          scale: 1.08,
+          ease: 'power2.out'
+        })
+        // Subtle oscillation for control effect
+        .to(targetCard, {
+          duration: 0.15,
+          rotation: 0.05,
+          ease: 'sine.inOut'
+        })
+        .to(targetCard, {
+          duration: 0.15,
+          rotation: -0.05,
+          ease: 'sine.inOut'
+        })
+        .to(targetCard, {
+          duration: 0.15,
+          rotation: 0.03,
+          ease: 'sine.inOut'
+        })
+        .to(targetCard, {
+          duration: 0.15,
+          rotation: -0.03,
+          ease: 'sine.inOut'
+        })
+        .to(targetCard, {
+          duration: 0.1,
+          rotation: 0,
+          ease: 'sine.inOut'
+        })
+        // Return to normal
+        .to(targetCard, {
+          duration: 0.4,
+          tint: 0xFFFFFF,
+          scale: 1.0,
+          ease: 'power2.inOut'
+        });
+      } else {
+        // Default non-damage effect - gentle glow
+        timeline.to(targetCard, {
+          duration: 0.2,
+          tint: 0x66CCFF, // Cyan tint for neutral effects
           scale: 1.1,
           ease: 'power2.out'
         })
@@ -440,6 +644,47 @@ export class CardBattleScene extends BaseScene {
         });
       }
     });
+  }
+
+  private showHealingNumber(targetCard: Container, healing: number): void {
+    // Create floating healing text
+    const healingText = new Text({
+      text: `+${healing}`,
+      style: {
+        fontFamily: 'Arial',
+        fontSize: 18,
+        fill: 0x44FF88,
+        fontWeight: 'bold',
+        stroke: { color: 0x006633, width: 2 }
+      }
+    });
+
+    // Position above the target card
+    healingText.x = targetCard.x;
+    healingText.y = targetCard.y - 30;
+    healingText.anchor.set(0.5);
+    healingText.alpha = 0;
+
+    targetCard.addChild(healingText);
+
+    // Animate healing number
+    gsap.timeline()
+      .to(healingText, {
+        duration: 0.2,
+        alpha: 1,
+        y: healingText.y - 20,
+        scale: 1.2,
+        ease: 'power2.out'
+      })
+      .to(healingText, {
+        duration: 0.8,
+        alpha: 0,
+        y: healingText.y - 40,
+        ease: 'power2.in',
+        onComplete: () => {
+          healingText.destroy();
+        }
+      });
   }
 
   private showDamageNumber(targetCard: Container, damage: number, isCritical: boolean): void {
@@ -932,6 +1177,41 @@ export class CardBattleScene extends BaseScene {
     
     // Enable/disable UI based on current player
     this.updateUIState();
+  }
+
+  private updateHandAndPlayerInfoZones(): void {
+    if (!this.battleState) return;
+
+    // Update player zones with battle state - only hand and player info
+    const player1 = this.battleState.players.find(p => p.team === 1);
+    const player2 = this.battleState.players.find(p => p.team === 2);
+
+    if (player1) {
+      this.p1HandZone.updateBattleState(player1);
+    }
+
+    if (player2) {
+      this.p2HandZone.updateBattleState(player2);
+    }
+
+    // Update battle log with turn number
+    this.battleLogZone.updatePhase(this.currentPhase, this.battleState.current_player, this.battleState.current_turn);
+  }
+
+  private updateCharacterZones(): void {
+    if (!this.battleState) return;
+
+    // Update player zones with battle state - only character zones
+    const player1 = this.battleState.players.find(p => p.team === 1);
+    const player2 = this.battleState.players.find(p => p.team === 2);
+
+    if (player1) {
+      this.p1CharacterZone.updateBattleState(player1);
+    }
+
+    if (player2) {
+      this.p2CharacterZone.updateBattleState(player2);
+    }
   }
 
   private updateUIState(): void {
