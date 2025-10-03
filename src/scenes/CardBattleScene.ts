@@ -969,8 +969,14 @@ export class CardBattleScene extends BaseScene {
         console.log('AI turn logs:', logs);
 
         // Process each log sequentially with animations
+        let gameEnded = false;
         for (const log of logs) {
-          await this.processAIActionLog(log);
+          gameEnded = await this.processAIActionLog(log);
+          
+          // Stop processing if game has ended
+          if (gameEnded) {
+            break;
+          }
           
           // Add delay between AI actions for better visual clarity
           await new Promise(resolve => setTimeout(resolve, 500));
@@ -978,8 +984,8 @@ export class CardBattleScene extends BaseScene {
 
         this.enablePlayerUI();
 
-        // Check if battle is completed before processing next turn
-        if (!this.checkGameEnd(logs[logs.length - 1])) {
+        // Only continue to player turn if game hasn't ended
+        if (!gameEnded) {
           this.processPlayerTurn();
         }
       }
@@ -997,7 +1003,7 @@ export class CardBattleScene extends BaseScene {
     }
   }
 
-  private async processAIActionLog(log: CardBattleLog): Promise<void> {
+  private async processAIActionLog(log: CardBattleLog): Promise<boolean> {
     if (log.action_type === 'draw_card') {
       // Handle draw card animation for AI
       const cardCount = log.drawn_cards?.length || 0;
@@ -1016,6 +1022,7 @@ export class CardBattleScene extends BaseScene {
 
       // Brief delay
       await new Promise(resolve => setTimeout(resolve, 300));
+      return false; // Game hasn't ended
     } else if (log.action_type === 'discard_card') {
       // Handle discard card animation for AI
       console.log('AI discarded a card');
@@ -1052,6 +1059,7 @@ export class CardBattleScene extends BaseScene {
 
       // Brief delay
       await new Promise(resolve => setTimeout(resolve, 300));
+      return false; // Game hasn't ended
     } else if (log.action_type === 'play_card' && log.card && log.targets) {
       // Handle play card animation for AI
       console.log(`AI played card: ${log.card.name}`);
@@ -1072,7 +1080,12 @@ export class CardBattleScene extends BaseScene {
       if (actorCharacterId) {
         await this.animateCardPlay(actorCharacterId, [log]);
       }
+
+      // Check for game end after AI plays a card (similar to player turn)
+      return this.checkGameEnd(log);
     }
+
+    return false; // Default case - game hasn't ended
   }
 
   private checkGameEnd(log: CardBattleLog): boolean {
