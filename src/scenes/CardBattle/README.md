@@ -21,6 +21,8 @@ Manages the discard pile zone.
 ### CardBattleEffects.ts
 **Centralized animation effects for card battles** - provides reusable animation methods with meaningful names.
 
+**Note:** This file has been moved to `src/ui/CardBattleEffects.ts` for better organization and reusability across the application.
+
 #### Main API
 
 ##### Character Skill Animations
@@ -90,7 +92,7 @@ await CardBattleEffects.animateSimpleEffect(characterCard);
 ## Usage Example
 
 ```typescript
-import { CardBattleEffects, CardGroup } from './CardBattle/CardBattleEffects';
+import { CardBattleEffects, CardGroup } from '@/ui/CardBattleEffects';
 
 // In your scene
 private async performSkill(characterId: string, cardGroup: CardGroup) {
