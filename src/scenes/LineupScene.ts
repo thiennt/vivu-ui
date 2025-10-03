@@ -6,6 +6,7 @@ import { navigation } from '@/utils/navigation';
 import { HomeScene } from './HomeScene';
 import { Colors } from '@/utils/colors';
 import { app } from '../app';
+import { playerApi } from '@/services/api';
 
 export class LineupScene extends BaseScene {
   private lineupPositions: (any | null)[] = [];
@@ -222,7 +223,7 @@ export class LineupScene extends BaseScene {
   }
 
   private createLineupCharacterCard(character: any, x: number, y: number, size: number, positionIndex: number): Container {
-    const card = this.createHeroCard(character, x, y, 'lineup', positionIndex);
+    const card = this.createCharacterCard(character, x, y, size, size);
     this.makeLineupCardInteractive(card, character, positionIndex);
     card.zIndex = 1;
     return card;
@@ -307,7 +308,8 @@ export class LineupScene extends BaseScene {
   }
 
   private createPoolCharacterCard(character: any, x: number, y: number): Container {
-    const card = this.createHeroCard(character, x, y, 'pool');
+    // Pool cards use the default width/height from parent
+    const card = this.createCharacterCard(character, x, y, 80, 80);
     card.interactive = true;
     card.cursor = 'pointer';
     card.on('pointertap', () => {
@@ -446,6 +448,21 @@ export class LineupScene extends BaseScene {
     this.createCharacterPool();
   }
 
+  private async saveLineup(): Promise<void> {
+    try {
+      const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
+      
+      // Convert lineup to character IDs for API
+      const lineupIds = this.lineupPositions.map(char => char ? char.id : null);
+      
+      await playerApi.updateLineup(playerId, lineupIds);
+      alert('Lineup saved successfully!');
+    } catch (error) {
+      console.error('Failed to save lineup:', error);
+      alert('Failed to save lineup. Please try again.');
+    }
+  }
+
   private createActionButtons(): void {
     const buttonWidth = Math.min(130, (this.gameWidth - 4 * this.STANDARD_PADDING) / 3); // Reduced from 150 and made responsive
     const buttonHeight = Math.max(40, Math.min(46, this.gameHeight * 0.07)); // Responsive height
@@ -474,10 +491,7 @@ export class LineupScene extends BaseScene {
       y,
       buttonWidth,
       buttonHeight,
-      () => {
-        // Convert Character objects back to string IDs for saving
-        alert('Lineup saved successfully!');
-      },
+      () => this.saveLineup(),
       14 // Added base font size
     );
 

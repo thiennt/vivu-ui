@@ -96,6 +96,13 @@ export const playerApi = {
       body: JSON.stringify(stats),
     }, { ...mockPlayer, ...stats });
   },
+
+  async updateLineup(playerId: string, lineup: any[]): Promise<any> {
+    return apiRequest(`/players/${playerId}/lineup`, {
+      method: 'POST',
+      body: JSON.stringify({ lineup }),
+    }, { success: true, lineup });
+  },
 };
 
 // Characters API methods
