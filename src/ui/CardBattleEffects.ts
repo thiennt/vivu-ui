@@ -1,6 +1,9 @@
 /**
  * CardBattleEffects - Handles all animation effects for card battle scenes
  * Provides reusable animation methods for character skills, target effects, and visual feedback
+ * * NOTE: GSAP does not have a native 'tint' property. For PIXI.js, you must use the 
+ * PixiPlugin and nest the tint property inside a 'pixi' object within the tween.
+ * E.g., { pixi: { tint: 0xFFFFFF } }
  */
 
 import { Container, Text } from 'pixi.js';
@@ -51,9 +54,8 @@ export class CardBattleEffects {
       .to(characterCard, {
         duration: 0.15,
         scale: 1.2,
-        tint: 0xFF4444, // Red tint for attack
-        ease: 'power2.out',
-        snap: { tint: 1 }
+        pixi: { tint: 0xFF4444 }, // Correct: Red tint for attack
+        ease: 'power2.out'
       })
       // Forward thrust
       .to(characterCard, {
@@ -73,9 +75,8 @@ export class CardBattleEffects {
         x: originalX,
         rotation: 0,
         scale: 1.0,
-        tint: 0xFFFFFF,
+        pixi: { tint: 0xFFFFFF }, // Correct: Return to white tint
         ease: 'power2.inOut',
-        snap: { tint: 1 }
       });
   }
 
@@ -87,9 +88,8 @@ export class CardBattleEffects {
       .to(characterCard, {
         duration: 0.3,
         scale: 1.1,
-        tint: 0x44FF44, // Green tint for healing
+        pixi: { tint: 0x44FF44 }, // Correct: Green tint for healing
         ease: 'sine.inOut',
-        snap: { tint: 1 }
       })
       // Gentle pulse
       .to(characterCard, {
@@ -106,9 +106,8 @@ export class CardBattleEffects {
       .to(characterCard, {
         duration: 0.4,
         scale: 1.0,
-        tint: 0xFFFFFF,
+        pixi: { tint: 0xFFFFFF }, // Correct: Return to white tint
         ease: 'sine.inOut',
-        snap: { tint: 1 }
       });
   }
 
@@ -122,9 +121,8 @@ export class CardBattleEffects {
       .to(characterCard, {
         duration: 0.2,
         scale: 1.15,
-        tint: 0x8844FF, // Purple tint for debuff
+        pixi: { tint: 0x8844FF }, // Correct: Purple tint for debuff
         ease: 'power2.out',
-        snap: { tint: 1 }
       })
       // Shake effect
       .to(characterCard, {
@@ -156,9 +154,8 @@ export class CardBattleEffects {
       .to(characterCard, {
         duration: 0.3,
         scale: 1.0,
-        tint: 0xFFFFFF,
+        pixi: { tint: 0xFFFFFF }, // Correct: Return to white tint
         ease: 'power2.inOut',
-        snap: { tint: 1 }
       });
   }
 
@@ -252,9 +249,8 @@ export class CardBattleEffects {
     timeline
       .to(targetCard, {
         duration: 0.08,
-        tint: 0xFF3333, // Bright red tint for damage
+        pixi: { tint: 0xFF3333 }, // Correct: Bright red tint for damage
         ease: 'power2.out',
-        snap: { tint: 1 }
       })
       // Strong recoil effect
       .to(targetCard, {
@@ -292,11 +288,10 @@ export class CardBattleEffects {
       // Return to normal
       .to(targetCard, {
         duration: 0.3,
-        tint: 0xFFFFFF,
+        pixi: { tint: 0xFFFFFF }, // Correct: Return to white tint
         scale: 1.0,
         rotation: 0,
         ease: 'elastic.out(1, 0.5)',
-        snap: { tint: 1 }
       });
   }
 
@@ -307,10 +302,9 @@ export class CardBattleEffects {
     timeline
       .to(targetCard, {
         duration: 0.25,
-        tint: 0x44FF88, // Bright green tint for healing
+        pixi: { tint: 0x44FF88 }, // Correct: Bright green tint for healing
         scale: 1.15,
         ease: 'sine.out',
-        snap: { tint: 1 }
       })
       // Gentle pulse for healing energy
       .to(targetCard, {
@@ -326,10 +320,9 @@ export class CardBattleEffects {
       // Return to normal
       .to(targetCard, {
         duration: 0.4,
-        tint: 0xFFFFFF,
+        pixi: { tint: 0xFFFFFF }, // Correct: Return to white tint
         scale: 1.0,
         ease: 'sine.inOut',
-        snap: { tint: 1 }
       });
   }
 
@@ -346,10 +339,9 @@ export class CardBattleEffects {
     timeline
       .to(targetCard, {
         duration: 0.2,
-        tint: effectColor,
+        pixi: { tint: effectColor }, // Correct: Apply the effect color tint
         scale: 1.08,
         ease: 'power2.out',
-        snap: { tint: 1 }
       })
       // Subtle oscillation for control effect
       .to(targetCard, {
@@ -380,10 +372,9 @@ export class CardBattleEffects {
       // Return to normal
       .to(targetCard, {
         duration: 0.4,
-        tint: 0xFFFFFF,
+        pixi: { tint: 0xFFFFFF }, // Correct: Return to white tint
         scale: 1.0,
         ease: 'power2.inOut',
-        snap: { tint: 1 }
       });
   }
 
@@ -394,17 +385,15 @@ export class CardBattleEffects {
     timeline
       .to(targetCard, {
         duration: 0.2,
-        tint: 0x66CCFF, // Cyan tint for neutral effects
+        pixi: { tint: 0x66CCFF }, // Correct: Cyan tint for neutral effects
         scale: 1.1,
         ease: 'power2.out',
-        snap: { tint: 1 }
       })
       .to(targetCard, {
         duration: 0.4,
-        tint: 0xFFFFFF,
+        pixi: { tint: 0xFFFFFF }, // Correct: Return to white tint
         scale: 1.0,
         ease: 'power2.inOut',
-        snap: { tint: 1 }
       });
   }
 
@@ -527,10 +516,9 @@ export class CardBattleEffects {
       })
       // Glow effect by changing tint
       .to(energyText, {
-        tint: 0xFFFF00, // Yellow glow
+        pixi: { tint: 0xFFFF00 }, // Correct: Yellow glow
         duration: 0.2,
         ease: 'power2.out',
-        snap: { tint: 1 }
       }, 0)
       // Return to normal scale
       .to(energyText, {
@@ -540,10 +528,9 @@ export class CardBattleEffects {
       })
       // Return to normal color
       .to(energyText, {
-        tint: 0xFFFFFF,
+        pixi: { tint: 0xFFFFFF }, // Correct: Return to white tint
         duration: 0.3,
         ease: 'power2.inOut',
-        snap: { tint: 1 }
       }, '-=0.3');
     });
   }

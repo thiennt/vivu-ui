@@ -7,6 +7,12 @@ import { initAssets } from "./utils/assets";
 import { getUrlParam } from './utils/getUrlParams';
 import { Colors } from './utils/colors';
 
+import { gsap } from "gsap";
+import { PixiPlugin } from "gsap/PixiPlugin";
+import * as PIXI from "pixi.js";
+
+gsap.registerPlugin(PixiPlugin);
+PixiPlugin.registerPIXI(PIXI);
 
 /** The PixiJS app Application instance, shared across the project */
 export const app = new Application();
