@@ -65,10 +65,22 @@ async function apiRequest<T>(
     const response = await fetch(url, defaultOptions);
     
     if (!response.ok) {
-      throw new ApiError(
-        `API request failed: ${response.statusText}`,
-        response.status
-      );
+      // Try to parse error response body for detailed error message
+      try {
+        const errorData = await response.json();
+        const errorMessage = errorData.message || `API request failed: ${response.statusText}`;
+        throw new ApiError(
+          errorMessage,
+          response.status,
+          errorData
+        );
+      } catch {
+        // If JSON parsing fails, fall back to status text
+        throw new ApiError(
+          `API request failed: ${response.statusText}`,
+          response.status
+        );
+      }
     }
 
     const data = await response.json();
