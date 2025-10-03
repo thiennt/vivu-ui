@@ -18,6 +18,7 @@ import { navigation } from '@/utils/navigation';
 import { HomeScene } from './HomeScene';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
 import { ErrorPopup } from '@/popups/ErrorPopup';
+import { CardBattleEffects, CardGroup } from './CardBattle/CardBattleEffects';
 
 export class CardBattleScene extends BaseScene {
   /** Assets bundles required by this screen */
@@ -275,36 +276,7 @@ export class CardBattleScene extends BaseScene {
     
     if (!energyText) return;
 
-    // Animate the energy text with a bounce and glow effect
-    return new Promise((resolve) => {
-      gsap.timeline({
-        onComplete: resolve
-      })
-      // Bounce effect
-      .to(energyText, {
-        scale: 1.4,
-        duration: 0.2,
-        ease: 'back.out(2)'
-      })
-      // Glow effect by changing tint
-      .to(energyText, {
-        tint: 0xFFFF00, // Yellow glow
-        duration: 0.2,
-        ease: 'power2.out'
-      }, 0)
-      // Return to normal scale
-      .to(energyText, {
-        scale: 1.0,
-        duration: 0.3,
-        ease: 'elastic.out(1, 0.5)'
-      })
-      // Return to normal color
-      .to(energyText, {
-        tint: 0xFFFFFF,
-        duration: 0.3,
-        ease: 'power2.inOut'
-      }, '-=0.3');
-    });
+    return CardBattleEffects.animateEnergyIncrease(energyText);
   }
 
   private async animateCardPlay(characterId: string, battleLogs?: CardBattleLog[]): Promise<void> {
@@ -333,7 +305,7 @@ export class CardBattleScene extends BaseScene {
     }
   }
 
-  private getCardGroup(card?: Card): 'damage' | 'healing' | 'debuff' | 'other' {
+  private getCardGroup(card?: Card): CardGroup {
     if (!card || !card.group) return 'other';
     
     const group = card.group.toLowerCase();
@@ -350,388 +322,21 @@ export class CardBattleScene extends BaseScene {
     return 'other';
   }
 
-  private async animateCharacterPerformSkill(characterId: string, cardGroup: 'damage' | 'healing' | 'debuff' | 'other' = 'other'): Promise<void> {
+  private async animateCharacterPerformSkill(characterId: string, cardGroup: CardGroup = 'other'): Promise<void> {
     const characterCard = this.findCharacterCard(characterId);
     if (!characterCard) return;
 
-    return new Promise((resolve) => {
-      const timeline = gsap.timeline({
-        onComplete: resolve
-      });
-
-      if (cardGroup === 'damage') {
-        // High Damage animation: aggressive forward lunge
-        timeline.to(characterCard, {
-          duration: 0.15,
-          scale: 1.2,
-          tint: 0xFF4444, // Red tint for attack
-          ease: 'power2.out'
-        })
-        // Forward thrust
-        .to(characterCard, {
-          duration: 0.15,
-          x: characterCard.x + 15,
-          rotation: 0.1,
-          ease: 'power2.out'
-        })
-        .to(characterCard, {
-          duration: 0.1,
-          x: characterCard.x + 10,
-          ease: 'power2.inOut'
-        })
-        // Return to position
-        .to(characterCard, {
-          duration: 0.3,
-          x: characterCard.x,
-          rotation: 0,
-          scale: 1.0,
-          tint: 0xFFFFFF,
-          ease: 'power2.inOut'
-        });
-      } else if (cardGroup === 'healing') {
-        // Healing & Support animation: gentle glow and pulse
-        timeline.to(characterCard, {
-          duration: 0.3,
-          scale: 1.1,
-          tint: 0x44FF44, // Green tint for healing
-          ease: 'sine.inOut'
-        })
-        // Gentle pulse
-        .to(characterCard, {
-          duration: 0.2,
-          scale: 1.15,
-          ease: 'sine.inOut'
-        })
-        .to(characterCard, {
-          duration: 0.2,
-          scale: 1.1,
-          ease: 'sine.inOut'
-        })
-        // Return to normal
-        .to(characterCard, {
-          duration: 0.4,
-          scale: 1.0,
-          tint: 0xFFFFFF,
-          ease: 'sine.inOut'
-        });
-      } else if (cardGroup === 'debuff') {
-        // Control & Debuff animation: dark energy and shake
-        timeline.to(characterCard, {
-          duration: 0.2,
-          scale: 1.15,
-          tint: 0x8844FF, // Purple tint for debuff
-          ease: 'power2.out'
-        })
-        // Shake effect
-        .to(characterCard, {
-          duration: 0.08,
-          x: characterCard.x - 6,
-          ease: 'power2.inOut'
-        })
-        .to(characterCard, {
-          duration: 0.08,
-          x: characterCard.x + 6,
-          ease: 'power2.inOut'
-        })
-        .to(characterCard, {
-          duration: 0.08,
-          x: characterCard.x - 4,
-          ease: 'power2.inOut'
-        })
-        .to(characterCard, {
-          duration: 0.08,
-          x: characterCard.x + 4,
-          ease: 'power2.inOut'
-        })
-        .to(characterCard, {
-          duration: 0.08,
-          x: characterCard.x,
-          ease: 'power2.inOut'
-        })
-        // Return to normal
-        .to(characterCard, {
-          duration: 0.3,
-          scale: 1.0,
-          tint: 0xFFFFFF,
-          ease: 'power2.inOut'
-        });
-      } else {
-        // Default animation: simple glow + scale + brief movement
-        timeline.to(characterCard, {
-          duration: 0.2,
-          scale: 1.15,
-          ease: 'power2.out'
-        })
-        .to(characterCard, {
-          duration: 0.1,
-          x: characterCard.x + 5,
-          ease: 'power2.inOut'
-        })
-        .to(characterCard, {
-          duration: 0.1,
-          x: characterCard.x - 5,
-          ease: 'power2.inOut'
-        })
-        .to(characterCard, {
-          duration: 0.1,
-          x: characterCard.x,
-          ease: 'power2.inOut'
-        })
-        .to(characterCard, {
-          duration: 0.3,
-          scale: 1.0,
-          ease: 'power2.inOut'
-        });
-      }
-    });
+    return CardBattleEffects.animateCharacterSkill(characterCard, cardGroup);
   }
 
-  private async animateTargetEffects(target: CardBattleLogTarget, cardGroup: 'damage' | 'healing' | 'debuff' | 'other' = 'other'): Promise<void> {
+  private async animateTargetEffects(target: CardBattleLogTarget, cardGroup: CardGroup = 'other'): Promise<void> {
     const targetCard = this.findCharacterCard(target.id);
     if (!targetCard) return;
 
-    // Extract impact types from impacts
-    const damageImpact = target.impacts?.find(impact => impact.type === 'damage');
-    const healImpact = target.impacts?.find(impact => impact.type === 'heal');
-    const effectImpact = target.impacts?.find(impact => impact.type === 'effect');
-    const statusImpact = target.impacts?.find(impact => impact.type === 'status');
-    
-    const damage = typeof damageImpact?.value === 'number' ? damageImpact.value : 0;
-    const healing = typeof healImpact?.value === 'number' ? healImpact.value : 0;
-    const isCritical = (damageImpact?.meta as { isCritical?: boolean })?.isCritical || false;
-
-    return new Promise((resolve) => {
-      const timeline = gsap.timeline({
-        onComplete: resolve
-      });
-
-      if (cardGroup === 'damage' || damage > 0) {
-        // High Damage animation: explosive impact with recoil
-        timeline.to(targetCard, {
-          duration: 0.08,
-          tint: 0xFF3333, // Bright red tint for damage
-          ease: 'power2.out'
-        })
-        // Strong recoil effect
-        .to(targetCard, {
-          duration: isCritical ? 0.15 : 0.12,
-          scale: isCritical ? 0.8 : 0.85,
-          rotation: isCritical ? 0.15 : 0.08,
-          ease: 'power2.out'
-        })
-        // Intense shake effect
-        .to(targetCard, {
-          duration: 0.04,
-          x: targetCard.x + (isCritical ? 10 : 6),
-          ease: 'power2.inOut'
-        })
-        .to(targetCard, {
-          duration: 0.04,
-          x: targetCard.x - (isCritical ? 10 : 6),
-          ease: 'power2.inOut'
-        })
-        .to(targetCard, {
-          duration: 0.04,
-          x: targetCard.x + (isCritical ? 6 : 3),
-          ease: 'power2.inOut'
-        })
-        .to(targetCard, {
-          duration: 0.04,
-          x: targetCard.x - (isCritical ? 6 : 3),
-          ease: 'power2.inOut'
-        })
-        .to(targetCard, {
-          duration: 0.04,
-          x: targetCard.x,
-          ease: 'power2.inOut'
-        })
-        // Return to normal
-        .to(targetCard, {
-          duration: 0.3,
-          tint: 0xFFFFFF,
-          scale: 1.0,
-          rotation: 0,
-          ease: 'elastic.out(1, 0.5)'
-        });
-
-        // Show damage number
-        if (damage > 0) {
-          this.showDamageNumber(targetCard, damage, isCritical);
-        }
-      } else if (cardGroup === 'healing' || healing > 0) {
-        // Healing & Support animation: gentle restore with sparkle
-        timeline.to(targetCard, {
-          duration: 0.25,
-          tint: 0x44FF88, // Bright green tint for healing
-          scale: 1.15,
-          ease: 'sine.out'
-        })
-        // Gentle pulse for healing energy
-        .to(targetCard, {
-          duration: 0.2,
-          scale: 1.2,
-          ease: 'sine.inOut'
-        })
-        .to(targetCard, {
-          duration: 0.2,
-          scale: 1.15,
-          ease: 'sine.inOut'
-        })
-        // Return to normal
-        .to(targetCard, {
-          duration: 0.4,
-          tint: 0xFFFFFF,
-          scale: 1.0,
-          ease: 'sine.inOut'
-        });
-
-        // Show healing number
-        if (healing > 0) {
-          this.showHealingNumber(targetCard, healing);
-        }
-      } else if (cardGroup === 'debuff' || effectImpact || statusImpact) {
-        // Control & Debuff animation: pulsing dark energy
-        const isDebuff = cardGroup === 'debuff';
-        const effectColor = isDebuff ? 0x8844FF : 0x44AAFF; // Purple for debuff, blue for effect/status
-        
-        timeline.to(targetCard, {
-          duration: 0.2,
-          tint: effectColor,
-          scale: 1.08,
-          ease: 'power2.out'
-        })
-        // Subtle oscillation for control effect
-        .to(targetCard, {
-          duration: 0.15,
-          rotation: 0.05,
-          ease: 'sine.inOut'
-        })
-        .to(targetCard, {
-          duration: 0.15,
-          rotation: -0.05,
-          ease: 'sine.inOut'
-        })
-        .to(targetCard, {
-          duration: 0.15,
-          rotation: 0.03,
-          ease: 'sine.inOut'
-        })
-        .to(targetCard, {
-          duration: 0.15,
-          rotation: -0.03,
-          ease: 'sine.inOut'
-        })
-        .to(targetCard, {
-          duration: 0.1,
-          rotation: 0,
-          ease: 'sine.inOut'
-        })
-        // Return to normal
-        .to(targetCard, {
-          duration: 0.4,
-          tint: 0xFFFFFF,
-          scale: 1.0,
-          ease: 'power2.inOut'
-        });
-      } else {
-        // Default non-damage effect - gentle glow
-        timeline.to(targetCard, {
-          duration: 0.2,
-          tint: 0x66CCFF, // Cyan tint for neutral effects
-          scale: 1.1,
-          ease: 'power2.out'
-        })
-        .to(targetCard, {
-          duration: 0.4,
-          tint: 0xFFFFFF,
-          scale: 1.0,
-          ease: 'power2.inOut'
-        });
-      }
-    });
+    return CardBattleEffects.applyTargetEffect(targetCard, target, cardGroup);
   }
 
-  private showHealingNumber(targetCard: Container, healing: number): void {
-    // Create floating healing text
-    const healingText = new Text({
-      text: `+${healing}`,
-      style: {
-        fontFamily: 'Arial',
-        fontSize: 18,
-        fill: 0x44FF88,
-        fontWeight: 'bold',
-        stroke: { color: 0x006633, width: 2 }
-      }
-    });
 
-    // Position above the target card
-    healingText.x = targetCard.x;
-    healingText.y = targetCard.y - 30;
-    healingText.anchor.set(0.5);
-    healingText.alpha = 0;
-
-    targetCard.addChild(healingText);
-
-    // Animate healing number
-    gsap.timeline()
-      .to(healingText, {
-        duration: 0.2,
-        alpha: 1,
-        y: healingText.y - 20,
-        scale: 1.2,
-        ease: 'power2.out'
-      })
-      .to(healingText, {
-        duration: 0.8,
-        alpha: 0,
-        y: healingText.y - 40,
-        ease: 'power2.in',
-        onComplete: () => {
-          healingText.destroy();
-        }
-      });
-  }
-
-  private showDamageNumber(targetCard: Container, damage: number, isCritical: boolean): void {
-    // Create floating damage text
-    const damageText = new Text({
-      text: `-${damage}`,
-      style: {
-        fontFamily: 'Arial',
-        fontSize: isCritical ? 20 : 16,
-        fill: isCritical ? 0xFF3333 : 0xFF6666,
-        fontWeight: isCritical ? 'bold' : 'normal',
-        stroke: { color: 0x000000, width: 2 }
-      }
-    });
-
-    // Position above the target card
-    damageText.x = targetCard.x;
-    damageText.y = targetCard.y - 30;
-    damageText.anchor.set(0.5);
-    damageText.alpha = 0;
-
-    targetCard.addChild(damageText);
-
-    // Animate damage number
-    gsap.timeline()
-      .to(damageText, {
-        duration: 0.2,
-        alpha: 1,
-        y: damageText.y - 20,
-        scale: isCritical ? 1.2 : 1.0,
-        ease: 'power2.out'
-      })
-      .to(damageText, {
-        duration: 0.8,
-        alpha: 0,
-        y: damageText.y - 40,
-        ease: 'power2.in',
-        onComplete: () => {
-          damageText.destroy();
-        }
-      });
-  }
 
   private findCharacterCard(characterId: string): Container | null {
     // Search in player 1 character zone
@@ -749,22 +354,7 @@ export class CardBattleScene extends BaseScene {
     const characterCard = this.findCharacterCard(characterId);
     if (!characterCard) return;
 
-    // Simple glow effect fallback
-    return new Promise((resolve) => {
-      gsap.timeline({
-        onComplete: resolve
-      })
-      .to(characterCard, {
-        duration: 0.2,
-        scale: 1.1,
-        ease: 'power2.inOut'
-      })
-      .to(characterCard, {
-        duration: 0.2,
-        scale: 1.0,
-        ease: 'power2.inOut'
-      });
-    });
+    return CardBattleEffects.animateSimpleEffect(characterCard);
   }
 
   // Helper method to update battle state from after_state in battle logs
