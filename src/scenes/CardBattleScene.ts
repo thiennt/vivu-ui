@@ -217,8 +217,10 @@ export class CardBattleScene extends BaseScene {
         // Update battle state from after_state if available
         if (logs.length > 0 && logs[0].after_state) {
           this.updateBattleStateFromAfterState(logs[0].after_state);
+          // New flow: refresh hand & player info -> animation -> update characters
+          this.updateHandAndPlayerInfoZones();
           await this.animateCardPlay(characterId, logs);
-          this.updateAllZones();
+          this.updateCharacterZones();
         }
 
         if (logs[1] && logs[1].after_state) {
@@ -324,9 +326,6 @@ export class CardBattleScene extends BaseScene {
       );
       await Promise.all(targetAnimations);
     }
-
-    // 3. Final update to refresh UI after all animations
-    this.updateAllZones();
   }
 
   private getCardGroup(card?: Card): 'damage' | 'healing' | 'debuff' | 'other' {
@@ -1178,6 +1177,41 @@ export class CardBattleScene extends BaseScene {
     
     // Enable/disable UI based on current player
     this.updateUIState();
+  }
+
+  private updateHandAndPlayerInfoZones(): void {
+    if (!this.battleState) return;
+
+    // Update player zones with battle state - only hand and player info
+    const player1 = this.battleState.players.find(p => p.team === 1);
+    const player2 = this.battleState.players.find(p => p.team === 2);
+
+    if (player1) {
+      this.p1HandZone.updateBattleState(player1);
+    }
+
+    if (player2) {
+      this.p2HandZone.updateBattleState(player2);
+    }
+
+    // Update battle log with turn number
+    this.battleLogZone.updatePhase(this.currentPhase, this.battleState.current_player, this.battleState.current_turn);
+  }
+
+  private updateCharacterZones(): void {
+    if (!this.battleState) return;
+
+    // Update player zones with battle state - only character zones
+    const player1 = this.battleState.players.find(p => p.team === 1);
+    const player2 = this.battleState.players.find(p => p.team === 2);
+
+    if (player1) {
+      this.p1CharacterZone.updateBattleState(player1);
+    }
+
+    if (player2) {
+      this.p2CharacterZone.updateBattleState(player2);
+    }
   }
 
   private updateUIState(): void {
