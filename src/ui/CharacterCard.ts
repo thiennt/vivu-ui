@@ -98,8 +98,32 @@ export class CharacterCard extends Container {
 
     this.addChild(atkText, defText);
 
-    // Apply visual effect if character has acted this turn
-    if (character.has_acted) {
+    // Apply visual effect for defeated characters (hp === 0)
+    if (character.hp === 0) {
+      this.alpha = 0.5; // Make defeated characters semi-transparent
+      
+      // Add "DEFEATED" overlay
+      const defeatedOverlay = new Graphics();
+      defeatedOverlay.roundRect(0, 0, width, height, 8)
+        .fill({ color: 0x000000, alpha: 0.6 });
+      
+      const defeatedText = new Text({
+        text: 'DEFEATED',
+        style: {
+          fontFamily: 'Kalam',
+          fontSize: Math.max(10, Math.min(14, width * 0.12)),
+          fontWeight: 'bold',
+          fill: 0xff4444,
+          align: 'center'
+        }
+      });
+      defeatedText.anchor.set(0.5);
+      defeatedText.x = width / 2;
+      defeatedText.y = height / 2;
+      
+      this.addChild(defeatedOverlay, defeatedText);
+    } else if (character.has_acted) {
+      // Apply visual effect if character has acted this turn
       this.alpha = 0.5;
       // Add a grayscale/desaturated effect by overlaying a gray tint
       const overlay = new Graphics();
