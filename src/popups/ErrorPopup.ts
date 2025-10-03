@@ -1,19 +1,18 @@
 import { Container, Graphics, Text } from 'pixi.js';
 import { navigation } from '@/utils/navigation';
 import { Colors } from '@/utils/colors';
+import { Button } from '@/ui/Button';
 
 export class ErrorPopup extends Container {
   private dialogBg!: Graphics;
   private dialogPanel!: Graphics;
   private message: string;
-  private onRetry?: () => void;
   private gameWidth: number;
   private gameHeight: number;
 
-  constructor(params: { message: string; onRetry?: () => void }) {
+  constructor(params: { message: string }) {
     super();
     this.message = params.message;
-    this.onRetry = params.onRetry;
     this.gameWidth = navigation.width;
     this.gameHeight = navigation.height;
     this.createDialog();
@@ -67,69 +66,21 @@ export class ErrorPopup extends Container {
     errorMessage.x = this.gameWidth / 2;
     errorMessage.y = dialogY + 80;
 
-    // Retry button
-    const retryButton = this.createButton(
-      'Retry',
-      dialogX + 20,
-      dialogY + dialogHeight - 60,
-      dialogWidth - 40,
-      40,
-      () => {
+    // Close button
+    const closeButton = new Button({
+      text: 'Close',
+      width: 100,
+      height: 40,
+      onClick: () => {
         navigation.dismissPopup();
-        if (this.onRetry) {
-          this.onRetry();
-        }
       }
+    });
+    closeButton.position.set(
+      dialogX + (dialogWidth - closeButton.width) / 2,
+      dialogY + dialogHeight - 60
     );
 
-    this.addChild(this.dialogBg, this.dialogPanel, errorTitle, errorMessage, retryButton);
-  }
-
-  private createButton(
-    text: string,
-    x: number,
-    y: number,
-    width: number,
-    height: number,
-    onClick: () => void
-  ): Container {
-    const button = new Container();
-    
-    const bg = new Graphics();
-    bg.roundRect(0, 0, width, height, 5);
-    bg.fill({ color: Colors.BUTTON_PRIMARY });
-    bg.stroke({ width: 2, color: Colors.BUTTON_BORDER });
-    
-    const buttonText = new Text({
-      text,
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 16,
-        fontWeight: 'bold',
-        fill: Colors.TEXT_PRIMARY
-      }
-    });
-    buttonText.anchor.set(0.5);
-    buttonText.x = width / 2;
-    buttonText.y = height / 2;
-    
-    button.addChild(bg, buttonText);
-    button.x = x;
-    button.y = y;
-    
-    button.interactive = true;
-    button.cursor = 'pointer';
-    button.on('pointerdown', onClick);
-    
-    // Add hover effect
-    button.on('pointerover', () => {
-      bg.tint = 0xcccccc;
-    });
-    button.on('pointerout', () => {
-      bg.tint = 0xffffff;
-    });
-    
-    return button;
+    this.addChild(this.dialogBg, this.dialogPanel, errorTitle, errorMessage, closeButton);
   }
 
   resize(width: number, height: number): void {

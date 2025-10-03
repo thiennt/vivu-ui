@@ -5,14 +5,14 @@
  */
 
 import { config } from '@/config';
-import { 
-  mockPlayer, mockSkills, mockDungeons, mockStages, mockCardBattleState,  
+import {
+  mockPlayer, mockSkills, mockDungeons, mockStages, mockCardBattleState,
   mockBattleStage, mockPlayer1Characters, mockActionResult, mockDrawCardResult,
-  mockPlayCardResult, mockEndTurnResult, 
+  mockPlayCardResult, mockEndTurnResult,
   mockAiTurnResult
 } from '@/utils/mockData';
-import { 
-  TurnAction, 
+import {
+  TurnAction,
 } from '@/types';
 
 // Loading state interface
@@ -51,7 +51,7 @@ async function apiRequest<T>(
 
   // Make real API call
   const url = `${config.apiBaseUrl}${endpoint}`;
-  
+
   const defaultOptions: RequestInit = {
     headers: {
       'Content-Type': 'application/json',
@@ -63,24 +63,15 @@ async function apiRequest<T>(
   try {
     console.log(`🌐 Making real API call to ${endpoint}`);
     const response = await fetch(url, defaultOptions);
-    
+
     if (!response.ok) {
-      // Try to parse error response body for detailed error message
-      try {
-        const errorData = await response.json();
-        const errorMessage = errorData.message || `API request failed: ${response.statusText}`;
-        throw new ApiError(
-          errorMessage,
-          response.status,
-          errorData
-        );
-      } catch {
-        // If JSON parsing fails, fall back to status text
-        throw new ApiError(
-          `API request failed: ${response.statusText}`,
-          response.status
-        );
-      }
+      const errorData = await response.json();
+      const errorMessage = errorData.message;
+      throw new ApiError(
+        errorMessage,
+        response.status,
+        errorData
+      );
     }
 
     const data = await response.json();
@@ -220,7 +211,7 @@ export const battleApi = {
   async startTurn(battleId: string): Promise<any> {
     console.log('🎯 startTurn API called for battle:', battleId);
     const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
-    
+
     return apiRequest(`/players/${playerId}/card-battle/${battleId}/start-turn`, {
       method: 'POST',
     }, mockActionResult);

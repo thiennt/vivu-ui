@@ -233,7 +233,12 @@ export class CardBattleScene extends BaseScene {
       const errorMessage = error instanceof ApiError 
         ? error.message 
         : 'Failed to play card. Please try again.';
-      this.battleLogZone.showNotification(errorMessage, Colors.ERROR, 3000);
+
+      
+      navigation.presentPopup(ErrorPopup, {
+        message: errorMessage
+      });
+      this.updateAllZones();
     }
   }
 
@@ -791,11 +796,9 @@ export class CardBattleScene extends BaseScene {
         ? error.message 
         : 'Failed to load battle. Please try again.';
       navigation.presentPopup(ErrorPopup, {
-        message: errorMessage,
-        onRetry: () => {
-          this.initializeBattle();
-        }
+        message: errorMessage
       });
+      this.updateAllZones();
     }
   }
 
@@ -848,12 +851,9 @@ export class CardBattleScene extends BaseScene {
         ? error.message 
         : 'Failed to start turn. Please try again.';
       navigation.presentPopup(ErrorPopup, {
-        message: errorMessage,
-        onRetry: () => {
-          this.processTurnStart();
-        }
+        message: errorMessage
       });
-      throw error; // Re-throw to stop turn processing
+      this.updateAllZones();
     }
   }
 
@@ -896,12 +896,9 @@ export class CardBattleScene extends BaseScene {
         ? error.message 
         : 'Failed to draw cards. Please try again.';
       navigation.presentPopup(ErrorPopup, {
-        message: errorMessage,
-        onRetry: () => {
-          this.processDrawPhase();
-        }
+        message: errorMessage
       });
-      throw error; // Re-throw to stop turn processing
+      this.updateAllZones();
     }
   }
 
@@ -950,11 +947,9 @@ export class CardBattleScene extends BaseScene {
         ? error.message 
         : 'Failed to end turn. Please try again.';
       navigation.presentPopup(ErrorPopup, {
-        message: errorMessage,
-        onRetry: () => {
-          this.processEndTurn();
-        }
+        message: errorMessage
       });
+      this.updateAllZones();
     }
   }
 
@@ -993,11 +988,9 @@ export class CardBattleScene extends BaseScene {
         ? error.message 
         : 'Failed to process AI turn. Please try again.';
       navigation.presentPopup(ErrorPopup, {
-        message: errorMessage,
-        onRetry: () => {
-          this.processAITurn();
-        }
+        message: errorMessage
       });
+      this.updateAllZones();
     }
   }
 
