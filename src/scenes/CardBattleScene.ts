@@ -150,7 +150,7 @@ export class CardBattleScene extends BaseScene {
     if (!this.battleState) return;
 
     // Store previous energy count for animation
-    const currentPlayer = this.battleState.players.find(p => p.team === this.battleState!.current_player);
+    let currentPlayer = this.battleState.players.find(p => p.team === this.battleState!.current_player);
     const previousEnergy = currentPlayer?.deck.current_energy || 0;
 
     const turnAction: TurnAction = {
@@ -180,6 +180,8 @@ export class CardBattleScene extends BaseScene {
         }
 
         this.updateAllZones();
+
+        currentPlayer = this.battleState.players.find(p => p.team === this.battleState!.current_player);
 
         // Animate energy count increase after updating zones
         const newEnergy = currentPlayer?.deck.current_energy || 0;
@@ -212,11 +214,10 @@ export class CardBattleScene extends BaseScene {
         const logs = response.data;
         console.log('Play card logs:', logs);
         
-        await this.animateCardPlay(characterId, logs);
-
         // Update battle state from after_state if available
         if (logs.length > 0 && logs[0].after_state) {
           this.updateBattleStateFromAfterState(logs[0].after_state);
+          await this.animateCardPlay(characterId, logs);
           this.updateAllZones();
         }
 
