@@ -1,6 +1,6 @@
 import { Container, Graphics, Text } from 'pixi.js';
 import { navigation } from '@/utils/navigation';
-import { BaseScene } from '@/utils/BaseScene';
+import { BaseScene } from '@/ui/BaseScene';
 import { Colors } from '@/utils/colors';
 import { CardBattleScene } from './CardBattleScene';
 import { BattleCard, BattleStageResponse, Card, CardType, CardRarity, Character } from '@/types';

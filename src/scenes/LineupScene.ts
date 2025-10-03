@@ -1,6 +1,6 @@
 import { Graphics, Text, Container } from 'pixi.js';
 import { ScrollBox } from '@pixi/ui';
-import { BaseScene } from '@/utils/BaseScene';
+import { BaseScene } from '@/ui/BaseScene';
 import { mockPlayer } from '@/utils/mockData';
 import { navigation } from '@/utils/navigation';
 import { HomeScene } from './HomeScene';

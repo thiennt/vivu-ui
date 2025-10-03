@@ -1,6 +1,6 @@
 import { Container, Graphics, Text, Ticker } from 'pixi.js';
 import { navigation } from '@/utils/navigation';
-import { BaseScene } from '@/utils/BaseScene';
+import { BaseScene } from '@/ui/BaseScene';
 import { HomeScene } from './HomeScene';
 import { Colors } from '@/utils/colors';
 import { battleApi, isLikelyUsingMockData } from '@/services/api';

@@ -1,6 +1,6 @@
 import { Container, Graphics, Text, FederatedPointerEvent } from 'pixi.js';
 import { navigation } from '@/utils/navigation';
-import { BaseScene } from '@/utils/BaseScene';
+import { BaseScene } from '@/ui/BaseScene';
 import { Colors } from '@/utils/colors';
 import { HomeScene } from './HomeScene';
 import { gsap } from 'gsap';

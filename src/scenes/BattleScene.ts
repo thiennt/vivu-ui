@@ -1,7 +1,7 @@
-import { Container, Graphics, Text } from 'pixi.js';
+import { Assets, Container, Graphics, Sprite, Text } from 'pixi.js';
 import { navigation } from '@/utils/navigation';
 import { mockCharacters } from '@/utils/mockData';
-import { BaseScene } from '@/utils/BaseScene';
+import { BaseScene } from '@/ui/BaseScene';
 import { HomeScene } from './HomeScene';
 import { Colors } from '@/utils/colors';
 import { gsap } from 'gsap';
@@ -197,6 +197,21 @@ export class BattleScene extends BaseScene {
     (this as any)._battleLogY = logY;
   }
 
+  private async loadAvatarForCard(character: any, cardWidth: number, cardHeight: number): Promise<Sprite> {
+    const avatarTexture = await Assets.load(character?.avatar_url || 'https://pixijs.com/assets/bunny.png');
+    const avatarIcon = new Sprite(avatarTexture);
+    
+    // Calculate avatar size based on card dimensions
+    const avatarSize = Math.min(cardWidth * 0.4, cardHeight * 0.4, 80);
+    avatarIcon.width = avatarSize;
+    avatarIcon.height = avatarSize;
+    avatarIcon.anchor.set(0.5);
+    avatarIcon.x = cardWidth / 2;
+    avatarIcon.y = avatarSize - 10;
+    
+    return avatarIcon;
+  }
+
   private createBattleCard(character: any, x: number, y: number, cardWidth: number = 100): Container {
     const cardHeight = 120;
     const card = new Container();
@@ -311,7 +326,7 @@ export class BattleScene extends BaseScene {
     statsText.y = 95;
     
     // Add avatar/logo
-    this.createAvatar(character, cardWidth, cardHeight).then(avatarIcon => {
+    this.loadAvatarForCard(character, cardWidth, cardHeight).then((avatarIcon) => {
       card.addChild(avatarIcon);
     });
     

@@ -1,5 +1,5 @@
 import { Container, Graphics, Text } from 'pixi.js';
-import { Colors } from './colors';
+import { Colors } from '@/utils/colors';
 
 export class BottomNavigationMenu extends Container {
   private menuHeight = 60;
@@ -56,28 +56,28 @@ export class BottomNavigationMenu extends Container {
     switch (action) {
       case 'home':
         import('@/scenes/HomeScene').then(({ HomeScene }) => {
-          import('./navigation').then(({ navigation }) => {
+          import('@/utils/navigation').then(({ navigation }) => {
             navigation.showScreen(HomeScene);
           });
         });
         break;
       case 'player':
         import('@/scenes/PlayerDetailScene').then(({ PlayerDetailScene }) => {
-          import('./navigation').then(({ navigation }) => {
+          import('@/utils/navigation').then(({ navigation }) => {
             navigation.showScreen(PlayerDetailScene);
           });
         });
         break;
       case 'dungeon':
         import('@/scenes/DungeonScene').then(({ DungeonScene }) => {
-          import('./navigation').then(({ navigation }) => {
+          import('@/utils/navigation').then(({ navigation }) => {
             navigation.showScreen(DungeonScene);
           });
         });
         break;
       case 'store':
         import('@/scenes/CharactersScene').then(({ CharactersScene }) => {
-          import('./navigation').then(({ navigation }) => {
+          import('@/utils/navigation').then(({ navigation }) => {
             navigation.showScreen(CharactersScene);
           });
         });

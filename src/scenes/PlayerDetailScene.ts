@@ -1,5 +1,5 @@
 import { Graphics, Container, Text, Ticker } from 'pixi.js';
-import { BaseScene } from '@/utils/BaseScene';
+import { BaseScene } from '@/ui/BaseScene';
 import { navigation } from '@/utils/navigation';
 import { CharactersScene } from './CharactersScene';
 import { CharacterDetailScene } from './CharacterDetailScene';
