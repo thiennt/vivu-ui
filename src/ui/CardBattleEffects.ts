@@ -52,7 +52,8 @@ export class CardBattleEffects {
         duration: 0.15,
         scale: 1.2,
         tint: 0xFF4444, // Red tint for attack
-        ease: 'power2.out'
+        ease: 'power2.out',
+        snap: { tint: 1 }
       })
       // Forward thrust
       .to(characterCard, {
@@ -73,7 +74,8 @@ export class CardBattleEffects {
         rotation: 0,
         scale: 1.0,
         tint: 0xFFFFFF,
-        ease: 'power2.inOut'
+        ease: 'power2.inOut',
+        snap: { tint: 1 }
       });
   }
 
@@ -86,7 +88,8 @@ export class CardBattleEffects {
         duration: 0.3,
         scale: 1.1,
         tint: 0x44FF44, // Green tint for healing
-        ease: 'sine.inOut'
+        ease: 'sine.inOut',
+        snap: { tint: 1 }
       })
       // Gentle pulse
       .to(characterCard, {
@@ -104,7 +107,8 @@ export class CardBattleEffects {
         duration: 0.4,
         scale: 1.0,
         tint: 0xFFFFFF,
-        ease: 'sine.inOut'
+        ease: 'sine.inOut',
+        snap: { tint: 1 }
       });
   }
 
@@ -119,7 +123,8 @@ export class CardBattleEffects {
         duration: 0.2,
         scale: 1.15,
         tint: 0x8844FF, // Purple tint for debuff
-        ease: 'power2.out'
+        ease: 'power2.out',
+        snap: { tint: 1 }
       })
       // Shake effect
       .to(characterCard, {
@@ -152,7 +157,8 @@ export class CardBattleEffects {
         duration: 0.3,
         scale: 1.0,
         tint: 0xFFFFFF,
-        ease: 'power2.inOut'
+        ease: 'power2.inOut',
+        snap: { tint: 1 }
       });
   }
 
@@ -247,7 +253,8 @@ export class CardBattleEffects {
       .to(targetCard, {
         duration: 0.08,
         tint: 0xFF3333, // Bright red tint for damage
-        ease: 'power2.out'
+        ease: 'power2.out',
+        snap: { tint: 1 }
       })
       // Strong recoil effect
       .to(targetCard, {
@@ -288,7 +295,8 @@ export class CardBattleEffects {
         tint: 0xFFFFFF,
         scale: 1.0,
         rotation: 0,
-        ease: 'elastic.out(1, 0.5)'
+        ease: 'elastic.out(1, 0.5)',
+        snap: { tint: 1 }
       });
   }
 
@@ -301,7 +309,8 @@ export class CardBattleEffects {
         duration: 0.25,
         tint: 0x44FF88, // Bright green tint for healing
         scale: 1.15,
-        ease: 'sine.out'
+        ease: 'sine.out',
+        snap: { tint: 1 }
       })
       // Gentle pulse for healing energy
       .to(targetCard, {
@@ -319,7 +328,8 @@ export class CardBattleEffects {
         duration: 0.4,
         tint: 0xFFFFFF,
         scale: 1.0,
-        ease: 'sine.inOut'
+        ease: 'sine.inOut',
+        snap: { tint: 1 }
       });
   }
 
@@ -338,7 +348,8 @@ export class CardBattleEffects {
         duration: 0.2,
         tint: effectColor,
         scale: 1.08,
-        ease: 'power2.out'
+        ease: 'power2.out',
+        snap: { tint: 1 }
       })
       // Subtle oscillation for control effect
       .to(targetCard, {
@@ -371,7 +382,8 @@ export class CardBattleEffects {
         duration: 0.4,
         tint: 0xFFFFFF,
         scale: 1.0,
-        ease: 'power2.inOut'
+        ease: 'power2.inOut',
+        snap: { tint: 1 }
       });
   }
 
@@ -384,13 +396,15 @@ export class CardBattleEffects {
         duration: 0.2,
         tint: 0x66CCFF, // Cyan tint for neutral effects
         scale: 1.1,
-        ease: 'power2.out'
+        ease: 'power2.out',
+        snap: { tint: 1 }
       })
       .to(targetCard, {
         duration: 0.4,
         tint: 0xFFFFFF,
         scale: 1.0,
-        ease: 'power2.inOut'
+        ease: 'power2.inOut',
+        snap: { tint: 1 }
       });
   }
 
@@ -515,7 +529,8 @@ export class CardBattleEffects {
       .to(energyText, {
         tint: 0xFFFF00, // Yellow glow
         duration: 0.2,
-        ease: 'power2.out'
+        ease: 'power2.out',
+        snap: { tint: 1 }
       }, 0)
       // Return to normal scale
       .to(energyText, {
@@ -527,7 +542,8 @@ export class CardBattleEffects {
       .to(energyText, {
         tint: 0xFFFFFF,
         duration: 0.3,
-        ease: 'power2.inOut'
+        ease: 'power2.inOut',
+        snap: { tint: 1 }
       }, '-=0.3');
     });
   }

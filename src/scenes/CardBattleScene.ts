@@ -18,7 +18,7 @@ import { navigation } from '@/utils/navigation';
 import { HomeScene } from './HomeScene';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
 import { ErrorPopup } from '@/popups/ErrorPopup';
-import { CardBattleEffects, CardGroup } from './CardBattle/CardBattleEffects';
+import { CardBattleEffects, CardGroup } from '@/ui/CardBattleEffects';
 
 export class CardBattleScene extends BaseScene {
   /** Assets bundles required by this screen */
