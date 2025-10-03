@@ -100,12 +100,35 @@ export class CharacterCard extends Container {
 
     // Apply visual effect if character has acted this turn
     if (character.has_acted) {
-      this.alpha = 0.5;
+      this.alpha = 0.6;
       // Add a grayscale/desaturated effect by overlaying a gray tint
       const overlay = new Graphics();
       overlay.roundRect(0, 0, width, height, 8)
-        .fill({ color: 0x000000, alpha: 0.3 });
+        .fill({ color: 0x000000, alpha: 0.4 });
       this.addChild(overlay);
+      
+      // Add "ACTED" indicator badge
+      const badge = new Graphics();
+      badge.roundRect(0, 0, width * 0.7, 20, 4)
+        .fill({ color: 0x555555, alpha: 0.9 })
+        .stroke({ width: 1, color: Colors.TEXT_WHITE });
+      badge.x = (width - width * 0.7) / 2;
+      badge.y = height * 0.1;
+      
+      const badgeText = new Text({
+        text: 'ACTED',
+        style: {
+          fontFamily: 'Kalam',
+          fontSize: 12,
+          fontWeight: 'bold',
+          fill: Colors.TEXT_WHITE
+        }
+      });
+      badgeText.anchor.set(0.5);
+      badgeText.x = width / 2;
+      badgeText.y = height * 0.1 + 10;
+      
+      this.addChild(badge, badgeText);
     }
 
     // Add avatar/logo if needed
