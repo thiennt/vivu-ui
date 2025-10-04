@@ -61,8 +61,13 @@ export class HandZone extends Container {
     this.handBg.clear();
 
     // Create simplified hand zone background
+    // For player 2: button above, handBg below (symmetric layout)
+    // For player 1: handBg above, button below (current layout)
+    const handBgHeight = height * 0.7;
+    const handBgY = this.playerNo === 2 ? height - handBgHeight : 0;
+    
     // Main background
-    this.handBg.roundRect(0, 0, width, height * 0.7, 8)
+    this.handBg.roundRect(0, handBgY, width, handBgHeight, 8)
       .fill(Colors.UI_BACKGROUND)
       .stroke({ width: 1, color: Colors.UI_BORDER, alpha: 0.6 });
     
@@ -114,7 +119,9 @@ export class HandZone extends Container {
     }
     
     const startX = Math.max(10, (width - totalWidth) / 2);
-    const cardY = (height - cardHeight) / 2;
+    // Account for handBg Y position - cards should be centered within handBg
+    const handBgY = this.handBg.getBounds().y;
+    const cardY = handBgY + (height - cardHeight) / 2;
     
     handCards.forEach((cardInDeck, index) => {
       // For Player 2 (AI), show face-down cards instead of actual card details
@@ -143,10 +150,14 @@ export class HandZone extends Container {
     const buttonWidth = Math.min(180, width - 2 * scene.STANDARD_PADDING);
     const buttonHeight = Math.max(40, Math.min(46, height * 0.07));
 
+    // For player 2: button at top (above handBg) - but not shown
+    // For player 1: button at bottom (below handBg)
+    const buttonY = this.playerNo === 2 ? 0 : height + scene.STANDARD_PADDING;
+
     const endTurnButton = scene.createButton(
       'END TURN',
       (width - buttonWidth - scene.STANDARD_PADDING) / 2,
-      height + scene.STANDARD_PADDING,
+      buttonY,
       buttonWidth,
       buttonHeight,
       () => {
