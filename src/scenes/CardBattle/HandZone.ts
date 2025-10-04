@@ -38,10 +38,17 @@ export class HandZone extends Container {
     this.playerNo = params?.playerNo || 1;
 
     this.handBg = new Graphics();
-    this.addChild(this.handBg);
-
     this.endTurnButton = new Container();
-    this.addChild(this.endTurnButton);
+
+    // For player 2: button first (below), then handBg (above)
+    // For player 1: handBg first (below), then button (above)
+    if (this.playerNo === 2) {
+      this.addChild(this.endTurnButton);
+      this.addChild(this.handBg);
+    } else {
+      this.addChild(this.handBg);
+      this.addChild(this.endTurnButton);
+    }
 
     // Setup stage event handlers for drag and drop
     app.stage.eventMode = 'static';
