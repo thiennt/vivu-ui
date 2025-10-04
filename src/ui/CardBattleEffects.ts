@@ -805,8 +805,9 @@ export class CardBattleEffects {
       }
     });
 
-    damageText.x = targetCard.x;
-    damageText.y = targetCard.y - 30;
+    // Center of the card
+    damageText.x = targetCard.width / 2;
+    damageText.y = targetCard.height / 2 - 30;
     damageText.anchor.set(0.5);
     damageText.alpha = 0;
 
@@ -846,8 +847,9 @@ export class CardBattleEffects {
       }
     });
 
-    healingText.x = targetCard.x;
-    healingText.y = targetCard.y - 30;
+    healingText.x = targetCard.width / 2;
+    healingText.y = targetCard.height / 2 - 30;
+
     healingText.anchor.set(0.5);
     healingText.alpha = 0;
 

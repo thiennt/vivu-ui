@@ -376,9 +376,12 @@ export class CardBattleScene extends BaseScene {
       if (this.battleState && this.battleState.players) {
         this.updateAllZones();
         this.loadingManager.hideLoading();
-        this.startGameLoop();
-      } else {
-        throw new Error('Invalid battle state received');
+
+        if (this.battleState.status === 'ongoing') {
+          this.startGameLoop();
+        } else {
+          throw new Error('Invalid battle state received');
+        }
       }
     } catch (error) {
       console.error('Failed to initialize battle:', error);
@@ -404,10 +407,11 @@ export class CardBattleScene extends BaseScene {
   private async processPlayerTurn(): Promise<void> {
     // Player 1 turn
     // Turn Start
-    await this.processTurnStart();
-
-    // Draw Phase  
-    await this.processDrawPhase();
+    if (this.battleState?.phase == 'start_turn') {
+      await this.processTurnStart();
+      // Draw Phase  
+      await this.processDrawPhase();
+    }
 
     // Main Phase
     await this.processMainPhase();
@@ -670,12 +674,27 @@ export class CardBattleScene extends BaseScene {
       if (actorCharacterId) {
         await this.animateCardPlay(actorCharacterId, [log]);
       }
+    } else if (log.action_type === 'end_turn') {
+      // Handle end turn for AI
+      console.log('AI ended its turn');
+      
+      // Show notification
+      this.battleLogZone.showNotification('AI ended its turn', Colors.TEXT_PRIMARY, 1500);
 
-      // Check for game end after AI plays a card (similar to player turn)
-      return this.checkGameEnd(log);
+      // Update battle state from after_state if available
+      if (log.after_state) {
+        this.updateBattleStateFromAfterState(log.after_state);
+      }
+
+      this.updateAllZones();
+
+      // Brief delay
+      await new Promise(resolve => setTimeout(resolve, 500));
+      return false; // Game hasn't ended
     }
 
-    return false; // Default case - game hasn't ended
+    // Check for game end after AI plays a card (similar to player turn)
+    return this.checkGameEnd(log);
   }
 
   private checkGameEnd(log: CardBattleLog): boolean {
@@ -849,9 +868,9 @@ export class CardBattleScene extends BaseScene {
 
     // Calculate available height and distribute remaining space
     const fixedHeight = handZoneHeight * 2 + characterZoneHeight * 2 + battleLogHeight;
-    const totalPadding = TOP_PADDING + BETWEEN_AREAS * 5 + BOTTOM_PADDING; // Reduced from 7 to 5 areas
+    const totalPadding = TOP_PADDING + BETWEEN_AREAS * 5 + BOTTOM_PADDING;
     const remainingHeight = height - fixedHeight - totalPadding;
-    const extraSpacing = Math.max(0, remainingHeight / 6); // Reduced from 8 to 6 sections
+    const extraSpacing = Math.max(0, remainingHeight / 2); // Distribute remaining space equally between the 2 inter-player gaps
 
     let currentY = TOP_PADDING;
 
@@ -859,7 +878,7 @@ export class CardBattleScene extends BaseScene {
     this.p2HandZone.x = this.STANDARD_PADDING;
     this.p2HandZone.y = currentY;
     this.p2HandZone.resize(width - 2 * this.STANDARD_PADDING, handZoneHeight);
-    currentY += handZoneHeight + BETWEEN_AREAS + extraSpacing;
+    currentY += handZoneHeight + BETWEEN_AREAS;
 
     // PLAYER 2 INFO + 3 CHARACTERS ZONE (now includes DiscardZone)
     this.p2CharacterZone.resize(width - 2 * this.STANDARD_PADDING, characterZoneHeight);
@@ -877,7 +896,7 @@ export class CardBattleScene extends BaseScene {
     this.p1CharacterZone.resize(width - 2 * this.STANDARD_PADDING, characterZoneHeight);
     this.p1CharacterZone.x = this.STANDARD_PADDING;
     this.p1CharacterZone.y = currentY;
-    currentY += characterZoneHeight + BETWEEN_AREAS + extraSpacing;
+    currentY += characterZoneHeight + BETWEEN_AREAS;
 
     // PLAYER 1 HAND ZONE anchored to bottom
     this.p1HandZone.x = this.STANDARD_PADDING;

@@ -8,7 +8,7 @@ import { CardDetailPopup, cardToBattleCard } from "@/popups/CardDetailPopup";
 
 
 export class HandZone extends Container {
-  private handBg: Graphics;
+  private handBg: Container;
   private handCards: Container[] = [];
   private playerState: CardBattlePlayerState | null = null;
   private playerNo: number = 1; // Default to player 1
@@ -37,7 +37,7 @@ export class HandZone extends Container {
 
     this.playerNo = params?.playerNo || 1;
 
-    this.handBg = new Graphics();
+    this.handBg = new Container();
     this.addChild(this.handBg);
 
     this.endTurnButton = new Container();
@@ -51,11 +51,18 @@ export class HandZone extends Container {
   }
 
   resize(width: number, height: number): void {
-    this.handBg.clear();
+    this.handBg.removeChildren();
 
     // Create simplified hand zone background
+    // For player 2: button above, handBg below (symmetric layout)
+    // For player 1: handBg above, button below (current layout)
+    const handBgHeight = height * 0.7;
+    const handBgY = this.playerNo === 2 ? height - handBgHeight : 0;
+
+    const handBgGraphics = new Graphics();
+    this.handBg.addChild(handBgGraphics);
     // Main background
-    this.handBg.roundRect(0, 0, width, height * 0.7, 8)
+    handBgGraphics.roundRect(0, handBgY, width, handBgHeight, 8)
       .fill(Colors.UI_BACKGROUND)
       .stroke({ width: 1, color: Colors.UI_BORDER, alpha: 0.6 });
     
@@ -107,8 +114,14 @@ export class HandZone extends Container {
     }
     
     const startX = Math.max(10, (width - totalWidth) / 2);
-    const cardY = (height - cardHeight) / 2;
-    
+    // Account for handBg Y position - cards should be centered within handBg
+    const handBgBounds = this.handBg.getBounds();
+    let cardY = (handBgBounds.height - cardHeight) / 2;
+
+    if (this.playerNo === 2) {
+      cardY = height - handBgBounds.y + (handBgBounds.height - cardHeight) / 2;
+    }
+
     handCards.forEach((cardInDeck, index) => {
       // For Player 2 (AI), show face-down cards instead of actual card details
       const x = startX + (index * (cardWidth + cardSpacing));
@@ -117,7 +130,7 @@ export class HandZone extends Container {
         : this.createHandCard(cardInDeck.card!, cardWidth, cardHeight);
       handCard.x = x;
       handCard.y = cardY;
-      this.addChild(handCard);
+      this.handBg.addChild(handCard);
       this.handCards.push(handCard);
     });
   }
@@ -136,10 +149,14 @@ export class HandZone extends Container {
     const buttonWidth = Math.min(180, width - 2 * scene.STANDARD_PADDING);
     const buttonHeight = Math.max(40, Math.min(46, height * 0.07));
 
+    // For player 2: button at top (above handBg) - but not shown
+    // For player 1: button at bottom (below handBg)
+    const buttonY = this.playerNo === 1 ? height + scene.STANDARD_PADDING : 0;
+
     const endTurnButton = scene.createButton(
       'END TURN',
       (width - buttonWidth - scene.STANDARD_PADDING) / 2,
-      height + scene.STANDARD_PADDING,
+      buttonY,
       buttonWidth,
       buttonHeight,
       () => {
