@@ -2,6 +2,8 @@
  * CardBattleEffects - Handles all animation effects for card battle scenes
  * Provides reusable animation methods for character skills, target effects, and visual feedback
  * Uses Graphics overlays and standard GSAP properties instead of PixiPlugin for tint effects
+ * 
+ * Enhanced with particle effects, screen shake, radial glows, and impact waves
  */
 
 import { Container, Text, Graphics } from 'pixi.js';
@@ -17,11 +19,12 @@ export class CardBattleEffects {
   /**
    * Create a color overlay for visual effects (replacement for tint)
    */
-  private static createColorOverlay(container: Container, color: number, alpha: number = 0): Graphics {
-    let bounds = container.getLocalBounds();
+  private static createColorOverlay(container: Container, color: number, initialAlpha: number = 0): Graphics {
+    const bounds = container.getLocalBounds();
     const overlay = new Graphics();
     overlay.rect(0, 0, bounds.width, bounds.height);
     overlay.fill({ color: color });
+    overlay.alpha = initialAlpha;
 
     overlay.x = bounds.x;
     overlay.y = bounds.y;
@@ -30,6 +33,119 @@ export class CardBattleEffects {
     container.addChild(overlay);
 
     return overlay;
+  }
+
+  /**
+   * Create a radial glow effect around a container
+   */
+  private static createRadialGlow(container: Container, color: number, radius: number = 50): Graphics {
+    const glow = new Graphics();
+    glow.circle(0, 0, radius);
+    glow.fill({ color: color, alpha: 0 });
+    
+    // Center the glow on the container
+    const bounds = container.getLocalBounds();
+    glow.x = bounds.x + bounds.width / 2;
+    glow.y = bounds.y + bounds.height / 2;
+    
+    container.addChildAt(glow, 0); // Add behind other elements
+    return glow;
+  }
+
+  /**
+   * Create particle burst effect
+   */
+  private static createParticleBurst(
+    container: Container,
+    color: number,
+    particleCount: number = 8
+  ): Graphics[] {
+    const particles: Graphics[] = [];
+    const bounds = container.getLocalBounds();
+    const centerX = bounds.x + bounds.width / 2;
+    const centerY = bounds.y + bounds.height / 2;
+
+    for (let i = 0; i < particleCount; i++) {
+      const particle = new Graphics();
+      const size = 4 + Math.random() * 4;
+      particle.circle(0, 0, size);
+      particle.fill({ color: color, alpha: 0.8 });
+      particle.x = centerX;
+      particle.y = centerY;
+      
+      container.addChild(particle);
+      particles.push(particle);
+    }
+
+    return particles;
+  }
+
+  /**
+   * Create an impact wave effect
+   */
+  private static createImpactWave(container: Container, color: number): Graphics {
+    const bounds = container.getLocalBounds();
+    const wave = new Graphics();
+    wave.circle(0, 0, 20);
+    wave.stroke({ width: 3, color: color, alpha: 0 });
+    
+    wave.x = bounds.x + bounds.width / 2;
+    wave.y = bounds.y + bounds.height / 2;
+    
+    container.addChild(wave);
+    return wave;
+  }
+
+  /**
+   * Animate screen shake effect (container shake)
+   */
+  private static async animateScreenShake(
+    container: Container,
+    intensity: number = 5,
+    duration: number = 0.3
+  ): Promise<void> {
+    const originalX = container.x;
+    const originalY = container.y;
+    
+    return new Promise((resolve) => {
+      gsap.timeline({
+        onComplete: () => {
+          container.x = originalX;
+          container.y = originalY;
+          resolve();
+        }
+      })
+      .to(container, {
+        duration: duration / 6,
+        x: originalX + intensity,
+        y: originalY + intensity * 0.5,
+        ease: 'power2.out'
+      })
+      .to(container, {
+        duration: duration / 6,
+        x: originalX - intensity,
+        y: originalY - intensity * 0.5,
+        ease: 'power2.inOut'
+      })
+      .to(container, {
+        duration: duration / 6,
+        x: originalX + intensity * 0.5,
+        y: originalY + intensity * 0.3,
+        ease: 'power2.inOut'
+      })
+      .to(container, {
+        duration: duration / 6,
+        x: originalX - intensity * 0.5,
+        y: originalY - intensity * 0.3,
+        ease: 'power2.inOut'
+      })
+      .to(container, {
+        duration: duration / 3,
+        x: originalX,
+        y: originalY,
+        ease: 'power2.inOut'
+      });
+    });
   }
 
   /**
@@ -91,11 +207,12 @@ export class CardBattleEffects {
   }
 
   /**
-   * High Damage animation: aggressive forward lunge
+   * High Damage animation: aggressive forward lunge with enhanced effects
    */
   private static animateDamageSkill(characterCard: Container, timeline: gsap.core.Timeline): void {
     const originalX = characterCard.x;
     const overlay = this.createColorOverlay(characterCard, 0xFF4444, 0);
+    const glow = this.createRadialGlow(characterCard, 0xFF0000, 60);
     
     timeline
       .to([characterCard], {
@@ -105,6 +222,12 @@ export class CardBattleEffects {
       })
       .to(overlay, {
         alpha: 0.6,
+        duration: 0.15,
+        ease: 'power2.out'
+      }, 0)
+      .to(glow, {
+        alpha: 0.4,
+        scale: 1.5,
         duration: 0.15,
         ease: 'power2.out'
       }, 0)
@@ -133,14 +256,23 @@ export class CardBattleEffects {
         duration: 0.3,
         ease: 'power2.inOut',
         onComplete: () => overlay.destroy()
+      }, '-=0.3')
+      .to(glow, {
+        alpha: 0,
+        scale: 2,
+        duration: 0.3,
+        ease: 'power2.inOut',
+        onComplete: () => glow.destroy()
       }, '-=0.3');
   }
 
   /**
-   * Healing & Support animation: gentle glow and pulse
+   * Healing & Support animation: gentle glow and pulse with sparkle particles
    */
   private static animateHealingSkill(characterCard: Container, timeline: gsap.core.Timeline): void {
     const overlay = this.createColorOverlay(characterCard, 0x44FF44, 0);
+    const glow = this.createRadialGlow(characterCard, 0x44FF88, 70);
+    const particles = this.createParticleBurst(characterCard, 0x88FFAA, 10);
     
     timeline
       .to(characterCard, {
@@ -153,6 +285,28 @@ export class CardBattleEffects {
         duration: 0.3,
         ease: 'sine.inOut',
       }, 0)
+      .to(glow, {
+        alpha: 0.6,
+        scale: 1.8,
+        duration: 0.3,
+        ease: 'sine.out'
+      }, 0)
+      // Animate particles outward
+      .add(() => {
+        particles.forEach((particle, index) => {
+          const angle = (index / particles.length) * Math.PI * 2;
+          const distance = 40 + Math.random() * 20;
+          gsap.timeline()
+            .to(particle, {
+              x: particle.x + Math.cos(angle) * distance,
+              y: particle.y + Math.sin(angle) * distance,
+              alpha: 0,
+              duration: 0.6,
+              ease: 'power2.out',
+              onComplete: () => particle.destroy()
+            });
+        });
+      }, 0.2)
       // Gentle pulse
       .to(characterCard, {
         duration: 0.2,
@@ -175,15 +329,24 @@ export class CardBattleEffects {
         duration: 0.4,
         ease: 'sine.inOut',
         onComplete: () => overlay.destroy()
+      }, '-=0.4')
+      .to(glow, {
+        alpha: 0,
+        scale: 2.5,
+        duration: 0.4,
+        ease: 'sine.inOut',
+        onComplete: () => glow.destroy()
       }, '-=0.4');
   }
 
   /**
-   * Control & Debuff animation: dark energy and shake
+   * Control & Debuff animation: dark energy waves and shake
    */
   private static animateDebuffSkill(characterCard: Container, timeline: gsap.core.Timeline): void {
     const originalX = characterCard.x;
     const overlay = this.createColorOverlay(characterCard, 0x8844FF, 0);
+    const wave1 = this.createImpactWave(characterCard, 0x8844FF);
+    const wave2 = this.createImpactWave(characterCard, 0x6622DD);
     
     timeline
       .to(characterCard, {
@@ -196,6 +359,31 @@ export class CardBattleEffects {
         duration: 0.2,
         ease: 'power2.out',
       }, 0)
+      // Animate waves
+      .to(wave1, {
+        alpha: 0.8,
+        scale: 3,
+        duration: 0.4,
+        ease: 'power2.out'
+      }, 0)
+      .to(wave2, {
+        alpha: 0.6,
+        scale: 4,
+        duration: 0.5,
+        ease: 'power2.out'
+      }, 0.1)
+      .to(wave1, {
+        alpha: 0,
+        duration: 0.2,
+        ease: 'power2.in',
+        onComplete: () => wave1.destroy()
+      }, 0.4)
+      .to(wave2, {
+        alpha: 0,
+        duration: 0.2,
+        ease: 'power2.in',
+        onComplete: () => wave2.destroy()
+      }, 0.5)
       // Shake effect
       .to(characterCard, {
         duration: 0.08,
@@ -313,7 +501,7 @@ export class CardBattleEffects {
   }
 
   /**
-   * Apply damage effect with recoil and shake
+   * Apply damage effect with recoil, shake, and impact waves
    */
   private static applyDamageEffect(
     targetCard: Container,
@@ -323,6 +511,8 @@ export class CardBattleEffects {
   ): void {
     const originalX = targetCard.x;
     const overlay = this.createColorOverlay(targetCard, 0xFF3333, 0);
+    const impactWave = this.createImpactWave(targetCard, 0xFF0000);
+    const particles = isCritical ? this.createParticleBurst(targetCard, 0xFF6666, 12) : [];
     
     timeline
       .to(overlay, {
@@ -330,6 +520,19 @@ export class CardBattleEffects {
         alpha: 0.7,
         ease: 'power2.out',
       })
+      // Impact wave effect
+      .to(impactWave, {
+        alpha: isCritical ? 0.9 : 0.7,
+        scale: isCritical ? 4 : 3,
+        duration: 0.3,
+        ease: 'power2.out'
+      }, 0)
+      .to(impactWave, {
+        alpha: 0,
+        duration: 0.2,
+        ease: 'power2.in',
+        onComplete: () => impactWave.destroy()
+      }, 0.3)
       // Strong recoil effect
       .to(targetCard, {
         duration: isCritical ? 0.15 : 0.12,
@@ -337,6 +540,24 @@ export class CardBattleEffects {
         rotation: isCritical ? 0.15 : 0.08,
         ease: 'power2.out'
       }, 0)
+      // Animate critical particles
+      .add(() => {
+        if (isCritical) {
+          particles.forEach((particle, index) => {
+            const angle = (index / particles.length) * Math.PI * 2;
+            const distance = 50 + Math.random() * 30;
+            gsap.timeline()
+              .to(particle, {
+                x: particle.x + Math.cos(angle) * distance,
+                y: particle.y + Math.sin(angle) * distance,
+                alpha: 0,
+                duration: 0.5,
+                ease: 'power2.out',
+                onComplete: () => particle.destroy()
+              });
+          });
+        }
+      }, 0.1)
       // Intense shake effect
       .to(targetCard, {
         duration: 0.04,
@@ -379,10 +600,12 @@ export class CardBattleEffects {
   }
 
   /**
-   * Apply healing effect with gentle restore and sparkle
+   * Apply healing effect with gentle restore, sparkle, and radial glow
    */
   private static applyHealingEffect(targetCard: Container, timeline: gsap.core.Timeline): void {
     const overlay = this.createColorOverlay(targetCard, 0x44FF88, 0);
+    const glow = this.createRadialGlow(targetCard, 0x44FF88, 80);
+    const particles = this.createParticleBurst(targetCard, 0xAAFFCC, 8);
     
     timeline
       .to(targetCard, {
@@ -395,6 +618,27 @@ export class CardBattleEffects {
         duration: 0.25,
         ease: 'sine.out',
       }, 0)
+      .to(glow, {
+        alpha: 0.7,
+        scale: 2,
+        duration: 0.25,
+        ease: 'sine.out'
+      }, 0)
+      // Animate particles upward
+      .add(() => {
+        particles.forEach((particle) => {
+          const xOffset = (Math.random() - 0.5) * 40;
+          gsap.timeline()
+            .to(particle, {
+              x: particle.x + xOffset,
+              y: particle.y - 50 - Math.random() * 30,
+              alpha: 0,
+              duration: 0.7,
+              ease: 'power1.out',
+              onComplete: () => particle.destroy()
+            });
+        });
+      }, 0.1)
       // Gentle pulse for healing energy
       .to(targetCard, {
         duration: 0.2,
@@ -417,11 +661,18 @@ export class CardBattleEffects {
         duration: 0.4,
         ease: 'sine.inOut',
         onComplete: () => overlay.destroy()
+      }, '-=0.4')
+      .to(glow, {
+        alpha: 0,
+        scale: 3,
+        duration: 0.4,
+        ease: 'sine.inOut',
+        onComplete: () => glow.destroy()
       }, '-=0.4');
   }
 
   /**
-   * Apply debuff effect with pulsing dark energy
+   * Apply debuff effect with pulsing dark energy and waves
    */
   private static applyDebuffEffect(
     targetCard: Container,
@@ -430,6 +681,8 @@ export class CardBattleEffects {
   ): void {
     const effectColor = isDebuff ? 0x8844FF : 0x44AAFF; // Purple for debuff, blue for effect/status
     const overlay = this.createColorOverlay(targetCard, effectColor, 0);
+    const wave = this.createImpactWave(targetCard, effectColor);
+    const glow = this.createRadialGlow(targetCard, effectColor, 60);
     
     timeline
       .to(targetCard, {
@@ -441,6 +694,24 @@ export class CardBattleEffects {
         alpha: 0.5,
         duration: 0.2,
         ease: 'power2.out',
+      }, 0)
+      .to(wave, {
+        alpha: 0.6,
+        scale: 3.5,
+        duration: 0.5,
+        ease: 'power2.out'
+      }, 0)
+      .to(wave, {
+        alpha: 0,
+        duration: 0.2,
+        ease: 'power2.in',
+        onComplete: () => wave.destroy()
+      }, 0.5)
+      .to(glow, {
+        alpha: 0.5,
+        scale: 1.5,
+        duration: 0.3,
+        ease: 'sine.inOut'
       }, 0)
       // Subtle oscillation for control effect
       .to(targetCard, {
@@ -479,6 +750,13 @@ export class CardBattleEffects {
         duration: 0.4,
         ease: 'power2.inOut',
         onComplete: () => overlay.destroy()
+      }, '-=0.4')
+      .to(glow, {
+        alpha: 0,
+        scale: 2.5,
+        duration: 0.4,
+        ease: 'sine.inOut',
+        onComplete: () => glow.destroy()
       }, '-=0.4');
   }
 
@@ -616,7 +894,7 @@ export class CardBattleEffects {
   }
 
   /**
-   * Animate energy increase on energy text
+   * Animate energy increase on energy text with enhanced glow
    */
   static async animateEnergyIncrease(energyText: Text): Promise<void> {
     return new Promise((resolve) => {
@@ -630,9 +908,18 @@ export class CardBattleEffects {
       // Add glow behind text
       energyText.addChildAt(glowCircle, 0);
       
+      // Create outer glow ring
+      const outerGlow = new Graphics();
+      outerGlow.circle(0, 0, 30);
+      outerGlow.stroke({ width: 2, color: 0xFFDD00, alpha: 0 });
+      outerGlow.x = energyText.width / 2;
+      outerGlow.y = energyText.height / 2;
+      energyText.addChildAt(outerGlow, 0);
+      
       gsap.timeline({
         onComplete: () => {
           glowCircle.destroy();
+          outerGlow.destroy();
           resolve();
         }
       })
@@ -648,6 +935,19 @@ export class CardBattleEffects {
         duration: 0.2,
         ease: 'power2.out',
       }, 0)
+      // Outer glow expansion
+      .to(outerGlow, {
+        alpha: 0.8,
+        scale: 1.5,
+        duration: 0.3,
+        ease: 'power2.out'
+      }, 0)
+      .to(outerGlow, {
+        alpha: 0,
+        scale: 2,
+        duration: 0.2,
+        ease: 'power2.in'
+      }, 0.3)
       // Return to normal scale
       .to(energyText, {
         scale: 1.0,
@@ -661,5 +961,54 @@ export class CardBattleEffects {
         ease: 'power2.inOut',
       }, '-=0.3');
     });
+  }
+
+  /**
+   * Screen flash effect for dramatic moments (e.g., critical hits)
+   * Can be called on the scene's main container for full-screen effect
+   */
+  static async animateScreenFlash(
+    container: Container,
+    color: number = 0xFFFFFF,
+    intensity: number = 0.6,
+    duration: number = 0.2
+  ): Promise<void> {
+    // Create a full-screen flash overlay
+    const flash = new Graphics();
+    flash.rect(0, 0, 10000, 10000); // Large enough to cover screen
+    flash.fill({ color: color, alpha: 0 });
+    flash.x = -5000;
+    flash.y = -5000;
+    
+    container.addChild(flash);
+    
+    return new Promise((resolve) => {
+      gsap.timeline({
+        onComplete: () => {
+          flash.destroy();
+          resolve();
+        }
+      })
+      .to(flash, {
+        alpha: intensity,
+        duration: duration * 0.3,
+        ease: 'power2.out'
+      })
+      .to(flash, {
+        alpha: 0,
+        duration: duration * 0.7,
+        ease: 'power2.in'
+      });
+    });
+  }
+
+  /**
+   * Public screen shake method for dramatic impact
+   */
+  static async shakeScreen(
+    container: Container,
+    intensity: number = 5
+  ): Promise<void> {
+    return this.animateScreenShake(container, intensity, 0.3);
   }
 }
