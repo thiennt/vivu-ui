@@ -1,12 +1,10 @@
 /**
  * CardBattleEffects - Handles all animation effects for card battle scenes
  * Provides reusable animation methods for character skills, target effects, and visual feedback
- * * NOTE: GSAP does not have a native 'tint' property. For PIXI.js, you must use the 
- * PixiPlugin and nest the tint property inside a 'pixi' object within the tween.
- * E.g., { pixi: { tint: 0xFFFFFF } }
+ * Uses Graphics overlays and standard GSAP properties instead of PixiPlugin for tint effects
  */
 
-import { Container, Text } from 'pixi.js';
+import { Container, Text, Graphics } from 'pixi.js';
 import { gsap } from 'gsap';
 import { CardBattleLogTarget } from '@/types';
 
@@ -16,6 +14,55 @@ export type CardGroup = 'damage' | 'healing' | 'debuff' | 'other';
  * Centralized effect animations for card battles
  */
 export class CardBattleEffects {
+  /**
+   * Create a color overlay for visual effects (replacement for tint)
+   */
+  private static createColorOverlay(container: Container, color: number, alpha: number = 0): Graphics {
+    const overlay = new Graphics();
+    const bounds = container.getBounds();
+    
+    // Draw a rectangle covering the container
+    overlay.rect(0, 0, bounds.width, bounds.height);
+    overlay.fill({ color, alpha });
+    
+    // Position the overlay relative to the container's local coordinates
+    overlay.x = bounds.x - container.x;
+    overlay.y = bounds.y - container.y;
+    
+    container.addChild(overlay);
+    return overlay;
+  }
+
+  /**
+   * Animate a color flash effect using an overlay
+   */
+  private static async animateColorFlash(
+    container: Container,
+    color: number,
+    duration: number = 0.3,
+    maxAlpha: number = 0.5
+  ): Promise<void> {
+    const overlay = this.createColorOverlay(container, color, 0);
+    
+    return new Promise((resolve) => {
+      gsap.timeline({
+        onComplete: () => {
+          overlay.destroy();
+          resolve();
+        }
+      })
+      .to(overlay, {
+        alpha: maxAlpha,
+        duration: duration * 0.4,
+        ease: 'power2.out'
+      })
+      .to(overlay, {
+        alpha: 0,
+        duration: duration * 0.6,
+        ease: 'power2.inOut'
+      });
+    });
+  }
   /**
    * Animate character performing a skill based on card group
    */
@@ -49,14 +96,19 @@ export class CardBattleEffects {
    */
   private static animateDamageSkill(characterCard: Container, timeline: gsap.core.Timeline): void {
     const originalX = characterCard.x;
+    const overlay = this.createColorOverlay(characterCard, 0xFF4444, 0);
     
     timeline
-      .to(characterCard, {
+      .to([characterCard, overlay], {
         duration: 0.15,
         scale: 1.2,
-        pixi: { tint: 0xFF4444 }, // Correct: Red tint for attack
         ease: 'power2.out'
       })
+      .to(overlay, {
+        alpha: 0.6,
+        duration: 0.15,
+        ease: 'power2.out'
+      }, 0)
       // Forward thrust
       .to(characterCard, {
         duration: 0.15,
@@ -75,22 +127,33 @@ export class CardBattleEffects {
         x: originalX,
         rotation: 0,
         scale: 1.0,
-        pixi: { tint: 0xFFFFFF }, // Correct: Return to white tint
         ease: 'power2.inOut',
-      });
+      })
+      .to(overlay, {
+        alpha: 0,
+        duration: 0.3,
+        ease: 'power2.inOut',
+        onComplete: () => overlay.destroy()
+      }, '-=0.3');
   }
 
   /**
    * Healing & Support animation: gentle glow and pulse
    */
   private static animateHealingSkill(characterCard: Container, timeline: gsap.core.Timeline): void {
+    const overlay = this.createColorOverlay(characterCard, 0x44FF44, 0);
+    
     timeline
       .to(characterCard, {
         duration: 0.3,
         scale: 1.1,
-        pixi: { tint: 0x44FF44 }, // Correct: Green tint for healing
         ease: 'sine.inOut',
       })
+      .to(overlay, {
+        alpha: 0.5,
+        duration: 0.3,
+        ease: 'sine.inOut',
+      }, 0)
       // Gentle pulse
       .to(characterCard, {
         duration: 0.2,
@@ -106,9 +169,14 @@ export class CardBattleEffects {
       .to(characterCard, {
         duration: 0.4,
         scale: 1.0,
-        pixi: { tint: 0xFFFFFF }, // Correct: Return to white tint
         ease: 'sine.inOut',
-      });
+      })
+      .to(overlay, {
+        alpha: 0,
+        duration: 0.4,
+        ease: 'sine.inOut',
+        onComplete: () => overlay.destroy()
+      }, '-=0.4');
   }
 
   /**
@@ -116,14 +184,19 @@ export class CardBattleEffects {
    */
   private static animateDebuffSkill(characterCard: Container, timeline: gsap.core.Timeline): void {
     const originalX = characterCard.x;
+    const overlay = this.createColorOverlay(characterCard, 0x8844FF, 0);
     
     timeline
       .to(characterCard, {
         duration: 0.2,
         scale: 1.15,
-        pixi: { tint: 0x8844FF }, // Correct: Purple tint for debuff
         ease: 'power2.out',
       })
+      .to(overlay, {
+        alpha: 0.5,
+        duration: 0.2,
+        ease: 'power2.out',
+      }, 0)
       // Shake effect
       .to(characterCard, {
         duration: 0.08,
@@ -154,9 +227,14 @@ export class CardBattleEffects {
       .to(characterCard, {
         duration: 0.3,
         scale: 1.0,
-        pixi: { tint: 0xFFFFFF }, // Correct: Return to white tint
         ease: 'power2.inOut',
-      });
+      })
+      .to(overlay, {
+        alpha: 0,
+        duration: 0.3,
+        ease: 'power2.inOut',
+        onComplete: () => overlay.destroy()
+      }, '-=0.3');
   }
 
   /**
@@ -245,11 +323,12 @@ export class CardBattleEffects {
     isCritical: boolean
   ): void {
     const originalX = targetCard.x;
+    const overlay = this.createColorOverlay(targetCard, 0xFF3333, 0);
     
     timeline
-      .to(targetCard, {
+      .to(overlay, {
         duration: 0.08,
-        pixi: { tint: 0xFF3333 }, // Correct: Bright red tint for damage
+        alpha: 0.7,
         ease: 'power2.out',
       })
       // Strong recoil effect
@@ -258,7 +337,7 @@ export class CardBattleEffects {
         scale: isCritical ? 0.8 : 0.85,
         rotation: isCritical ? 0.15 : 0.08,
         ease: 'power2.out'
-      })
+      }, 0)
       // Intense shake effect
       .to(targetCard, {
         duration: 0.04,
@@ -288,24 +367,35 @@ export class CardBattleEffects {
       // Return to normal
       .to(targetCard, {
         duration: 0.3,
-        pixi: { tint: 0xFFFFFF }, // Correct: Return to white tint
         scale: 1.0,
         rotation: 0,
         ease: 'elastic.out(1, 0.5)',
-      });
+      })
+      .to(overlay, {
+        alpha: 0,
+        duration: 0.3,
+        ease: 'elastic.out(1, 0.5)',
+        onComplete: () => overlay.destroy()
+      }, '-=0.3');
   }
 
   /**
    * Apply healing effect with gentle restore and sparkle
    */
   private static applyHealingEffect(targetCard: Container, timeline: gsap.core.Timeline): void {
+    const overlay = this.createColorOverlay(targetCard, 0x44FF88, 0);
+    
     timeline
       .to(targetCard, {
         duration: 0.25,
-        pixi: { tint: 0x44FF88 }, // Correct: Bright green tint for healing
         scale: 1.15,
         ease: 'sine.out',
       })
+      .to(overlay, {
+        alpha: 0.5,
+        duration: 0.25,
+        ease: 'sine.out',
+      }, 0)
       // Gentle pulse for healing energy
       .to(targetCard, {
         duration: 0.2,
@@ -320,10 +410,15 @@ export class CardBattleEffects {
       // Return to normal
       .to(targetCard, {
         duration: 0.4,
-        pixi: { tint: 0xFFFFFF }, // Correct: Return to white tint
         scale: 1.0,
         ease: 'sine.inOut',
-      });
+      })
+      .to(overlay, {
+        alpha: 0,
+        duration: 0.4,
+        ease: 'sine.inOut',
+        onComplete: () => overlay.destroy()
+      }, '-=0.4');
   }
 
   /**
@@ -335,14 +430,19 @@ export class CardBattleEffects {
     isDebuff: boolean
   ): void {
     const effectColor = isDebuff ? 0x8844FF : 0x44AAFF; // Purple for debuff, blue for effect/status
+    const overlay = this.createColorOverlay(targetCard, effectColor, 0);
     
     timeline
       .to(targetCard, {
         duration: 0.2,
-        pixi: { tint: effectColor }, // Correct: Apply the effect color tint
         scale: 1.08,
         ease: 'power2.out',
       })
+      .to(overlay, {
+        alpha: 0.5,
+        duration: 0.2,
+        ease: 'power2.out',
+      }, 0)
       // Subtle oscillation for control effect
       .to(targetCard, {
         duration: 0.15,
@@ -372,29 +472,45 @@ export class CardBattleEffects {
       // Return to normal
       .to(targetCard, {
         duration: 0.4,
-        pixi: { tint: 0xFFFFFF }, // Correct: Return to white tint
         scale: 1.0,
         ease: 'power2.inOut',
-      });
+      })
+      .to(overlay, {
+        alpha: 0,
+        duration: 0.4,
+        ease: 'power2.inOut',
+        onComplete: () => overlay.destroy()
+      }, '-=0.4');
   }
 
   /**
    * Apply default effect with gentle glow
    */
   private static applyDefaultEffect(targetCard: Container, timeline: gsap.core.Timeline): void {
+    const overlay = this.createColorOverlay(targetCard, 0x66CCFF, 0);
+    
     timeline
       .to(targetCard, {
         duration: 0.2,
-        pixi: { tint: 0x66CCFF }, // Correct: Cyan tint for neutral effects
         scale: 1.1,
         ease: 'power2.out',
       })
+      .to(overlay, {
+        alpha: 0.4,
+        duration: 0.2,
+        ease: 'power2.out',
+      }, 0)
       .to(targetCard, {
         duration: 0.4,
-        pixi: { tint: 0xFFFFFF }, // Correct: Return to white tint
         scale: 1.0,
         ease: 'power2.inOut',
-      });
+      })
+      .to(overlay, {
+        alpha: 0,
+        duration: 0.4,
+        ease: 'power2.inOut',
+        onComplete: () => overlay.destroy()
+      }, '-=0.4');
   }
 
   /**
@@ -505,8 +621,21 @@ export class CardBattleEffects {
    */
   static async animateEnergyIncrease(energyText: Text): Promise<void> {
     return new Promise((resolve) => {
+      // Create a glow effect using a Graphics object behind the text
+      const glowCircle = new Graphics();
+      glowCircle.circle(0, 0, 20);
+      glowCircle.fill({ color: 0xFFFF00, alpha: 0 });
+      glowCircle.x = energyText.width / 2;
+      glowCircle.y = energyText.height / 2;
+      
+      // Add glow behind text
+      energyText.addChildAt(glowCircle, 0);
+      
       gsap.timeline({
-        onComplete: resolve
+        onComplete: () => {
+          glowCircle.destroy();
+          resolve();
+        }
       })
       // Bounce effect
       .to(energyText, {
@@ -514,9 +643,9 @@ export class CardBattleEffects {
         duration: 0.2,
         ease: 'back.out(2)'
       })
-      // Glow effect by changing tint
-      .to(energyText, {
-        pixi: { tint: 0xFFFF00 }, // Correct: Yellow glow
+      // Glow effect
+      .to(glowCircle, {
+        alpha: 0.6,
         duration: 0.2,
         ease: 'power2.out',
       }, 0)
@@ -526,9 +655,9 @@ export class CardBattleEffects {
         duration: 0.3,
         ease: 'elastic.out(1, 0.5)'
       })
-      // Return to normal color
-      .to(energyText, {
-        pixi: { tint: 0xFFFFFF }, // Correct: Return to white tint
+      // Fade glow
+      .to(glowCircle, {
+        alpha: 0,
         duration: 0.3,
         ease: 'power2.inOut',
       }, '-=0.3');
