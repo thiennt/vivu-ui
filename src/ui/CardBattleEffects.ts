@@ -18,18 +18,17 @@ export class CardBattleEffects {
    * Create a color overlay for visual effects (replacement for tint)
    */
   private static createColorOverlay(container: Container, color: number, alpha: number = 0): Graphics {
+    let bounds = container.getLocalBounds();
     const overlay = new Graphics();
-    const bounds = container.getBounds();
-    
-    // Draw a rectangle covering the container
     overlay.rect(0, 0, bounds.width, bounds.height);
-    overlay.fill({ color, alpha });
-    
-    // Position the overlay relative to the container's local coordinates
-    overlay.x = bounds.x - container.x;
-    overlay.y = bounds.y - container.y;
-    
+    overlay.fill({ color: color });
+
+    overlay.x = bounds.x;
+    overlay.y = bounds.y;
+
+    // Always add overlay as the top child for visibility
     container.addChild(overlay);
+
     return overlay;
   }
 
@@ -42,7 +41,7 @@ export class CardBattleEffects {
     duration: number = 0.3,
     maxAlpha: number = 0.5
   ): Promise<void> {
-    const overlay = this.createColorOverlay(container, color, 0);
+    const overlay = this.createColorOverlay(container, color, 1);
     
     return new Promise((resolve) => {
       gsap.timeline({
@@ -99,7 +98,7 @@ export class CardBattleEffects {
     const overlay = this.createColorOverlay(characterCard, 0xFF4444, 0);
     
     timeline
-      .to([characterCard, overlay], {
+      .to([characterCard], {
         duration: 0.15,
         scale: 1.2,
         ease: 'power2.out'
