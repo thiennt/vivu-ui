@@ -1174,4 +1174,38 @@ export class CardBattleEffects {
         return 0x66CCFF;
     }
   }
+
+  /**
+   * Animate complete skill sequence: character performs skill + targets receive effects
+   * Consolidates the animation logic for playing a card skill
+   * 
+   * @param characterId - ID of the character performing the skill
+   * @param targets - Array of targets affected by the skill
+   * @param cardGroup - Type of skill effect (damage/healing/debuff/other)
+   * @param findCharacterCard - Callback function to find character card by ID
+   * @returns Promise that resolves when all animations complete
+   */
+  static async animateSkill(
+    characterId: string,
+    targets: CardBattleLogTarget[] | undefined,
+    cardGroup: CardGroup,
+    findCharacterCard: (id: string) => Container | null
+  ): Promise<void> {
+    // 1. Animate character performing skill based on card group
+    const characterCard = findCharacterCard(characterId);
+    if (characterCard) {
+      await this.animateCharacterSkill(characterCard, cardGroup);
+    }
+
+    // 2. Animate effects on targets based on card group
+    if (targets && targets.length > 0) {
+      // Process all targets simultaneously for visual impact
+      const targetAnimations = targets.map(target => {
+        const targetCard = findCharacterCard(target.id);
+        if (!targetCard) return Promise.resolve();
+        return this.applyTargetEffect(targetCard, target, cardGroup);
+      });
+      await Promise.all(targetAnimations);
+    }
+  }
 }
