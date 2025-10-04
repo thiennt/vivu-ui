@@ -50,53 +50,75 @@ export class CharacterCard extends Container {
 
     this.addChild(bg);
 
-    // HP Bar in the middle section
-    const hpBarWidth = width * 0.8;
-    const hpBarHeight = 8;
+    // ATK in top-left corner
+    const atkText = new Text({
+      text: `⚔️${character.atk}`,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 12,
+        fontWeight: 'bold',
+        fill: Colors.TEXT_WHITE
+      }
+    });
+    atkText.anchor.set(0, 0);
+    atkText.x = 5;
+    atkText.y = 5;
+
+    // DEF in top-right corner
+    const defText = new Text({
+      text: `🛡️${character.def}`,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 12,
+        fontWeight: 'bold',
+        fill: Colors.TEXT_WHITE
+      }
+    });
+    defText.anchor.set(1, 0);
+    defText.x = width - 5;
+    defText.y = 5;
+
+    this.addChild(atkText, defText);
+
+    // HP Bar at the bottom
+    const hpBarWidth = width * 0.9;
+    const hpBarHeight = 6;
     const hpBarX = (width - hpBarWidth) / 2;
-    const hpBarY = height * 0.45;
+    const hpBarY = height - 18;
 
     // HP Bar background
     const hpBarBg = new Graphics()
-      .roundRect(hpBarX, hpBarY, hpBarWidth, hpBarHeight, 4)
+      .roundRect(hpBarX, hpBarY, hpBarWidth, hpBarHeight, 3)
       .fill(Colors.HP_BAR_BG);
 
     // HP Bar foreground
     const hpPercent = Math.max(0, Math.min(1, character.hp / (character.max_hp || character.hp || 1)));
     const hpBarFg = new Graphics()
-      .roundRect(hpBarX, hpBarY, hpBarWidth * hpPercent, hpBarHeight, 4)
+      .roundRect(hpBarX, hpBarY, hpBarWidth * hpPercent, hpBarHeight, 3)
       .fill(Colors.HP_BAR_FILL);
 
     this.addChild(hpBarBg, hpBarFg);
 
-    // Stats area at bottom
-    const atkText = new Text({
-      text: `⚔️${character.atk}`,
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 14,
-        fontWeight: 'bold',
-        fill: Colors.TEXT_WHITE
-      }
-    });
-    atkText.anchor.set(0.5);
-    atkText.x = width / 2;
-    atkText.y = height * 0.65;
+    // Energy Bar at the bottom (below HP bar)
+    const energyBarWidth = width * 0.9;
+    const energyBarHeight = 6;
+    const energyBarX = (width - energyBarWidth) / 2;
+    const energyBarY = height - 10;
 
-    const defText = new Text({
-      text: `🛡️${character.def}`,
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 14,
-        fontWeight: 'bold',
-        fill: Colors.TEXT_WHITE
-      }
-    });
-    defText.anchor.set(0.5);
-    defText.x = width / 2;
-    defText.y = height * 0.85;
+    // Energy Bar background
+    const energyBarBg = new Graphics()
+      .roundRect(energyBarX, energyBarY, energyBarWidth, energyBarHeight, 3)
+      .fill(Colors.BACKGROUND_SECONDARY);
 
-    this.addChild(atkText, defText);
+    // Energy Bar foreground
+    const maxEnergy = character.max_energy || 100;
+    const currentEnergy = character.current_energy || character.energy || 0;
+    const energyPercent = Math.max(0, Math.min(1, currentEnergy / maxEnergy));
+    const energyBarFg = new Graphics()
+      .roundRect(energyBarX, energyBarY, energyBarWidth * energyPercent, energyBarHeight, 3)
+      .fill(0x2196f3);
+
+    this.addChild(energyBarBg, energyBarFg);
 
     // Apply visual effect for defeated characters (hp === 0)
     if (character.hp === 0) {
