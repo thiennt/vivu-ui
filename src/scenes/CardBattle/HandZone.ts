@@ -75,7 +75,7 @@ export class HandZone extends Container {
 
     // Redraw hand cards if we have player state
     if (this.playerState) {
-      this.updateHandDisplay(width, height);
+      this.updateHandDisplay(width, handBgHeight);
     }
   }
 
@@ -119,9 +119,9 @@ export class HandZone extends Container {
     }
     
     const startX = Math.max(10, (width - totalWidth) / 2);
-    // Account for handBg Y position - cards should be centered within handBg
-    const handBgY = this.handBg.getBounds().y;
-    const cardY = handBgY + (height - cardHeight) / 2;
+    // Account for handBg Y position - cards should be centered vertically within handBg
+    const handBgBounds = this.handBg.getBounds();
+    const cardY = handBgBounds.y + (handBgBounds.height - cardHeight) / 2;
     
     handCards.forEach((cardInDeck, index) => {
       // For Player 2 (AI), show face-down cards instead of actual card details
