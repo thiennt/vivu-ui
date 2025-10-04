@@ -292,17 +292,13 @@ export class CardBattleScene extends BaseScene {
     // Determine card group for animation style
     const cardGroup = this.getCardGroup(playCardLog.card);
 
-    // 1. Animate character performing skill based on card group
-    await this.animateCharacterPerformSkill(characterId, cardGroup);
-
-    // 2. Animate effects on targets based on card group
-    if (playCardLog.targets && playCardLog.targets.length > 0) {
-      // Process all targets simultaneously for visual impact
-      const targetAnimations = playCardLog.targets.map(target => 
-        this.animateTargetEffects(target, cardGroup)
-      );
-      await Promise.all(targetAnimations);
-    }
+    // Animate complete skill sequence using CardBattleEffects
+    await CardBattleEffects.animateSkill(
+      characterId,
+      playCardLog.targets,
+      cardGroup,
+      (id: string) => this.findCharacterCard(id)
+    );
   }
 
   private getCardGroup(card?: Card): CardGroup {
@@ -320,20 +316,6 @@ export class CardBattleScene extends BaseScene {
     }
     
     return 'other';
-  }
-
-  private async animateCharacterPerformSkill(characterId: string, cardGroup: CardGroup = 'other'): Promise<void> {
-    const characterCard = this.findCharacterCard(characterId);
-    if (!characterCard) return;
-
-    return CardBattleEffects.animateCharacterSkill(characterCard, cardGroup);
-  }
-
-  private async animateTargetEffects(target: CardBattleLogTarget, cardGroup: CardGroup = 'other'): Promise<void> {
-    const targetCard = this.findCharacterCard(target.id);
-    if (!targetCard) return;
-
-    return CardBattleEffects.applyTargetEffect(targetCard, target, cardGroup);
   }
 
 

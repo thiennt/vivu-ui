@@ -6,7 +6,7 @@
  * Enhanced with particle effects, screen shake, radial glows, and impact waves
  */
 
-import { Container, Text, Graphics } from 'pixi.js';
+import { Container, Text, Graphics, Sprite } from 'pixi.js';
 import { gsap } from 'gsap';
 import { CardBattleLogTarget } from '@/types';
 
@@ -1012,5 +1012,200 @@ export class CardBattleEffects {
     intensity: number = 5
   ): Promise<void> {
     return this.animateScreenShake(container, intensity, 0.3);
+  }
+
+  /**
+   * Find and extract avatar sprite from a character card
+   */
+  private static findAvatarSprite(characterCard: Container): Sprite | null {
+    // Search through children to find the avatar sprite
+    for (const child of characterCard.children) {
+      if (child instanceof Sprite && child.texture) {
+        // Avatar sprites typically have anchor at (0.5, 0.5) and are positioned at the card center
+        if (child.anchor && Math.abs(child.anchor.x - 0.5) < 0.01 && Math.abs(child.anchor.y - 0.5) < 0.01) {
+          return child;
+        }
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Animate avatar as a flying projectile skill effect
+   * Creates a clone of the character's avatar that flies from attacker to target
+   * 
+   * @param effectsContainer - Container to add the effect to (should be above cards)
+   * @param attackerCard - The attacking character's card
+   * @param targetCard - The target character's card
+   * @param cardGroup - Type of skill effect (damage/healing/debuff/other)
+   * @returns Promise that resolves when animation completes
+   */
+  static async animateAvatarSkillEffect(
+    effectsContainer: Container,
+    attackerCard: Container,
+    targetCard: Container,
+    cardGroup: CardGroup = 'other'
+  ): Promise<void> {
+    // Find avatar sprite in the attacker card
+    const avatarSprite = this.findAvatarSprite(attackerCard);
+    if (!avatarSprite || !avatarSprite.texture) {
+      console.warn('Avatar sprite not found in character card');
+      return;
+    }
+
+    // Create a clone of the avatar for the projectile effect
+    const avatarClone = new Sprite(avatarSprite.texture);
+    avatarClone.anchor.set(0.5);
+    avatarClone.width = avatarSprite.width;
+    avatarClone.height = avatarSprite.height;
+    
+    // Get world positions of attacker and target
+    const attackerPos = attackerCard.toGlobal({ x: attackerCard.width / 2, y: attackerCard.height / 2 });
+    const targetPos = targetCard.toGlobal({ x: targetCard.width / 2, y: targetCard.height / 2 });
+    
+    // Convert to local coordinates of effects container
+    const startPos = effectsContainer.toLocal(attackerPos);
+    const endPos = effectsContainer.toLocal(targetPos);
+    
+    avatarClone.x = startPos.x;
+    avatarClone.y = startPos.y;
+    avatarClone.alpha = 0;
+    avatarClone.scale.set(0.8);
+    
+    effectsContainer.addChild(avatarClone);
+
+    // Create glow effect based on card group
+    const glowColor = this.getGlowColorForCardGroup(cardGroup);
+    const glow = new Graphics();
+    glow.circle(0, 0, Math.max(avatarClone.width, avatarClone.height) * 0.8);
+    glow.fill({ color: glowColor, alpha: 0 });
+    avatarClone.addChild(glow);
+
+    // Create trail particles
+    const trailParticles: Graphics[] = [];
+    
+    return new Promise((resolve) => {
+      const duration = 0.6;
+      const timeline = gsap.timeline({
+        onComplete: () => {
+          avatarClone.destroy({ children: true });
+          trailParticles.forEach(p => p.destroy());
+          resolve();
+        }
+      });
+
+      // Phase 1: Fade in and scale up
+      timeline
+        .to(avatarClone, {
+          alpha: 1,
+          scale: 1.2,
+          duration: 0.15,
+          ease: 'power2.out'
+        })
+        // Phase 2: Fly to target with rotation
+        .to(avatarClone, {
+          x: endPos.x,
+          y: endPos.y,
+          rotation: Math.PI * 2,
+          duration: duration,
+          ease: 'power2.inOut',
+          onUpdate: () => {
+            // Create trail particles during flight
+            if (Math.random() > 0.7) {
+              const particle = new Graphics();
+              particle.circle(0, 0, 3 + Math.random() * 3);
+              particle.fill({ color: glowColor, alpha: 0.8 });
+              particle.x = avatarClone.x;
+              particle.y = avatarClone.y;
+              effectsContainer.addChild(particle);
+              trailParticles.push(particle);
+              
+              gsap.to(particle, {
+                alpha: 0,
+                scale: 0.5,
+                duration: 0.4,
+                ease: 'power2.out',
+                onComplete: () => {
+                  particle.destroy();
+                  const index = trailParticles.indexOf(particle);
+                  if (index > -1) {
+                    trailParticles.splice(index, 1);
+                  }
+                }
+              });
+            }
+          }
+        }, 0.15)
+        // Animate glow during flight
+        .to(glow, {
+          alpha: 0.6,
+          scale: 1.3,
+          duration: duration * 0.5,
+          ease: 'power2.out'
+        }, 0.15)
+        .to(glow, {
+          alpha: 0,
+          scale: 1.8,
+          duration: duration * 0.5,
+          ease: 'power2.in'
+        }, 0.15 + duration * 0.5)
+        // Phase 3: Impact - scale up and fade out
+        .to(avatarClone, {
+          scale: 1.5,
+          alpha: 0,
+          duration: 0.2,
+          ease: 'power2.out'
+        });
+    });
+  }
+
+  /**
+   * Get glow color based on card group type
+   */
+  private static getGlowColorForCardGroup(cardGroup: CardGroup): number {
+    switch (cardGroup) {
+      case 'damage':
+        return 0xFF4444;
+      case 'healing':
+        return 0x44FF88;
+      case 'debuff':
+        return 0x8844FF;
+      default:
+        return 0x66CCFF;
+    }
+  }
+
+  /**
+   * Animate complete skill sequence: character performs skill + targets receive effects
+   * Consolidates the animation logic for playing a card skill
+   * 
+   * @param characterId - ID of the character performing the skill
+   * @param targets - Array of targets affected by the skill
+   * @param cardGroup - Type of skill effect (damage/healing/debuff/other)
+   * @param findCharacterCard - Callback function to find character card by ID
+   * @returns Promise that resolves when all animations complete
+   */
+  static async animateSkill(
+    characterId: string,
+    targets: CardBattleLogTarget[] | undefined,
+    cardGroup: CardGroup,
+    findCharacterCard: (id: string) => Container | null
+  ): Promise<void> {
+    // 1. Animate character performing skill based on card group
+    const characterCard = findCharacterCard(characterId);
+    if (characterCard) {
+      await this.animateCharacterSkill(characterCard, cardGroup);
+    }
+
+    // 2. Animate effects on targets based on card group
+    if (targets && targets.length > 0) {
+      // Process all targets simultaneously for visual impact
+      const targetAnimations = targets.map(target => {
+        const targetCard = findCharacterCard(target.id);
+        if (!targetCard) return Promise.resolve();
+        return this.applyTargetEffect(targetCard, target, cardGroup);
+      });
+      await Promise.all(targetAnimations);
+    }
   }
 }
