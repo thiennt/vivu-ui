@@ -40,16 +40,6 @@ async function apiRequest<T>(
   options: RequestInit = {},
   fallbackData?: T
 ): Promise<T> {
-  // If using mock data, return fallback data immediately without making API calls
-  if (config.useMockData) {
-    if (fallbackData !== undefined) {
-      console.log(`🎭 Using mock data for ${endpoint}`);
-      return fallbackData;
-    }
-    throw new ApiError(`Mock data not available for endpoint: ${endpoint}`);
-  }
-
-  // Make real API call
   const url = `${config.apiBaseUrl}${endpoint}`;
 
   const defaultOptions: RequestInit = {
@@ -77,6 +67,10 @@ async function apiRequest<T>(
     const data = await response.json();
     return data;
   } catch (error) {
+    if (fallbackData !== undefined) {
+      console.warn(`⚠️ API failed, using fallbackData for ${endpoint}`);
+      return fallbackData;
+    }
     if (error instanceof ApiError) {
       throw error;
     }
