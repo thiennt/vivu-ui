@@ -40,6 +40,17 @@ async function apiRequest<T>(
   options: RequestInit = {},
   fallbackData?: T
 ): Promise<T> {
+  if (config.useMockData) {
+    console.log(`🧪 Using mock data for ${endpoint}`)
+    if (fallbackData !== undefined) {
+      return new Promise((resolve) => {
+        setTimeout(() => resolve(fallbackData), 500); // Simulate network delay
+      });
+    } else {
+      throw new ApiError(`No mock data available for ${endpoint}`);
+    }
+  }
+
   const url = `${config.apiBaseUrl}${endpoint}`;
 
   const defaultOptions: RequestInit = {
@@ -67,10 +78,6 @@ async function apiRequest<T>(
     const data = await response.json();
     return data;
   } catch (error) {
-    if (fallbackData !== undefined) {
-      console.warn(`⚠️ API failed, using fallbackData for ${endpoint}`);
-      return fallbackData;
-    }
     if (error instanceof ApiError) {
       throw error;
     }
