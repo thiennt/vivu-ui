@@ -63,15 +63,15 @@ export class CharactersScene extends BaseScene {
       this.loadingManager.showMockDataIndicator();
     }
     
-    await this.initializeUI();
+    this.initializeUI();
   }
   
-  private async initializeUI(): Promise<void> {
+  private initializeUI(): void {
     if (!this.characters.length) return;
     
     this.createBackground();
     this.createHeader();
-    await this.createCharacterGrid();
+    this.createCharacterGrid();
     this.createBackButton();
   }
 
@@ -89,7 +89,7 @@ export class CharactersScene extends BaseScene {
     }
   }
   
-  private async updateLayout(): Promise<void> {
+  private updateLayout(): void {
     // Clear and recreate layout - this is more efficient than destroying/recreating all elements
     this.backgroundContainer.removeChildren();
     this.headerContainer.removeChildren();
@@ -99,7 +99,7 @@ export class CharactersScene extends BaseScene {
     // Recreate layout with current dimensions
     this.createBackground();
     this.createHeader();
-    await this.createCharacterGrid();
+    this.createCharacterGrid();
     this.createBackButton();
   }
 
@@ -176,7 +176,7 @@ export class CharactersScene extends BaseScene {
     this.headerContainer.addChild(title, subtitle);
   }
 
-  private async createCharacterGrid(): Promise<void> {
+  private createCharacterGrid(): void {
     // Calculate area for grid (leave space for back button)
     const gridTop = 140;
     const backButtonHeight = 50;
@@ -211,9 +211,7 @@ export class CharactersScene extends BaseScene {
       const x = col * (layout.itemWidth + gap);
       const y = row * (cardHeight + gap);
 
-      const characterCard = await this.createHeroCard(character, x, y, 'detailed', undefined, cardWidth);
-      characterCard.width = layout.itemWidth;
-      characterCard.height = cardHeight;
+      const characterCard = this.createCharacterCard(character, x, y, layout.itemWidth, cardHeight);
 
       characterCard.on('pointerdown', () => {
         navigation.showScreen(CharacterDetailScene, { selectedCharacter: character });

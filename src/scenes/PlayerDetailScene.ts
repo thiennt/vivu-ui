@@ -542,7 +542,9 @@ export class PlayerDetailScene extends BaseScene {
   }
 
   private createCharacterPreviewCard(character: any, x: number, y: number, customWidth?: number): Container {
-    const card = this.createHeroCard(character, x, y, 'preview', undefined, customWidth);
+    const cardWidth = customWidth || 120;
+    const cardHeight = cardWidth * 1.25; // 4:5 aspect ratio as used in preview cards
+    const card = this.createCharacterCard(character, x, y, cardWidth, cardHeight);
     
     // Click handler
     card.on('pointerdown', () => {
