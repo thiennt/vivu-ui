@@ -9,17 +9,24 @@
 import { Container, Text, Graphics, Sprite } from 'pixi.js';
 import { gsap } from 'gsap';
 import { CardBattleLogTarget } from '@/types';
+import type { CardBattleScene } from '@/scenes/CardBattleScene';
 
 export type CardGroup = 'damage' | 'healing' | 'debuff' | 'other';
 
 /**
  * Centralized effect animations for card battles
  */
-export class CardBattleEffects {
+export class CardBattleEffects extends Container {
+  private scene: CardBattleScene;
+
+  constructor(scene: CardBattleScene) {
+    super();
+    this.scene = scene;
+  }
   /**
    * Create a color overlay for visual effects (replacement for tint)
    */
-  private static createColorOverlay(container: Container, color: number, initialAlpha: number = 0): Graphics {
+  private createColorOverlay(container: Container, color: number, initialAlpha: number = 0): Graphics {
     const bounds = container.getLocalBounds();
     const overlay = new Graphics();
     overlay.rect(0, 0, bounds.width, bounds.height);
@@ -38,7 +45,7 @@ export class CardBattleEffects {
   /**
    * Create a radial glow effect around a container
    */
-  private static createRadialGlow(container: Container, color: number, radius: number = 50): Graphics {
+  private createRadialGlow(container: Container, color: number, radius: number = 50): Graphics {
     const glow = new Graphics();
     glow.circle(0, 0, radius);
     glow.fill({ color: color, alpha: 0 });
@@ -55,7 +62,7 @@ export class CardBattleEffects {
   /**
    * Create particle burst effect
    */
-  private static createParticleBurst(
+  private createParticleBurst(
     container: Container,
     color: number,
     particleCount: number = 8
@@ -83,7 +90,7 @@ export class CardBattleEffects {
   /**
    * Create an impact wave effect
    */
-  private static createImpactWave(container: Container, color: number): Graphics {
+  private createImpactWave(container: Container, color: number): Graphics {
     const bounds = container.getLocalBounds();
     const wave = new Graphics();
     wave.circle(0, 0, 20);
@@ -99,7 +106,7 @@ export class CardBattleEffects {
   /**
    * Animate screen shake effect (container shake)
    */
-  private static async animateScreenShake(
+  private async animateScreenShake(
     container: Container,
     intensity: number = 5,
     duration: number = 0.3
@@ -151,7 +158,7 @@ export class CardBattleEffects {
   /**
    * Animate a color flash effect using an overlay
    */
-  private static async animateColorFlash(
+  private async animateColorFlash(
     container: Container,
     color: number,
     duration: number = 0.3,
@@ -181,7 +188,7 @@ export class CardBattleEffects {
   /**
    * Animate character performing a skill based on card group
    */
-  static async animateCharacterSkill(
+  public async animateCharacterSkill(
     characterCard: Container,
     cardGroup: CardGroup = 'other'
   ): Promise<void> {
@@ -209,7 +216,7 @@ export class CardBattleEffects {
   /**
    * High Damage animation: aggressive forward lunge with enhanced effects
    */
-  private static animateDamageSkill(characterCard: Container, timeline: gsap.core.Timeline): void {
+  private animateDamageSkill(characterCard: Container, timeline: gsap.core.Timeline): void {
     const originalX = characterCard.x;
     const overlay = this.createColorOverlay(characterCard, 0xFF4444, 0);
     const glow = this.createRadialGlow(characterCard, 0xFF0000, 60);
@@ -269,7 +276,7 @@ export class CardBattleEffects {
   /**
    * Healing & Support animation: gentle glow and pulse with sparkle particles
    */
-  private static animateHealingSkill(characterCard: Container, timeline: gsap.core.Timeline): void {
+  private animateHealingSkill(characterCard: Container, timeline: gsap.core.Timeline): void {
     const overlay = this.createColorOverlay(characterCard, 0x44FF44, 0);
     const glow = this.createRadialGlow(characterCard, 0x44FF88, 70);
     const particles = this.createParticleBurst(characterCard, 0x88FFAA, 10);
@@ -342,7 +349,7 @@ export class CardBattleEffects {
   /**
    * Control & Debuff animation: dark energy waves and shake
    */
-  private static animateDebuffSkill(characterCard: Container, timeline: gsap.core.Timeline): void {
+  private animateDebuffSkill(characterCard: Container, timeline: gsap.core.Timeline): void {
     const originalX = characterCard.x;
     const overlay = this.createColorOverlay(characterCard, 0x8844FF, 0);
     const wave1 = this.createImpactWave(characterCard, 0x8844FF);
@@ -427,7 +434,7 @@ export class CardBattleEffects {
   /**
    * Default animation: simple glow + scale + brief movement
    */
-  private static animateDefaultSkill(characterCard: Container, timeline: gsap.core.Timeline): void {
+  private animateDefaultSkill(characterCard: Container, timeline: gsap.core.Timeline): void {
     const originalX = characterCard.x;
     
     timeline
@@ -461,7 +468,7 @@ export class CardBattleEffects {
   /**
    * Apply effect animation to a target based on card group and impact data
    */
-  static async applyTargetEffect(
+  public async applyTargetEffect(
     targetCard: Container,
     target: CardBattleLogTarget,
     cardGroup: CardGroup = 'other'
@@ -503,7 +510,7 @@ export class CardBattleEffects {
   /**
    * Apply damage effect with recoil, shake, and impact waves
    */
-  private static applyDamageEffect(
+  private applyDamageEffect(
     targetCard: Container,
     timeline: gsap.core.Timeline,
     damage: number,
@@ -602,7 +609,7 @@ export class CardBattleEffects {
   /**
    * Apply healing effect with gentle restore, sparkle, and radial glow
    */
-  private static applyHealingEffect(targetCard: Container, timeline: gsap.core.Timeline): void {
+  private applyHealingEffect(targetCard: Container, timeline: gsap.core.Timeline): void {
     const overlay = this.createColorOverlay(targetCard, 0x44FF88, 0);
     const glow = this.createRadialGlow(targetCard, 0x44FF88, 80);
     const particles = this.createParticleBurst(targetCard, 0xAAFFCC, 8);
@@ -674,7 +681,7 @@ export class CardBattleEffects {
   /**
    * Apply debuff effect with pulsing dark energy and waves
    */
-  private static applyDebuffEffect(
+  private applyDebuffEffect(
     targetCard: Container,
     timeline: gsap.core.Timeline,
     isDebuff: boolean
@@ -763,7 +770,7 @@ export class CardBattleEffects {
   /**
    * Apply default effect with gentle glow
    */
-  private static applyDefaultEffect(targetCard: Container, timeline: gsap.core.Timeline): void {
+  private applyDefaultEffect(targetCard: Container, timeline: gsap.core.Timeline): void {
     const overlay = this.createColorOverlay(targetCard, 0x66CCFF, 0);
     
     timeline
@@ -793,7 +800,7 @@ export class CardBattleEffects {
   /**
    * Show floating damage number
    */
-  static showFloatingDamage(targetCard: Container, damage: number, isCritical: boolean): void {
+  public showFloatingDamage(targetCard: Container, damage: number, isCritical: boolean): void {
     const damageText = new Text({
       text: `-${damage}`,
       style: {
@@ -835,7 +842,7 @@ export class CardBattleEffects {
   /**
    * Show floating healing number
    */
-  static showFloatingHealing(targetCard: Container, healing: number): void {
+  public showFloatingHealing(targetCard: Container, healing: number): void {
     const healingText = new Text({
       text: `+${healing}`,
       style: {
@@ -877,7 +884,7 @@ export class CardBattleEffects {
   /**
    * Simple character effect animation (fallback)
    */
-  static async animateSimpleEffect(characterCard: Container): Promise<void> {
+  public async animateSimpleEffect(characterCard: Container): Promise<void> {
     return new Promise((resolve) => {
       gsap.timeline({
         onComplete: resolve
@@ -898,7 +905,7 @@ export class CardBattleEffects {
   /**
    * Animate energy increase on energy text with enhanced glow
    */
-  static async animateEnergyIncrease(energyText: Text): Promise<void> {
+  public async animateEnergyIncrease(energyText: Text): Promise<void> {
     return new Promise((resolve) => {
       // Create a glow effect using a Graphics object behind the text
       const glowCircle = new Graphics();
@@ -969,7 +976,7 @@ export class CardBattleEffects {
    * Screen flash effect for dramatic moments (e.g., critical hits)
    * Can be called on the scene's main container for full-screen effect
    */
-  static async animateScreenFlash(
+  public async animateScreenFlash(
     container: Container,
     color: number = 0xFFFFFF,
     intensity: number = 0.6,
@@ -1007,7 +1014,7 @@ export class CardBattleEffects {
   /**
    * Public screen shake method for dramatic impact
    */
-  static async shakeScreen(
+  public async shakeScreen(
     container: Container,
     intensity: number = 5
   ): Promise<void> {
@@ -1017,7 +1024,7 @@ export class CardBattleEffects {
   /**
    * Find and extract avatar sprite from a character card
    */
-  private static findAvatarSprite(characterCard: Container): Sprite | null {
+  private findAvatarSprite(characterCard: Container): Sprite | null {
     // Search through children to find the avatar sprite
     for (const child of characterCard.children) {
       if (child instanceof Sprite && child.texture) {
@@ -1040,7 +1047,7 @@ export class CardBattleEffects {
    * @param cardGroup - Type of skill effect (damage/healing/debuff/other)
    * @returns Promise that resolves when animation completes
    */
-  static async animateAvatarSkillEffect(
+  public async animateAvatarSkillEffect(
     effectsContainer: Container,
     attackerCard: Container,
     targetCard: Container,
@@ -1162,7 +1169,7 @@ export class CardBattleEffects {
   /**
    * Get glow color based on card group type
    */
-  private static getGlowColorForCardGroup(cardGroup: CardGroup): number {
+  private getGlowColorForCardGroup(cardGroup: CardGroup): number {
     switch (cardGroup) {
       case 'damage':
         return 0xFF4444;
@@ -1182,17 +1189,15 @@ export class CardBattleEffects {
    * @param characterId - ID of the character performing the skill
    * @param targets - Array of targets affected by the skill
    * @param cardGroup - Type of skill effect (damage/healing/debuff/other)
-   * @param findCharacterCard - Callback function to find character card by ID
    * @returns Promise that resolves when all animations complete
    */
-  static async animateSkill(
+  public async animateSkill(
     characterId: string,
     targets: CardBattleLogTarget[] | undefined,
-    cardGroup: CardGroup,
-    findCharacterCard: (id: string) => Container | null
+    cardGroup: CardGroup
   ): Promise<void> {
     // 1. Animate character performing skill based on card group
-    const characterCard = findCharacterCard(characterId);
+    const characterCard = this.scene.findCharacterCard(characterId);
     if (characterCard) {
       await this.animateCharacterSkill(characterCard, cardGroup);
     }
@@ -1201,7 +1206,7 @@ export class CardBattleEffects {
     if (targets && targets.length > 0) {
       // Process all targets simultaneously for visual impact
       const targetAnimations = targets.map(target => {
-        const targetCard = findCharacterCard(target.id);
+        const targetCard = this.scene.findCharacterCard(target.id);
         if (!targetCard) return Promise.resolve();
         return this.applyTargetEffect(targetCard, target, cardGroup);
       });

@@ -8,8 +8,7 @@ import {
   TurnAction,
   BattlePhaseName,
   Card,
-  CardBattleLog,
-  CardBattleLogTarget
+  CardBattleLog
 } from '@/types';
 import { battleApi, ApiError } from '@/services/api';
 import { gsap } from 'gsap';
@@ -42,11 +41,14 @@ export class CardBattleScene extends BaseScene {
   // PLAYER 1 HAND ZONE (Skill Cards)
   // BUTTONS ZONE
 
-  private p2HandZone: HandZone;
-  private p2CharacterZone: PlayerCharacterZone;
-  private battleLogZone: BattleLogZone;
-  private p1CharacterZone: PlayerCharacterZone;
-  private p1HandZone: HandZone;
+  public p2HandZone: HandZone;
+  public p2CharacterZone: PlayerCharacterZone;
+  public battleLogZone: BattleLogZone;
+  public p1CharacterZone: PlayerCharacterZone;
+  public p1HandZone: HandZone;
+
+  // Visual effects handler
+  public readonly vfx: CardBattleEffects;
 
   constructor(params?: { battleId?: string }) {
     super();
@@ -71,6 +73,10 @@ export class CardBattleScene extends BaseScene {
 
     this.p1HandZone = new HandZone({ playerNo: 1 });
     this.addChild(this.p1HandZone);
+
+    // Initialize visual effects handler
+    this.vfx = new CardBattleEffects(this);
+    this.addChild(this.vfx);
 
     this.setupDragDropHandlers();
 
@@ -276,7 +282,7 @@ export class CardBattleScene extends BaseScene {
     
     if (!energyText) return;
 
-    return CardBattleEffects.animateEnergyIncrease(energyText);
+    return this.vfx.animateEnergyIncrease(energyText);
   }
 
   private async animateCardPlay(characterId: string, battleLogs?: CardBattleLog[]): Promise<void> {
@@ -292,12 +298,11 @@ export class CardBattleScene extends BaseScene {
     // Determine card group for animation style
     const cardGroup = this.getCardGroup(playCardLog.card);
 
-    // Animate complete skill sequence using CardBattleEffects
-    await CardBattleEffects.animateSkill(
+    // Animate complete skill sequence using vfx
+    await this.vfx.animateSkill(
       characterId,
       playCardLog.targets,
-      cardGroup,
-      (id: string) => this.findCharacterCard(id)
+      cardGroup
     );
   }
 
@@ -320,7 +325,8 @@ export class CardBattleScene extends BaseScene {
 
 
 
-  private findCharacterCard(characterId: string): Container | null {
+  // Public method to expose findCharacterCard functionality for CardBattleEffects
+  public findCharacterCard(characterId: string): Container | null {
     // Search in player 1 character zone
     const p1Card = this.p1CharacterZone.findCharacterCard(characterId);
     if (p1Card) return p1Card;
@@ -336,7 +342,7 @@ export class CardBattleScene extends BaseScene {
     const characterCard = this.findCharacterCard(characterId);
     if (!characterCard) return;
 
-    return CardBattleEffects.animateSimpleEffect(characterCard);
+    return this.vfx.animateSimpleEffect(characterCard);
   }
 
   // Helper method to update battle state from after_state in battle logs
