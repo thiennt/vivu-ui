@@ -1179,20 +1179,20 @@ export class CardBattleEffects {
    * Animate complete skill sequence: character performs skill + targets receive effects
    * Consolidates the animation logic for playing a card skill
    * 
+   * @param scene - Instance of CardBattleScene for accessing zones and finding characters
    * @param characterId - ID of the character performing the skill
    * @param targets - Array of targets affected by the skill
    * @param cardGroup - Type of skill effect (damage/healing/debuff/other)
-   * @param findCharacterCard - Callback function to find character card by ID
    * @returns Promise that resolves when all animations complete
    */
   static async animateSkill(
+    scene: { findCharacterCard: (id: string) => Container | null },
     characterId: string,
     targets: CardBattleLogTarget[] | undefined,
-    cardGroup: CardGroup,
-    findCharacterCard: (id: string) => Container | null
+    cardGroup: CardGroup
   ): Promise<void> {
     // 1. Animate character performing skill based on card group
-    const characterCard = findCharacterCard(characterId);
+    const characterCard = scene.findCharacterCard(characterId);
     if (characterCard) {
       await this.animateCharacterSkill(characterCard, cardGroup);
     }
@@ -1201,7 +1201,7 @@ export class CardBattleEffects {
     if (targets && targets.length > 0) {
       // Process all targets simultaneously for visual impact
       const targetAnimations = targets.map(target => {
-        const targetCard = findCharacterCard(target.id);
+        const targetCard = scene.findCharacterCard(target.id);
         if (!targetCard) return Promise.resolve();
         return this.applyTargetEffect(targetCard, target, cardGroup);
       });

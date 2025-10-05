@@ -8,8 +8,7 @@ import {
   TurnAction,
   BattlePhaseName,
   Card,
-  CardBattleLog,
-  CardBattleLogTarget
+  CardBattleLog
 } from '@/types';
 import { battleApi, ApiError } from '@/services/api';
 import { gsap } from 'gsap';
@@ -42,11 +41,52 @@ export class CardBattleScene extends BaseScene {
   // PLAYER 1 HAND ZONE (Skill Cards)
   // BUTTONS ZONE
 
-  private p2HandZone: HandZone;
-  private p2CharacterZone: PlayerCharacterZone;
-  private battleLogZone: BattleLogZone;
-  private p1CharacterZone: PlayerCharacterZone;
-  private p1HandZone: HandZone;
+  private _p2HandZone: HandZone;
+  private _p2CharacterZone: PlayerCharacterZone;
+  private _battleLogZone: BattleLogZone;
+  private _p1CharacterZone: PlayerCharacterZone;
+  private _p1HandZone: HandZone;
+
+  // Getters and setters for zones
+  get p2HandZone(): HandZone {
+    return this._p2HandZone;
+  }
+
+  set p2HandZone(value: HandZone) {
+    this._p2HandZone = value;
+  }
+
+  get p2CharacterZone(): PlayerCharacterZone {
+    return this._p2CharacterZone;
+  }
+
+  set p2CharacterZone(value: PlayerCharacterZone) {
+    this._p2CharacterZone = value;
+  }
+
+  get battleLogZone(): BattleLogZone {
+    return this._battleLogZone;
+  }
+
+  set battleLogZone(value: BattleLogZone) {
+    this._battleLogZone = value;
+  }
+
+  get p1CharacterZone(): PlayerCharacterZone {
+    return this._p1CharacterZone;
+  }
+
+  set p1CharacterZone(value: PlayerCharacterZone) {
+    this._p1CharacterZone = value;
+  }
+
+  get p1HandZone(): HandZone {
+    return this._p1HandZone;
+  }
+
+  set p1HandZone(value: HandZone) {
+    this._p1HandZone = value;
+  }
 
   constructor(params?: { battleId?: string }) {
     super();
@@ -57,20 +97,20 @@ export class CardBattleScene extends BaseScene {
     this.loadingManager = new LoadingStateManager(this, this.gameWidth, this.gameHeight);
 
     // Initialize all zones
-    this.p2HandZone = new HandZone({ playerNo: 2 });
-    this.addChild(this.p2HandZone);
+    this._p2HandZone = new HandZone({ playerNo: 2 });
+    this.addChild(this._p2HandZone);
 
-    this.p2CharacterZone = new PlayerCharacterZone({ playerNo: 2 });
-    this.addChild(this.p2CharacterZone);
+    this._p2CharacterZone = new PlayerCharacterZone({ playerNo: 2 });
+    this.addChild(this._p2CharacterZone);
 
-    this.battleLogZone = new BattleLogZone();
-    this.addChild(this.battleLogZone);
+    this._battleLogZone = new BattleLogZone();
+    this.addChild(this._battleLogZone);
 
-    this.p1CharacterZone = new PlayerCharacterZone({ playerNo: 1 });
-    this.addChild(this.p1CharacterZone);
+    this._p1CharacterZone = new PlayerCharacterZone({ playerNo: 1 });
+    this.addChild(this._p1CharacterZone);
 
-    this.p1HandZone = new HandZone({ playerNo: 1 });
-    this.addChild(this.p1HandZone);
+    this._p1HandZone = new HandZone({ playerNo: 1 });
+    this.addChild(this._p1HandZone);
 
     this.setupDragDropHandlers();
 
@@ -294,10 +334,10 @@ export class CardBattleScene extends BaseScene {
 
     // Animate complete skill sequence using CardBattleEffects
     await CardBattleEffects.animateSkill(
+      this,
       characterId,
       playCardLog.targets,
-      cardGroup,
-      (id: string) => this.findCharacterCard(id)
+      cardGroup
     );
   }
 
@@ -320,7 +360,8 @@ export class CardBattleScene extends BaseScene {
 
 
 
-  private findCharacterCard(characterId: string): Container | null {
+  // Public method to expose findCharacterCard functionality for CardBattleEffects
+  public findCharacterCard(characterId: string): Container | null {
     // Search in player 1 character zone
     const p1Card = this.p1CharacterZone.findCharacterCard(characterId);
     if (p1Card) return p1Card;
