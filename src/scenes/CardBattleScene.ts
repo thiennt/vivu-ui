@@ -41,52 +41,11 @@ export class CardBattleScene extends BaseScene {
   // PLAYER 1 HAND ZONE (Skill Cards)
   // BUTTONS ZONE
 
-  private _p2HandZone: HandZone;
-  private _p2CharacterZone: PlayerCharacterZone;
-  private _battleLogZone: BattleLogZone;
-  private _p1CharacterZone: PlayerCharacterZone;
-  private _p1HandZone: HandZone;
-
-  // Getters and setters for zones
-  get p2HandZone(): HandZone {
-    return this._p2HandZone;
-  }
-
-  set p2HandZone(value: HandZone) {
-    this._p2HandZone = value;
-  }
-
-  get p2CharacterZone(): PlayerCharacterZone {
-    return this._p2CharacterZone;
-  }
-
-  set p2CharacterZone(value: PlayerCharacterZone) {
-    this._p2CharacterZone = value;
-  }
-
-  get battleLogZone(): BattleLogZone {
-    return this._battleLogZone;
-  }
-
-  set battleLogZone(value: BattleLogZone) {
-    this._battleLogZone = value;
-  }
-
-  get p1CharacterZone(): PlayerCharacterZone {
-    return this._p1CharacterZone;
-  }
-
-  set p1CharacterZone(value: PlayerCharacterZone) {
-    this._p1CharacterZone = value;
-  }
-
-  get p1HandZone(): HandZone {
-    return this._p1HandZone;
-  }
-
-  set p1HandZone(value: HandZone) {
-    this._p1HandZone = value;
-  }
+  public p2HandZone: HandZone;
+  public p2CharacterZone: PlayerCharacterZone;
+  public battleLogZone: BattleLogZone;
+  public p1CharacterZone: PlayerCharacterZone;
+  public p1HandZone: HandZone;
 
   constructor(params?: { battleId?: string }) {
     super();
@@ -97,20 +56,20 @@ export class CardBattleScene extends BaseScene {
     this.loadingManager = new LoadingStateManager(this, this.gameWidth, this.gameHeight);
 
     // Initialize all zones
-    this._p2HandZone = new HandZone({ playerNo: 2 });
-    this.addChild(this._p2HandZone);
+    this.p2HandZone = new HandZone({ playerNo: 2 });
+    this.addChild(this.p2HandZone);
 
-    this._p2CharacterZone = new PlayerCharacterZone({ playerNo: 2 });
-    this.addChild(this._p2CharacterZone);
+    this.p2CharacterZone = new PlayerCharacterZone({ playerNo: 2 });
+    this.addChild(this.p2CharacterZone);
 
-    this._battleLogZone = new BattleLogZone();
-    this.addChild(this._battleLogZone);
+    this.battleLogZone = new BattleLogZone();
+    this.addChild(this.battleLogZone);
 
-    this._p1CharacterZone = new PlayerCharacterZone({ playerNo: 1 });
-    this.addChild(this._p1CharacterZone);
+    this.p1CharacterZone = new PlayerCharacterZone({ playerNo: 1 });
+    this.addChild(this.p1CharacterZone);
 
-    this._p1HandZone = new HandZone({ playerNo: 1 });
-    this.addChild(this._p1HandZone);
+    this.p1HandZone = new HandZone({ playerNo: 1 });
+    this.addChild(this.p1HandZone);
 
     this.setupDragDropHandlers();
 
