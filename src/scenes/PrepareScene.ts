@@ -139,12 +139,9 @@ export class PrepareScene extends BaseScene {
       const row = 0; // single row for lineup
       const col = index;
 
-      const charCard = this.createHeroCard(char, 0, 0, 'preview');
-      charCard.width = cardWidth;
-      charCard.height = cardHeight;
-
-      charCard.x = 20 + col * (cardWidth + spacing);
-      charCard.y = lineupTitle.height + 10 + row * (cardHeight + spacing);
+      const x = 20 + col * (cardWidth + spacing);
+      const y = lineupTitle.height + 10 + row * (cardHeight + spacing);
+      const charCard = this.createCharacterCard(char, x, y, cardWidth, cardHeight);
 
       lineupContainer.addChild(charCard);
     });
