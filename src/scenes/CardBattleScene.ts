@@ -47,6 +47,9 @@ export class CardBattleScene extends BaseScene {
   public p1CharacterZone: PlayerCharacterZone;
   public p1HandZone: HandZone;
 
+  // Visual effects handler
+  public readonly vfx: CardBattleEffects;
+
   constructor(params?: { battleId?: string }) {
     super();
 
@@ -70,6 +73,10 @@ export class CardBattleScene extends BaseScene {
 
     this.p1HandZone = new HandZone({ playerNo: 1 });
     this.addChild(this.p1HandZone);
+
+    // Initialize visual effects handler
+    this.vfx = new CardBattleEffects(this);
+    this.addChild(this.vfx);
 
     this.setupDragDropHandlers();
 
@@ -275,7 +282,7 @@ export class CardBattleScene extends BaseScene {
     
     if (!energyText) return;
 
-    return CardBattleEffects.animateEnergyIncrease(energyText);
+    return this.vfx.animateEnergyIncrease(energyText);
   }
 
   private async animateCardPlay(characterId: string, battleLogs?: CardBattleLog[]): Promise<void> {
@@ -291,9 +298,8 @@ export class CardBattleScene extends BaseScene {
     // Determine card group for animation style
     const cardGroup = this.getCardGroup(playCardLog.card);
 
-    // Animate complete skill sequence using CardBattleEffects
-    await CardBattleEffects.animateSkill(
-      this,
+    // Animate complete skill sequence using vfx
+    await this.vfx.animateSkill(
       characterId,
       playCardLog.targets,
       cardGroup
@@ -336,7 +342,7 @@ export class CardBattleScene extends BaseScene {
     const characterCard = this.findCharacterCard(characterId);
     if (!characterCard) return;
 
-    return CardBattleEffects.animateSimpleEffect(characterCard);
+    return this.vfx.animateSimpleEffect(characterCard);
   }
 
   // Helper method to update battle state from after_state in battle logs
