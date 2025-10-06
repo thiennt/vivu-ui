@@ -89,8 +89,8 @@ export class CardBattleScene extends BaseScene {
 
   private setupDragDropHandlers(): void {
     // Set up drag/drop callbacks for player 1 hand (only player 1 can drag cards)
-    this.p1HandZone.setCardDropCallback((card: Card, dropTarget: string) => {
-      this.handleCardDrop(card, dropTarget);
+    this.p1HandZone.setCardDropCallback((card: Card, dropTarget: string, cardPosition?: number) => {
+      this.handleCardDrop(card, dropTarget, cardPosition);
     });
 
     // Set up discard highlighting callbacks
@@ -131,7 +131,7 @@ export class CardBattleScene extends BaseScene {
     return null;
   }
 
-  private async handleCardDrop(card: Card, dropTarget: string): Promise<void> {
+  private async handleCardDrop(card: Card, dropTarget: string, cardPosition?: number): Promise<void> {
     if (!this.battleState) return;
     
     // Prevent actions if not interactable
@@ -144,10 +144,10 @@ export class CardBattleScene extends BaseScene {
     try {
       if (dropTarget === 'discard') {
         // Discard card for energy
-        await this.discardCardForEnergy(card);
+        await this.discardCardForEnergy(card, cardPosition);
       } else if (dropTarget.startsWith('character:')) {
         const characterId = dropTarget.replace('character:', '');
-        await this.playCardOnCharacter(card, characterId);
+        await this.playCardOnCharacter(card, characterId, cardPosition);
       }
     } catch (error) {
       console.error('Error handling card drop:', error);
@@ -156,7 +156,7 @@ export class CardBattleScene extends BaseScene {
     this.enablePlayerUI();
   }
 
-  private async discardCardForEnergy(card: Card): Promise<void> {
+  private async discardCardForEnergy(card: Card, cardPosition?: number): Promise<void> {
     if (!this.battleState) return;
 
     // Store previous energy count for animation
@@ -166,7 +166,8 @@ export class CardBattleScene extends BaseScene {
     const turnAction: TurnAction = {
       type: 'discard_card',
       player_team: this.battleState.current_player,
-      card_id: card.id
+      card_id: card.id,
+      card_position: cardPosition
     };
 
     try {
@@ -208,14 +209,15 @@ export class CardBattleScene extends BaseScene {
     }
   }
 
-  private async playCardOnCharacter(card: Card, characterId: string): Promise<void> {
+  private async playCardOnCharacter(card: Card, characterId: string, cardPosition?: number): Promise<void> {
     if (!this.battleState) return;
 
     const turnAction: TurnAction = {
       type: 'play_card',
       player_team: this.battleState.current_player,
       card_id: card.id,
-      character_id: characterId
+      character_id: characterId,
+      card_position: cardPosition
     };
 
     try {
