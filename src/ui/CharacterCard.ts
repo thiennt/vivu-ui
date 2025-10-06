@@ -9,198 +9,233 @@ const defaultCharacterCardOptions = {
 
 export type CharacterCardOptions = typeof defaultCharacterCardOptions;
 
-/**
- * A character card with stats, HP bar, and avatar
- */
 export class CharacterCard extends Container {
   public character: any;
 
   constructor(character: any, options: Partial<CharacterCardOptions> = {}) {
     super();
-    
+
     const opts = { ...defaultCharacterCardOptions, ...options };
     this.character = character;
     const { width, height } = opts;
 
-    // Enhanced character card background with trading card appearance
-    const bg = new Graphics();
-    
-    // Card shadow for depth
-    bg.roundRect(3, 3, width, height, 8)
-      .fill({ color: Colors.SHADOW_COLOR, alpha: 0.4 });
-    
-    // Get rarity color for background
-    const rarityColors: { [key: string]: string } = {
-      common: Colors.RARITY_COMMON,
-      uncommon: Colors.RARITY_UNCOMMON,
-      rare: Colors.RARITY_RARE,
-      epic: Colors.RARITY_EPIC,
-      legendary: Colors.RARITY_LEGENDARY
+    // 1. Art Deco metallic frame with geometric accents
+    const frame = new Graphics();
+    // Outer metallic frame (gold for legendary, silver for epic, bronze for rare, etc.)
+    const rarityMetal: Record<string, number> = {
+      legendary: 0xFFD700, // gold
+      epic: 0xC0C0C0,      // silver
+      rare: 0xCD7F32,      // bronze
+      uncommon: 0x7FFFD4,  // aquamarine
+      common: 0xB0B0B0     // gray
     };
-    const rarityColor = rarityColors[character.rarity] || rarityColors.common;
-    
-    // Main card background
-    bg.roundRect(0, 0, width, height, 8)
-      .fill(rarityColor)
-      .stroke({ width: 2, color: Colors.CARD_BORDER });
-    
-    // Inner card frame
-    bg.roundRect(3, 3, width - 6, height - 6, 5)
-      .stroke({ width: 1, color: Colors.TEXT_WHITE, alpha: 0.4 });
+    const frameColor = rarityMetal[character.rarity] || rarityMetal.common;
+    frame.roundRect(0, 0, width, height, 12);
+    frame.stroke({ width: 4, color: frameColor, alpha: 0.95 });
 
+    // Art Deco geometric corner accents
+    for (const [x, y] of [
+      [8, 8], [width - 8, 8], [8, height - 8], [width - 8, height - 8]
+    ]) {
+      frame.rect(x - 4, y - 4, 8, 8);
+      frame.stroke({ width: 2, color: frameColor, alpha: 0.5 });
+    }
+    this.addChild(frame);
+
+    // 2. Deep gradient background with subtle Art Deco pattern
+    const bg = new Graphics();
+    // Simulate a vertical gradient (Pixi v8: use a solid for now, or use a gradient texture for full effect)
+    const decoBgColor = 0x1a2337; // deep blue
+    bg.roundRect(4, 4, width - 8, height - 8, 8);
+    bg.fill({ color: decoBgColor, alpha: 1 });
+
+    // Subtle Art Deco pattern overlay (diagonal lines)
+    for (let i = 0; i < width; i += 12) {
+      bg.moveTo(4 + i, 4);
+      bg.lineTo(4, 4 + i);
+      bg.stroke({ width: 1, color: 0xffffff, alpha: 0.04 });
+    }
     this.addChild(bg);
 
-    // ATK in top-left corner
+    // 3. Avatar in a metallic circle with gradient
+    const avatarCircle = new Graphics();
+    const avatarRadius = width * 0.28;
+    avatarCircle.circle(width / 2, height / 2 - 8, avatarRadius);
+    avatarCircle.fill({ color: 0x222a38, alpha: 1 });
+    avatarCircle.stroke({ width: 3, color: frameColor, alpha: 0.7 });
+    this.addChild(avatarCircle);
+
+    this.loadAvatar(character, width, height);
+
+    // 4. Stats in geometric medallions (top corners)
+    const statBgColor = 0x222a38;
+    const statTextColor = frameColor;
+    // ATK (top-left, hexagon)
+    const atkMedallion = new Graphics();
+    this.drawHexagon(atkMedallion, 18, 18, 13);
+    atkMedallion.fill({ color: statBgColor, alpha: 1 });
+    atkMedallion.stroke({ width: 2, color: frameColor, alpha: 0.7 });
+    this.addChild(atkMedallion);
+
     const atkText = new Text({
-      text: `⚔️ \n ${character.atk}`,
+      text: `${character.atk}222`,
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Merriweather, serif',
         fontSize: 13,
         fontWeight: 'bold',
-        fill: Colors.TEXT_WHITE
+        fill: statTextColor,
+        align: 'center'
       }
     });
-    atkText.anchor.set(0, 0);
-    atkText.x = 5;
-    atkText.y = 5;
+    atkText.anchor.set(0.5);
+    atkText.x = 18;
+    atkText.y = 18;
+    this.addChild(atkText);
 
-    // DEF in top-right corner
+    // DEF (top-right, octagon)
+    const defMedallion = new Graphics();
+    this.drawOctagon(defMedallion, width - 18, 18, 13);
+    defMedallion.fill({ color: statBgColor, alpha: 1 });
+    defMedallion.stroke({ width: 2, color: frameColor, alpha: 0.7 });
+    this.addChild(defMedallion);
+
     const defText = new Text({
-      text: `🛡️ \n ${character.def}`,
+      text: `${character.def}`,
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Merriweather, serif',
         fontSize: 13,
         fontWeight: 'bold',
-        fill: Colors.TEXT_WHITE
+        fill: statTextColor,
+        align: 'center'
       }
     });
-    defText.anchor.set(1, 0);
-    defText.x = width - 5;
-    defText.y = 5;
+    defText.anchor.set(0.5);
+    defText.x = width - 18;
+    defText.y = 18;
+    this.addChild(defText);
 
-    this.addChild(atkText, defText);
+    // 5. Sleek HP/Energy bars with metallic borders and deco caps
+    const barWidth = width * 0.82;
+    const barHeight = 7;
+    const barX = (width - barWidth) / 2;
+    const hpBarY = height - 22;
+    const energyBarY = height - 12;
 
-    // HP Bar at the bottom
-    const hpBarWidth = width * 0.9;
-    const hpBarHeight = 6;
-    const hpBarX = (width - hpBarWidth) / 2;
-    const hpBarY = height - 18;
+    // HP metallic border
+    const hpBarBorder = new Graphics();
+    hpBarBorder.roundRect(barX - 2, hpBarY - 2, barWidth + 4, barHeight + 4, 4);
+    hpBarBorder.stroke({ width: 2, color: frameColor, alpha: 0.7 });
+    this.addChild(hpBarBorder);
 
-    // HP Bar background
-    const hpBarBg = new Graphics()
-      .roundRect(hpBarX, hpBarY, hpBarWidth, hpBarHeight, 3)
-      .fill(Colors.HP_BAR_BG);
-
-    // HP Bar foreground
+    // HP bar
     const hpPercent = Math.max(0, Math.min(1, character.hp / (character.max_hp || character.hp || 1)));
-    const hpBarFg = new Graphics()
-      .roundRect(hpBarX, hpBarY, hpBarWidth * hpPercent, hpBarHeight, 3)
-      .fill(Colors.HP_BAR_FILL);
+    const hpBar = new Graphics();
+    hpBar.roundRect(barX, hpBarY, barWidth * hpPercent, barHeight, 3);
+    hpBar.fill({ color: 0xE53935, alpha: 0.95 });
+    this.addChild(hpBar);
 
-    this.addChild(hpBarBg, hpBarFg);
+    // HP deco caps
+    const hpCapL = new Graphics();
+    hpCapL.roundRect(barX - 6, hpBarY - 2, 4, barHeight + 4, 2);
+    hpCapL.fill({ color: frameColor, alpha: 0.8 });
+    this.addChild(hpCapL);
+    const hpCapR = new Graphics();
+    hpCapR.roundRect(barX + barWidth + 2, hpBarY - 2, 4, barHeight + 4, 2);
+    hpCapR.fill({ color: frameColor, alpha: 0.8 });
+    this.addChild(hpCapR);
 
-    // Energy Bar at the bottom (below HP bar)
-    const energyBarWidth = width * 0.9;
-    const energyBarHeight = 6;
-    const energyBarX = (width - energyBarWidth) / 2;
-    const energyBarY = height - 10;
+    // Energy metallic border
+    const energyBarBorder = new Graphics();
+    energyBarBorder.roundRect(barX - 2, energyBarY - 2, barWidth + 4, barHeight + 4, 4);
+    energyBarBorder.stroke({ width: 2, color: frameColor, alpha: 0.7 });
+    this.addChild(energyBarBorder);
 
-    // Energy Bar background
-    const energyBarBg = new Graphics()
-      .roundRect(energyBarX, energyBarY, energyBarWidth, energyBarHeight, 3)
-      .fill(Colors.BACKGROUND_SECONDARY);
-
-    // Energy Bar foreground
+    // Energy bar
     const maxEnergy = character.max_energy || 100;
     const currentEnergy = character.current_energy || character.energy || 0;
     const energyPercent = Math.max(0, Math.min(1, currentEnergy / maxEnergy));
-    const energyBarFg = new Graphics()
-      .roundRect(energyBarX, energyBarY, energyBarWidth * energyPercent, energyBarHeight, 3)
-      .fill(0x2196f3);
+    const energyBar = new Graphics();
+    energyBar.roundRect(barX, energyBarY, barWidth * energyPercent, barHeight, 3);
+    energyBar.fill({ color: 0x00B8D4, alpha: 0.95 });
+    this.addChild(energyBar);
 
-    this.addChild(energyBarBg, energyBarFg);
+    // Energy deco caps
+    const energyCapL = new Graphics();
+    energyCapL.roundRect(barX - 6, energyBarY - 2, 4, barHeight + 4, 2);
+    energyCapL.fill({ color: frameColor, alpha: 0.8 });
+    this.addChild(energyCapL);
+    const energyCapR = new Graphics();
+    energyCapR.roundRect(barX + barWidth + 2, energyBarY - 2, 4, barHeight + 4, 2);
+    energyCapR.fill({ color: frameColor, alpha: 0.8 });
+    this.addChild(energyCapR);
 
-    // Apply visual effect for defeated characters (hp === 0)
+    // 6. Defeated or acted overlay
     if (character.hp === 0) {
-      this.alpha = 0.5; // Make defeated characters semi-transparent
-      
-      // Add "DEFEATED" overlay
+      this.alpha = 0.5;
       const defeatedOverlay = new Graphics();
-      defeatedOverlay.roundRect(0, 0, width, height, 8)
-        .fill({ color: 0x000000, alpha: 0.6 });
-      
+      defeatedOverlay.roundRect(0, 0, width, height, 12);
+      defeatedOverlay.fill({ color: 0x000000, alpha: 0.6 });
       const defeatedText = new Text({
         text: 'DEFEATED',
         style: {
-          fontFamily: 'Kalam',
+          fontFamily: 'Merriweather, serif',
           fontSize: Math.max(10, Math.min(14, width * 0.12)),
           fontWeight: 'bold',
-          fill: 0xff4444,
+          fill: 0xffd700,
           align: 'center'
         }
       });
       defeatedText.anchor.set(0.5);
       defeatedText.x = width / 2;
       defeatedText.y = height / 2;
-      
       this.addChild(defeatedOverlay, defeatedText);
     } else if (character.has_acted) {
-      // Apply visual effect if character has acted this turn
       this.alpha = 0.5;
-      // Add a grayscale/desaturated effect by overlaying a gray tint
       const overlay = new Graphics();
-      overlay.roundRect(0, 0, width, height, 8)
-        .fill({ color: 0x000000, alpha: 0.3 });
+      overlay.roundRect(0, 0, width, height, 12);
+      overlay.fill({ color: 0x000000, alpha: 0.3 });
       this.addChild(overlay);
     }
-
-    // Add avatar/logo if needed
-    this.loadAvatar(character, width, height);
   }
 
   private async loadAvatar(character: any, width: number, height: number) {
     try {
       const avatarTexture = await Assets.load(character?.avatar_url || 'https://pixijs.com/assets/bunny.png');
       const avatarIcon = new Sprite(avatarTexture);
-      
-      // Calculate avatar size based on card dimensions
-      avatarIcon.width = width * 0.5;
-      avatarIcon.height = height * 0.5;
+      avatarIcon.width = width * 0.44;
+      avatarIcon.height = height * 0.44;
       avatarIcon.anchor.set(0.5);
       avatarIcon.x = width / 2;
-      avatarIcon.y = height / 2;
-      
+      avatarIcon.y = height / 2 - 8;
       this.addChild(avatarIcon);
+
+      // Metallic sheen overlay (ellipse)
+      const sheen = new Graphics();
+      sheen.ellipse(width / 2, height / 2 - 18, width * 0.18, 8);
+      sheen.fill({ color: 0xffffff, alpha: 0.13 });
+      //this.addChild(sheen);
     } catch (error) {
       console.warn('Failed to load avatar:', error);
     }
   }
 
-  /** Show the card with optional animation */
-  public async show(animated = true) {
-    gsap.killTweensOf(this);
-    this.visible = true;
-    if (animated) {
-      this.alpha = 0;
-      this.scale.set(0.5);
-      await gsap.to(this, { alpha: 1, duration: 0.3, ease: 'power2.out' });
-      await gsap.to(this.scale, { x: 1, y: 1, duration: 0.3, ease: 'back.out' });
-    } else {
-      this.alpha = 1;
-      this.scale.set(1);
+  // Draw a regular hexagon centered at (cx, cy) with radius r
+  private drawHexagon(g: Graphics, cx: number, cy: number, r: number) {
+    g.moveTo(cx + r, cy);
+    for (let i = 1; i <= 6; i++) {
+      const angle = Math.PI / 3 * i;
+      g.lineTo(cx + r * Math.cos(angle), cy + r * Math.sin(angle));
     }
+    g.closePath();
   }
 
-  /** Hide the card with optional animation */
-  public async hide(animated = true) {
-    gsap.killTweensOf(this);
-    if (animated) {
-      await gsap.to(this.scale, { x: 0.5, y: 0.5, duration: 0.2, ease: 'back.in' });
-      await gsap.to(this, { alpha: 0, duration: 0.2, ease: 'power2.in' });
-    } else {
-      this.alpha = 0;
-      this.scale.set(0.5);
+  // Draw a regular octagon centered at (cx, cy) with radius r
+  private drawOctagon(g: Graphics, cx: number, cy: number, r: number) {
+    g.moveTo(cx + r, cy);
+    for (let i = 1; i <= 8; i++) {
+      const angle = Math.PI / 4 * i;
+      g.lineTo(cx + r * Math.cos(angle), cy + r * Math.sin(angle));
     }
-    this.visible = false;
+    g.closePath();
   }
 }
