@@ -431,6 +431,7 @@ export interface TurnAction {
   character_id?: string;
   target_ids?: string[];
   action_data?: any;
+  card_position?: number; // position in hand for draw/discard
 }
 
 // Standardized API response format for CardBattle APIs
