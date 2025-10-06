@@ -168,6 +168,7 @@ export interface Card {
   energy_cost: number;
   rarity?: string;
   actions?: unknown[]; // Define specific actions/effects of the card
+  position?: number; // position in hand or deck
 }
 
 export interface BattleCard {

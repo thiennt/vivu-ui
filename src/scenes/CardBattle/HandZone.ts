@@ -130,6 +130,7 @@ export class HandZone extends Container {
         : this.createHandCard(cardInDeck.card!, cardWidth, cardHeight);
       handCard.x = x;
       handCard.y = cardY;
+      (handCard as Container & { card: Card, cardPosition?: number }).cardPosition = cardInDeck.position;
       this.handBg.addChild(handCard);
       this.handCards.push(handCard);
     });
@@ -320,7 +321,7 @@ export class HandZone extends Container {
     const card = (this.dragTarget as Container & { card: Card }).card;
 
     // Find the position of this card in the hand
-    const cardPosition = this.handCards.indexOf(this.dragTarget);
+    const cardPosition = (this.dragTarget as Container & { cardPosition?: number }).cardPosition ?? 0;
 
     // Hide card tooltip
     this.hideCardTooltip();
