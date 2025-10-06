@@ -1,6 +1,7 @@
 import { Assets, Container, Graphics, Sprite, Text } from 'pixi.js';
 import { Colors } from '@/utils/colors';
 import { gsap } from 'gsap';
+import { createEffectIconRow } from '@/utils/effectIcons';
 
 const defaultCharacterCardOptions = {
   width: 100,
@@ -168,6 +169,22 @@ export class CharacterCard extends Container {
     energyCapR.roundRect(barX + barWidth + 2, energyBarY - 2, 4, barHeight + 4, 2);
     energyCapR.fill({ color: frameColor, alpha: 0.8 });
     this.addChild(energyCapR);
+
+    // 5.5. Active effect icons above HP bar
+    if (character.active_effects && character.active_effects.length > 0) {
+      const iconSize = 16;
+      const effectIcons = createEffectIconRow(
+        character.active_effects,
+        5, // max icons to show
+        iconSize,
+        3 // spacing
+      );
+      
+      // Position above HP bar, centered
+      effectIcons.x = (width - effectIcons.width) / 2;
+      effectIcons.y = hpBarY - iconSize - 4;
+      this.addChild(effectIcons);
+    }
 
     // 6. Defeated or acted overlay
     if (character.hp === 0) {

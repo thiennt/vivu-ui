@@ -474,36 +474,108 @@ export class CardBattleEffects extends Container {
     target: CardBattleLogTarget,
     cardGroup: CardGroup = 'other'
   ): Promise<void> {
-    // Extract impact types from impacts
-    const damageImpact = target.impacts?.find(impact => impact.type === 'damage');
-    const healImpact = target.impacts?.find(impact => impact.type === 'heal');
-    const effectImpact = target.impacts?.find(impact => impact.type === 'effect');
-    const statusImpact = target.impacts?.find(impact => impact.type === 'status');
+    // Handle all impacts sequentially for better visual feedback
+    if (!target.impacts || target.impacts.length === 0) {
+      // No impacts, apply default effect based on card group
+      return this.applyCardGroupEffect(targetCard, cardGroup);
+    }
+
+    // Process all impacts
+    const impactAnimations: Promise<void>[] = [];
     
-    const damage = typeof damageImpact?.value === 'number' ? damageImpact.value : 0;
-    const healing = typeof healImpact?.value === 'number' ? healImpact.value : 0;
-    const isCritical = (damageImpact?.meta as { isCritical?: boolean })?.isCritical || false;
+    for (const impact of target.impacts) {
+      switch (impact.type) {
+        case 'damage': {
+          const damage = typeof impact.value === 'number' ? impact.value : 0;
+          const isCritical = (impact.meta as { isCritical?: boolean })?.isCritical || false;
+          
+          impactAnimations.push(
+            new Promise((resolve) => {
+              const timeline = gsap.timeline({ onComplete: resolve });
+              this.applyDamageEffect(targetCard, timeline, damage, isCritical);
+              if (damage > 0) {
+                this.showFloatingDamage(targetCard, damage, isCritical);
+              }
+            })
+          );
+          break;
+        }
+        
+        case 'heal': {
+          const healing = typeof impact.value === 'number' ? impact.value : 0;
+          
+          impactAnimations.push(
+            new Promise((resolve) => {
+              const timeline = gsap.timeline({ onComplete: resolve });
+              this.applyHealingEffect(targetCard, timeline);
+              if (healing > 0) {
+                this.showFloatingHealing(targetCard, healing);
+              }
+            })
+          );
+          break;
+        }
+        
+        case 'effect':
+        case 'status': {
+          const isDebuff = cardGroup === 'debuff';
+          
+          impactAnimations.push(
+            new Promise((resolve) => {
+              const timeline = gsap.timeline({ onComplete: resolve });
+              this.applyDebuffEffect(targetCard, timeline, isDebuff);
+            })
+          );
+          break;
+        }
+        
+        case 'energy': {
+          // Energy change - show visual feedback
+          const energyChange = typeof impact.value === 'number' ? impact.value : 0;
+          if (energyChange !== 0) {
+            impactAnimations.push(this.showFloatingEnergy(targetCard, energyChange));
+          }
+          break;
+        }
+        
+        default: {
+          // Unknown impact type - apply default effect
+          impactAnimations.push(
+            new Promise((resolve) => {
+              const timeline = gsap.timeline({ onComplete: resolve });
+              this.applyDefaultEffect(targetCard, timeline);
+            })
+          );
+        }
+      }
+    }
+    
+    // Play all impact animations in parallel for simultaneous visual impact
+    await Promise.all(impactAnimations);
+  }
 
+  /**
+   * Apply effect based on card group when no specific impacts are provided
+   */
+  private async applyCardGroupEffect(
+    targetCard: Container,
+    cardGroup: CardGroup
+  ): Promise<void> {
     return new Promise((resolve) => {
-      const timeline = gsap.timeline({
-        onComplete: resolve
-      });
-
-      if (cardGroup === 'damage' || damage > 0) {
-        this.applyDamageEffect(targetCard, timeline, damage, isCritical);
-        if (damage > 0) {
-          this.showFloatingDamage(targetCard, damage, isCritical);
-        }
-      } else if (cardGroup === 'healing' || healing > 0) {
-        this.applyHealingEffect(targetCard, timeline);
-        if (healing > 0) {
-          this.showFloatingHealing(targetCard, healing);
-        }
-      } else if (cardGroup === 'debuff' || effectImpact || statusImpact) {
-        const isDebuff = cardGroup === 'debuff';
-        this.applyDebuffEffect(targetCard, timeline, isDebuff);
-      } else {
-        this.applyDefaultEffect(targetCard, timeline);
+      const timeline = gsap.timeline({ onComplete: resolve });
+      
+      switch (cardGroup) {
+        case 'damage':
+          this.applyDamageEffect(targetCard, timeline, 0, false);
+          break;
+        case 'healing':
+          this.applyHealingEffect(targetCard, timeline);
+          break;
+        case 'debuff':
+          this.applyDebuffEffect(targetCard, timeline, true);
+          break;
+        default:
+          this.applyDefaultEffect(targetCard, timeline);
       }
     });
   }
@@ -880,6 +952,52 @@ export class CardBattleEffects extends Container {
           healingText.destroy();
         }
       });
+  }
+
+  /**
+   * Show floating energy change
+   */
+  public async showFloatingEnergy(targetCard: Container, energyChange: number): Promise<void> {
+    const energyText = new Text({
+      text: energyChange > 0 ? `+${energyChange} ⚡` : `${energyChange} ⚡`,
+      style: {
+        fontFamily: 'Arial',
+        fontSize: 16,
+        fill: energyChange > 0 ? Colors.ENERGY_TEXT : Colors.ERROR,
+        fontWeight: 'bold',
+        stroke: { color: Colors.EFFECT_STROKE_BLACK, width: 2 }
+      }
+    });
+
+    energyText.x = targetCard.width / 2;
+    energyText.y = targetCard.height / 2 - 20;
+
+    energyText.anchor.set(0.5);
+    energyText.alpha = 0;
+
+    targetCard.addChild(energyText);
+
+    return new Promise((resolve) => {
+      gsap.timeline({
+        onComplete: () => {
+          energyText.destroy();
+          resolve();
+        }
+      })
+        .to(energyText, {
+          duration: 0.2,
+          alpha: 1,
+          y: energyText.y - 15,
+          scale: 1.1,
+          ease: 'power2.out'
+        })
+        .to(energyText, {
+          duration: 0.7,
+          alpha: 0,
+          y: energyText.y - 35,
+          ease: 'power2.in'
+        });
+    });
   }
 
   /**
