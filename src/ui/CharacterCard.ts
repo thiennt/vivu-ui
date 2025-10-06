@@ -78,11 +78,15 @@ export class CharacterCard extends Container {
     atkMedallion.stroke({ width: 2, color: frameColor, alpha: 0.7 });
     this.addChild(atkMedallion);
 
+    // Calculate font size based on digit count to prevent overflow
+    const atkDigits = String(character.atk).length;
+    const atkFontSize = this.calculateStatFontSize(atkDigits);
+    
     const atkText = new Text({
       text: `${character.atk}`,
       style: {
         fontFamily: 'Merriweather, serif',
-        fontSize: 13,
+        fontSize: atkFontSize,
         fontWeight: 'bold',
         fill: statTextColor,
         align: 'center'
@@ -100,11 +104,15 @@ export class CharacterCard extends Container {
     defMedallion.stroke({ width: 2, color: frameColor, alpha: 0.7 });
     this.addChild(defMedallion);
 
+    // Calculate font size based on digit count to prevent overflow
+    const defDigits = String(character.def).length;
+    const defFontSize = this.calculateStatFontSize(defDigits);
+    
     const defText = new Text({
       text: `${character.def}`,
       style: {
         fontFamily: 'Merriweather, serif',
-        fontSize: 13,
+        fontSize: defFontSize,
         fontWeight: 'bold',
         fill: statTextColor,
         align: 'center'
@@ -234,6 +242,16 @@ export class CharacterCard extends Container {
     } catch (error) {
       console.warn('Failed to load avatar:', error);
     }
+  }
+
+  // Calculate font size based on digit count to prevent overflow in stat medallions
+  private calculateStatFontSize(digitCount: number): number {
+    // Base font size for 4 digits or less
+    if (digitCount <= 4) return 13;
+    // Scale down for 5 digits
+    if (digitCount === 5) return 10;
+    // Scale down further for 6+ digits
+    return 8;
   }
 
   // Draw a regular hexagon centered at (cx, cy) with radius r
