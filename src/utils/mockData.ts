@@ -278,6 +278,26 @@ export const mockPlayer = {
   "points": 0,
   "characters": [
     {
+      "id": "test-large-stats-character",
+      "name": "Test Large Stats",
+      "code": "TEST",
+      "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/1.png",
+      "hp": 99999,
+      "atk": 123456,
+      "def": 98765,
+      "agi": 5000
+    },
+    {
+      "id": "test-5digit-stats-character",
+      "name": "Test 5 Digits",
+      "code": "TST5",
+      "avatar_url": "https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png",
+      "hp": 50000,
+      "atk": 12345,
+      "def": 10000,
+      "agi": 5000
+    },
+    {
       "id": "888be80b-0d34-459d-8337-125c3183d4d7",
       "name": "Bitcoin",
       "code": "BTC",
