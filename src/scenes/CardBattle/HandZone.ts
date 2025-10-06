@@ -20,7 +20,7 @@ export class HandZone extends Container {
   // Drag/drop state
   private dragTarget: Container | null = null;
   private dragOffset = { x: 0, y: 0 };
-  private onCardDropCallback?: (card: Card, dropTarget: string) => void;
+  private onCardDropCallback?: (card: Card, dropTarget: string, cardPosition?: number) => void;
   private onDragEnterDiscardCallback?: () => void;
   private onDragLeaveDiscardCallback?: () => void;
   private onCharacterHoverCallback?: (globalX: number, globalY: number, isDragging: boolean) => void;
@@ -175,7 +175,7 @@ export class HandZone extends Container {
     this.endTurnButton.addChild(endTurnButton);
   }
 
-  setCardDropCallback(callback: (card: Card, dropTarget: string) => void): void {
+  setCardDropCallback(callback: (card: Card, dropTarget: string, cardPosition?: number) => void): void {
     this.onCardDropCallback = callback;
   }
 
@@ -319,6 +319,9 @@ export class HandZone extends Container {
 
     const card = (this.dragTarget as Container & { card: Card }).card;
 
+    // Find the position of this card in the hand
+    const cardPosition = this.handCards.indexOf(this.dragTarget);
+
     // Hide card tooltip
     this.hideCardTooltip();
 
@@ -342,7 +345,7 @@ export class HandZone extends Container {
     app.stage.off('pointermove', this.onCardDragMove, this);
 
     if (dropTarget && this.onCardDropCallback) {
-      this.onCardDropCallback(card, dropTarget);
+      this.onCardDropCallback(card, dropTarget, cardPosition >= 0 ? cardPosition : undefined);
     } else {
       // Return card to hand
       this.returnCardToHand(this.dragTarget);
