@@ -22,7 +22,7 @@ export class ErrorPopup extends Container {
     // Create semi-transparent background
     this.dialogBg = new Graphics();
     this.dialogBg.rect(0, 0, this.gameWidth, this.gameHeight)
-      .fill({ color: 0x000000, alpha: 0.7 });
+      .fill({ color: Colors.OVERLAY_DARK, alpha: 0.7 });
     
     const dialogWidth = Math.min(400, this.gameWidth - 40);
     const dialogHeight = 200;
@@ -33,7 +33,7 @@ export class ErrorPopup extends Container {
     this.dialogPanel = new Graphics();
     this.dialogPanel.roundRect(dialogX, dialogY, dialogWidth, dialogHeight, 10)
       .fill({ color: Colors.BACKGROUND_SECONDARY, alpha: 0.95 })
-      .stroke({ width: 3, color: 0xff4444 });
+      .stroke({ width: 3, color: Colors.MODAL_BORDER });
 
     // Error title
     const errorTitle = new Text({
@@ -42,7 +42,7 @@ export class ErrorPopup extends Container {
         fontFamily: 'Kalam',
         fontSize: 24,
         fontWeight: 'bold',
-        fill: 0xff4444,
+        fill: Colors.MODAL_BORDER,
         align: 'center'
       }
     });

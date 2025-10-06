@@ -38,7 +38,7 @@ export class LoadingStateManager {
     // Semi-transparent background
     const bg = new Graphics();
     bg.rect(0, 0, this.gameWidth, this.gameHeight);
-    bg.fill({ color: 0x000000, alpha: 0.7 });
+    bg.fill({ color: Colors.OVERLAY_DARK, alpha: 0.7 });
     this.loadingContainer.addChild(bg);
 
     // Loading spinner background
@@ -74,7 +74,7 @@ export class LoadingStateManager {
     // Semi-transparent background
     const bg = new Graphics();
     bg.rect(0, 0, this.gameWidth, this.gameHeight);
-    bg.fill({ color: 0x000000, alpha: 0.7 });
+    bg.fill({ color: Colors.OVERLAY_DARK, alpha: 0.7 });
     this.errorContainer.addChild(bg);
 
     // Error panel
@@ -83,7 +83,7 @@ export class LoadingStateManager {
     const panelHeight = 200;
     panel.roundRect(0, 0, panelWidth, panelHeight, 10);
     panel.fill({ color: Colors.BACKGROUND_SECONDARY, alpha: 0.95 });
-    panel.stroke({ width: 3, color: 0xff4444 });
+    panel.stroke({ width: 3, color: Colors.MODAL_BORDER });
     panel.x = (this.gameWidth - panelWidth) / 2;
     panel.y = (this.gameHeight - panelHeight) / 2;
     this.errorContainer.addChild(panel);
@@ -95,7 +95,7 @@ export class LoadingStateManager {
         fontFamily: 'Kalam',
         fontSize: 24,
         fontWeight: 'bold',
-        fill: 0xff4444,
+        fill: Colors.MODAL_BORDER,
         align: 'center'
       }
     });
@@ -168,8 +168,8 @@ export class LoadingStateManager {
     // Background
     const bg = new Graphics();
     bg.roundRect(0, 0, 120, 30, 5);
-    bg.fill({ color: 0x444444, alpha: 0.8 });
-    bg.stroke({ width: 1, color: 0xFFAA00 });
+    bg.fill({ color: Colors.EMPTY_SLOT, alpha: 0.8 });
+    bg.stroke({ width: 1, color: Colors.GLOW_COLOR });
     indicator.addChild(bg);
 
     // Text
@@ -178,7 +178,7 @@ export class LoadingStateManager {
       style: {
         fontFamily: 'Kalam',
         fontSize: 12,
-        fill: 0xFFAA00,
+        fill: Colors.GLOW_COLOR,
         align: 'center'
       }
     });

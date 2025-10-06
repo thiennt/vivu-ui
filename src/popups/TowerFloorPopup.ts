@@ -24,7 +24,7 @@ export class TowerFloorPopup extends Container {
     // Create semi-transparent background
     this.dialogBg = new Graphics();
     this.dialogBg.rect(0, 0, this.gameWidth, this.gameHeight)
-      .fill({ color: 0x000000, alpha: 0.7 });
+      .fill({ color: Colors.OVERLAY_DARK, alpha: 0.7 });
     
     const dialogWidth = Math.min(500, this.gameWidth - 40);
     const dialogHeight = Math.min(600, this.gameHeight - 40);
@@ -303,10 +303,10 @@ export class TowerFloorPopup extends Container {
     
     // Add hover effect
     button.on('pointerover', () => {
-      bg.tint = 0xcccccc;
+      bg.tint = Colors.HOVER_TINT;
     });
     button.on('pointerout', () => {
-      bg.tint = 0xffffff;
+      bg.tint = Colors.ACTIVE_WHITE;
     });
     
     return button;

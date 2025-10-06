@@ -157,11 +157,11 @@ export class DeckCard extends Container {
 
       if (enableHover) {
         this.on('pointerover', () => {
-          this.bg.tint = 0xcccccc;
+          this.bg.tint = Colors.HOVER_TINT;
         });
 
         this.on('pointerout', () => {
-          this.bg.tint = 0xffffff;
+          this.bg.tint = Colors.ACTIVE_WHITE;
         });
       }
 

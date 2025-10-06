@@ -460,7 +460,7 @@ export class CardBattleScene extends BaseScene {
         if (logs.length > 0 && logs[0].drawn_cards) {
           const drawnCards = logs[0].drawn_cards;
           if (this.battleState.current_player === 1) {
-            this.battleLogZone.showNotification(`Drew ${drawnCards.length} card${drawnCards.length !== 1 ? 's' : ''}`, 0x66FF66);
+            this.battleLogZone.showNotification(`Drew ${drawnCards.length} card${drawnCards.length !== 1 ? 's' : ''}`, Colors.EFFECT_DRAW_GREEN);
           }
         }
 
@@ -592,7 +592,7 @@ export class CardBattleScene extends BaseScene {
       console.log('AI drew cards:', cardCount);
       
       // Show notification
-      this.battleLogZone.showNotification(`AI drew ${cardCount} card${cardCount !== 1 ? 's' : ''}`, 0x6699FF);
+      this.battleLogZone.showNotification(`AI drew ${cardCount} card${cardCount !== 1 ? 's' : ''}`, Colors.EFFECT_DRAW_BLUE);
 
       // Update battle state from after_state if available
       if (log.after_state) {
@@ -614,7 +614,7 @@ export class CardBattleScene extends BaseScene {
       const previousEnergy = aiPlayer?.deck.current_energy || 0;
       
       // Show notification
-      this.battleLogZone.showNotification('AI discarded a card', 0xFF6666);
+      this.battleLogZone.showNotification('AI discarded a card', Colors.EFFECT_DISCARD_RED);
 
       // Animate the last card in AI's hand (or random)
       const cardToAnimate = this.p2HandZone.getRandomHandCard();
@@ -647,7 +647,7 @@ export class CardBattleScene extends BaseScene {
       console.log(`AI played card: ${log.card.name}`);
       
       // Show notification
-      this.battleLogZone.showNotification(`AI played: ${log.card.name}`, 0xFF9966);
+      this.battleLogZone.showNotification(`AI played: ${log.card.name}`, Colors.EFFECT_PLAY_ORANGE);
       
       // Update battle state from after_state if available
       if (log.after_state) {
@@ -701,7 +701,7 @@ export class CardBattleScene extends BaseScene {
     
     const overlay = new Graphics();
     overlay.rect(0, 0, this.gameWidth, this.gameHeight)
-      .fill(0x000000, 0.7);
+      .fill(Colors.BATTLE_LOG_BG, 0.7);
     
     const resultBg = new Graphics();
     resultBg.roundRect(0, 0, 300, 200, 20)

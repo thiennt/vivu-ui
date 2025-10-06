@@ -99,7 +99,7 @@ export class BottomNavigationMenu extends Container {
     // Item background (for hover effect)
     const itemBg = new Graphics();
     itemBg.rect(0, 0, width, height)
-      .fill({ color: 0x000000, alpha: 0 }); // Transparent by default
+      .fill({ color: Colors.TRANSPARENT, alpha: 0 }); // Transparent by default
 
     // Icon
     const iconText = new Text({
@@ -144,7 +144,7 @@ export class BottomNavigationMenu extends Container {
     item.on('pointerout', () => {
       itemBg.clear();
       itemBg.rect(0, 0, width, height)
-        .fill({ color: 0x000000, alpha: 0 });
+        .fill({ color: Colors.TRANSPARENT, alpha: 0 });
     });
 
     item.on('pointerdown', onClick);

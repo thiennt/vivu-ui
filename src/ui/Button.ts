@@ -92,7 +92,7 @@ export class Button extends Container {
   }
 
   private handleOut() {
-    this.bg.tint = 0xffffff;
+    this.bg.tint = Colors.ACTIVE_WHITE;
   }
 
   /**

@@ -27,7 +27,7 @@ export class SkillDetailPopup extends Container {
     // Create semi-transparent background
     this.dialogBg = new Graphics();
     this.dialogBg.rect(0, 0, this.gameWidth, this.gameHeight)
-      .fill({ color: 0x000000, alpha: 0.7 });
+      .fill({ color: Colors.OVERLAY_DARK, alpha: 0.7 });
     
     const dialogWidth = Math.min(400, this.gameWidth - 40);
     const dialogHeight = 300;
@@ -120,13 +120,13 @@ export class SkillDetailPopup extends Container {
   private createSkillTypeBadge(skillType: string, x: number, y: number): Container {
     const badge = new Container();
     
-    const skillTypeColors: { [key: string]: number } = {
-      normal_attack: 0x9e9e9e,
-      active_skill: 0x2196f3,
-      passive_skill: 0x4caf50
+    const skillTypeColors: { [key: string]: string } = {
+      normal_attack: Colors.SKILL_NORMAL,
+      active_skill: Colors.SKILL_ACTIVE,
+      passive_skill: Colors.SKILL_PASSIVE
     };
     
-    const color = skillTypeColors[skillType] || 0x9e9e9e;
+    const color = skillTypeColors[skillType] || Colors.SKILL_NORMAL;
     
     const badgeBg = new Graphics();
     badgeBg.roundRect(0, 0, 80, 25, 4)
@@ -191,10 +191,10 @@ export class SkillDetailPopup extends Container {
     
     // Add hover effect
     button.on('pointerover', () => {
-      bg.tint = 0xcccccc;
+      bg.tint = Colors.HOVER_TINT;
     });
     button.on('pointerout', () => {
-      bg.tint = 0xffffff;
+      bg.tint = Colors.ACTIVE_WHITE;
     });
     
     return button;

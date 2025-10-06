@@ -439,7 +439,7 @@ export class PlayerDetailScene extends BaseScene {
       bg.tint = Colors.BUTTON_HOVER;
     });
     button.on('pointerout', () => {
-      bg.tint = 0xffffff;
+      bg.tint = Colors.ACTIVE_WHITE;
     });
     
     button.on('pointerdown', onClick);

@@ -90,19 +90,19 @@ export class HeroCard extends Container {
   private createPolishedCard(w: number, h: number, isSelected: boolean = false) {
     // Shadow
     this.filters = [
-      new DropShadowFilter({ color: 0x000000, alpha: 0.17, blur: 8, offset: { x: 4, y: 4 } })
+      new DropShadowFilter({ color: Colors.SHADOW_COLOR, alpha: 0.17, blur: 8, offset: { x: 4, y: 4 } })
     ];
 
     // Card background
     const bg = new Graphics();
-    bg.roundRect(0, 0, w, h, 12).fill(0xffffff);
+    bg.roundRect(0, 0, w, h, 12).fill(Colors.ACTIVE_WHITE);
     this.addChild(bg);
 
     // Glow on selection
     if (isSelected) {
       this.filters = [
         ...(this.filters ?? []),
-        new GlowFilter({ color: 0xffa000, distance: 8, outerStrength: 2, innerStrength: 0.8 })
+        new GlowFilter({ color: Colors.HERO_GLOW_ORANGE, distance: 8, outerStrength: 2, innerStrength: 0.8 })
       ];
     }
   }
