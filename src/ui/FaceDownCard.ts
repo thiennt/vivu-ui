@@ -26,7 +26,7 @@ export class FaceDownCard extends Container {
     
     // Main card background - use a darker color for card back
     bg.roundRect(0, 0, width, height, 8)
-      .fill(0x2c3e50) // Dark blue-gray for card back
+      .fill(Colors.CARD_BACK_DARK) // Dark blue-gray for card back
       .stroke({ width: 2, color: Colors.CARD_BORDER });
     
     // Inner card frame
@@ -46,7 +46,7 @@ export class FaceDownCard extends Container {
       centerX, centerY + patternSize / 2,
       centerX - patternSize / 4, centerY
     ])
-      .fill({ color: 0x34495e, alpha: 0.5 })
+      .fill({ color: Colors.CARD_BACK_PATTERN_1, alpha: 0.5 })
       .stroke({ width: 1, color: Colors.CARD_BORDER, alpha: 0.3 });
     
     // Add a smaller inner diamond
@@ -56,7 +56,7 @@ export class FaceDownCard extends Container {
       centerX, centerY + patternSize / 4,
       centerX - patternSize / 8, centerY
     ])
-      .fill({ color: 0x3d566e, alpha: 0.5 });
+      .fill({ color: Colors.CARD_BACK_PATTERN_2, alpha: 0.5 });
 
     this.addChild(bg, pattern);
   }

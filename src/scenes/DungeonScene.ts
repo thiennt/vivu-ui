@@ -273,10 +273,10 @@ export class DungeonScene extends BaseScene {
     // Hover effects
     card.interactive = true;
     card.on('pointerover', () => {
-      bg.tint = 0xe8e8e8;
+      bg.tint = Colors.HOVER_LIGHTEST;
     });
     card.on('pointerout', () => {
-      bg.tint = 0xffffff;
+      bg.tint = Colors.ACTIVE_WHITE;
     });
     
     return card;

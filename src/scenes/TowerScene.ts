@@ -317,11 +317,11 @@ export class TowerScene extends BaseScene {
 
     if (isClickable) {
       card.on('pointerover', () => {
-        bg.tint = 0xe0e0ff;
+        bg.tint = Colors.HOVER_BLUE;
         towerIcon.scale.set(1.1);
       });
       card.on('pointerout', () => {
-        bg.tint = 0xffffff;
+        bg.tint = Colors.ACTIVE_WHITE;
         towerIcon.scale.set(1.0);
       });
       card.on('pointerdown', () => {

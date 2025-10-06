@@ -28,7 +28,7 @@ export class LearnSkillPopup extends Container {
     // Create semi-transparent background
     this.dialogBg = new Graphics();
     this.dialogBg.rect(0, 0, this.gameWidth, this.gameHeight)
-      .fill({ color: 0x000000, alpha: 0.7 });
+      .fill({ color: Colors.OVERLAY_DARK, alpha: 0.7 });
     
     const dialogWidth = Math.min(500, this.gameWidth - 40);
     const dialogHeight = 450;
@@ -122,10 +122,10 @@ export class LearnSkillPopup extends Container {
       
       // Add hover effect
       optionContainer.on('pointerover', () => {
-        optionBg.tint = 0xdddddd;
+        optionBg.tint = Colors.HOVER_LIGHT;
       });
       optionContainer.on('pointerout', () => {
-        optionBg.tint = 0xffffff;
+        optionBg.tint = Colors.ACTIVE_WHITE;
       });
       
       skillOptions.push(optionContainer);
@@ -190,10 +190,10 @@ export class LearnSkillPopup extends Container {
     
     // Add hover effect
     button.on('pointerover', () => {
-      bg.tint = 0xcccccc;
+      bg.tint = Colors.HOVER_TINT;
     });
     button.on('pointerout', () => {
-      bg.tint = 0xffffff;
+      bg.tint = Colors.ACTIVE_WHITE;
     });
     
     return button;

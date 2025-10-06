@@ -284,11 +284,11 @@ export class StageScene extends BaseScene {
     stageName.y = 35;
     
     // Difficulty
-    const difficultyColors: { [key: number]: number } = {
-      1: 0x4caf50, // Green for easy
-      2: 0xff9800, // Orange for normal
-      3: 0xff4500, // Red for hard
-      4: 0x9c27b0  // Purple for nightmare
+    const difficultyColors: { [key: number]: string } = {
+      1: Colors.DIFFICULTY_EASY, // Green for easy
+      2: Colors.DIFFICULTY_NORMAL, // Orange for normal
+      3: Colors.DIFFICULTY_HARD, // Red for hard
+      4: Colors.DIFFICULTY_NIGHTMARE  // Purple for nightmare
     };
 
     const difficulty = new Text({
@@ -338,10 +338,10 @@ export class StageScene extends BaseScene {
     // Hover effects
     card.interactive = true;
     card.on('pointerover', () => {
-      bg.tint = 0xe8e8e8;
+      bg.tint = Colors.HOVER_LIGHTEST;
     });
     card.on('pointerout', () => {
-      bg.tint = 0xffffff;
+      bg.tint = Colors.ACTIVE_WHITE;
     });
     
     return card;

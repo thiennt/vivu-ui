@@ -10,6 +10,7 @@ import { Container, Text, Graphics, Sprite } from 'pixi.js';
 import { gsap } from 'gsap';
 import { CardBattleLogTarget } from '@/types';
 import type { CardBattleScene } from '@/scenes/CardBattleScene';
+import { Colors } from '@/utils/colors';
 
 export type CardGroup = 'damage' | 'healing' | 'debuff' | 'other';
 
@@ -26,7 +27,7 @@ export class CardBattleEffects extends Container {
   /**
    * Create a color overlay for visual effects (replacement for tint)
    */
-  private createColorOverlay(container: Container, color: number, initialAlpha: number = 0): Graphics {
+  private createColorOverlay(container: Container, color: string | number, initialAlpha: number = 0): Graphics {
     const bounds = container.getLocalBounds();
     const overlay = new Graphics();
     overlay.rect(0, 0, bounds.width, bounds.height);
@@ -45,7 +46,7 @@ export class CardBattleEffects extends Container {
   /**
    * Create a radial glow effect around a container
    */
-  private createRadialGlow(container: Container, color: number, radius: number = 50): Graphics {
+  private createRadialGlow(container: Container, color: string | number, radius: number = 50): Graphics {
     const glow = new Graphics();
     glow.circle(0, 0, radius);
     glow.fill({ color: color, alpha: 0 });
@@ -64,7 +65,7 @@ export class CardBattleEffects extends Container {
    */
   private createParticleBurst(
     container: Container,
-    color: number,
+    color: string | number,
     particleCount: number = 8
   ): Graphics[] {
     const particles: Graphics[] = [];
@@ -90,7 +91,7 @@ export class CardBattleEffects extends Container {
   /**
    * Create an impact wave effect
    */
-  private createImpactWave(container: Container, color: number): Graphics {
+  private createImpactWave(container: Container, color: string | number): Graphics {
     const bounds = container.getLocalBounds();
     const wave = new Graphics();
     wave.circle(0, 0, 20);
@@ -218,8 +219,8 @@ export class CardBattleEffects extends Container {
    */
   private animateDamageSkill(characterCard: Container, timeline: gsap.core.Timeline): void {
     const originalX = characterCard.x;
-    const overlay = this.createColorOverlay(characterCard, 0xFF4444, 0);
-    const glow = this.createRadialGlow(characterCard, 0xFF0000, 60);
+    const overlay = this.createColorOverlay(characterCard, Colors.EFFECT_DAMAGE_RED, 0);
+    const glow = this.createRadialGlow(characterCard, Colors.EFFECT_FIRE_RED, 60);
     
     timeline
       .to([characterCard], {
@@ -277,9 +278,9 @@ export class CardBattleEffects extends Container {
    * Healing & Support animation: gentle glow and pulse with sparkle particles
    */
   private animateHealingSkill(characterCard: Container, timeline: gsap.core.Timeline): void {
-    const overlay = this.createColorOverlay(characterCard, 0x44FF44, 0);
-    const glow = this.createRadialGlow(characterCard, 0x44FF88, 70);
-    const particles = this.createParticleBurst(characterCard, 0x88FFAA, 10);
+    const overlay = this.createColorOverlay(characterCard, Colors.EFFECT_HEAL_BRIGHT, 0);
+    const glow = this.createRadialGlow(characterCard, Colors.EFFECT_HEAL_GREEN, 70);
+    const particles = this.createParticleBurst(characterCard, Colors.EFFECT_HEAL_PARTICLE, 10);
     
     timeline
       .to(characterCard, {
@@ -351,9 +352,9 @@ export class CardBattleEffects extends Container {
    */
   private animateDebuffSkill(characterCard: Container, timeline: gsap.core.Timeline): void {
     const originalX = characterCard.x;
-    const overlay = this.createColorOverlay(characterCard, 0x8844FF, 0);
-    const wave1 = this.createImpactWave(characterCard, 0x8844FF);
-    const wave2 = this.createImpactWave(characterCard, 0x6622DD);
+    const overlay = this.createColorOverlay(characterCard, Colors.EFFECT_DEBUFF_PURPLE, 0);
+    const wave1 = this.createImpactWave(characterCard, Colors.EFFECT_DEBUFF_PURPLE);
+    const wave2 = this.createImpactWave(characterCard, Colors.EFFECT_DEBUFF_DARK);
     
     timeline
       .to(characterCard, {
@@ -517,9 +518,9 @@ export class CardBattleEffects extends Container {
     isCritical: boolean
   ): void {
     const originalX = targetCard.x;
-    const overlay = this.createColorOverlay(targetCard, 0xFF3333, 0);
-    const impactWave = this.createImpactWave(targetCard, 0xFF0000);
-    const particles = isCritical ? this.createParticleBurst(targetCard, 0xFF6666, 12) : [];
+    const overlay = this.createColorOverlay(targetCard, Colors.EFFECT_DAMAGE_DARK, 0);
+    const impactWave = this.createImpactWave(targetCard, Colors.EFFECT_FIRE_RED);
+    const particles = isCritical ? this.createParticleBurst(targetCard, Colors.EFFECT_DAMAGE_LIGHT, 12) : [];
     
     timeline
       .to(overlay, {
@@ -610,9 +611,9 @@ export class CardBattleEffects extends Container {
    * Apply healing effect with gentle restore, sparkle, and radial glow
    */
   private applyHealingEffect(targetCard: Container, timeline: gsap.core.Timeline): void {
-    const overlay = this.createColorOverlay(targetCard, 0x44FF88, 0);
-    const glow = this.createRadialGlow(targetCard, 0x44FF88, 80);
-    const particles = this.createParticleBurst(targetCard, 0xAAFFCC, 8);
+    const overlay = this.createColorOverlay(targetCard, Colors.EFFECT_HEAL_GREEN, 0);
+    const glow = this.createRadialGlow(targetCard, Colors.EFFECT_HEAL_GREEN, 80);
+    const particles = this.createParticleBurst(targetCard, Colors.EFFECT_HEAL_LIGHT, 8);
     
     timeline
       .to(targetCard, {
@@ -686,7 +687,7 @@ export class CardBattleEffects extends Container {
     timeline: gsap.core.Timeline,
     isDebuff: boolean
   ): void {
-    const effectColor = isDebuff ? 0x8844FF : 0x44AAFF; // Purple for debuff, blue for effect/status
+    const effectColor = isDebuff ? Colors.EFFECT_DEBUFF_PURPLE : Colors.EFFECT_BUFF_BLUE; // Purple for debuff, blue for effect/status
     const overlay = this.createColorOverlay(targetCard, effectColor, 0);
     const wave = this.createImpactWave(targetCard, effectColor);
     const glow = this.createRadialGlow(targetCard, effectColor, 60);
@@ -771,7 +772,7 @@ export class CardBattleEffects extends Container {
    * Apply default effect with gentle glow
    */
   private applyDefaultEffect(targetCard: Container, timeline: gsap.core.Timeline): void {
-    const overlay = this.createColorOverlay(targetCard, 0x66CCFF, 0);
+    const overlay = this.createColorOverlay(targetCard, Colors.EFFECT_BUFF_CYAN, 0);
     
     timeline
       .to(targetCard, {
@@ -806,9 +807,9 @@ export class CardBattleEffects extends Container {
       style: {
         fontFamily: 'Arial',
         fontSize: isCritical ? 20 : 16,
-        fill: isCritical ? 0xFF3333 : 0xFF6666,
+        fill: isCritical ? Colors.EFFECT_DAMAGE_DARK : Colors.EFFECT_DAMAGE_LIGHT,
         fontWeight: isCritical ? 'bold' : 'normal',
-        stroke: { color: 0x000000, width: 2 }
+        stroke: { color: Colors.EFFECT_STROKE_BLACK, width: 2 }
       }
     });
 
@@ -848,9 +849,9 @@ export class CardBattleEffects extends Container {
       style: {
         fontFamily: 'Arial',
         fontSize: 18,
-        fill: 0x44FF88,
+        fill: Colors.EFFECT_HEAL_GREEN,
         fontWeight: 'bold',
-        stroke: { color: 0x006633, width: 2 }
+        stroke: { color: Colors.EFFECT_STROKE_DARK_GREEN, width: 2 }
       }
     });
 
@@ -910,7 +911,7 @@ export class CardBattleEffects extends Container {
       // Create a glow effect using a Graphics object behind the text
       const glowCircle = new Graphics();
       glowCircle.circle(0, 0, 20);
-      glowCircle.fill({ color: 0xFFFF00, alpha: 0 });
+      glowCircle.fill({ color: Colors.EFFECT_YELLOW, alpha: 0 });
       glowCircle.x = energyText.width / 2;
       glowCircle.y = energyText.height / 2;
       
@@ -920,7 +921,7 @@ export class CardBattleEffects extends Container {
       // Create outer glow ring
       const outerGlow = new Graphics();
       outerGlow.circle(0, 0, 30);
-      outerGlow.stroke({ width: 2, color: 0xFFDD00, alpha: 0 });
+      outerGlow.stroke({ width: 2, color: Colors.EFFECT_YELLOW_BRIGHT, alpha: 0 });
       outerGlow.x = energyText.width / 2;
       outerGlow.y = energyText.height / 2;
       energyText.addChildAt(outerGlow, 0);
@@ -978,7 +979,7 @@ export class CardBattleEffects extends Container {
    */
   public async animateScreenFlash(
     container: Container,
-    color: number = 0xFFFFFF,
+    color: string | number = Colors.EFFECT_WHITE,
     intensity: number = 0.6,
     duration: number = 0.2
   ): Promise<void> {
@@ -1169,16 +1170,16 @@ export class CardBattleEffects extends Container {
   /**
    * Get glow color based on card group type
    */
-  private getGlowColorForCardGroup(cardGroup: CardGroup): number {
+  private getGlowColorForCardGroup(cardGroup: CardGroup): string {
     switch (cardGroup) {
       case 'damage':
-        return 0xFF4444;
+        return Colors.EFFECT_DAMAGE_RED;
       case 'healing':
-        return 0x44FF88;
+        return Colors.EFFECT_HEAL_GREEN;
       case 'debuff':
-        return 0x8844FF;
+        return Colors.EFFECT_DEBUFF_PURPLE;
       default:
-        return 0x66CCFF;
+        return Colors.EFFECT_BUFF_CYAN;
     }
   }
 
