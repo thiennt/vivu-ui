@@ -22,12 +22,12 @@ export class CharacterCard extends Container {
     // 1. Art Deco metallic frame with geometric accents
     const frame = new Graphics();
     // Outer metallic frame (gold for legendary, silver for epic, bronze for rare, etc.)
-    const rarityMetal: Record<string, number> = {
-      legendary: 0xFFD700, // gold
-      epic: 0xC0C0C0,      // silver
-      rare: 0xCD7F32,      // bronze
-      uncommon: 0x7FFFD4,  // aquamarine
-      common: 0xB0B0B0     // gray
+    const rarityMetal: Record<string, string> = {
+      legendary: Colors.FRAME_LEGENDARY, // gold
+      epic: Colors.FRAME_EPIC,      // silver
+      rare: Colors.FRAME_RARE,      // bronze
+      uncommon: Colors.FRAME_UNCOMMON,  // aquamarine
+      common: Colors.FRAME_COMMON     // gray
     };
     const frameColor = rarityMetal[character.rarity] || rarityMetal.common;
     frame.roundRect(0, 0, width, height, 12);
@@ -45,7 +45,7 @@ export class CharacterCard extends Container {
     // 2. Deep gradient background with subtle Art Deco pattern
     const bg = new Graphics();
     // Simulate a vertical gradient (Pixi v8: use a solid for now, or use a gradient texture for full effect)
-    const decoBgColor = 0x1a2337; // deep blue
+    const decoBgColor = Colors.CARD_DECO_BG; // deep blue
     bg.roundRect(4, 4, width - 8, height - 8, 8);
     bg.fill({ color: decoBgColor, alpha: 1 });
 
@@ -53,7 +53,7 @@ export class CharacterCard extends Container {
     for (let i = 0; i < width; i += 12) {
       bg.moveTo(4 + i, 4);
       bg.lineTo(4, 4 + i);
-      bg.stroke({ width: 1, color: 0xffffff, alpha: 0.04 });
+      bg.stroke({ width: 1, color: Colors.SHEEN_WHITE, alpha: 0.04 });
     }
     this.addChild(bg);
 
@@ -61,14 +61,14 @@ export class CharacterCard extends Container {
     const avatarCircle = new Graphics();
     const avatarRadius = width * 0.28;
     avatarCircle.circle(width / 2, height / 2 - 8, avatarRadius);
-    avatarCircle.fill({ color: 0x222a38, alpha: 1 });
+    avatarCircle.fill({ color: Colors.CARD_AVATAR_BG, alpha: 1 });
     avatarCircle.stroke({ width: 3, color: frameColor, alpha: 0.7 });
     this.addChild(avatarCircle);
 
     this.loadAvatar(character, width, height);
 
     // 4. Stats in geometric medallions (top corners)
-    const statBgColor = 0x222a38;
+    const statBgColor = Colors.CARD_STAT_BG;
     const statTextColor = frameColor;
     // ATK (top-left, hexagon)
     const atkMedallion = new Graphics();
@@ -131,7 +131,7 @@ export class CharacterCard extends Container {
     const hpPercent = Math.max(0, Math.min(1, character.hp / (character.max_hp || character.hp || 1)));
     const hpBar = new Graphics();
     hpBar.roundRect(barX, hpBarY, barWidth * hpPercent, barHeight, 3);
-    hpBar.fill({ color: 0xE53935, alpha: 0.95 });
+    hpBar.fill({ color: Colors.CARD_HP_BAR, alpha: 0.95 });
     this.addChild(hpBar);
 
     // HP deco caps
@@ -156,7 +156,7 @@ export class CharacterCard extends Container {
     const energyPercent = Math.max(0, Math.min(1, currentEnergy / maxEnergy));
     const energyBar = new Graphics();
     energyBar.roundRect(barX, energyBarY, barWidth * energyPercent, barHeight, 3);
-    energyBar.fill({ color: 0x00B8D4, alpha: 0.95 });
+    energyBar.fill({ color: Colors.CARD_ENERGY_BAR, alpha: 0.95 });
     this.addChild(energyBar);
 
     // Energy deco caps
@@ -174,14 +174,14 @@ export class CharacterCard extends Container {
       this.alpha = 0.5;
       const defeatedOverlay = new Graphics();
       defeatedOverlay.roundRect(0, 0, width, height, 12);
-      defeatedOverlay.fill({ color: 0x000000, alpha: 0.6 });
+      defeatedOverlay.fill({ color: Colors.DEFEATED_OVERLAY, alpha: 0.6 });
       const defeatedText = new Text({
         text: 'DEFEATED',
         style: {
           fontFamily: 'Merriweather, serif',
           fontSize: Math.max(10, Math.min(14, width * 0.12)),
           fontWeight: 'bold',
-          fill: 0xffd700,
+          fill: Colors.DEFEATED_TEXT,
           align: 'center'
         }
       });
@@ -193,7 +193,7 @@ export class CharacterCard extends Container {
       this.alpha = 0.5;
       const overlay = new Graphics();
       overlay.roundRect(0, 0, width, height, 12);
-      overlay.fill({ color: 0x000000, alpha: 0.3 });
+      overlay.fill({ color: Colors.DIMMED_OVERLAY, alpha: 0.3 });
       this.addChild(overlay);
     }
   }
@@ -212,7 +212,7 @@ export class CharacterCard extends Container {
       // Metallic sheen overlay (ellipse)
       const sheen = new Graphics();
       sheen.ellipse(width / 2, height / 2 - 18, width * 0.18, 8);
-      sheen.fill({ color: 0xffffff, alpha: 0.13 });
+      sheen.fill({ color: Colors.SHEEN_WHITE, alpha: 0.13 });
       //this.addChild(sheen);
     } catch (error) {
       console.warn('Failed to load avatar:', error);

@@ -196,10 +196,10 @@ export class CharacterDetailScene extends BaseScene {
 
     // Core stats: HP, ATK, DEF, AGI (prominent display)
     const coreStats = [
-      { name: '❤️', value: this.character!.hp, color: 0x4caf50 },
-      { name: '⚔️', value: this.character!.atk, color: 0xf44336 },
-      { name: '🛡️', value: this.character!.def, color: 0x2196f3 },
-      { name: '⚡', value: this.character!.agi, color: 0xffeb3b }
+      { name: '❤️', value: this.character!.hp, color: Colors.STAT_HP },
+      { name: '⚔️', value: this.character!.atk, color: Colors.STAT_ATK },
+      { name: '🛡️', value: this.character!.def, color: Colors.STAT_DEF },
+      { name: '⚡', value: this.character!.agi, color: Colors.STAT_AGI }
     ];
 
     const statWidth = (panelWidth - 2 * padding - avatar.width) / 4;
@@ -255,13 +255,13 @@ export class CharacterDetailScene extends BaseScene {
 
     // Other stats in grid layout
     const otherStats = [
-      { name: 'CritRate', value: this.character!.crit_rate + '%', color: 0xff9800 },
-      { name: 'CritDmg', value: this.character!.crit_dmg + '%', color: 0x9c27b0 },
-      { name: 'Res', value: this.character!.res, color: 0x607d8b },
-      { name: 'Damage', value: this.character!.damage, color: 0xff5722 },
-      { name: 'Mitig', value: this.character!.mitigation, color: 0x795548 },
-      { name: 'Hit', value: this.character!.hit_rate, color: 0x4caf50 },
-      { name: 'Dodge', value: this.character!.dodge, color: 0x9e9e9e }
+      { name: 'CritRate', value: this.character!.crit_rate + '%', color: Colors.STAT_CRIT_RATE },
+      { name: 'CritDmg', value: this.character!.crit_dmg + '%', color: Colors.STAT_CRIT_DMG },
+      { name: 'Res', value: this.character!.res, color: Colors.STAT_RES },
+      { name: 'Damage', value: this.character!.damage, color: Colors.STAT_DAMAGE },
+      { name: 'Mitig', value: this.character!.mitigation, color: Colors.STAT_MITIGATION },
+      { name: 'Hit', value: this.character!.hit_rate, color: Colors.STAT_HIT },
+      { name: 'Dodge', value: this.character!.dodge, color: Colors.STAT_DODGE }
     ];
 
     const colWidth = (panelWidth - 2 * padding) / 3;
@@ -324,9 +324,9 @@ export class CharacterDetailScene extends BaseScene {
 
     // Define all skill types that should always be shown
     const skillTypes = [
-      { type: 'normal_attack', label: 'Normal', color: 0x9e9e9e },
-      { type: 'active_skill', label: 'Active', color: 0x2196f3 },
-      { type: 'passive_skill', label: 'Passive', color: 0x4caf50 }
+      { type: 'normal_attack', label: 'Normal', color: Colors.SKILL_NORMAL },
+      { type: 'active_skill', label: 'Active', color: Colors.SKILL_ACTIVE },
+      { type: 'passive_skill', label: 'Passive', color: Colors.SKILL_PASSIVE }
     ];
 
     // Skills layout - always show 3 skill types
@@ -587,7 +587,7 @@ export class CharacterDetailScene extends BaseScene {
       // Slot background
       const slotBg = new Graphics();
       slotBg.roundRect(0, 0, slotWidth - 10, 40, 6)
-        .fill({ color: slot.item === '(empty)' ? 0x424242 : Colors.BUTTON_BORDER, alpha: 0.8 })
+        .fill({ color: slot.item === '(empty)' ? Colors.EMPTY_SLOT : Colors.BUTTON_BORDER, alpha: 0.8 })
         .stroke({ width: 1, color: Colors.BUTTON_PRIMARY });
       
       // Slot type label
@@ -628,10 +628,10 @@ export class CharacterDetailScene extends BaseScene {
       
       // Add hover effect
       slotContainer.on('pointerover', () => {
-        slotBg.tint = 0xcccccc;
+        slotBg.tint = Colors.HOVER_TINT;
       });
       slotContainer.on('pointerout', () => {
-        slotBg.tint = 0xffffff;
+        slotBg.tint = Colors.ACTIVE_WHITE;
       });
       
       this.equipmentContainer.addChild(slotContainer);

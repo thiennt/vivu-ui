@@ -269,7 +269,7 @@ export class BattleScene extends BaseScene {
     const hpPercentage = character.hp / character.hp;
     const hpBarFill = new Graphics();
     hpBarFill.roundRect(6, 46, (cardWidth - 12) * hpPercentage, 6, 3)
-      .fill(hpPercentage > 0.5 ? 0x4caf50 : hpPercentage > 0.25 ? 0xff9800 : 0xf44336);
+      .fill(hpPercentage > 0.5 ? Colors.HP_HIGH : hpPercentage > 0.25 ? Colors.HP_MEDIUM : Colors.HP_LOW);
     
     // HP Text
     const hpText = new Text({
@@ -295,7 +295,7 @@ export class BattleScene extends BaseScene {
     const energyPercentage = character.current_energy / maxEnergy;
     const energyBarFill = new Graphics();
     energyBarFill.roundRect(6, 71, (cardWidth - 12) * energyPercentage, 6, 3)
-      .fill(0x2196f3); // Blue for energy
+      .fill(Colors.ENERGY_BAR); // Blue for energy
     
     // Energy Text
     const energyText = new Text({
@@ -517,16 +517,16 @@ export class BattleScene extends BaseScene {
     switch (actionType) {
       case 'slash': {
         // Slash effect - diagonal line
-        effect.rect(-2, -20, 4, 40).fill(0xFFFFFF);
-        effect.rect(-1, -20, 2, 40).fill(0xFFAA00);
+        effect.rect(-2, -20, 4, 40).fill(Colors.EFFECT_WHITE);
+        effect.rect(-1, -20, 2, 40).fill(Colors.GLOW_COLOR);
         effect.rotation = Math.PI / 4;
         break;
       }
       case 'fire': {
         // Fire burst effect
-        effect.circle(0, 0, 25).fill(0xFF4444);
-        effect.circle(0, 0, 15).fill(0xFF8800);
-        effect.circle(0, 0, 8).fill(0xFFDD00);
+        effect.circle(0, 0, 25).fill(Colors.EFFECT_DAMAGE_RED);
+        effect.circle(0, 0, 15).fill(Colors.EFFECT_FIRE_ORANGE);
+        effect.circle(0, 0, 8).fill(Colors.EFFECT_FIRE_YELLOW);
         break;
       }
       case 'ice': {
@@ -535,14 +535,14 @@ export class BattleScene extends BaseScene {
           .lineTo(10, 15)
           .lineTo(-10, 15)
           .closePath()
-          .fill(0x88DDFF);
-        effect.circle(0, 0, 8).fill(0xAAEEFF);
+          .fill(Colors.EFFECT_ICE_BLUE);
+        effect.circle(0, 0, 8).fill(Colors.EFFECT_ICE_LIGHT);
         break;
       }
       default: {
         // Default impact effect
-        effect.circle(0, 0, 20).fill(0xFFFFFF);
-        effect.circle(0, 0, 12).fill(0xFFDD00);
+        effect.circle(0, 0, 20).fill(Colors.EFFECT_WHITE);
+        effect.circle(0, 0, 12).fill(Colors.EFFECT_YELLOW_BRIGHT);
       }
     }
     
@@ -597,8 +597,8 @@ export class BattleScene extends BaseScene {
         fontFamily: 'Kalam',
         fontSize: 20,
         fontWeight: 'bold',
-        fill: 0xFF4444,
-        stroke: { color: 0xFFFFFF, width: 2 }
+        fill: Colors.EFFECT_DAMAGE_RED,
+        stroke: { color: Colors.EFFECT_WHITE, width: 2 }
       }
     });
     
@@ -798,7 +798,7 @@ export class BattleScene extends BaseScene {
       const hpPercentage = character.hp / character.hp;
       hpBarFill.clear();
       hpBarFill.roundRect(6, 46, (cardWidth - 12) * hpPercentage, 6, 3)
-        .fill(hpPercentage > 0.5 ? 0x4caf50 : hpPercentage > 0.25 ? 0xff9800 : 0xf44336);
+        .fill(hpPercentage > 0.5 ? Colors.HP_HIGH : hpPercentage > 0.25 ? Colors.HP_MEDIUM : Colors.HP_LOW);
       
       hpText.text = `HP: ${character.hp}/${character.hp}`;
     }
@@ -807,7 +807,7 @@ export class BattleScene extends BaseScene {
       const energyPercentage = character.current_energy / 100;
       energyBarFill.clear();
       energyBarFill.roundRect(6, 71, (cardWidth - 12) * energyPercentage, 6, 3)
-        .fill(0x2196f3);
+        .fill(Colors.ENERGY_BAR);
       
       energyText.text = `EN: ${character.current_energy}/100`;
     }
@@ -820,7 +820,7 @@ export class BattleScene extends BaseScene {
       if (!cardContainer.children.find(child => (child as any).isDefeatedOverlay)) {
         const defeatedOverlay = new Graphics();
         defeatedOverlay.roundRect(0, 0, cardWidth, cardHeight, 8)
-          .fill({ color: 0x000000, alpha: 0.6 });
+          .fill({ color: Colors.DEFEATED_OVERLAY, alpha: 0.6 });
         
         const defeatedText = new Text({
           text: 'DEFEATED',
@@ -828,7 +828,7 @@ export class BattleScene extends BaseScene {
             fontFamily: 'Kalam',
             fontSize: 10,
             fontWeight: 'bold',
-            fill: 0xff4444,
+            fill: Colors.HP_CRITICAL,
             align: 'center'
           }
         });
