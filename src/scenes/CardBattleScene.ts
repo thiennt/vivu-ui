@@ -53,7 +53,10 @@ export class CardBattleScene extends BaseScene {
   constructor(params?: { battleId?: string }) {
     super();
 
-    this.battleId = params?.battleId || 'f91bb046-78d3-449e-bd2b-7e35f92dd9ea';
+    const player = sessionStorage.getItem('player');
+    let _battleId = player ? JSON.parse(player).ongoing_battles[0] : null;
+
+    this.battleId = params?.battleId || _battleId || '';
 
     // Initialize loading manager
     this.loadingManager = new LoadingStateManager(this, this.gameWidth, this.gameHeight);

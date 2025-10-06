@@ -79,7 +79,7 @@ export class CharacterCard extends Container {
     this.addChild(atkMedallion);
 
     const atkText = new Text({
-      text: `${character.atk}222`,
+      text: `${character.atk}`,
       style: {
         fontFamily: 'Merriweather, serif',
         fontSize: 13,

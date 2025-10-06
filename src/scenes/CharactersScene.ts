@@ -213,6 +213,9 @@ export class CharactersScene extends BaseScene {
 
       const characterCard = this.createCharacterCard(character, x, y, layout.itemWidth, cardHeight);
 
+      characterCard.interactive = true;
+      characterCard.cursor = 'pointer';
+
       characterCard.on('pointerdown', () => {
         navigation.showScreen(CharacterDetailScene, { selectedCharacter: character });
       });

@@ -170,20 +170,7 @@ export const mockPlayer2Characters = [
     "hit_rate": 96,
     "dodge": 8,
     "has_acted": false,
-    "active_effects": [
-      {
-        "name": "ATK Buff",
-        "effectId": "atk_buff_001",
-        "stacks": 2,
-        "remainingDuration": 3
-      },
-      {
-        "name": "Shield",
-        "effectId": "shield_001",
-        "stacks": 1,
-        "remainingDuration": 2
-      }
-    ],
+    "active_effects": [],
     "equipped_skills": [
       "bcce57f4-5b26-49ff-8950-bee1b0a9336d",
       "f3fd80b1-15d1-4c21-87ca-09e98938ec5b"
@@ -209,26 +196,7 @@ export const mockPlayer2Characters = [
     "hit_rate": 96,
     "dodge": 8,
     "has_acted": false,
-    "active_effects": [
-      {
-        "name": "Poison",
-        "effectId": "poison_001",
-        "stacks": 3,
-        "remainingDuration": 4
-      },
-      {
-        "name": "DEF Down",
-        "effectId": "def_down_001",
-        "stacks": 1,
-        "remainingDuration": 2
-      },
-      {
-        "name": "Bleed",
-        "effectId": "bleed_001",
-        "stacks": 2,
-        "remainingDuration": 3
-      }
-    ],
+    "active_effects": [],
     "equipped_skills": [
       "bcce57f4-5b26-49ff-8950-bee1b0a9336d",
       "c0cf1536-3355-4250-92c6-c77acef7e5b2"
@@ -254,20 +222,7 @@ export const mockPlayer2Characters = [
     "hit_rate": 96,
     "dodge": 8,
     "has_acted": false,
-    "active_effects": [
-      {
-        "name": "Frozen",
-        "effectId": "frozen_001",
-        "stacks": 1,
-        "remainingDuration": 1
-      },
-      {
-        "name": "Regen",
-        "effectId": "regen_001",
-        "stacks": 1,
-        "remainingDuration": 5
-      }
-    ],
+    "active_effects": [],
     "equipped_skills": [
       "bcce57f4-5b26-49ff-8950-bee1b0a9336d",
       "62cf745c-ac43-4817-88fe-8a5cbe7d9196"
@@ -422,7 +377,8 @@ export const mockPlayer = {
       "def": 1391,
       "agi": 726
     }
-  ]
+  ],
+  ongoing_battles: []
 };
 
 // ---- Stages ----
@@ -1531,8 +1487,6 @@ export const mockBattleStage = {
 
 // ---- Card Battle Mock Data ----
 import { CardBattleState } from '../types';
-import { mock } from 'node:test';
-
 
 export const mockCardBattleState: CardBattleState = {
   "id": "79c2bcc3-9d38-469f-96ea-208e37cacac4",
