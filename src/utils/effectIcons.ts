@@ -165,6 +165,13 @@ export function createEffectIcon(
   return container;
 }
 
+export interface ActiveEffect {
+  name?: string;
+  effectId?: string;
+  stacks?: number;
+  remainingDuration?: number;
+}
+
 /**
  * Create a row of effect icons from an array of active effects
  * @param activeEffects - Array of active effects
@@ -173,7 +180,7 @@ export function createEffectIcon(
  * @param spacing - Space between icons (default: 4)
  */
 export function createEffectIconRow(
-  activeEffects: any[],
+  activeEffects: ActiveEffect[],
   maxIcons: number = 5,
   iconSize: number = 20,
   spacing: number = 4
