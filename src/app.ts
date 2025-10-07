@@ -16,8 +16,9 @@ initDevtools({ app });
 /** Set up a resize function for the app */
 function resize() {
   const maxWidth = 350; //540;
+  const maxHeight = 700;
   const windowWidth = Math.min(window.innerWidth, maxWidth);
-  const windowHeight = window.innerHeight;
+  const windowHeight = Math.min(window.innerHeight, maxHeight);
   const minWidth = 350;
   const minHeight = 700;
 
