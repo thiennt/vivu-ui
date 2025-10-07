@@ -154,7 +154,8 @@ export class SignInScene extends BaseScene {
 
   private async handleSignIn(): Promise<void> {
     try {
-      this.loadingManager.showLoading('Creating sign-in channel...');
+      this.loadingManager.showLoading();
+      console.log('Creating sign-in channel...');
 
       // Create authentication channel
       const { channel, waitForAuth } = await farcasterAuth.authenticate();
@@ -166,14 +167,15 @@ export class SignInScene extends BaseScene {
       this.showAuthChannel(channel);
 
       // Wait for user to authenticate via their Farcaster wallet
-      this.loadingManager.showLoading('Waiting for authentication...\nPlease sign in with your Farcaster wallet');
+      this.loadingManager.showLoading();
+      console.log('Waiting for authentication... Please sign in with your Farcaster wallet');
       
       const farcasterUser = await waitForAuth();
 
       console.log('✅ Farcaster authentication successful:', farcasterUser);
 
       // Then, call the auth API with Farcaster data
-      this.loadingManager.showLoading('Completing sign in...');
+      console.log('Completing sign in...');
       
       const response = await authApi.signIn({
         fid: farcasterUser.fid.toString(),

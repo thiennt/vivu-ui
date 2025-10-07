@@ -111,7 +111,7 @@ export class FarcasterAuthService {
       channelToken,
       timeout,
       interval,
-      onResponse: onResponse ? ({ data }) => onResponse(data) : undefined,
+      onResponse: onResponse ? ({ data }: { data: any }) => onResponse(data) : undefined,
     });
 
     if (response.isError) {
