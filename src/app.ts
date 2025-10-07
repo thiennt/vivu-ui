@@ -100,24 +100,12 @@ async function init() {
   const isAuthenticated = !!authToken;
 
   //Go to one of the screens if a shortcut is present in url params, otherwise go to home screen
-  if (getUrlParam("combat") !== null) {
-    //await navigation.showScreen(CombatScreen);
-  } else if (getUrlParam("battle") !== null) {
-    const { BattleScene } = await import('./scenes/BattleScene');
-    await navigation.showScreen(BattleScene);
-  } else if (getUrlParam("cardbattle") !== null) {
-    const { CardBattleScene } = await import('./scenes/CardBattleScene');
-    await navigation.showScreen(CardBattleScene);
-  } else if (getUrlParam("player") !== null) {
-    await navigation.showScreen(PlayerDetailScene);
-  } else if (getUrlParam("home") !== null) {
-    await navigation.showScreen(HomeScene);
-  } else if (getUrlParam("signin") !== null) {
+  if (getUrlParam("signin") !== null) {
     // Force show sign-in screen for testing
     await navigation.showScreen(SignInScene);
   } else if (!isAuthenticated) {
     // Show sign-in screen if not authenticated
-    await navigation.showScreen(SignInScene);
+    await navigation.showScreen(HomeScene);
   } else {
     // Show HomeScene by default for authenticated users
     await navigation.showScreen(HomeScene);

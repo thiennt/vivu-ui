@@ -36,17 +36,10 @@ export class HomeScene extends BaseScene {
   private async loadPlayerData(): Promise<void> {
     this.loadingManager.showLoading();
     
-    // Get player data from session storage (set during sign-in)
-    const storedPlayer = sessionStorage.getItem('player');
-    if (storedPlayer) {
-      this.player = JSON.parse(storedPlayer);
-    } else {
-      // Fallback: fetch player data using stored playerId
-      const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
-      this.player = await playerApi.getPlayer(playerId);
-      sessionStorage.setItem('player', JSON.stringify(this.player));
-      sessionStorage.setItem('playerId', this.player.id);
-    }
+    const playerId = 'player_fc_001';
+    this.player = await playerApi.getPlayer(playerId);
+    sessionStorage.setItem('player', JSON.stringify(this.player));
+    sessionStorage.setItem('playerId', this.player.id);
 
     this.loadingManager.hideLoading();
 
