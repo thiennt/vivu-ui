@@ -917,13 +917,13 @@ export class CardBattleScene extends BaseScene {
     // Update loading manager dimensions
     this.loadingManager.updateDimensions(width, height);
 
-    // Calculate layout based on backup structure
-    const TOP_PADDING = this.STANDARD_PADDING * 2;
-    const BETWEEN_AREAS = this.STANDARD_PADDING * 2;
-    const BOTTOM_PADDING = this.STANDARD_PADDING * 2;
+    // Calculate layout optimized for 400x700
+    const TOP_PADDING = this.STANDARD_PADDING * 1.5; // Reduced multiplier
+    const BETWEEN_AREAS = this.STANDARD_PADDING * 1.5; // Reduced multiplier  
+    const BOTTOM_PADDING = this.STANDARD_PADDING * 1.5; // Reduced multiplier
 
-    const characterZoneHeight = 120;
-    const battleLogHeight = 120;
+    const characterZoneHeight = 100; // Reduced from 120
+    const battleLogHeight = 90; // Reduced from 120
     const handZoneHeight = (height - characterZoneHeight * 2 - battleLogHeight - TOP_PADDING - BOTTOM_PADDING - BETWEEN_AREAS * 5) / 2;
 
     // Calculate available height and distribute remaining space
