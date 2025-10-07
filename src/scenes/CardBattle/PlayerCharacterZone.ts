@@ -183,7 +183,6 @@ export class PlayerCharacterZone extends Container {
     });
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private createCharacterCard(character: any, x: number, y: number, width: number, height: number): Container {
     const scene = this.parent as BaseScene;
     const card = scene.createCharacterCard(character, x, y, width, height);
