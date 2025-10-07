@@ -2,6 +2,7 @@ import { Application } from 'pixi.js';
 import { initDevtools } from '@pixi/devtools';
 import { navigation } from './utils/navigation';
 import { HomeScene } from './scenes/HomeScene';
+import { SignInScene } from './scenes/SignInScene';
 import { PlayerDetailScene } from './scenes/PlayerDetailScene';
 import { initAssets } from "./utils/assets";
 import { getUrlParam } from './utils/getUrlParams';
@@ -94,6 +95,10 @@ async function init() {
   // Show initial loading screen
   //await navigation.showScreen(HomeScene);
 
+  // Check if user is authenticated
+  const authToken = sessionStorage.getItem('authToken');
+  const isAuthenticated = !!authToken;
+
   //Go to one of the screens if a shortcut is present in url params, otherwise go to home screen
   if (getUrlParam("combat") !== null) {
     //await navigation.showScreen(CombatScreen);
@@ -107,8 +112,14 @@ async function init() {
     await navigation.showScreen(PlayerDetailScene);
   } else if (getUrlParam("home") !== null) {
     await navigation.showScreen(HomeScene);
+  } else if (getUrlParam("signin") !== null) {
+    // Force show sign-in screen for testing
+    await navigation.showScreen(SignInScene);
+  } else if (!isAuthenticated) {
+    // Show sign-in screen if not authenticated
+    await navigation.showScreen(SignInScene);
   } else {
-    // Show HomeScene by default for easier navigation
+    // Show HomeScene by default for authenticated users
     await navigation.showScreen(HomeScene);
   }
 }

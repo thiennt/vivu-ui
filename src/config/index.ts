@@ -12,7 +12,7 @@ export interface AppConfig {
 
 // Default configuration
 const defaultConfig: AppConfig = {
-  useMockData: false, // Default to false - set to true for development/testing
+  useMockData: true, // Default to true for development/testing - set to false in production
   apiBaseUrl: ((import.meta as unknown) as { env?: { VITE_API_BASE_URL?: string } }).env?.VITE_API_BASE_URL || 'https://api.vivu.game'
 };
 
