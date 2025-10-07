@@ -110,7 +110,6 @@ export class CardBattleScene extends BaseScene {
     });
 
     // Override the getDropTarget method for HandZone 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (this.p1HandZone as any).getDropTarget = (globalX: number, globalY: number): string | null => {
       return this.getDropTarget(globalX, globalY);
     };

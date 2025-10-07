@@ -32,7 +32,6 @@ A whimsical fantasy turn-based card game UI built with PixiJS and TypeScript, fe
 - **PixiJS 7.3.0**: High-performance 2D rendering engine
 - **TypeScript**: Type-safe development with comprehensive interfaces
 - **Vite**: Fast development server and optimized builds
-- **ESLint**: Code quality and consistency
 
 ## 🚀 Getting Started
 
@@ -151,12 +150,9 @@ src/
 - `npm run dev` - Start development server
 - `npm run build` - Build for production
 - `npm run preview` - Preview production build
-- `npm run lint` - Run ESLint
-- `npm run lint:fix` - Fix ESLint issues
 
 ### Code Style
 - TypeScript with strict mode enabled
-- ESLint for code quality
 - Modular scene-based architecture
 - Comprehensive type definitions
 
@@ -173,7 +169,7 @@ The game includes rich mock data featuring:
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes
-4. Run tests and linting
+4. Run tests
 5. Submit a pull request
 
 ## 📄 License

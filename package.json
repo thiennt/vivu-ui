@@ -6,14 +6,12 @@
     "prestart": "run-s assets",
     "start": "vite --open",
     "assets": "assetpack",
-    "prebuild": "run-s clean lint assets types",
+    "prebuild": "run-s clean assets types",
     "build": "vite build",
     "types": "tsc",
     "prepreview": "run-s build",
     "preview": "vite preview --open",
-    "clean": "rimraf public/assets/* dist/* .assetpack/*",
-    "lint": "eslint src --ext .ts,.tsx",
-    "lint:fix": "eslint src --ext .ts,.tsx --fix"
+    "clean": "rimraf public/assets/* dist/* .assetpack/*"
   },
   "keywords": [
     "game",
@@ -26,14 +24,9 @@
   "license": "MIT",
   "devDependencies": {
     "@assetpack/core": "^1.5.3",
-    "@eslint/js": "^9.35.0",
     "@types/node": "^24.3.1",
-    "@typescript-eslint/eslint-plugin": "^8.42.0",
-    "@typescript-eslint/parser": "^8.42.0",
-    "eslint": "^9.35.0",
     "npm-run-all": "^4.1.5",
     "typescript": "^5.9.2",
-    "typescript-eslint": "^8.42.0",
     "vite": "^7.1.4"
   },
   "dependencies": {
