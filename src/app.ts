@@ -3,6 +3,7 @@ import { initDevtools } from '@pixi/devtools';
 import { navigation } from './utils/navigation';
 import { HomeScene } from './scenes/HomeScene';
 import { SignInScene } from './scenes/SignInScene';
+import { QuickAuthSignInScene } from './scenes/QuickAuthSignInScene';
 import { PlayerDetailScene } from './scenes/PlayerDetailScene';
 import { initAssets } from "./utils/assets";
 import { getUrlParam } from './utils/getUrlParams';
@@ -103,10 +104,13 @@ async function init() {
   //Go to one of the screens if a shortcut is present in url params, otherwise go to home screen
   if (getUrlParam("signin") !== null) {
     // Force show sign-in screen for testing
+    await navigation.showScreen(QuickAuthSignInScene);
+  } else if (getUrlParam("oldauth") !== null) {
+    // Show original SIWF-only screen for testing
     await navigation.showScreen(SignInScene);
   } else if (!isAuthenticated) {
     // Show sign-in screen if not authenticated
-    await navigation.showScreen(HomeScene);
+    await navigation.showScreen(QuickAuthSignInScene);
   } else {
     // Show HomeScene by default for authenticated users
     await navigation.showScreen(HomeScene);
