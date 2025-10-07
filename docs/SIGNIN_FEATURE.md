@@ -10,6 +10,14 @@ The sign-in screen displays a form for users to authenticate with their Farcaste
 - Farcaster ID input field
 - Username input field
 - Sign In button
+- Integrates with Farcaster Auth Client SDK
+
+### Farcaster Service (`src/services/farcaster.ts`)
+New `FarcasterAuthService` that wraps the `@farcaster/auth-client` SDK:
+- `authenticate(fid, username)` - Authenticates a user with Farcaster
+- `isAvailable()` - Checks if Farcaster authentication is available
+- `signOut()` - Signs out the current user
+- `getCurrentUser()` - Gets the current authenticated user from session storage
 
 ### Auth API (`src/services/api.ts`)
 New `authApi` service with the following method:
@@ -25,11 +33,13 @@ New `authApi` service with the following method:
 2. **Sign-In Process**
    - User enters Farcaster ID and username
    - Clicks "Sign In" button
+   - **NEW**: System authenticates with Farcaster SDK via `farcasterAuth.authenticate()`
    - API request to POST `/auth/signin` with:
      ```json
      {
        "fid": "player_fc_001",
-       "username": "PlayerOne"
+       "username": "PlayerOne",
+       "custody_address": "0x..." (optional)
      }
      ```
    

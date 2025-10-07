@@ -3,6 +3,7 @@ import { BaseScene } from '@/ui/BaseScene';
 import { Button } from '@/ui/Button';
 import { Colors } from '@/utils/colors';
 import { authApi } from '@/services/api';
+import { farcasterAuth } from '@/services/farcaster';
 import { navigation } from '@/utils/navigation';
 import { HomeScene } from './HomeScene';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
@@ -196,10 +197,19 @@ export class SignInScene extends BaseScene {
     try {
       this.loadingManager.showLoading();
 
-      // Call the auth API
+      // First, authenticate with Farcaster service
+      const farcasterUser = await farcasterAuth.authenticate(
+        this.farcasterIdInput,
+        this.usernameInput
+      );
+
+      console.log('✅ Farcaster authentication successful:', farcasterUser);
+
+      // Then, call the auth API with Farcaster data
       const response = await authApi.signIn({
         fid: this.farcasterIdInput,
-        username: this.usernameInput
+        username: this.usernameInput,
+        custody_address: farcasterUser.custody_address
       });
 
       // Store auth token and player data

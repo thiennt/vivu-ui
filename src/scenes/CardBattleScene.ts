@@ -50,6 +50,9 @@ export class CardBattleScene extends BaseScene {
   // Visual effects handler
   public readonly vfx: CardBattleEffects;
 
+  // Back button for navigation
+  private backButton: Container | null = null;
+
   constructor(params?: { battleId?: string }) {
     super();
 
@@ -82,6 +85,7 @@ export class CardBattleScene extends BaseScene {
     this.addChild(this.vfx);
 
     this.setupDragDropHandlers();
+    this.createBackButton();
 
     // Initialize battle after zones are set up
     this.initializeBattle();
@@ -128,6 +132,47 @@ export class CardBattleScene extends BaseScene {
     }
 
     return null;
+  }
+
+  private createBackButton(): void {
+    const backButton = new Container();
+    
+    // Button dimensions - small and unobtrusive
+    const buttonWidth = 80;
+    const buttonHeight = 32;
+    
+    const backBg = new Graphics();
+    backBg.roundRect(0, 0, buttonWidth, buttonHeight, 8)
+      .fill(Colors.BUTTON_PRIMARY)
+      .stroke({ width: 2, color: Colors.BUTTON_BORDER });
+    
+    const backText = new Text({
+      text: '← BACK',
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 12,
+        fill: Colors.TEXT_PRIMARY,
+        align: 'center'
+      }
+    });
+    backText.anchor.set(0.5);
+    backText.x = buttonWidth / 2;
+    backText.y = buttonHeight / 2;
+    
+    backButton.addChild(backBg, backText);
+    
+    // Position at top-left corner with padding
+    backButton.x = this.STANDARD_PADDING;
+    backButton.y = this.STANDARD_PADDING;
+    
+    backButton.interactive = true;
+    backButton.cursor = 'pointer';
+    backButton.on('pointertap', () => {
+      navigation.showScreen(HomeScene);
+    });
+    
+    this.backButton = backButton;
+    this.addChild(backButton);
   }
 
   private async handleCardDrop(card: Card, dropTarget: string, cardPosition?: number): Promise<void> {
@@ -962,5 +1007,11 @@ export class CardBattleScene extends BaseScene {
     this.p1HandZone.x = this.STANDARD_PADDING;
     this.p1HandZone.y = currentY;
     this.p1HandZone.resize(width - 2 * this.STANDARD_PADDING, handZoneHeight);
+
+    // Reposition back button
+    if (this.backButton) {
+      this.backButton.x = this.STANDARD_PADDING;
+      this.backButton.y = this.STANDARD_PADDING;
+    }
   }
 }

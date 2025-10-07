@@ -30,6 +30,7 @@
     "vite": "^7.1.4"
   },
   "dependencies": {
+    "@farcaster/auth-client": "^0.7.0",
     "@pixi/devtools": "^2.0.1",
     "@pixi/ui": "^2.2.7",
     "gsap": "^3.13.0",
