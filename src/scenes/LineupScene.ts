@@ -132,16 +132,16 @@ export class LineupScene extends BaseScene {
   }
 
   private createHeader(): void {
-    const title = this.createTitle('Battle Lineup', this.gameWidth / 2, 60);
+    const title = this.createTitle('Battle Lineup', this.gameWidth / 2, 45); // Reduced Y from 60
     title.anchor.set(0.5, 0.5);
     title.x = this.gameWidth / 2;
-    title.y = 60;
+    title.y = 45;
 
     const subtitle = new Text({
       text: 'Drag to swap positions in lineup. Click to move between lineup and pool.',
       style: {
         fontFamily: 'Kalam',
-        fontSize: 16,
+        fontSize: 12, // Reduced from 16 for 400x700
         fill: Colors.TEXT_SECONDARY,
         align: 'center',
         wordWrap: true,
@@ -158,20 +158,21 @@ export class LineupScene extends BaseScene {
   private createLineupGrid(): void {
     this.lineupContainer.label = 'lineupContainer';
 
-    // Lineup positions (single row of 3) with standard spacing
+    // Lineup positions (single row of 3) with tighter spacing for 400x700
     const cols = 3;
     const availableWidth = this.gameWidth - 2 * this.STANDARD_PADDING;
-    const layout = this.calculateThreeCardsLayout(availableWidth, this.STANDARD_SPACING);
-    const slotWidth = Math.min(layout.itemWidth, 120); // Cap at 120px to maintain reasonable size
+    const gap = 6; // Tighter gap for 400x700
+    const layout = this.calculateThreeCardsLayout(availableWidth, gap);
+    const slotWidth = Math.min(layout.itemWidth, 100); // Reduced cap from 120 to 100
     const slotHeight = slotWidth * 1.25; // Use 1:1.25 aspect ratio for consistency
-    const gridWidth = cols * slotWidth + (cols - 1) * this.STANDARD_SPACING;
+    const gridWidth = cols * slotWidth + (cols - 1) * gap;
     const startX = (this.gameWidth - gridWidth) / 2;
-    const startY = 150;
+    const startY = 110; // Reduced from 150
 
     this.lineupSlotHitBoxes = [];
     for (let col = 0; col < cols; col++) {
       const positionIndex = col;
-      const x = col * (slotWidth + this.STANDARD_SPACING);
+      const x = col * (slotWidth + gap);
       const y = 0;
 
       this.lineupSlotHitBoxes.push({index: positionIndex, x: startX + x, y: startY + y, size: slotWidth});
@@ -208,7 +209,7 @@ export class LineupScene extends BaseScene {
       text: `${positionIndex + 1}`,
       style: {
         fontFamily: 'Kalam',
-        fontSize: 24,
+        fontSize: 20, // Reduced from 24 for 400x700
         fill: Colors.BUTTON_PRIMARY,
         align: 'center'
       }
@@ -476,24 +477,24 @@ export class LineupScene extends BaseScene {
   }
 
   private createActionButtons(): void {
-    const buttonWidth = Math.min(130, (this.gameWidth - 4 * this.STANDARD_PADDING) / 3); // Reduced from 150 and made responsive
-    const buttonHeight = Math.max(40, Math.min(46, this.gameHeight * 0.07)); // Responsive height
+    const buttonWidth = Math.min(115, (this.gameWidth - 4 * this.STANDARD_PADDING) / 3); // Reduced from 130 for 400x700
+    const buttonHeight = 40; // Fixed height for consistency
     const buttonCount = 3;
 
     // Calculate total width for all buttons with standard spacing
-    const totalWidth = buttonWidth * buttonCount + this.STANDARD_SPACING * (buttonCount - 1);
+    const totalWidth = buttonWidth * buttonCount + this.STANDARD_PADDING * (buttonCount - 1);
     const startX = (this.gameWidth - totalWidth) / 2;
-    const y = this.gameHeight - buttonHeight - this.STANDARD_PADDING; // Use calculated height
+    const y = this.gameHeight - buttonHeight - this.STANDARD_PADDING;
 
     // Back button - positioned separately at left with standard padding
     const backButton = this.createButton(
-      '← Back to Home',
+      '← Back',
       this.STANDARD_PADDING,
       y,
       buttonWidth,
       buttonHeight,
       () => navigation.showScreen(HomeScene),
-      14 // Added base font size
+      13 // Reduced font size
     );
 
     // Save button - centered

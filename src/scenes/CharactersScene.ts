@@ -158,35 +158,35 @@ export class CharactersScene extends BaseScene {
   }
 
   private createHeader(): void {
-    const title = this.createTitle('Character Collection', this.gameWidth / 2, 60);
+    const title = this.createTitle('Character Collection', this.gameWidth / 2, 45); // Reduced Y from 60
 
     const subtitle = new Text({
       text: `${this.characters.length} Characters`,
       style: {
         fontFamily: 'Kalam',
-        fontSize: 18,
+        fontSize: 14, // Reduced from 18
         fill: Colors.TEXT_SECONDARY,
         align: 'center'
       }
     });
     subtitle.anchor.set(0.5);
     subtitle.x = this.gameWidth / 2;
-    subtitle.y = 100;
+    subtitle.y = 75; // Reduced from 100
     
     this.headerContainer.addChild(title, subtitle);
   }
 
   private createCharacterGrid(): void {
-    // Calculate area for grid (leave space for back button)
-    const gridTop = 140;
-    const backButtonHeight = 50;
-    const backButtonMargin = 30;
+    // Calculate area for grid (leave space for back button) - optimized for 400x700
+    const gridTop = 100; // Reduced from 140
+    const backButtonHeight = 45; // Reduced from 50
+    const backButtonMargin = 20; // Reduced from 30
     const gridHeight = this.gameHeight - gridTop - backButtonHeight - backButtonMargin - this.STANDARD_PADDING;
 
     // Mobile-optimized card layout using the specified formula
     const availableWidth = this.gameWidth - 2 * this.STANDARD_PADDING;
     const isMobile = this.gameWidth < 768; // Mobile detection
-    const gap = isMobile ? 8 : this.STANDARD_SPACING; // Use 8px gap on mobile
+    const gap = isMobile ? 6 : this.STANDARD_SPACING; // Reduced gap from 8 to 6 for 400x700
     const cardCount = 3; // Force 3 cards per row
     
     // Apply mobile formula: card_width = (screen_width - (gap * (card_count - 1))) / card_count
@@ -277,9 +277,9 @@ export class CharactersScene extends BaseScene {
   }
 
   private createBackButton(): void {
-    // Responsive button sizing
-    const buttonWidth = Math.min(140, this.gameWidth - 2 * this.STANDARD_PADDING); // Reduced from 150
-    const buttonHeight = Math.max(40, Math.min(46, this.gameHeight * 0.07)); // Reduced heights for small screens
+    // Responsive button sizing - optimized for 400x700
+    const buttonWidth = Math.min(120, this.gameWidth - 2 * this.STANDARD_PADDING); // Reduced from 140
+    const buttonHeight = 40; // Fixed height for consistency
     
     const backButton = this.createButton(
       '← Back',
@@ -288,7 +288,7 @@ export class CharactersScene extends BaseScene {
       buttonWidth,
       buttonHeight,
       () => navigation.showScreen(HomeScene),
-      14 // Reduced base font size from 16
+      14 // Base font size
     );
     this.buttonContainer.addChild(backButton);
   }

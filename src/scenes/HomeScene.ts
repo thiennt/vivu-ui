@@ -176,31 +176,31 @@ export class HomeScene extends BaseScene {
       text: 'VIVU',
       style: {
         fontFamily: 'Kalam',
-        fontSize: 72,
+        fontSize: 48, // Reduced from 72 for 400x700
         fontWeight: 'bold',
         fill: Colors.TEXT_PRIMARY,
         stroke: {
           color: Colors.BACKGROUND_SECONDARY,
-          width: 4,
+          width: 3, // Reduced from 4
         },
         dropShadow: {
           color: Colors.SHADOW_COLOR,
-          blur: 8,
+          blur: 6, // Reduced from 8
           angle: Math.PI / 6,
-          distance: 8,
+          distance: 6, // Reduced from 8
           alpha: 0.5,
         },
       }
     });
     title.anchor.set(0.5);
     title.x = this.gameWidth / 2;
-    title.y = 100;
+    title.y = 70; // Reduced from 100
     
     const subtitle = new Text({
       text: 'Crypto Card Adventures',
       style: {
         fontFamily: 'Kalam',
-        fontSize: 24,
+        fontSize: 16, // Reduced from 24
         fontStyle: 'italic',
         fill: Colors.TEXT_SECONDARY,
         align: 'center'
@@ -208,7 +208,7 @@ export class HomeScene extends BaseScene {
     });
     subtitle.anchor.set(0.5);
     subtitle.x = this.gameWidth / 2;
-    subtitle.y = 150;
+    subtitle.y = 110; // Adjusted position
     
     this.container.addChild(title, subtitle);
   }
@@ -216,54 +216,55 @@ export class HomeScene extends BaseScene {
   private createPlayerInfo(): void {
     const playerPanel = new Container();
     
-    // Make panel wider to utilize more screen width
-    const panelWidth = Math.min(this.gameWidth - 2 * this.STANDARD_PADDING, 350);
+    // Optimized for 400x700
+    const panelWidth = Math.min(this.gameWidth - 2 * this.STANDARD_PADDING, 380);
+    const panelHeight = 85; // Reduced from 100
     
     // Background panel
     const bg = new Graphics();
     bg.fill({ color: Colors.BACKGROUND_SECONDARY, alpha: 0.8 })
       .stroke({ width: 2, color: Colors.BUTTON_PRIMARY })
-      .roundRect(0, 0, panelWidth, 100, 12);
+      .roundRect(0, 0, panelWidth, panelHeight, 10); // Reduced border radius
     
-    // Player info text
+    // Player info text - more compact
     const playerName = new Text({
       text: `Welcome, ${this.player.username}!`,
       style: {
         fontFamily: 'Kalam',
-        fontSize: 20,
+        fontSize: 16, // Reduced from 20
         fontWeight: 'bold',
         fill: Colors.TEXT_PRIMARY
       }
     });
-    playerName.x = 15;
-    playerName.y = 15;
+    playerName.x = 12; // Reduced padding
+    playerName.y = 12;
     
     const playerLevel = new Text({
       text: `Level: ${this.player.level}`,
       style: {
         fontFamily: 'Kalam',
-        fontSize: 16,
+        fontSize: 14, // Reduced from 16
         fill: Colors.TEXT_SECONDARY
       }
     });
-    playerLevel.x = 15;
-    playerLevel.y = 45;
+    playerLevel.x = 12;
+    playerLevel.y = 38; // Tighter spacing
     
     const playerExp = new Text({
       text: `EXP: ${this.player.exp}`,
       style: {
         fontFamily: 'Kalam',
-        fontSize: 16,
+        fontSize: 14, // Reduced from 16
         fill: Colors.TEXT_SECONDARY
       }
     });
-    playerExp.x = 15;
-    playerExp.y = 65;
+    playerExp.x = 12;
+    playerExp.y = 58; // Tighter spacing
     
     playerPanel.addChild(bg, playerName, playerLevel, playerExp);
     // Center the panel with standard padding consideration
     playerPanel.x = (this.gameWidth - panelWidth) / 2;
-    playerPanel.y = 200;
+    playerPanel.y = 145; // Adjusted position
     
     this.container.addChild(playerPanel);
   }
@@ -279,35 +280,36 @@ export class HomeScene extends BaseScene {
       { text: '🧑‍🤝‍🧑 Lineup', screen: LineupScene },
     ];
     
-    // Make buttons wider to utilize more screen space
-    const buttonWidth = Math.min(this.gameWidth - 2 * this.STANDARD_PADDING, 280);
+    // Optimized for 400x700
+    const buttonWidth = Math.min(this.gameWidth - 2 * this.STANDARD_PADDING, 380);
+    const buttonHeight = 50; // Reduced from 60
     
     // Calculate button spacing based on available space
-    const headerHeight = 320; // Approximate height used by title and player info
+    const headerHeight = 245; // Updated for new compact header
     const availableHeight = this.gameHeight - headerHeight - this.STANDARD_PADDING;
-    const totalButtonHeight = buttons.length * 60 + (buttons.length - 1) * this.STANDARD_SPACING;
+    const totalButtonHeight = buttons.length * buttonHeight + (buttons.length - 1) * this.STANDARD_SPACING;
     
-    // Use smaller spacing if content doesn't fit
+    // Use tighter spacing if content doesn't fit
     const spacing = totalButtonHeight > availableHeight ? 
-      Math.max(5, (availableHeight - (buttons.length * 60)) / (buttons.length - 1)) : 
+      Math.max(6, (availableHeight - (buttons.length * buttonHeight)) / (buttons.length - 1)) : 
       this.STANDARD_SPACING;
     
     buttons.forEach((buttonData, index) => {
       const button = this.createButton(
         buttonData.text,
         0,
-        index * (60 + spacing),
+        index * (buttonHeight + spacing),
         buttonWidth,
-        60,
+        buttonHeight,
         () => navigation.showScreen(buttonData.screen),
-        18 // Base font size for responsive scaling
+        16 // Reduced base font size from 18
       );
       buttonContainer.addChild(button);
     });
     
     // Center horizontally and position based on content
     buttonContainer.x = (this.gameWidth - buttonWidth) / 2;
-    buttonContainer.y = Math.min(350, headerHeight);
+    buttonContainer.y = headerHeight;
     
     this.container.addChild(buttonContainer);
   }
