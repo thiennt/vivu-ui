@@ -1,210 +1,209 @@
 /**
  * Centralized color constants for the application
  * All hex color values used throughout the UI should be defined here
- * Orange theme with gradient support
+ * "Ancient Forest" theme: Deep forest greens with golden accents
+ * Optimized for Lư Trung Hỏa (Fire) element alignment for dev born in 1987
  */
 
 export const Colors = {
-  // Background colors - Orange theme
-  BACKGROUND_PRIMARY: '#4a1f0d',     // Very dark orange/brown
-  BACKGROUND_SECONDARY: '#6b2e17',   // Dark orange
+  // Background colors - Ancient Forest theme
+  BACKGROUND_PRIMARY: '#1C3A33',     // Deep Forest Green - main background
+  BACKGROUND_SECONDARY: '#2A4C44',   // Emerald Forest - secondary backgrounds
 
-  // Text colors - High contrast for orange backgrounds
-  TEXT_PRIMARY: '#fff4e0',           // Primary text (titles) - warm white
-  TEXT_SECONDARY: '#ffe0b3',         // Secondary text (subtitles, stats) - light orange
-  TEXT_TERTIARY: '#ffb366',          // Tertiary text (skill stats) - medium orange
-  TEXT_WHITE: '#ffffff',             // White text
-  TEXT_BUTTON: '#fff8e1',            // Button text - warm white
+  // Text colors - High contrast for dark green backgrounds
+  TEXT_PRIMARY: '#F0F4E8',           // Soft Ivory - main text
+  TEXT_SECONDARY: '#A9C1A9',         // Sage Green - secondary text
+  TEXT_TERTIARY: '#D4B35F',          // Antique Gold - highlighted text
+  TEXT_WHITE: '#FFFFFF',             // Pure White - for maximum contrast
+  TEXT_BUTTON: '#F0F4E8',            // Soft Ivory - button text
 
-  // Button colors - Orange gradient theme
-  BUTTON_PRIMARY: '#d2691e',         // Primary button background - chocolate orange
-  BUTTON_BORDER: '#8b4513',          // Button border - saddle brown
-  BUTTON_HOVER: '#ff8c00',           // Button hover state - dark orange
+  // Button colors - Wood and Gold theme
+  BUTTON_PRIMARY: '#8B6D31',         // Ancient Gold - primary button
+  BUTTON_BORDER: '#4A6C5D',          // Forest Border - button borders
+  BUTTON_HOVER: '#A88A45',           // Lighter Gold - hover state
 
-  // Card rarity colors - Updated for orange theme
-  RARITY_COMMON: '#d2691e',          // Orange theme common
-  RARITY_UNCOMMON: '#66bb6a',        // Keep green for contrast
-  RARITY_RARE: '#42a5f5',            // Keep blue for contrast
-  RARITY_EPIC: '#ab47bc',            // Keep purple for contrast
-  RARITY_LEGENDARY: '#ff9800',       // Bright orange
+  // Card rarity colors - Natural progression
+  RARITY_COMMON: '#729683',          // Forest Stone - common
+  RARITY_UNCOMMON: '#5FAD56',        // Vibrant Leaf - uncommon
+  RARITY_RARE: '#5792C1',            // Azure Sky - rare (touches of sky through canopy)
+  RARITY_EPIC: '#9568A7',            // Mystical Orchid - epic
+  RARITY_LEGENDARY: '#D9A441',       // Ancient Gold - legendary
 
-  // Element colors - Maintain variety for gameplay
-  ELEMENT_FIRE: '#ff4500',           // Orange-red for fire
-  ELEMENT_WATER: '#2196f3',
-  ELEMENT_EARTH: '#4caf50',
-  ELEMENT_AIR: '#ffeb3b',
-  ELEMENT_LIGHT: '#ffc107',
-  ELEMENT_DARK: '#9c27b0',
-  ELEMENT_DEFAULT: '#888888',
+  // Element colors - Natural forces
+  ELEMENT_FIRE: '#E05E33',           // Ember Orange - fire
+  ELEMENT_WATER: '#4CA5B3',          // Forest Lake - water
+  ELEMENT_EARTH: '#5FAD56',          // Vibrant Leaf - earth
+  ELEMENT_AIR: '#D4CE8D',            // Golden Wind - air
+  ELEMENT_LIGHT: '#F0E68C',          // Sunlight - light
+  ELEMENT_DARK: '#2F4F4F',           // Dark Forest - dark
+  ELEMENT_DEFAULT: '#729683',        // Forest Stone - default
 
-  // Lineup labels
-  LINEUP_FRONT: '#ff6347',           // Tomato orange
-  LINEUP_BACK: '#2196f3',
+  // Lineup labels - Position indicators
+  LINEUP_FRONT: '#E05E33',           // Ember Orange - front line
+  LINEUP_BACK: '#4CA5B3',            // Forest Lake - back line
 
-  // Card borders and backgrounds - More realistic card colors
-  CARD_BORDER: '#2d1810',            // Darker border for better definition
-  CARD_BACKGROUND: '#f5f0e8',        // Cream/parchment color for cards
-  CARD_BACK: '#8b4513',             // Card back color
+  // Card borders and backgrounds
+  CARD_BORDER: '#3D5A50',            // Deep Forest Border
+  CARD_BACKGROUND: '#2A4C44',        // Emerald Forest - card background
+  CARD_BACK: '#8B6D31',              // Ancient Gold - card back
 
-  // Panel and container backgrounds - Orange theme
-  PANEL_BACKGROUND: '#8b4513',       // Saddle brown
-  CONTAINER_BACKGROUND: '#a0522d',    // Sienna
+  // Panel and container backgrounds
+  PANEL_BACKGROUND: '#2A4C44',       // Emerald Forest - panel background
+  CONTAINER_BACKGROUND: '#1C3A33',   // Deep Forest - container background
 
   // UI elements
-  ENERGY_ACTIVE: '#ffa500',          // Active energy color
-  ENERGY_INACTIVE: '#808080',        // Inactive energy color
-  HP_BAR_BACKGROUND: '#666666',      // HP bar background
+  ENERGY_ACTIVE: '#D9A441',          // Ancient Gold - active energy
+  ENERGY_INACTIVE: '#3D5A50',        // Deep Forest Gray - inactive energy
+  HP_BAR_BACKGROUND: '#3D5A50',      // Deep Forest Gray - HP background
+  HP_BAR_FILL: '#5FAD56',            // Vibrant Leaf - HP fill
+  HP_BAR_BG: '#3D5A50',              // Deep Forest Gray - HP background (alias)
+  TEXT_ON_DARK: '#F0F4E8',           // Soft Ivory - text on dark backgrounds
 
-  // use green as fill for HP bar to indicate health
-  HP_BAR_FILL: '#4caf50',           // HP bar fill
-  HP_BAR_BG: '#666666',              // HP bar background (alias)
-  TEXT_ON_DARK: '#ffffff',          // Text on dark backgrounds
-  
   // Card Battle UI colors
-  UI_BACKGROUND: '#8b4513',          // UI panel background
-  UI_BORDER: '#6b2e17',              // UI panel border
-  UI_BORDER_GLOW: '#ff8c00',         // Glowing border effect
-  CARD_DISCARD: '#654321',           // Discard pile color
-  TEAM_ALLY: '#4caf50',              // Player team color (green)
-  TEAM_ENEMY: '#f44336',             // Enemy team color (red)
-  ENERGY_TEXT: '#ffa500',            // Energy cost text
-  SUCCESS: '#4caf50',                // Success message color
-  ERROR: '#f44336',                  // Error message color
+  UI_BACKGROUND: '#2A4C44',          // Emerald Forest - UI background
+  UI_BORDER: '#3D5A50',              // Deep Forest Border
+  UI_BORDER_GLOW: '#D9A441',         // Ancient Gold - border glow
+  CARD_DISCARD: '#3D5A50',           // Deep Forest Gray - discard pile
+  TEAM_ALLY: '#5FAD56',              // Vibrant Leaf - ally team
+  TEAM_ENEMY: '#E05E33',             // Ember Orange - enemy team
+  ENERGY_TEXT: '#D9A441',            // Ancient Gold - energy text
+  SUCCESS: '#5FAD56',                // Vibrant Leaf - success message
+  ERROR: '#E05E33',                  // Ember Orange - error message
 
-  // Decorative elements - Orange theme
-  DECORATION_MAGIC: '#ff8c00',       // Dark orange for magical elements
-  DECORATION_FRAME: '#d4af37',       // Gold frame accents
-  DECORATION_INNER_GLOW: '#ffcc66',  // Inner glow effects
-  
-  // Battle zone specific colors - Enhanced for epic battle feel
-  BATTLEFIELD_PRIMARY: '#2d1810',    // Deep mystical brown background
-  BATTLEFIELD_SECONDARY: '#1e0f08',  // Darker mystical zones
-  BATTLEFIELD_ACCENT: '#ff8c00',     // Vibrant orange accents
-  BATTLEFIELD_BORDER: '#d4af37',     // Golden battle borders
-  BATTLEFIELD_INNER_GLOW: '#ffcc66', // Inner mystical glow
+  // Decorative elements
+  DECORATION_MAGIC: '#9568A7',       // Mystical Orchid - magical elements
+  DECORATION_FRAME: '#D9A441',       // Ancient Gold - frame accents
+  DECORATION_INNER_GLOW: '#F0E68C',  // Sunlight - inner glow
+
+  // Battle zone specific colors
+  BATTLEFIELD_PRIMARY: '#182D29',    // Darkest Forest - battlefield primary
+  BATTLEFIELD_SECONDARY: '#1C3A33',  // Deep Forest - battlefield secondary
+  BATTLEFIELD_ACCENT: '#D9A441',     // Ancient Gold - battlefield accent
+  BATTLEFIELD_BORDER: '#8B6D31',     // Ancient Gold Dark - battlefield border
+  BATTLEFIELD_INNER_GLOW: '#F0E68C', // Sunlight - battlefield inner glow
 
   // Enhanced battle effects
-  BATTLE_MAGIC_AURA: '#ff6600',      // Magical battle aura
-  BATTLE_ENERGY_GLOW: '#ffaa44',     // Energy glow effects
-  BATTLE_FRAME_GOLD: '#ffd700',      // Gold frame highlights
-  BATTLE_SHADOW_DEEP: '#0d0603',     // Deep shadows for depth
+  BATTLE_MAGIC_AURA: '#9568A7',      // Mystical Orchid - magic aura
+  BATTLE_ENERGY_GLOW: '#D9A441',     // Ancient Gold - energy glow
+  BATTLE_FRAME_GOLD: '#D9A441',      // Ancient Gold - frame gold
+  BATTLE_SHADOW_DEEP: '#121F1D',     // Darkest Shadow - deep shadow
 
   // Shadow and effects
-  SHADOW_COLOR: '#000000',
-  GLOW_COLOR: '#ffaa00',             // Golden glow effects
-  MYSTICAL_GLOW: '#ff9500',          // Mystical orange glow
-  EPIC_BORDER_GLOW: '#ffcc00',       // Epic border glow effect
+  SHADOW_COLOR: 'rgba(18, 31, 29, 0.7)', // Darkest Shadow - shadow color
+  GLOW_COLOR: '#D9A441',             // Ancient Gold - glow color
+  MYSTICAL_GLOW: '#9568A7',          // Mystical Orchid - mystical glow
+  EPIC_BORDER_GLOW: '#D4CE8D',       // Golden Wind - epic border glow
 
   // Stat colors - Core stats
-  STAT_HP: '#4caf50',                // HP - Green
-  STAT_ATK: '#f44336',               // Attack - Red
-  STAT_DEF: '#2196f3',               // Defense - Blue
-  STAT_AGI: '#ffeb3b',               // Agility - Yellow
-  STAT_CRIT_RATE: '#ff9800',         // Crit Rate - Orange
-  STAT_CRIT_DMG: '#9c27b0',          // Crit Damage - Purple
-  STAT_RES: '#607d8b',               // Resistance - Blue Grey
-  STAT_DAMAGE: '#ff5722',            // Damage - Deep Orange
-  STAT_MITIGATION: '#795548',        // Mitigation - Brown
-  STAT_HIT: '#4caf50',               // Hit Rate - Green
-  STAT_DODGE: '#9e9e9e',             // Dodge - Grey
+  STAT_HP: '#5FAD56',                // Vibrant Leaf - HP
+  STAT_ATK: '#E05E33',               // Ember Orange - Attack
+  STAT_DEF: '#4CA5B3',               // Forest Lake - Defense
+  STAT_AGI: '#D4CE8D',               // Golden Wind - Agility
+  STAT_CRIT_RATE: '#D9A441',         // Ancient Gold - Critical Rate
+  STAT_CRIT_DMG: '#9568A7',          // Mystical Orchid - Critical Damage
+  STAT_RES: '#729683',               // Forest Stone - Resistance
+  STAT_DAMAGE: '#C4502D',            // Deep Ember - Damage
+  STAT_MITIGATION: '#3D5A50',        // Deep Forest Border - Mitigation
+  STAT_HIT: '#5FAD56',               // Vibrant Leaf - Hit Rate
+  STAT_DODGE: '#A9C1A9',             // Sage Green - Dodge
 
   // Skill type colors
-  SKILL_NORMAL: '#9e9e9e',           // Normal attack - Grey
-  SKILL_ACTIVE: '#2196f3',           // Active skill - Blue
-  SKILL_PASSIVE: '#4caf50',          // Passive skill - Green
+  SKILL_NORMAL: '#729683',           // Forest Stone - Normal attack
+  SKILL_ACTIVE: '#4CA5B3',           // Forest Lake - Active skill
+  SKILL_PASSIVE: '#5FAD56',          // Vibrant Leaf - Passive skill
 
   // Difficulty colors
-  DIFFICULTY_EASY: '#4caf50',        // Easy - Green
-  DIFFICULTY_NORMAL: '#ff9800',      // Normal - Orange
-  DIFFICULTY_HARD: '#ff4500',        // Hard - Orange Red
-  DIFFICULTY_NIGHTMARE: '#9c27b0',   // Nightmare - Purple
+  DIFFICULTY_EASY: '#5FAD56',        // Vibrant Leaf - Easy
+  DIFFICULTY_NORMAL: '#D9A441',      // Ancient Gold - Normal
+  DIFFICULTY_HARD: '#E05E33',        // Ember Orange - Hard
+  DIFFICULTY_NIGHTMARE: '#9568A7',   // Mystical Orchid - Nightmare
 
   // HP bar colors based on percentage
-  HP_HIGH: '#4caf50',                // HP > 50% - Green
-  HP_MEDIUM: '#ff9800',              // HP 25-50% - Orange
-  HP_LOW: '#f44336',                 // HP < 25% - Red
-  HP_CRITICAL: '#ff4444',            // Critical HP - Bright Red
+  HP_HIGH: '#5FAD56',                // Vibrant Leaf - HP > 50%
+  HP_MEDIUM: '#D9A441',              // Ancient Gold - HP 25-50%
+  HP_LOW: '#E05E33',                 // Ember Orange - HP < 25%
+  HP_CRITICAL: '#FF5252',            // Bright Red - Critical HP
 
   // Energy colors
-  ENERGY_BAR: '#2196f3',             // Energy bar - Blue
-  ENERGY_BAR_FULL: '#00b8d4',        // Full energy - Cyan
+  ENERGY_BAR: '#4CA5B3',             // Forest Lake - Energy bar
+  ENERGY_BAR_FULL: '#5ECCD9',        // Bright Cyan - Full energy bar
 
   // Overlay and modal colors
-  OVERLAY_DARK: '#000000',           // Dark overlay (used with alpha)
-  MODAL_BORDER: '#ff4444',           // Modal border for errors
+  OVERLAY_DARK: 'rgba(18, 31, 29, 0.8)', // Darkest Shadow - overlay
+  MODAL_BORDER: '#8B6D31',           // Ancient Gold Dark - modal border
 
   // Hover and interaction states
-  HOVER_TINT: '#cccccc',             // Hover tint
-  HOVER_LIGHT: '#dddddd',            // Light hover
-  HOVER_LIGHTEST: '#e8e8e8',         // Lightest hover
-  HOVER_BLUE: '#e0e0ff',             // Blue-tinted hover
-  ACTIVE_WHITE: '#ffffff',           // Active/normal state
+  HOVER_TINT: 'rgba(240, 244, 232, 0.05)', // Soft Ivory - hover tint
+  HOVER_LIGHT: 'rgba(240, 244, 232, 0.1)',
+  HOVER_LIGHTEST: 'rgba(240, 244, 232, 0.15)',
+  HOVER_BLUE: '#4CA5B3',             // Forest Lake - blue hover
+  ACTIVE_WHITE: '#F0F4E8',           // Soft Ivory - active white
 
   // Rarity frame colors (for CharacterCard)
-  FRAME_LEGENDARY: '#ffd700',        // Gold
-  FRAME_EPIC: '#c0c0c0',             // Silver
-  FRAME_RARE: '#cd7f32',             // Bronze
-  FRAME_UNCOMMON: '#7fffd4',         // Aquamarine
-  FRAME_COMMON: '#b0b0b0',           // Gray
+  FRAME_LEGENDARY: '#D9A441',        // Ancient Gold - legendary frame
+  FRAME_EPIC: '#9568A7',             // Mystical Orchid - epic frame
+  FRAME_RARE: '#4CA5B3',             // Forest Lake - rare frame
+  FRAME_UNCOMMON: '#5FAD56',         // Vibrant Leaf - uncommon frame
+  FRAME_COMMON: '#729683',           // Forest Stone - common frame
 
   // Card decorative backgrounds
-  CARD_DECO_BG: '#1a2337',           // Deep blue decorative background
-  CARD_STAT_BG: '#222a38',           // Stat medallion background
-  CARD_AVATAR_BG: '#222a38',         // Avatar circle background
-  CARD_HP_BAR: '#e53935',            // HP bar fill - red
-  CARD_ENERGY_BAR: '#00b8d4',        // Energy bar fill - cyan
+  CARD_DECO_BG: '#182D29',           // Darkest Forest - card decorative background
+  CARD_STAT_BG: '#2A4C44',           // Emerald Forest - stat medallion background
+  CARD_AVATAR_BG: '#3D5A50',         // Deep Forest Border - avatar background
+  CARD_HP_BAR: '#E05E33',            // Ember Orange - HP bar
+  CARD_ENERGY_BAR: '#5ECCD9',        // Bright Cyan - energy bar
 
   // Card back colors (FaceDownCard)
-  CARD_BACK_DARK: '#2c3e50',         // Dark blue-gray
-  CARD_BACK_PATTERN_1: '#34495e',    // Pattern color 1
-  CARD_BACK_PATTERN_2: '#3d566e',    // Pattern color 2
+  CARD_BACK_DARK: '#1C3A33',         // Deep Forest - card back dark
+  CARD_BACK_PATTERN_1: '#2A4C44',    // Emerald Forest - pattern 1
+  CARD_BACK_PATTERN_2: '#3D5A50',    // Deep Forest Border - pattern 2
 
   // Effect and animation colors
-  EFFECT_WHITE: '#ffffff',           // White effect
-  EFFECT_GOLD: '#ffd700',            // Gold effect/glow
-  EFFECT_YELLOW: '#ffff00',          // Yellow effect
-  EFFECT_YELLOW_BRIGHT: '#ffdd00',   // Bright yellow
-  EFFECT_FIRE_RED: '#ff0000',        // Fire red
-  EFFECT_FIRE_ORANGE: '#ff8800',     // Fire orange
-  EFFECT_FIRE_YELLOW: '#ffdd00',     // Fire yellow
-  EFFECT_ICE_BLUE: '#88ddff',        // Ice blue
-  EFFECT_ICE_LIGHT: '#aaeeFF',       // Light ice
-  EFFECT_DAMAGE_RED: '#ff4444',      // Damage red
-  EFFECT_DAMAGE_DARK: '#ff3333',     // Dark damage red
-  EFFECT_DAMAGE_LIGHT: '#ff6666',    // Light damage red
-  EFFECT_HEAL_GREEN: '#44ff88',      // Heal green
-  EFFECT_HEAL_BRIGHT: '#44ff44',     // Bright heal green
-  EFFECT_HEAL_PARTICLE: '#88ffaa',   // Heal particle
-  EFFECT_HEAL_LIGHT: '#aaffcc',      // Light heal
-  EFFECT_DEBUFF_PURPLE: '#8844ff',   // Debuff purple
-  EFFECT_DEBUFF_DARK: '#6622dd',     // Dark debuff purple
-  EFFECT_BUFF_BLUE: '#44aaff',       // Buff blue
-  EFFECT_BUFF_CYAN: '#66ccff',       // Buff cyan
-  EFFECT_DRAW_GREEN: '#66ff66',      // Card draw green
-  EFFECT_DRAW_BLUE: '#6699ff',       // Card draw blue
-  EFFECT_DISCARD_RED: '#ff6666',     // Card discard red
-  EFFECT_PLAY_ORANGE: '#ff9966',     // Card play orange
-  EFFECT_STROKE_BLACK: '#000000',    // Stroke black
-  EFFECT_STROKE_DARK_GREEN: '#006633', // Dark green stroke
+  EFFECT_WHITE: '#F0F4E8',           // Soft Ivory - white effect
+  EFFECT_GOLD: '#D9A441',            // Ancient Gold - gold effect
+  EFFECT_YELLOW: '#F0E68C',          // Sunlight - yellow effect
+  EFFECT_YELLOW_BRIGHT: '#FFEB3B',   // Bright Yellow - bright yellow effect
+  EFFECT_FIRE_RED: '#E05E33',        // Ember Orange - fire red
+  EFFECT_FIRE_ORANGE: '#FF8800',     // Bright Orange - fire orange
+  EFFECT_FIRE_YELLOW: '#FFCC00',     // Fire Yellow - fire yellow
+  EFFECT_ICE_BLUE: '#5ECCD9',        // Bright Cyan - ice blue
+  EFFECT_ICE_LIGHT: '#A5E8F1',       // Light Cyan - light ice
+  EFFECT_DAMAGE_RED: '#FF5252',      // Bright Red - damage red
+  EFFECT_DAMAGE_DARK: '#C4502D',     // Deep Ember - dark damage
+  EFFECT_DAMAGE_LIGHT: '#FF8A80',    // Light Red - light damage
+  EFFECT_HEAL_GREEN: '#77DD77',      // Light Green - heal green
+  EFFECT_HEAL_BRIGHT: '#5AFFB9',     // Bright Green - bright heal
+  EFFECT_HEAL_PARTICLE: '#A5FFD6',   // Pale Green - heal particle
+  EFFECT_HEAL_LIGHT: '#CCFFEB',      // Lightest Green - light heal
+  EFFECT_DEBUFF_PURPLE: '#9568A7',   // Mystical Orchid - debuff
+  EFFECT_DEBUFF_DARK: '#6B469C',     // Dark Purple - dark debuff
+  EFFECT_BUFF_BLUE: '#4CA5B3',       // Forest Lake - buff
+  EFFECT_BUFF_CYAN: '#5ECCD9',       // Bright Cyan - cyan buff
+  EFFECT_DRAW_GREEN: '#77DD77',      // Light Green - draw green
+  EFFECT_DRAW_BLUE: '#66B9FF',       // Light Blue - draw blue
+  EFFECT_DISCARD_RED: '#FF8A80',     // Light Red - discard red
+  EFFECT_PLAY_ORANGE: '#FFBB66',     // Light Orange - play orange
+  EFFECT_STROKE_BLACK: '#121F1D',    // Darkest Shadow - stroke black
+  EFFECT_STROKE_DARK_GREEN: '#0F312A', // Darkest Green - dark green stroke
 
   // Defeated/dimmed state
-  DEFEATED_OVERLAY: '#000000',       // Defeated overlay (used with alpha)
-  DEFEATED_TEXT: '#ffd700',          // Defeated text - gold
-  DIMMED_OVERLAY: '#000000',         // Dimmed overlay
-  EMPTY_SLOT: '#424242',             // Empty equipment slot
+  DEFEATED_OVERLAY: 'rgba(18, 31, 29, 0.7)', // Darkest Shadow - defeated overlay
+  DEFEATED_TEXT: '#D9A441',          // Ancient Gold - defeated text
+  DIMMED_OVERLAY: 'rgba(18, 31, 29, 0.6)', // Darkest Shadow - dimmed overlay
+  EMPTY_SLOT: '#2A4C44',             // Emerald Forest - empty slot
 
   // Sheen and lighting effects
-  SHEEN_WHITE: '#ffffff',            // White sheen
-  WHITE_OVERLAY: '#ffffff',          // White overlay
+  SHEEN_WHITE: 'rgba(240, 244, 232, 0.2)', // Soft Ivory - sheen white
+  WHITE_OVERLAY: 'rgba(240, 244, 232, 0.3)', // Soft Ivory - white overlay
 
   // Battle log zone
-  BATTLE_LOG_BG: '#000000',          // Battle log background (used with alpha)
+  BATTLE_LOG_BG: 'rgba(18, 31, 29, 0.8)', // Darkest Shadow - battle log background
 
   // Hero card glow
-  HERO_GLOW_ORANGE: '#ffa000',       // Hero card orange glow
+  HERO_GLOW_ORANGE: '#D9A441',       // Ancient Gold - hero card glow
 
   // Transparent/invisible
-  TRANSPARENT: '#000000',            // Used with alpha: 0 for transparent backgrounds
+  TRANSPARENT: 'rgba(0, 0, 0, 0)',   // True transparent
 } as const;
 
 // Type-safe color access
