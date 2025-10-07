@@ -425,9 +425,36 @@ export class CardBattleScene extends BaseScene {
       if (response.success && response.data) {
         console.log('Turn start logs:', response.data);
         
-        const data = response.data[0];
-        if (data.after_state) {
-          this.updateBattleStateFromAfterState(data.after_state);
+        const logs = response.data;
+        
+        // Process each log sequentially with animations
+        for (const log of logs) {
+          if (log.action_type === 'effect_trigger') {
+            // Handle effect_trigger animation
+            console.log('Effect triggered at turn start:', log);
+            
+            // Update battle state from after_state if available
+            if (log.after_state) {
+              this.updateBattleStateFromAfterState(log.after_state);
+            }
+
+            // Update UI before animation
+            this.updateAllZones();
+
+            // Animate the effect trigger - using actor's character_id if available
+            const actorCharacterId = log.actor?.character_id;
+            if (actorCharacterId) {
+              await this.animateCardPlay(actorCharacterId, [log]);
+            }
+            
+            // Add delay between effects for better visual clarity
+            await new Promise(resolve => setTimeout(resolve, 300));
+          } else {
+            // For other action types, just update state
+            if (log.after_state) {
+              this.updateBattleStateFromAfterState(log.after_state);
+            }
+          }
         }
 
         this.updateAllZones();
@@ -667,6 +694,31 @@ export class CardBattleScene extends BaseScene {
       if (actorCharacterId) {
         await this.animateCardPlay(actorCharacterId, [log]);
       }
+    } else if (log.action_type === 'effect_trigger') {
+      // Handle effect_trigger animation for AI
+      console.log('AI effect triggered:', log);
+      
+      // Show notification if card/effect name is available
+      const effectName = log.card?.name || 'Effect';
+      this.battleLogZone.showNotification(`${effectName} triggered!`, Colors.EFFECT_PLAY_ORANGE);
+      
+      // Update battle state from after_state if available
+      if (log.after_state) {
+        this.updateBattleStateFromAfterState(log.after_state);
+      }
+
+      // Update UI before animation
+      this.updateAllZones();
+
+      // Animate the effect trigger - using actor's character_id if available
+      const effectActorId = log.actor?.character_id;
+      if (effectActorId) {
+        await this.animateCardPlay(effectActorId, [log]);
+      }
+      
+      // Brief delay
+      await new Promise(resolve => setTimeout(resolve, 300));
+      return false; // Game hasn't ended
     } else if (log.action_type === 'end_turn') {
       // Handle end turn for AI
       console.log('AI ended its turn');
