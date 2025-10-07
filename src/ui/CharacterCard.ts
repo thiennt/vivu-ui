@@ -143,6 +143,22 @@ export class CharacterCard extends Container {
     hpBar.fill({ color: Colors.CARD_HP_BAR, alpha: 0.95 });
     this.addChild(hpBar);
 
+    // HP text (e.g., "30/30")
+    const hpText = new Text({
+      text: `${character.hp}/${character.max_hp || character.hp}`,
+      style: {
+        fontFamily: 'Merriweather, serif',
+        fontSize: 8,
+        fontWeight: 'bold',
+        fill: Colors.TEXT_WHITE,
+        align: 'center'
+      }
+    });
+    hpText.anchor.set(0.5);
+    hpText.x = width / 2;
+    hpText.y = hpBarY + barHeight / 2;
+    this.addChild(hpText);
+
     // HP deco caps
     const hpCapL = new Graphics();
     hpCapL.roundRect(barX - 6, hpBarY - 2, 4, barHeight + 4, 2);

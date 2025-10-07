@@ -54,7 +54,7 @@ export class CardBattleScene extends BaseScene {
     super();
 
     const player = sessionStorage.getItem('player');
-    let _battleId = player ? JSON.parse(player).ongoing_battles[0] : null;
+    const _battleId = player ? JSON.parse(player).ongoing_battles[0] : null;
 
     this.battleId = params?.battleId || _battleId || '';
 
@@ -146,6 +146,21 @@ export class CardBattleScene extends BaseScene {
         // Discard card for energy
         await this.discardCardForEnergy(card, cardPosition);
       } else if (dropTarget.startsWith('character:')) {
+        // Check if player has enough energy to play the card
+        const currentPlayer = this.battleState.players.find(p => p.team === this.battleState!.current_player);
+        const currentEnergy = currentPlayer?.deck.current_energy || 0;
+        
+        if (card.energy_cost > currentEnergy) {
+          // Insufficient energy - return card to hand
+          this.battleLogZone.showNotification(
+            `Not enough energy! Need ${card.energy_cost}, have ${currentEnergy}`,
+            Colors.ERROR,
+            2000
+          );
+          this.enablePlayerUI();
+          return;
+        }
+        
         const characterId = dropTarget.replace('character:', '');
         await this.playCardOnCharacter(card, characterId, cardPosition);
       }
