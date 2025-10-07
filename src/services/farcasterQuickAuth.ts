@@ -1,7 +1,7 @@
 /**
  * Farcaster Quick Auth Service
  * 
- * Integrates with @farcaster/frame-sdk for quick authentication in Farcaster Mini Apps.
+ * Integrates with @farcaster/miniapp-sdk for quick authentication in Farcaster Mini Apps.
  * Reference: https://miniapps.farcaster.xyz/docs/sdk/quick-auth
  * 
  * This service is designed for apps running inside Farcaster clients (like Warpcast).
@@ -38,12 +38,12 @@ export class FarcasterQuickAuthService {
   private context: QuickAuthContext | null = null;
 
   /**
-   * Initialize the Frame SDK
+   * Initialize the Mini App SDK
    * This must be called before any other methods
    */
   async initialize(): Promise<boolean> {
     try {
-      // Initialize the Frame SDK
+      // Initialize the Mini App SDK
       await sdk.actions.ready();
       
       // Check if we're in a mini app
@@ -51,13 +51,13 @@ export class FarcasterQuickAuthService {
       
       if (isInMiniApp) {
         this.isInitialized = true;
-        console.log('✅ Farcaster Frame SDK initialized');
+        console.log('✅ Farcaster Mini App SDK initialized');
         return true;
       }
       
       return false;
     } catch (error) {
-      console.warn('⚠️ Failed to initialize Farcaster Frame SDK:', error);
+      console.warn('⚠️ Failed to initialize Farcaster Mini App SDK:', error);
       return false;
     }
   }

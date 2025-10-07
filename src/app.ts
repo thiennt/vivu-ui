@@ -93,7 +93,7 @@ async function init() {
   // This should be called early in the app lifecycle for Farcaster Mini Apps
   try {
     await sdk.actions.ready();
-    console.log('✅ Farcaster Frame SDK notified: app ready');
+    console.log('✅ Farcaster Mini App SDK notified: app ready');
   } catch (error) {
     // Silently fail if not in a Farcaster client
     console.debug('Not running in Farcaster client or SDK initialization failed');

@@ -5,7 +5,7 @@ This document describes the Farcaster Quick Auth integration for Vivu UI. Quick 
 
 ## Reference
 - Official Documentation: [Quick Auth Documentation](https://miniapps.farcaster.xyz/docs/sdk/quick-auth)
-- Package: [@farcaster/frame-sdk](https://www.npmjs.com/package/@farcaster/frame-sdk)
+- Package: [@farcaster/miniapp-sdk](https://www.npmjs.com/package/@farcaster/miniapp-sdk)
 
 ## When to Use Quick Auth vs SIWF
 
@@ -28,12 +28,12 @@ This document describes the Farcaster Quick Auth integration for Vivu UI. Quick 
 
 ### FarcasterQuickAuthService (`src/services/farcasterQuickAuth.ts`)
 
-A wrapper service around the Farcaster Frame SDK that provides:
+A wrapper service around the Farcaster Mini App SDK that provides:
 
 #### Methods
 
 - **`initialize(): Promise<boolean>`**
-  - Initializes the Frame SDK
+  - Initializes the Mini App SDK
   - Returns `true` if running inside a Farcaster client
   - Must be called before using other methods
 
@@ -162,9 +162,9 @@ window.location.href = '/?signin'
 
 ## Configuration
 
-### Frame SDK Configuration
+### Mini App SDK Configuration
 
-The Frame SDK is initialized automatically when the app loads. No additional configuration is needed.
+The Mini App SDK is initialized automatically when the app loads. No additional configuration is needed.
 
 ### Environment Detection
 
@@ -228,7 +228,7 @@ The service handles errors gracefully:
    - Display username and FID in UI
 
 2. **Enhanced Integration**
-   - Use Frame SDK actions for sharing
+   - Use Mini App SDK actions for sharing
    - Integrate with Farcaster social features
 
 3. **Better UX**
