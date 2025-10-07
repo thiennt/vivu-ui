@@ -62,6 +62,23 @@ The game will be available at `http://localhost:3000`
 npm run build
 ```
 
+### Configuration
+
+The application can be configured using environment variables. Create a `.env` file in the root directory (see `.env.example` for reference):
+
+```bash
+# Use mock data instead of real API calls
+# Set to 'true' for development/testing, 'false' for production
+VITE_USE_MOCK_DATA=true
+
+# API base URL for backend services
+VITE_API_BASE_URL=https://api.vivu.game
+```
+
+**Environment Variables:**
+- `VITE_USE_MOCK_DATA`: Controls whether to use mock data (`true`) or make real API calls (`false`). Defaults to `true` if not set.
+- `VITE_API_BASE_URL`: The base URL for API requests. Defaults to `https://api.vivu.game` if not set.
+
 ## 🎯 Game Navigation
 
 ### Using UI Buttons

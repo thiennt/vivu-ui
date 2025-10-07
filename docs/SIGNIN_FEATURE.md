@@ -57,12 +57,16 @@ New `authApi` service with the following method:
 - `playerId` - Player ID for quick access
 
 ## Configuration
-Mock data mode can be enabled/disabled in `src/config/index.ts`:
-```typescript
-const defaultConfig: AppConfig = {
-  useMockData: true, // Set to false for production
-  apiBaseUrl: 'https://api.vivu.game'
-};
+Mock data mode can be enabled/disabled using the `VITE_USE_MOCK_DATA` environment variable:
+- Create a `.env` file in the project root (see `.env.example` for reference)
+- Set `VITE_USE_MOCK_DATA=true` to use mock data (default if not set)
+- Set `VITE_USE_MOCK_DATA=false` to use real API calls
+- Set `VITE_API_BASE_URL` to configure the API base URL (defaults to `https://api.vivu.game`)
+
+Example `.env` file:
+```bash
+VITE_USE_MOCK_DATA=true
+VITE_API_BASE_URL=https://api.vivu.game
 ```
 
 ## Testing
