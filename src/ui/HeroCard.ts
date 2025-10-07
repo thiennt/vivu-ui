@@ -25,12 +25,12 @@ export class HeroCard extends Container {
     const opts = { ...defaultHeroCardOptions, ...options };
     this.character = character;
 
-    // Define card dimensions based on type, or use custom width
+    // Define card dimensions based on type - optimized for 400x700
     const cardSizes = {
-      preview: { width: opts.customWidth || 120, height: (opts.customWidth || 120) * 1.25 },
-      detailed: { width: opts.customWidth || 140, height: (opts.customWidth || 140) * 1.25 },
-      lineup: { width: opts.customWidth || 100, height: opts.customWidth || 100 },
-      pool: { width: opts.customWidth || 90, height: opts.customWidth || 90 }
+      preview: { width: opts.customWidth || 100, height: (opts.customWidth || 100) * 1.25 }, // Reduced from 120
+      detailed: { width: opts.customWidth || 110, height: (opts.customWidth || 110) * 1.25 }, // Reduced from 140
+      lineup: { width: opts.customWidth || 85, height: opts.customWidth || 85 }, // Reduced from 100
+      pool: { width: opts.customWidth || 75, height: opts.customWidth || 75 } // Reduced from 90
     };
     
     const { width, height } = cardSizes[opts.cardType];
@@ -56,9 +56,9 @@ export class HeroCard extends Container {
 
     this.addChild(bg);
 
-    // Character name - responsive font size
-    const baseNameSize = opts.cardType === 'detailed' ? 16 : (opts.cardType === 'preview' ? 14 : 12);
-    const nameSize = this.calculateResponsiveFontSize(baseNameSize, width, opts.gameWidth, 10, 20);
+    // Character name - responsive font size (reduced for 400x700)
+    const baseNameSize = opts.cardType === 'detailed' ? 14 : (opts.cardType === 'preview' ? 12 : 10); // Reduced all by 2
+    const nameSize = this.calculateResponsiveFontSize(baseNameSize, width, opts.gameWidth, 9, 16); // Reduced max from 20 to 16
     const nameText = new Text({
       text: character.name,
       style: {

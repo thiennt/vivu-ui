@@ -117,17 +117,18 @@ export class BattleScene extends BaseScene {
     this.team1Container = new Container();
     this.team2Container = new Container();
 
-    // Calculate layout for 3 cards per row
+    // Calculate layout for 3 cards per row - optimized for 400x700
     const availableWidth = this.gameWidth - 2 * this.STANDARD_PADDING;
-    const layout = this.calculateThreeCardsLayout(availableWidth, this.STANDARD_SPACING);
+    const gap = 6; // Tighter gap for 400x700
+    const layout = this.calculateThreeCardsLayout(availableWidth, gap);
     const cardWidth = layout.itemWidth;
     const teamWidth = layout.totalWidth;
-    const cardHeight = 120;
+    const cardHeight = 100; // Reduced from 120 for 400x700
     const teamBlockHeight = cardHeight; // Single row now
 
-    // Battle log height (should match createBattleLog)
-    const logHeight = 80;
-    const logMargin = 30;
+    // Battle log height (should match createBattleLog) - reduced
+    const logHeight = 70; // Reduced from 80
+    const logMargin = 20; // Reduced from 30
 
     // Calculate vertical positions
     const totalUsedHeight = teamBlockHeight * 2 + logHeight + logMargin * 2 + 5;
@@ -146,14 +147,14 @@ export class BattleScene extends BaseScene {
 
     // Single row of 4 cards for each team
     this.team1.forEach((character, index) => {
-      const x = index * (cardWidth + this.STANDARD_SPACING);
+      const x = index * (cardWidth + gap);
       const y = 0;
       const card = this.createBattleCard(character, x, y, cardWidth);
       this.team1Container.addChild(card);
     });
 
     this.team2.forEach((character, index) => {
-      const x = index * (cardWidth + this.STANDARD_SPACING);
+      const x = index * (cardWidth + gap);
       const y = 0;
       const card = this.createBattleCard(character, x, y, cardWidth);
       this.team2Container.addChild(card);
@@ -164,25 +165,25 @@ export class BattleScene extends BaseScene {
     this.team2Container.x = team2X;
     this.team2Container.y = team2Y;
 
-    // Add team labels
+    // Add team labels - reduced font sizes for 400x700
     const team1Label = new Text({
       text: 'Enemies',
       style: {
         fontFamily: 'Kalam',
-        fontSize: 18,
+        fontSize: 14, // Reduced from 18
         fontWeight: 'bold',
         fill: Colors.TEXT_PRIMARY
       }
     });
     team1Label.anchor.set(0.5);
     team1Label.x = this.gameWidth / 2;
-    team1Label.y = team1Y - 30;
+    team1Label.y = team1Y - 22; // Reduced from -30
 
     const team2Label = new Text({
       text: 'Allies',
       style: {
         fontFamily: 'Kalam',
-        fontSize: 18,
+        fontSize: 14, // Reduced from 18
         fontWeight: 'bold',
         fill: Colors.TEXT_PRIMARY
       }
@@ -213,7 +214,7 @@ export class BattleScene extends BaseScene {
   }
 
   private createBattleCard(character: any, x: number, y: number, cardWidth: number = 100): Container {
-    const cardHeight = 120;
+    const cardHeight = 100; // Reduced from 120 for 400x700
     const card = new Container();
     
     // Rarity colors
@@ -227,16 +228,16 @@ export class BattleScene extends BaseScene {
     
     // Card background
     const bg = new Graphics();
-    bg.roundRect(0, 0, cardWidth, cardHeight, 8)
+    bg.roundRect(0, 0, cardWidth, cardHeight, 6) // Reduced border radius from 8
       .fill(rarityColors[character.rarity] || rarityColors.common)
       .stroke({ width: 2, color: Colors.CARD_BORDER });
     
-    // Character ticker/symbol
+    // Character ticker/symbol - reduced font
     const symbolText = new Text({
       text: character.ticker,
       style: {
         fontFamily: 'Kalam',
-        fontSize: 14,
+        fontSize: 11, // Reduced from 14
         fontWeight: 'bold',
         fill: Colors.TEXT_WHITE,
         align: 'center'
@@ -244,46 +245,46 @@ export class BattleScene extends BaseScene {
     });
     symbolText.anchor.set(0.5);
     symbolText.x = cardWidth / 2;
-    symbolText.y = 15;
+    symbolText.y = 12; // Reduced from 15
     
-    // Level
+    // Level - reduced font
     const levelText = new Text({
       text: `Lv.${character.level}`,
       style: {
         fontFamily: 'Kalam',
-        fontSize: 10,
+        fontSize: 9, // Reduced from 10
         fill: Colors.TEXT_SECONDARY,
         align: 'center'
       }
     });
     levelText.anchor.set(0.5);
     levelText.x = cardWidth / 2;
-    levelText.y = 30;
+    levelText.y = 26; // Adjusted from 30
     
-    // HP Bar
+    // HP Bar - more compact
     const hpBarBg = new Graphics();
-    hpBarBg.roundRect(5, 45, cardWidth - 10, 8, 4)
+    hpBarBg.roundRect(5, 38, cardWidth - 10, 7, 3) // Adjusted positions, reduced height from 8 to 7
       .fill(Colors.BACKGROUND_SECONDARY)
       .stroke({ width: 1, color: Colors.CARD_BORDER });
     
     const hpPercentage = character.hp / character.hp;
     const hpBarFill = new Graphics();
-    hpBarFill.roundRect(6, 46, (cardWidth - 12) * hpPercentage, 6, 3)
+    hpBarFill.roundRect(6, 39, (cardWidth - 12) * hpPercentage, 5, 2) // Adjusted positions
       .fill(hpPercentage > 0.5 ? Colors.HP_HIGH : hpPercentage > 0.25 ? Colors.HP_MEDIUM : Colors.HP_LOW);
     
-    // HP Text
+    // HP Text - reduced font
     const hpText = new Text({
       text: `HP: ${character.hp}/${character.hp}`,
       style: {
         fontFamily: 'Kalam',
-        fontSize: 8,
+        fontSize: 7, // Reduced from 8
         fill: Colors.TEXT_SECONDARY,
         align: 'center'
       }
     });
     hpText.anchor.set(0.5);
     hpText.x = cardWidth / 2;
-    hpText.y = 58;
+    hpText.y = 50; // Adjusted from 58
     
     // Energy Bar
     const energyBarBg = new Graphics();
@@ -345,26 +346,26 @@ export class BattleScene extends BaseScene {
   private createBattleLog(): void {
     this.logContainer = new Container();
 
-    // Log background
+    // Log background - reduced size for 400x700
     const logBg = new Graphics();
-    const logWidth = this.gameWidth - 40;
-    const logHeight = 80;
-    logBg.roundRect(0, 0, logWidth, logHeight, 8)
+    const logWidth = this.gameWidth - 32; // Reduced from 40
+    const logHeight = 70; // Reduced from 80
+    logBg.roundRect(0, 0, logWidth, logHeight, 6) // Reduced border radius from 8
       .fill({ color: Colors.BACKGROUND_SECONDARY, alpha: 0.8 })
       .stroke({ width: 2, color: Colors.CARD_BORDER });
 
-    // Log title
+    // Log title - reduced font
     const logTitle = new Text({
       text: 'Battle Log',
       style: {
         fontFamily: 'Kalam',
-        fontSize: 14,
+        fontSize: 12, // Reduced from 14
         fontWeight: 'bold',
         fill: Colors.TEXT_PRIMARY
       }
     });
-    logTitle.x = 10;
-    logTitle.y = 5;
+    logTitle.x = 8; // Reduced from 10
+    logTitle.y = 4; // Reduced from 5
 
     this.logContainer.addChild(logBg, logTitle);
     this.logContainer.x = 20;
@@ -377,9 +378,9 @@ export class BattleScene extends BaseScene {
   private createActionButtons(): void {
     const buttonContainer = new Container();
     
-    // Responsive button sizing
-    const buttonWidth = Math.min(100, (this.gameWidth - 3 * this.STANDARD_PADDING) / 2);
-    const buttonHeight = Math.max(44, Math.min(40, this.gameHeight * 0.08));
+    // Responsive button sizing - optimized for 400x700
+    const buttonWidth = Math.min(95, (this.gameWidth - 3 * this.STANDARD_PADDING) / 2); // Reduced from 100
+    const buttonHeight = 40; // Fixed height for consistency
     
     // Start Battle button
     const startButton = this.createButton(

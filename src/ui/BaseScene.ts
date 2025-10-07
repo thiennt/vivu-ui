@@ -18,9 +18,9 @@ export abstract class BaseScene extends Container {
   protected gameWidth: number = navigation.width;
   protected gameHeight: number = navigation.height;
   
-  // Standard layout constants
-  public readonly STANDARD_PADDING = 10;
-  public readonly STANDARD_SPACING = 10;
+  // Standard layout constants - optimized for 400x700
+  public readonly STANDARD_PADDING = 8;
+  public readonly STANDARD_SPACING = 8;
 
   // Bottom navigation
   protected bottomNavigation: BottomNavigationMenu | null = null;
@@ -65,7 +65,7 @@ export abstract class BaseScene extends Container {
   }
 
   protected initializeDimensions() {
-    this.gameWidth = Math.max(350, app.screen?.width || 800);
+    this.gameWidth = Math.max(400, app.screen?.width || 800);
     this.gameHeight = Math.max(700, app.screen?.height || 700);
   }
 
@@ -192,18 +192,18 @@ export abstract class BaseScene extends Container {
       text: text,
       style: {
         fontFamily: 'Kalam',
-        fontSize: 36,
+        fontSize: 28, // Reduced from 36 for 400x700
         fontWeight: 'bold',
         fill: Colors.TEXT_PRIMARY,
         stroke: {
           color: Colors.BACKGROUND_SECONDARY,
-          width: 3,
+          width: 2, // Reduced from 3
         },
         dropShadow: {
           color: Colors.SHADOW_COLOR,
-          blur: 4,
+          blur: 3, // Reduced from 4
           angle: Math.PI / 6,
-          distance: 6,
+          distance: 4, // Reduced from 6
           alpha: 0.5,
         },
       }
