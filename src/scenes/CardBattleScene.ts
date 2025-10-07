@@ -158,6 +158,7 @@ export class CardBattleScene extends BaseScene {
             2000
           );
           this.enablePlayerUI();
+          this.updateHandAndPlayerInfoZones();
           return;
         }
         
