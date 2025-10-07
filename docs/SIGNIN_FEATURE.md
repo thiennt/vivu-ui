@@ -6,15 +6,17 @@ This document describes the Farcaster authentication implementation in the Vivu 
 ## Components
 
 ### SignInScene (`src/scenes/SignInScene.ts`)
-The sign-in screen displays a form for users to authenticate with their Farcaster credentials:
-- Farcaster ID input field
-- Username input field
-- Sign In button
+The sign-in screen implements the Sign In With Farcaster (SIWF) flow:
+- Sign In with Farcaster button
+- QR code placeholder for authentication URL
 - Integrates with Farcaster Auth Client SDK
+- Displays authentication channel URL for users to scan with their wallet
 
 ### Farcaster Service (`src/services/farcaster.ts`)
-New `FarcasterAuthService` that wraps the `@farcaster/auth-client` SDK:
-- `authenticate(fid, username)` - Authenticates a user with Farcaster
+`FarcasterAuthService` that wraps the `@farcaster/auth-client` SDK:
+- `authenticate()` - Creates an auth channel and returns functions to wait for authentication
+- `createChannel()` - Creates a new Farcaster Auth relay channel
+- `watchStatus(channelToken)` - Polls for authentication completion
 - `isAvailable()` - Checks if Farcaster authentication is available
 - `signOut()` - Signs out the current user
 - `getCurrentUser()` - Gets the current authenticated user from session storage
@@ -31,15 +33,18 @@ New `authApi` service with the following method:
    - If token exists, displays HomeScene
 
 2. **Sign-In Process**
-   - User enters Farcaster ID and username
-   - Clicks "Sign In" button
-   - **NEW**: System authenticates with Farcaster SDK via `farcasterAuth.authenticate()`
-   - API request to POST `/auth/signin` with:
+   - User clicks "Sign In with Farcaster" button
+   - System creates a Farcaster Auth channel via `farcasterAuth.authenticate()`
+   - Authentication URL is displayed (as QR code and/or link)
+   - User scans QR code or opens URL in their Farcaster wallet app
+   - System polls for authentication completion
+   - Once authenticated, receives verified user data from Farcaster
+   - API request to POST `/auth/signin` with verified Farcaster data:
      ```json
      {
-       "fid": "player_fc_001",
-       "username": "PlayerOne",
-       "custody_address": "0x..." (optional)
+       "fid": "123456",
+       "username": "alice",
+       "custody_address": "0x..." (verified custody address)
      }
      ```
    
@@ -79,7 +84,13 @@ const defaultConfig: AppConfig = {
 To test the sign-in flow:
 1. Clear sessionStorage: `sessionStorage.clear()`
 2. Navigate to `/?signin` to force sign-in screen
-3. Or simply reload the app without auth token
+3. Click "Sign In with Farcaster" button
+4. An authentication URL will be displayed in console and alert
+5. Open the URL in your Farcaster wallet app (e.g., Warpcast)
+6. Sign the authentication request in your wallet
+7. The app will automatically complete sign-in once authentication is detected
+
+**Note:** You need a Farcaster account and wallet app to test the full flow.
 
 ## API Endpoint
 **POST** `/auth/signin`

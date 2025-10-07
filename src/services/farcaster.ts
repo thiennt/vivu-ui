@@ -2,7 +2,7 @@
  * Farcaster Authentication Service
  * 
  * Integrates with @farcaster/auth-client for Farcaster authentication.
- * Reference: https://github.com/farcasterxyz/protocol/discussions/110
+ * Reference: https://docs.farcaster.xyz/developers/siwf/
  */
 
 import { createAppClient, viemConnector } from '@farcaster/auth-client';
@@ -19,6 +19,14 @@ export interface FarcasterUser {
   displayName?: string;
   pfpUrl?: string;
   custody_address?: string;
+  bio?: string;
+  verifications?: string[];
+}
+
+export interface AuthChannel {
+  channelToken: string;
+  url: string;
+  nonce: string;
 }
 
 /**
@@ -56,27 +64,88 @@ export class FarcasterAuthService {
   }
 
   /**
-   * Authenticate a user with Farcaster
-   * This is a simplified mock implementation as the full Farcaster auth
-   * requires a backend channel for the sign-in flow
-   * 
-   * @param fid Farcaster ID
-   * @param username Farcaster username
-   * @returns FarcasterUser object
+   * Create a Farcaster Auth channel for sign-in
+   * Returns a channel with URL to display as QR code or link
    */
-  async authenticate(fid: string, username: string): Promise<FarcasterUser> {
-    // In a production environment, this would:
-    // 1. Use the Farcaster auth client to generate a sign-in request
-    // 2. Show a QR code or deeplink for the user to sign with their Farcaster wallet
-    // 3. Poll for the signature from the Farcaster network
-    // 4. Verify the signature and return user data
-    
-    // For now, return mock data that matches the existing flow
+  async createChannel(): Promise<AuthChannel> {
+    if (!this.appClient) {
+      throw new Error('Farcaster client not initialized');
+    }
+
+    const response = await this.appClient.createChannel({
+      siweUri: this.config.siweUri,
+      domain: this.config.domain,
+    });
+
+    if (response.isError) {
+      throw new Error(`Failed to create auth channel: ${response.error.message}`);
+    }
+
     return {
-      fid: parseInt(fid.replace(/\D/g, '')) || 1,
-      username: username,
-      displayName: username,
-      custody_address: undefined
+      channelToken: response.data.channelToken,
+      url: response.data.url,
+      nonce: response.data.nonce,
+    };
+  }
+
+  /**
+   * Poll for authentication status on a channel
+   * Returns user data when authentication is complete
+   * 
+   * @param channelToken - Channel token from createChannel
+   * @param timeout - Timeout in milliseconds (default: 300000 = 5 minutes)
+   * @param interval - Polling interval in milliseconds (default: 1500)
+   * @param onResponse - Callback for each polling response
+   */
+  async watchStatus(
+    channelToken: string,
+    timeout: number = 300000,
+    interval: number = 1500,
+    onResponse?: (data: any) => void
+  ): Promise<FarcasterUser> {
+    if (!this.appClient) {
+      throw new Error('Farcaster client not initialized');
+    }
+
+    const response = await this.appClient.watchStatus({
+      channelToken,
+      timeout,
+      interval,
+      onResponse: onResponse ? ({ data }) => onResponse(data) : undefined,
+    });
+
+    if (response.isError) {
+      throw new Error(`Authentication failed: ${response.error.message}`);
+    }
+
+    if (response.data.state !== 'completed') {
+      throw new Error('Authentication not completed');
+    }
+
+    return {
+      fid: response.data.fid || 0,
+      username: response.data.username || '',
+      displayName: response.data.displayName,
+      pfpUrl: response.data.pfpUrl,
+      custody_address: response.data.custody,
+      bio: response.data.bio,
+      verifications: response.data.verifications,
+    };
+  }
+
+  /**
+   * Authenticate a user with Farcaster using the Sign In With Farcaster (SIWF) flow
+   * 
+   * @returns Promise with authentication channel info and user data
+   */
+  async authenticate(): Promise<{ channel: AuthChannel; waitForAuth: () => Promise<FarcasterUser> }> {
+    // Create a new auth channel
+    const channel = await this.createChannel();
+
+    // Return channel info and a function to wait for authentication
+    return {
+      channel,
+      waitForAuth: () => this.watchStatus(channel.channelToken),
     };
   }
 
