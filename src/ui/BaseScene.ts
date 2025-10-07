@@ -65,7 +65,7 @@ export abstract class BaseScene extends Container {
   }
 
   protected initializeDimensions() {
-    this.gameWidth = Math.max(400, app.screen?.width || 800);
+    this.gameWidth = Math.max(350, app.screen?.width || 800);
     this.gameHeight = app.screen?.height || 600;
   }
 
