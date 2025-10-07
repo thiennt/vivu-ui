@@ -3,10 +3,12 @@ import { initDevtools } from '@pixi/devtools';
 import { navigation } from './utils/navigation';
 import { HomeScene } from './scenes/HomeScene';
 import { SignInScene } from './scenes/SignInScene';
+import { QuickAuthSignInScene } from './scenes/QuickAuthSignInScene';
 import { PlayerDetailScene } from './scenes/PlayerDetailScene';
 import { initAssets } from "./utils/assets";
 import { getUrlParam } from './utils/getUrlParams';
 import { Colors } from './utils/colors';
+import sdk from '@farcaster/frame-sdk';
 
 /** The PixiJS app Application instance, shared across the project */
 export const app = new Application();
@@ -87,6 +89,16 @@ async function init() {
   // Add a visibility listener, so the app can pause sounds and screens
   document.addEventListener("visibilitychange", visibilityChange);
 
+  // Notify Farcaster client that the app is ready
+  // This should be called early in the app lifecycle for Farcaster Mini Apps
+  try {
+    await sdk.actions.ready();
+    console.log('✅ Farcaster Frame SDK notified: app ready');
+  } catch (error) {
+    // Silently fail if not in a Farcaster client
+    console.debug('Not running in Farcaster client or SDK initialization failed');
+  }
+
   // Setup assets bundles (see assets.ts) and start up loading everything in background
   await initAssets();
 
@@ -103,10 +115,13 @@ async function init() {
   //Go to one of the screens if a shortcut is present in url params, otherwise go to home screen
   if (getUrlParam("signin") !== null) {
     // Force show sign-in screen for testing
+    await navigation.showScreen(QuickAuthSignInScene);
+  } else if (getUrlParam("oldauth") !== null) {
+    // Show original SIWF-only screen for testing
     await navigation.showScreen(SignInScene);
   } else if (!isAuthenticated) {
     // Show sign-in screen if not authenticated
-    await navigation.showScreen(HomeScene);
+    await navigation.showScreen(QuickAuthSignInScene);
   } else {
     // Show HomeScene by default for authenticated users
     await navigation.showScreen(HomeScene);

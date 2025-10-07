@@ -86,8 +86,8 @@ export class SignInScene extends BaseScene {
     
     // Form background
     const formBg = new Graphics();
-    const formWidth = Math.min(this.gameWidth - 2 * this.STANDARD_PADDING, 300);
-    const formHeight = 250;
+    const formWidth = Math.min(this.gameWidth - 2 * this.STANDARD_PADDING, 400);
+    const formHeight = 320;
     const formX = (this.gameWidth - formWidth) / 2;
     const formY = this.gameHeight * 0.35;
     
@@ -96,14 +96,16 @@ export class SignInScene extends BaseScene {
       .roundRect(formX, formY, formWidth, formHeight, 12);
     formContainer.addChild(formBg);
 
-    // Input instruction text
+    // Instruction text
     const instructionText = new Text({
-      text: 'Enter your Farcaster details',
+      text: 'Click the button below to sign in with Farcaster',
       style: {
         fontFamily: 'Kalam',
         fontSize: 16,
         fill: Colors.TEXT_PRIMARY,
-        align: 'center'
+        align: 'center',
+        wordWrap: true,
+        wordWrapWidth: formWidth - 40
       }
     });
     instructionText.anchor.set(0.5, 0);
@@ -111,75 +113,32 @@ export class SignInScene extends BaseScene {
     instructionText.y = formY + 20;
     formContainer.addChild(instructionText);
 
-    // Farcaster ID label
-    const fidLabel = new Text({
-      text: 'Farcaster ID:',
+    // QR Code placeholder (will be populated after channel creation)
+    const qrPlaceholder = new Graphics();
+    qrPlaceholder.fill({ color: 0xFFFFFF })
+      .stroke({ width: 2, color: Colors.BUTTON_BORDER })
+      .rect(formX + (formWidth - 200) / 2, formY + 60, 200, 200);
+    formContainer.addChild(qrPlaceholder);
+
+    const qrText = new Text({
+      text: 'QR code will appear here',
       style: {
         fontFamily: 'Kalam',
         fontSize: 14,
-        fill: Colors.TEXT_PRIMARY
+        fill: Colors.TEXT_SECONDARY,
+        align: 'center',
+        wordWrap: true,
+        wordWrapWidth: 180
       }
     });
-    fidLabel.x = formX + 20;
-    fidLabel.y = formY + 55;
-    formContainer.addChild(fidLabel);
-
-    // Farcaster ID input box (simulated)
-    const fidInputBg = new Graphics();
-    fidInputBg.fill({ color: 0xFFFFFF })
-      .stroke({ width: 1, color: Colors.BUTTON_BORDER })
-      .roundRect(formX + 20, formY + 75, formWidth - 40, 35, 5);
-    formContainer.addChild(fidInputBg);
-
-    const fidInputText = new Text({
-      text: 'player_fc_001',
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 14,
-        fill: 0x333333
-      }
-    });
-    fidInputText.x = formX + 30;
-    fidInputText.y = formY + 85;
-    formContainer.addChild(fidInputText);
-    this.farcasterIdInput = 'player_fc_001';
-
-    // Username label
-    const usernameLabel = new Text({
-      text: 'Username:',
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 14,
-        fill: Colors.TEXT_PRIMARY
-      }
-    });
-    usernameLabel.x = formX + 20;
-    usernameLabel.y = formY + 120;
-    formContainer.addChild(usernameLabel);
-
-    // Username input box (simulated)
-    const usernameInputBg = new Graphics();
-    usernameInputBg.fill({ color: 0xFFFFFF })
-      .stroke({ width: 1, color: Colors.BUTTON_BORDER })
-      .roundRect(formX + 20, formY + 140, formWidth - 40, 35, 5);
-    formContainer.addChild(usernameInputBg);
-
-    const usernameInputText = new Text({
-      text: 'PlayerOne',
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 14,
-        fill: 0x333333
-      }
-    });
-    usernameInputText.x = formX + 30;
-    usernameInputText.y = formY + 150;
-    formContainer.addChild(usernameInputText);
-    this.usernameInput = 'PlayerOne';
+    qrText.anchor.set(0.5);
+    qrText.x = this.gameWidth / 2;
+    qrText.y = formY + 160;
+    formContainer.addChild(qrText);
 
     // Sign In button
     const signInButton = new Button({
-      text: 'Sign In',
+      text: 'Sign In with Farcaster',
       width: formWidth - 40,
       height: 45,
       gameWidth: this.gameWidth,
@@ -187,7 +146,7 @@ export class SignInScene extends BaseScene {
       onClick: () => this.handleSignIn()
     });
     signInButton.x = formX + 20;
-    signInButton.y = formY + 195;
+    signInButton.y = formY + 270;
     formContainer.addChild(signInButton);
 
     this.container.addChild(formContainer);
@@ -196,19 +155,31 @@ export class SignInScene extends BaseScene {
   private async handleSignIn(): Promise<void> {
     try {
       this.loadingManager.showLoading();
+      console.log('Creating sign-in channel...');
 
-      // First, authenticate with Farcaster service
-      const farcasterUser = await farcasterAuth.authenticate(
-        this.farcasterIdInput,
-        this.usernameInput
-      );
+      // Create authentication channel
+      const { channel, waitForAuth } = await farcasterAuth.authenticate();
+
+      console.log('✅ Auth channel created:', channel.url);
+      
+      // Update UI to show the sign-in URL
+      this.loadingManager.hideLoading();
+      this.showAuthChannel(channel);
+
+      // Wait for user to authenticate via their Farcaster wallet
+      this.loadingManager.showLoading();
+      console.log('Waiting for authentication... Please sign in with your Farcaster wallet');
+      
+      const farcasterUser = await waitForAuth();
 
       console.log('✅ Farcaster authentication successful:', farcasterUser);
 
       // Then, call the auth API with Farcaster data
+      console.log('Completing sign in...');
+      
       const response = await authApi.signIn({
-        fid: this.farcasterIdInput,
-        username: this.usernameInput,
+        fid: farcasterUser.fid.toString(),
+        username: farcasterUser.username,
         custody_address: farcasterUser.custody_address
       });
 
@@ -234,6 +205,20 @@ export class SignInScene extends BaseScene {
       );
       console.error('❌ Sign in error:', error);
     }
+  }
+
+  private showAuthChannel(channel: { url: string; channelToken: string }): void {
+    // Log the URL to console for users to access
+    console.log('🔗 Sign in URL:', channel.url);
+    console.log('📱 Scan QR code or visit the URL above with your Farcaster wallet');
+    
+    // In a production app, you would:
+    // 1. Generate a QR code from channel.url
+    // 2. Display it in the UI
+    // 3. Show the URL as a clickable link
+    
+    // For now, we'll show a message to check the console
+    alert(`Sign in URL created!\n\nPlease check the browser console for the authentication URL.\n\nOpen this URL in your Farcaster wallet to sign in:\n${channel.url}`);
   }
 
   resize(width: number, height: number): void {
