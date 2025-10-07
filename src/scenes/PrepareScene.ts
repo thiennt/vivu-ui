@@ -133,7 +133,7 @@ export class PrepareScene extends BaseScene {
     const spacing = 10;
     const availableWidth = this.gameWidth - 40 - (maxPerRow - 1) * spacing;
     const cardWidth = availableWidth / maxPerRow;
-    const cardHeight = cardWidth * 1.2;
+    const cardHeight = cardWidth * 1.25;
 
     chars.forEach((char: Character, index: number) => {
       const row = 0; // single row for lineup
