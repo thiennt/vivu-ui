@@ -8,7 +8,7 @@
  * For standalone web apps, use the SIWF flow in farcaster.ts instead.
  */
 
-import sdk from '@farcaster/frame-sdk';
+import sdk from '@farcaster/miniapp-sdk';
 
 export interface QuickAuthUser {
   fid: number;

@@ -180,6 +180,10 @@ export class SignInScene extends BaseScene {
       const response = await authApi.signIn({
         fid: farcasterUser.fid.toString(),
         username: farcasterUser.username,
+        displayName: farcasterUser.displayName,
+        bio: farcasterUser.bio,
+        pfpUrl: farcasterUser.pfpUrl,
+        verifications: farcasterUser.verifications,
         custody_address: farcasterUser.custody_address
       });
 

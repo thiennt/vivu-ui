@@ -285,7 +285,10 @@ export const battleApi = {
 
 // Auth API methods
 export const authApi = {
-  async signIn(farcasterData: { fid: string; username: string; custody_address?: string }): Promise<any> {
+  async signIn(farcasterData: { 
+    fid: string; username: string; custody_address?: string; 
+    displayName?: string; bio?: string; pfpUrl?: string; verifications?: string[]
+  }): Promise<any> {
     return apiRequest('/auth/signin', {
       method: 'POST',
       body: JSON.stringify(farcasterData),

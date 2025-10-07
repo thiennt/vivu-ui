@@ -8,6 +8,8 @@ import { farcasterAuth } from '@/services/farcaster';
 import { navigation } from '@/utils/navigation';
 import { HomeScene } from './HomeScene';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
+import { quickAuth } from '@farcaster/miniapp-sdk';
+
 
 /**
  * Quick Auth Sign-In Scene
@@ -351,26 +353,27 @@ export class QuickAuthSignInScene extends BaseScene {
       // Then, call the auth API with Farcaster data
       console.log('Completing sign in...');
       
-      const response = await authApi.signIn({
+      const player = await authApi.signIn({
         fid: farcasterUser.fid.toString(),
         username: farcasterUser.username,
-        custody_address: farcasterUser.custody_address
+        displayName: farcasterUser.displayName,
+        bio: farcasterUser.bio,
+        pfpUrl: farcasterUser.pfpUrl,
+        custody_address: farcasterUser.custody_address,
+        verifications: farcasterUser.verifications
       });
 
       // Store auth token and player data
-      if (response.success && response.data) {
-        sessionStorage.setItem('authToken', response.data.token);
-        sessionStorage.setItem('player', JSON.stringify(response.data.player));
-        sessionStorage.setItem('playerId', response.data.player.id);
-        
-        console.log('✅ Sign in successful:', response.data.player.username);
-        
+      if (player) {
+        sessionStorage.setItem('player', JSON.stringify(player));
+        sessionStorage.setItem('playerId', player.id);
+
+        console.log('✅ Sign in successful:', player.username);
+
         this.loadingManager.hideLoading();
 
         // Navigate to HomeScene
         await navigation.showScreen(HomeScene);
-      } else {
-        throw new Error(response.message || 'Sign in failed');
       }
     } catch (error) {
       this.loadingManager.hideLoading();
