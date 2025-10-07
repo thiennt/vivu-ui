@@ -8,6 +8,7 @@ import { PlayerDetailScene } from './scenes/PlayerDetailScene';
 import { initAssets } from "./utils/assets";
 import { getUrlParam } from './utils/getUrlParams';
 import { Colors } from './utils/colors';
+import sdk from '@farcaster/frame-sdk';
 
 /** The PixiJS app Application instance, shared across the project */
 export const app = new Application();
@@ -87,6 +88,16 @@ async function init() {
 
   // Add a visibility listener, so the app can pause sounds and screens
   document.addEventListener("visibilitychange", visibilityChange);
+
+  // Notify Farcaster client that the app is ready
+  // This should be called early in the app lifecycle for Farcaster Mini Apps
+  try {
+    await sdk.actions.ready();
+    console.log('✅ Farcaster Frame SDK notified: app ready');
+  } catch (error) {
+    // Silently fail if not in a Farcaster client
+    console.debug('Not running in Farcaster client or SDK initialization failed');
+  }
 
   // Setup assets bundles (see assets.ts) and start up loading everything in background
   await initAssets();
