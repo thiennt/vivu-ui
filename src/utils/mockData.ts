@@ -5132,3 +5132,52 @@ export const mockBattleLogs: BattleLogEntry[] = [
     description: 'Enemy cast Shadow Strike'
   }
 ];
+
+// ---- Checkin Response ----
+export const mockCheckinResponse = {
+  success: true,
+  code: 200,
+  message: "Check-in successful",
+  data: {
+    checkin_reward: {
+      gold: 100,
+      experience: 50
+    },
+    characters: [
+      {
+        id: "888be80b-0d34-459d-8337-125c3183d4d7",
+        name: "Bitcoin",
+        avatar_url: "https://s2.coinmarketcap.com/static/img/coins/64x64/1.png",
+        hp: 6079,
+        atk: 2717,
+        def: 1536,
+        agi: 801,
+        rarity: "legendary"
+      },
+      {
+        id: "d14fa036-c0fb-4d4c-8060-709c7b7ff034",
+        name: "Ethereum",
+        avatar_url: "https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png",
+        hp: 5892,
+        atk: 2627,
+        def: 1490,
+        agi: 772,
+        rarity: "epic"
+      },
+      {
+        id: "9fe1866f-00c9-4293-8b7f-cf20c1051a17",
+        name: "BNB",
+        avatar_url: "https://s2.coinmarketcap.com/static/img/coins/64x64/1839.png",
+        hp: 5654,
+        atk: 2525,
+        def: 1430,
+        agi: 745,
+        rarity: "rare"
+      }
+    ]
+  },
+  errors: null,
+  meta: {
+    timestamp: new Date().toISOString()
+  }
+};

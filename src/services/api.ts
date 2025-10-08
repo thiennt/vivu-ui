@@ -9,7 +9,7 @@ import {
   mockPlayer, mockSkills, mockDungeons, mockStages, mockCardBattleState,
   mockBattleStage, mockPlayer1Characters, mockActionResult, mockDrawCardResult,
   mockPlayCardResult, mockEndTurnResult,
-  mockAiTurnResult
+  mockAiTurnResult, mockCheckinResponse
 } from '@/utils/mockData';
 import {
   TurnAction,
@@ -292,6 +292,15 @@ export const authApi = {
         'Authorization': `Bearer ${token}`
       }
     }, mockPlayer);
+  },
+
+  async checkin(): Promise<any> {
+    return apiRequest('/auth/checkin', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${sessionStorage.getItem('authToken') || ''}`
+      }
+    }, mockCheckinResponse);
   },
 };
 

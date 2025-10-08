@@ -6,6 +6,7 @@ import { LineupScene } from './LineupScene';
 import { BattleScene } from './BattleScene';
 import { CardBattleScene } from './CardBattleScene';
 import { TowerScene } from './TowerScene';
+import { CheckinScene } from './CheckinScene';
 import { Colors } from '@/utils/colors';
 import { playerApi, isLikelyUsingMockData } from '@/services/api';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
@@ -273,6 +274,7 @@ export class HomeScene extends BaseScene {
     const buttonContainer = new Container();
     
     const buttons = [
+      { text: '📅 Daily Check-In', screen: CheckinScene },
       { text: '🗼 Tower (Card Battle)', screen: TowerScene },
       { text: '👥 Characters', screen: CharactersScene },
       { text: '⚔️ Battle Arena', screen: BattleScene },
