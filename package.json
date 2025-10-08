@@ -30,7 +30,6 @@
     "vite": "^7.1.4"
   },
   "dependencies": {
-    "@farcaster/auth-client": "^0.7.0",
     "@farcaster/miniapp-sdk": "^0.1.10",
     "@pixi/devtools": "^2.0.1",
     "@pixi/ui": "^2.2.7",

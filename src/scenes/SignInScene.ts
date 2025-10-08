@@ -3,19 +3,26 @@ import { BaseScene } from '@/ui/BaseScene';
 import { Button } from '@/ui/Button';
 import { Colors } from '@/utils/colors';
 import { authApi } from '@/services/api';
-import { farcasterAuth } from '@/services/farcaster';
 import { navigation } from '@/utils/navigation';
 import { HomeScene } from './HomeScene';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
+import { config } from '@/config';
+import { sdk } from '@farcaster/miniapp-sdk';
 
+/**
+ * Quick Auth Sign-In Scene
+ * 
+ * This scene provides two authentication methods:
+ * 1. Quick Auth - For users inside Farcaster clients (seamless, one-click)
+ * 2. SIWF - For users on regular web browsers (QR code flow)
+ */
 export class SignInScene extends BaseScene {
   /** Assets bundles required by this screen */
   public static assetBundles = [];
   
   private container: Container;
   private loadingManager: LoadingStateManager;
-  private farcasterIdInput: string = '';
-  private usernameInput: string = '';
+  private isInFarcasterClient: boolean = false;
 
   constructor() {
     super();
@@ -26,13 +33,17 @@ export class SignInScene extends BaseScene {
     // Initialize loading manager
     this.loadingManager = new LoadingStateManager(this.container, this.gameWidth, this.gameHeight);
     
+    this.initializeAndCreateUI();
+  }
+
+  private async initializeAndCreateUI(): Promise<void> {
     this.createUI();
   }
 
   private createUI(): void {
     this.createBackground();
     this.createTitleSection();
-    this.createSignInForm();
+    this.createSignInOptions();
   }
 
   private createBackground(): void {
@@ -64,30 +75,15 @@ export class SignInScene extends BaseScene {
     titleText.x = this.gameWidth / 2;
     titleText.y = this.gameHeight * 0.2;
     this.container.addChild(titleText);
-
-    const subtitleText = new Text({
-      text: 'Sign in with Farcaster',
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 18,
-        fill: Colors.TEXT_SECONDARY,
-        align: 'center'
-      }
-    });
-    
-    subtitleText.anchor.set(0.5);
-    subtitleText.x = this.gameWidth / 2;
-    subtitleText.y = this.gameHeight * 0.25;
-    this.container.addChild(subtitleText);
   }
 
-  private createSignInForm(): void {
+  private createSignInOptions(): void {
     const formContainer = new Container();
     
     // Form background
     const formBg = new Graphics();
     const formWidth = Math.min(this.gameWidth - 2 * this.STANDARD_PADDING, 400);
-    const formHeight = 320;
+    const formHeight = this.isInFarcasterClient ? 280 : 420;
     const formX = (this.gameWidth - formWidth) / 2;
     const formY = this.gameHeight * 0.35;
     
@@ -96,133 +92,68 @@ export class SignInScene extends BaseScene {
       .roundRect(formX, formY, formWidth, formHeight, 12);
     formContainer.addChild(formBg);
 
-    // Instruction text
-    const instructionText = new Text({
-      text: 'Click the button below to sign in with Farcaster',
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 16,
-        fill: Colors.TEXT_PRIMARY,
-        align: 'center',
-        wordWrap: true,
-        wordWrapWidth: formWidth - 40
-      }
-    });
-    instructionText.anchor.set(0.5, 0);
-    instructionText.x = this.gameWidth / 2;
-    instructionText.y = formY + 20;
-    formContainer.addChild(instructionText);
+    let currentY = formY + 30;
 
-    // QR Code placeholder (will be populated after channel creation)
-    const qrPlaceholder = new Graphics();
-    qrPlaceholder.fill({ color: 0xFFFFFF })
-      .stroke({ width: 2, color: Colors.BUTTON_BORDER })
-      .rect(formX + (formWidth - 200) / 2, formY + 60, 200, 200);
-    formContainer.addChild(qrPlaceholder);
-
-    const qrText = new Text({
-      text: 'QR code will appear here',
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 14,
-        fill: Colors.TEXT_SECONDARY,
-        align: 'center',
-        wordWrap: true,
-        wordWrapWidth: 180
-      }
-    });
-    qrText.anchor.set(0.5);
-    qrText.x = this.gameWidth / 2;
-    qrText.y = formY + 160;
-    formContainer.addChild(qrText);
-
-    // Sign In button
-    const signInButton = new Button({
-      text: 'Sign In with Farcaster',
-      width: formWidth - 40,
-      height: 45,
-      gameWidth: this.gameWidth,
-      gameHeight: this.gameHeight,
-      onClick: () => this.handleSignIn()
-    });
-    signInButton.x = formX + 20;
-    signInButton.y = formY + 270;
-    formContainer.addChild(signInButton);
+    // Show Quick Auth option (primary method when in Farcaster client)
+    this.createQuickAuthSection(formContainer, formX, formWidth, currentY);
+    currentY += 180;
 
     this.container.addChild(formContainer);
   }
 
-  private async handleSignIn(): Promise<void> {
+  private createQuickAuthSection(container: Container, formX: number, formWidth: number, startY: number): void {
+    // Quick Auth button
+    const quickAuthButton = new Button({
+      text: 'Sign In With Farcaster',
+      width: formWidth - 40,
+      height: 50,
+      gameWidth: this.gameWidth,
+      gameHeight: this.gameHeight,
+      onClick: () => this.handleQuickAuth()
+    });
+    quickAuthButton.x = formX + 20;
+    quickAuthButton.y = startY + 100;
+    container.addChild(quickAuthButton);
+  }
+
+  private async handleQuickAuth(): Promise<void> {
     try {
       this.loadingManager.showLoading();
-      console.log('Creating sign-in channel...');
+      console.log('Attempting Quick Auth...');
 
-      // Create authentication channel
-      const { channel, waitForAuth } = await farcasterAuth.authenticate();
+      const { token } = await sdk.quickAuth.getToken();
+      //let token = 'eyJhbGciOiJSUzI1NiIsImtpZCI6IjM1NWQ0M2JmLWM0YjQtNDVlMy04MmNhLThlYjI4YzY3MDllNSJ9.eyJpYXQiOjE3NTk5MjAxNTAsImlzcyI6Imh0dHBzOi8vYXV0aC5mYXJjYXN0ZXIueHl6IiwiZXhwIjoxNzU5OTIzNzUwLCJzdWIiOjE5MTIzMSwiYXVkIjoiY2YwOGRjNDgwMjUwLm5ncm9rLWZyZWUuYXBwIn0.Jrx-iGIfsESH5ea3s0bCabDYrKWl-AFx1t1toeCWIs94jRG-OekCuf5jxRcjvSFOENtwECMHpJI6E9jA7QoKoF1cirbw8wszpb1ouXIuIsBYdgZVZZc6lvSDn2XZsJZvBXnJ85S2s9TOq57pVCotfHX_EGO6VITbtoOAw9DkiesfSv9xjtXmvVUpgjSnmqIH7imMZ8veAkVVvnELvsCkQPTk2qgOtjAp1jyRM7GUoSnzpEeTs0NXjOOI6UiESogR4OqGrtmp5YQyY1yjl4RkAIviojinvxO_f3DZYLMgcrk_IRQHWSaGCc1YYZ1kbmdTgKK1RhDFnzPr0p9YxfP8Dw';
+      //token = 'MK-QRFtFkKWj3+fvyB5HjYetJ2FNts2zCq09uAlEMlDOhTyV967NjAOrZJbQPgxaTqlZaaC9y9MVEv3bkU0SiaKig=='
 
-      console.log('✅ Auth channel created:', channel.url);
-      
-      // Update UI to show the sign-in URL
-      this.loadingManager.hideLoading();
-      this.showAuthChannel(channel);
+      console.log('Quick Auth token received:', token);
+      if (!token) {
+        throw new Error("Failed to get Farcaster Quick Auth token.");
+      }
 
-      // Wait for user to authenticate via their Farcaster wallet
-      this.loadingManager.showLoading();
-      console.log('Waiting for authentication... Please sign in with your Farcaster wallet');
-      
-      const farcasterUser = await waitForAuth();
+      console.log('Token acquired. Sending to backend...', token);
 
-      console.log('✅ Farcaster authentication successful:', farcasterUser);
-
-      // Then, call the auth API with Farcaster data
-      console.log('Completing sign in...');
-      
-      const response = await authApi.signIn({
-        fid: farcasterUser.fid.toString(),
-        username: farcasterUser.username,
-        displayName: farcasterUser.displayName,
-        bio: farcasterUser.bio,
-        pfpUrl: farcasterUser.pfpUrl,
-        verifications: farcasterUser.verifications,
-        custody_address: farcasterUser.custody_address
-      });
+      // Call backend API with Farcaster data
+      const player = await authApi.signIn(token);
 
       // Store auth token and player data
-      if (response.success && response.data) {
-        sessionStorage.setItem('authToken', response.data.token);
-        sessionStorage.setItem('player', JSON.stringify(response.data.player));
-        sessionStorage.setItem('playerId', response.data.player.id);
-        
-        console.log('✅ Sign in successful:', response.data.player.username);
+      if (player) {
+        sessionStorage.setItem('player', JSON.stringify(player));
+        sessionStorage.setItem('playerId', player.id);
+
+        console.log('✅ Sign in successful:', player.username);
         
         this.loadingManager.hideLoading();
 
         // Navigate to HomeScene
         await navigation.showScreen(HomeScene);
-      } else {
-        throw new Error(response.message || 'Sign in failed');
       }
     } catch (error) {
       this.loadingManager.hideLoading();
       this.loadingManager.showError(
-        error instanceof Error ? error.message : 'Sign in failed. Please try again.'
+        error instanceof Error ? error.message : 'Quick Auth failed. Please try the QR code method.'
       );
-      console.error('❌ Sign in error:', error);
+      console.error('❌ Quick Auth error:', error);
     }
-  }
-
-  private showAuthChannel(channel: { url: string; channelToken: string }): void {
-    // Log the URL to console for users to access
-    console.log('🔗 Sign in URL:', channel.url);
-    console.log('📱 Scan QR code or visit the URL above with your Farcaster wallet');
-    
-    // In a production app, you would:
-    // 1. Generate a QR code from channel.url
-    // 2. Display it in the UI
-    // 3. Show the URL as a clickable link
-    
-    // For now, we'll show a message to check the console
-    alert(`Sign in URL created!\n\nPlease check the browser console for the authentication URL.\n\nOpen this URL in your Farcaster wallet to sign in:\n${channel.url}`);
   }
 
   resize(width: number, height: number): void {

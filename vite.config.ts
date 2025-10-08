@@ -21,6 +21,13 @@ export default defineConfig({
   },
   server: {
     port: 8080,
-    open: true
+    open: true,
+    allowedHosts: [
+      // Add your ngrok hostname here
+      "cf08dc480250.ngrok-free.app",
+      // Optionally add other hosts if needed
+      "localhost",
+      "127.0.0.1",
+    ],
   }
 });

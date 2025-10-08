@@ -7,6 +7,8 @@ import { initAssets } from "./utils/assets";
 import { getUrlParam } from './utils/getUrlParams';
 import { Colors } from './utils/colors';
 import { sdk } from '@farcaster/miniapp-sdk';
+import { Sign } from 'crypto';
+import { SignInScene } from './scenes/SignInScene';
 
 /** The PixiJS app Application instance, shared across the project */
 export const app = new Application();
@@ -99,9 +101,9 @@ async function init() {
 
   //Go to one of the screens if a shortcut is present in url params, otherwise go to home screen
   if (getUrlParam("signin") !== null) {
-    await navigation.showScreen(QuickAuthSignInScene);
+    await navigation.showScreen(SignInScene);
   } else {
-    await navigation.showScreen(HomeScene);
+    await navigation.showScreen(SignInScene);
   }
 }
 
