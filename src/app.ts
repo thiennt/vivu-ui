@@ -103,7 +103,7 @@ async function init() {
   if (getUrlParam("signin") !== null) {
     await navigation.showScreen(SignInScene);
   } else {
-    await navigation.showScreen(SignInScene);
+    await navigation.showScreen(HomeScene);
   }
 }
 
