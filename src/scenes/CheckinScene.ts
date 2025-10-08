@@ -192,14 +192,18 @@ export class CheckinScene extends BaseScene {
   private createRewardDisplay(): void {
     if (!this.checkinReward) return;
 
-    const rewardBox = new Graphics();
     const boxWidth = Math.min(this.gameWidth - 2 * this.STANDARD_PADDING, 350);
     const boxHeight = 60;
     
-    // Draw reward box with border
-    rewardBox.fill({ color: Colors.CARD_BACKGROUND, alpha: 0.9 });
-    rewardBox.roundRect(0, 0, boxWidth, boxHeight, 8);
-    rewardBox.stroke({ width: 2, color: Colors.BUTTON_PRIMARY, alpha: 0.8 });
+    // Create a container for the reward box
+    const rewardBox = new Container();
+    
+    // Draw reward box background with border
+    const rewardBg = new Graphics();
+    rewardBg.fill({ color: Colors.CARD_BACKGROUND, alpha: 0.9 });
+    rewardBg.roundRect(0, 0, boxWidth, boxHeight, 8);
+    rewardBg.stroke({ width: 2, color: Colors.BUTTON_PRIMARY, alpha: 0.8 });
+    rewardBox.addChild(rewardBg);
 
     const rewardText = new Text({
       text: `Rewards: 🪙 ${this.checkinReward.gold || 0} Gold  ✨ ${this.checkinReward.experience || 0} EXP`,
