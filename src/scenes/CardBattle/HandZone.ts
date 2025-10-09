@@ -1,5 +1,5 @@
 import { Colors } from "@/utils/colors";
-import { Container, Graphics, FederatedPointerEvent } from "pixi.js";
+import { Container, Graphics, FederatedPointerEvent, Text } from "pixi.js";
 import { CardBattlePlayerState, Card } from "@/types";
 import { BaseScene } from "@/ui/BaseScene";
 import { app } from "@/app";
@@ -13,9 +13,14 @@ export class HandZone extends Container {
   private playerState: CardBattlePlayerState | null = null;
   private playerNo: number = 1; // Default to player 1
   
-  // End Turn Button state
-  private endTurnButton: Container;
+  // Store dimensions for consistent calculations
+  private zoneWidth: number = 0;
+  private zoneHeight: number = 0;
+  
+  // Button state (End Turn for P1, Back for P2)
+  private buttonContainer: Container;
   private endTurnCallback?: () => void;
+  private backButtonCallback?: () => void;
 
   // Drag/drop state
   private dragTarget: Container | null = null;
@@ -40,8 +45,8 @@ export class HandZone extends Container {
     this.handBg = new Container();
     this.addChild(this.handBg);
 
-    this.endTurnButton = new Container();
-    this.addChild(this.endTurnButton);
+    this.buttonContainer = new Container();
+    this.addChild(this.buttonContainer);
 
     // Setup stage event handlers for drag and drop
     app.stage.eventMode = 'static';
@@ -51,40 +56,52 @@ export class HandZone extends Container {
   }
 
   resize(width: number, height: number): void {
+    // Store dimensions
+    this.zoneWidth = width;
+    this.zoneHeight = height;
+    
     this.handBg.removeChildren();
 
-    // Create simplified hand zone background
-    // For player 2: button above, handBg below (symmetric layout)
-    // For player 1: handBg above, button below (current layout)
-    const handBgHeight = height * 0.7;
-    const handBgY = this.playerNo === 2 ? height - handBgHeight : 0;
+    const BUTTON_HEIGHT = 46;
+    const BUTTON_PADDING = this.parent ? (this.parent as BaseScene).STANDARD_PADDING : 8;
+    
+    // Calculate hand background area (excludes button space)
+    // P1: Button at bottom, so handBg is at top
+    // P2: Button at top, so handBg is at bottom
+    const buttonTotalSpace = BUTTON_HEIGHT + BUTTON_PADDING * 2; // Button + padding above and below
+    const handBgHeight = height - buttonTotalSpace;
+    
+    // Position hand background based on player number
+    // Player 1: handBg at TOP (0 to handBgHeight), button at bottom
+    // Player 2: handBg at BOTTOM (buttonTotalSpace to height), button at top
+    const handBgY = this.playerNo === 2 ? buttonTotalSpace : 0;
 
     const handBgGraphics = new Graphics();
-    this.handBg.addChild(handBgGraphics);
-    // Main background
+    //this.handBg.addChild(handBgGraphics);
+    
+    // Draw background at calculated position
     handBgGraphics.roundRect(0, handBgY, width, handBgHeight, 8)
       .fill(Colors.UI_BACKGROUND)
       .stroke({ width: 1, color: Colors.UI_BORDER, alpha: 0.6 });
     
-    this.updateEndTurnButton(width, height);
+    this.updateButton(width, height);
 
     // Redraw hand cards if we have player state
     if (this.playerState) {
-      this.updateHandDisplay(width, height);
+      this.updateHandDisplay();
     }
   }
 
   updateBattleState(playerState: CardBattlePlayerState): void {
     this.playerState = playerState;
 
-    // Get the current size from the background
-    const bounds = this.handBg.getBounds();
-    if (bounds.width > 0 && bounds.height > 0) {
-      this.updateHandDisplay(bounds.width, bounds.height);
+    // Update display if zone has been sized
+    if (this.zoneWidth > 0 && this.zoneHeight > 0) {
+      this.updateHandDisplay();
     }
   }
 
-  private updateHandDisplay(width: number, height: number): void {
+  private updateHandDisplay(): void {
     if (!this.playerState) return;
 
     // Clear existing
@@ -96,9 +113,9 @@ export class HandZone extends Container {
     if (handCards.length === 0) return;
 
     // Keep card size fixed as requested
-    const cardWidth = 70;
+    const cardWidth = 60;
     const cardHeight = 90;
-    const availableWidth = width - 20; // Padding on both sides
+    const availableWidth = this.zoneWidth - 20; // Padding on both sides
     
     // Calculate spacing - start with preferred spacing
     let cardSpacing = 5;
@@ -113,14 +130,17 @@ export class HandZone extends Container {
       totalWidth = (cardWidth * handCards.length) + (cardSpacing * Math.max(0, handCards.length - 1));
     }
     
-    const startX = Math.max(10, (width - totalWidth) / 2);
-    // Account for handBg Y position - cards should be centered within handBg
-    const handBgBounds = this.handBg.getBounds();
-    let cardY = (handBgBounds.height - cardHeight) / 2;
-
-    if (this.playerNo === 2) {
-      cardY = height - handBgBounds.y + (handBgBounds.height - cardHeight) / 2;
-    }
+    const startX = Math.max(10, (this.zoneWidth - totalWidth) / 2);
+    
+    // Calculate Y position to center cards in the handBg area (NOT the full zone)
+    const BUTTON_HEIGHT = 46;
+    const BUTTON_PADDING = (this.parent as BaseScene).STANDARD_PADDING;
+    const buttonTotalSpace = BUTTON_HEIGHT + BUTTON_PADDING * 2;
+    const handBgHeight = this.zoneHeight - buttonTotalSpace;
+    const handBgY = this.playerNo === 2 ? buttonTotalSpace : 0;
+    
+    // Center cards vertically within the handBg area
+    const cardY = handBgY + (handBgHeight - cardHeight) / 2;
 
     handCards.forEach((cardInDeck, index) => {
       // For Player 2 (AI), show face-down cards instead of actual card details
@@ -128,52 +148,70 @@ export class HandZone extends Container {
       const handCard = this.playerNo === 2 
         ? this.createFaceDownHandCard(cardWidth, cardHeight)
         : this.createHandCard(cardInDeck.card!, cardWidth, cardHeight);
+      
+      // Position cards - they are positioned from top-left corner
       handCard.x = x;
       handCard.y = cardY;
+      
       (handCard as Container & { card: Card, cardPosition?: number }).cardPosition = cardInDeck.position;
       this.handBg.addChild(handCard);
       this.handCards.push(handCard);
     });
   }
 
-  private updateEndTurnButton(width: number, height: number): void {
+  private updateButton(width: number, height: number): void {
     // Remove existing button if any
-    this.endTurnButton.removeChildren();
-
-    // Only show end turn button for player 1
-    if (this.playerNo !== 1) {
-      return;
-    }
+    this.buttonContainer.removeChildren();
 
     const scene = this.parent as BaseScene;
-    // Responsive button sizing - improved for small screens
+    // Responsive button sizing
     const buttonWidth = Math.min(180, width - 2 * scene.STANDARD_PADDING);
-    const buttonHeight = Math.max(40, Math.min(46, height * 0.07));
+    const buttonHeight = 46;
 
-    // For player 2: button at top (above handBg) - but not shown
-    // For player 1: button at bottom (below handBg)
-    const buttonY = this.playerNo === 1 ? height + scene.STANDARD_PADDING : 0;
-
-    const endTurnButton = scene.createButton(
-      'END TURN',
-      (width - buttonWidth - scene.STANDARD_PADDING) / 2,
-      buttonY,
-      buttonWidth,
-      buttonHeight,
-      () => {
-        if (this.isInteractable && this.endTurnCallback) {
-          this.endTurnCallback();
-        }
-      },
-      14 // Reduced base font size
-    );
-    
-    // Set button interactivity based on isInteractable state
-    endTurnButton.interactive = this.isInteractable;
-    endTurnButton.alpha = this.isInteractable ? 1.0 : 0.5;
-    endTurnButton.cursor = this.isInteractable ? 'pointer' : 'default';
-    
-    this.endTurnButton.addChild(endTurnButton);
+    if (this.playerNo === 1) {
+      // END TURN button for Player 1 - at BOTTOM INSIDE the zone
+      const buttonY = height - buttonHeight - scene.STANDARD_PADDING;
+      
+      const endTurnButton = scene.createButton(
+        'END TURN',
+        (width - buttonWidth) / 2,
+        buttonY,
+        buttonWidth,
+        buttonHeight,
+        () => {
+          if (this.isInteractable && this.endTurnCallback) {
+            this.endTurnCallback();
+          }
+        },
+        14
+      );
+      
+      // Set button interactivity based on isInteractable state
+      endTurnButton.interactive = this.isInteractable;
+      endTurnButton.alpha = this.isInteractable ? 1.0 : 0.5;
+      endTurnButton.cursor = this.isInteractable ? 'pointer' : 'default';
+      
+      this.buttonContainer.addChild(endTurnButton);
+    } else {
+      // BACK button for Player 2 - at TOP INSIDE the zone
+      const buttonY = scene.STANDARD_PADDING;
+      
+      const backButton = scene.createButton(
+        '← BACK',
+        scene.STANDARD_PADDING,
+        buttonY,
+        100, // Smaller width for back button
+        buttonHeight,
+        () => {
+          if (this.backButtonCallback) {
+            this.backButtonCallback();
+          }
+        },
+        12 // Smaller font size
+      );
+      
+      this.buttonContainer.addChild(backButton);
+    }
   }
 
   setCardDropCallback(callback: (card: Card, dropTarget: string, cardPosition?: number) => void): void {
@@ -194,6 +232,10 @@ export class HandZone extends Container {
 
   setEndTurnCallback(callback: () => void): void {
     this.endTurnCallback = callback;
+  }
+
+  setBackButtonCallback(callback: () => void): void {
+    this.backButtonCallback = callback;
   }
 
   private createHandCard(card: Card, width: number, height: number): Container {
@@ -390,9 +432,8 @@ export class HandZone extends Container {
   }
 
   private refreshHandDisplay(): void {
-    const bounds = this.handBg.getBounds();
-    if (bounds.width > 0 && bounds.height > 0 && this.playerState) {
-      this.updateHandDisplay(bounds.width, bounds.height);
+    if (this.zoneWidth > 0 && this.zoneHeight > 0 && this.playerState) {
+      this.updateHandDisplay();
     }
   }
 
@@ -485,10 +526,9 @@ export class HandZone extends Container {
       cardContainer.cursor = interactable ? 'grab' : 'default';
     });
     
-    // Update end turn button state
-    const bounds = this.handBg.getBounds();
-    if (bounds.width > 0 && bounds.height > 0) {
-      this.updateEndTurnButton(bounds.width, bounds.height);
+    // Update button state
+    if (this.zoneWidth > 0 && this.zoneHeight > 0) {
+      this.updateButton(this.zoneWidth, this.zoneHeight);
     }
   }
 }

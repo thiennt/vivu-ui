@@ -269,7 +269,7 @@ export class CharacterCard extends Container {
 
     // HP Text overlay
     const hpText = new Text({
-      text: `HP ${Math.max(0, character.hp)}/${character.max_hp}`,
+      text: `${Math.max(0, character.hp)}/${character.max_hp}`,
       style: {
         fontFamily: 'Kalam',
         fontSize: 9,

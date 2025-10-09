@@ -1,8 +1,9 @@
-import { Container, Text, Graphics } from 'pixi.js';
+import { Container, Text, Graphics, Ticker } from 'pixi.js';
 import { BaseScene } from '@/ui/BaseScene';
 import { HandZone } from './CardBattle/HandZone';
 import { PlayerCharacterZone } from './CardBattle/PlayerCharacterZone';
 import { BattleLogZone } from './CardBattle/BattleLogZone';
+import { BattleField } from './CardBattle/BattleField';
 import {
   CardBattleState,
   TurnAction,
@@ -33,14 +34,10 @@ export class CardBattleScene extends BaseScene {
   // Loading and error state management
   private loadingManager: LoadingStateManager;
 
-  // Zone components following the layout order:
-  // PLAYER 2 HAND ZONE (Skill Cards)
-  // PLAYER 2 INFO (P2 + Energy count + Deck count + DISCARD ZONE) + 3 CHARACTERS ZONE
-  // BATTLE LOG ZONE
-  // PLAYER 1 INFO (P1 + Energy count + Deck count + DISCARD ZONE) + 3 CHARACTERS ZONE
-  // PLAYER 1 HAND ZONE (Skill Cards)
-  // BUTTONS ZONE
+  // Battlefield background
+  private battlefield: BattleField;
 
+  // Zone components
   public p2HandZone: HandZone;
   public p2CharacterZone: PlayerCharacterZone;
   public battleLogZone: BattleLogZone;
@@ -50,9 +47,6 @@ export class CardBattleScene extends BaseScene {
   // Visual effects handler
   public readonly vfx: CardBattleEffects;
 
-  // Back button for navigation
-  private backButton: Container | null = null;
-
   constructor(params?: { battleId?: string }) {
     super();
 
@@ -60,6 +54,10 @@ export class CardBattleScene extends BaseScene {
     const _battleId = player ? JSON.parse(player).ongoing_battles[0] : null;
 
     this.battleId = params?.battleId || _battleId || '';
+
+    // Initialize battlefield background first
+    this.battlefield = new BattleField();
+    this.addChild(this.battlefield);
 
     // Initialize loading manager
     this.loadingManager = new LoadingStateManager(this, this.gameWidth, this.gameHeight);
@@ -85,7 +83,6 @@ export class CardBattleScene extends BaseScene {
     this.addChild(this.vfx);
 
     this.setupDragDropHandlers();
-    this.createBackButton();
 
     // Initialize battle after zones are set up
     this.initializeBattle();
@@ -108,9 +105,14 @@ export class CardBattleScene extends BaseScene {
       this.p1CharacterZone.updateCharacterHover(globalX, globalY, isDragging);
     });
 
-    // Set up end turn callback
+    // Set up end turn callback for P1
     this.p1HandZone.setEndTurnCallback(() => {
       this.endTurn();
+    });
+
+    // Set up back button callback for P2
+    this.p2HandZone.setBackButtonCallback(() => {
+      navigation.showScreen(HomeScene);
     });
 
     // Override the getDropTarget method for HandZone 
@@ -134,50 +136,9 @@ export class CardBattleScene extends BaseScene {
     return null;
   }
 
-  private createBackButton(): void {
-    const backButton = new Container();
-    
-    // Button dimensions - small and unobtrusive
-    const buttonWidth = 80;
-    const buttonHeight = 32;
-    
-    const backBg = new Graphics();
-    backBg.roundRect(0, 0, buttonWidth, buttonHeight, 8)
-      .fill(Colors.BUTTON_PRIMARY)
-      .stroke({ width: 2, color: Colors.BUTTON_BORDER });
-    
-    const backText = new Text({
-      text: '← BACK',
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 12,
-        fill: Colors.TEXT_PRIMARY,
-        align: 'center'
-      }
-    });
-    backText.anchor.set(0.5);
-    backText.x = buttonWidth / 2;
-    backText.y = buttonHeight / 2;
-    
-    backButton.addChild(backBg, backText);
-    
-    // Position at top-left corner with padding
-    backButton.x = this.STANDARD_PADDING;
-    backButton.y = this.STANDARD_PADDING;
-    
-    backButton.interactive = true;
-    backButton.cursor = 'pointer';
-    backButton.on('pointertap', () => {
-      navigation.showScreen(HomeScene);
-    });
-    
-    this.backButton = backButton;
-    this.addChild(backButton);
-  }
-
   private async handleCardDrop(card: Card, dropTarget: string, cardPosition?: number): Promise<void> {
     if (!this.battleState) return;
-    
+
     // Prevent actions if not interactable
     if (this.battleState.current_player !== 1) {
       return;
@@ -193,7 +154,7 @@ export class CardBattleScene extends BaseScene {
         // Check if player has enough energy to play the card
         const currentPlayer = this.battleState.players.find(p => p.team === this.battleState!.current_player);
         const currentEnergy = currentPlayer?.deck.current_energy || 0;
-        
+
         if (card.energy_cost > currentEnergy) {
           // Insufficient energy - return card to hand
           this.battleLogZone.showNotification(
@@ -205,7 +166,7 @@ export class CardBattleScene extends BaseScene {
           this.updateHandAndPlayerInfoZones();
           return;
         }
-        
+
         const characterId = dropTarget.replace('character:', '');
         await this.playCardOnCharacter(card, characterId, cardPosition);
       }
@@ -238,7 +199,7 @@ export class CardBattleScene extends BaseScene {
 
         // Get the card container from hand zone before updating zones
         const cardContainer = this.p1HandZone.getDragTarget();
-        
+
         // Animate card to discard zone before updating UI
         if (cardContainer) {
           const discardTarget = this.p1CharacterZone.toGlobal({ x: 0, y: 0 });
@@ -262,8 +223,8 @@ export class CardBattleScene extends BaseScene {
       }
     } catch (error) {
       console.error('Failed to discard card:', error);
-      const errorMessage = error instanceof ApiError 
-        ? error.message 
+      const errorMessage = error instanceof ApiError
+        ? error.message
         : 'Failed to discard card. Please try again.';
       this.battleLogZone.showNotification(errorMessage, Colors.ERROR, 3000);
     }
@@ -285,7 +246,7 @@ export class CardBattleScene extends BaseScene {
       if (response.success && response.data) {
         const logs = response.data;
         console.log('Play card logs:', logs);
-        
+
         // Update battle state from after_state if available
         if (logs.length > 0 && logs[0].after_state) {
           this.updateBattleStateFromAfterState(logs[0].after_state);
@@ -302,11 +263,11 @@ export class CardBattleScene extends BaseScene {
       }
     } catch (error) {
       console.error('Failed to play card:', error);
-      const errorMessage = error instanceof ApiError 
-        ? error.message 
+      const errorMessage = error instanceof ApiError
+        ? error.message
         : 'Failed to play card. Please try again.';
 
-      
+
       navigation.presentPopup(ErrorPopup, {
         message: errorMessage
       });
@@ -324,19 +285,19 @@ export class CardBattleScene extends BaseScene {
           resolve();
         }
       })
-      .to(cardContainer, {
-        x: discardTarget.x + 40, // Center of player info zone
-        y: discardTarget.y + 60,
-        duration: 0.5,
-        ease: 'power2.inOut'
-      }, 0)
-      .to(cardContainer, {
-        scale: 0.3,
-        rotation: Math.PI * 2, // Full rotation
-        alpha: 0,
-        duration: 0.5,
-        ease: 'power2.in'
-      }, 0);
+        .to(cardContainer, {
+          x: discardTarget.x + 40, // Center of player info zone
+          y: discardTarget.y + 60,
+          duration: 0.5,
+          ease: 'power2.inOut'
+        }, 0)
+        .to(cardContainer, {
+          scale: 0.3,
+          rotation: Math.PI * 2, // Full rotation
+          alpha: 0,
+          duration: 0.5,
+          ease: 'power2.in'
+        }, 0);
     });
   }
 
@@ -344,7 +305,7 @@ export class CardBattleScene extends BaseScene {
     // Get the appropriate character zone based on player team
     const characterZone = playerTeam === 1 ? this.p1CharacterZone : this.p2CharacterZone;
     const energyText = characterZone.getEnergyText();
-    
+
     if (!energyText) return;
 
     return this.vfx.animateEnergyIncrease(energyText);
@@ -373,9 +334,9 @@ export class CardBattleScene extends BaseScene {
 
   private getCardGroup(card?: Card): CardGroup {
     if (!card || !card.group) return 'other';
-    
+
     const group = card.group.toLowerCase();
-    
+
     // Map card groups to animation types
     if (group.includes('attack') || group.includes('high damage')) {
       return 'damage';
@@ -384,7 +345,7 @@ export class CardBattleScene extends BaseScene {
     } else if (group.includes('control') || group.includes('debuff')) {
       return 'debuff';
     }
-    
+
     return 'other';
   }
 
@@ -418,7 +379,7 @@ export class CardBattleScene extends BaseScene {
   // Battle initialization and game logic
   private async initializeBattle(): Promise<void> {
     this.loadingManager.showLoading();
-    
+
     try {
       // Load battle state from API
       const response = await battleApi.getBattleState(this.battleId);
@@ -438,8 +399,8 @@ export class CardBattleScene extends BaseScene {
       }
     } catch (error) {
       console.error('Failed to initialize battle:', error);
-      const errorMessage = error instanceof ApiError 
-        ? error.message 
+      const errorMessage = error instanceof ApiError
+        ? error.message
         : 'Failed to load battle. Please try again.';
       navigation.presentPopup(ErrorPopup, {
         message: errorMessage
@@ -484,15 +445,15 @@ export class CardBattleScene extends BaseScene {
       const response = await battleApi.startTurn(this.battleId);
       if (response.success && response.data) {
         console.log('Turn start logs:', response.data);
-        
+
         const logs = response.data;
-        
+
         // Process each log sequentially with animations
         for (const log of logs) {
           if (log.action_type === 'effect_trigger') {
             // Handle effect_trigger animation
             console.log('Effect triggered at turn start:', log);
-            
+
             // Update battle state from after_state if available
             if (log.after_state) {
               this.updateBattleStateFromAfterState(log.after_state);
@@ -506,7 +467,7 @@ export class CardBattleScene extends BaseScene {
             if (actorCharacterId) {
               await this.animateCardPlay(actorCharacterId, [log]);
             }
-            
+
             // Add delay between effects for better visual clarity
             await new Promise(resolve => setTimeout(resolve, 300));
           } else {
@@ -521,8 +482,8 @@ export class CardBattleScene extends BaseScene {
       }
     } catch (error) {
       console.error('Failed to process turn start:', error);
-      const errorMessage = error instanceof ApiError 
-        ? error.message 
+      const errorMessage = error instanceof ApiError
+        ? error.message
         : 'Failed to start turn. Please try again.';
       navigation.presentPopup(ErrorPopup, {
         message: errorMessage
@@ -566,8 +527,8 @@ export class CardBattleScene extends BaseScene {
       }
     } catch (error) {
       console.error('Failed to draw cards:', error);
-      const errorMessage = error instanceof ApiError 
-        ? error.message 
+      const errorMessage = error instanceof ApiError
+        ? error.message
         : 'Failed to draw cards. Please try again.';
       navigation.presentPopup(ErrorPopup, {
         message: errorMessage
@@ -620,8 +581,8 @@ export class CardBattleScene extends BaseScene {
       }
     } catch (error) {
       console.error('Failed to process end turn:', error);
-      const errorMessage = error instanceof ApiError 
-        ? error.message 
+      const errorMessage = error instanceof ApiError
+        ? error.message
         : 'Failed to end turn. Please try again.';
       navigation.presentPopup(ErrorPopup, {
         message: errorMessage
@@ -646,12 +607,12 @@ export class CardBattleScene extends BaseScene {
         let gameEnded = false;
         for (const log of logs) {
           gameEnded = await this.processAIActionLog(log);
-          
+
           // Stop processing if game has ended
           if (gameEnded) {
             break;
           }
-          
+
           // Add delay between AI actions for better visual clarity
           await new Promise(resolve => setTimeout(resolve, 500));
         }
@@ -666,9 +627,9 @@ export class CardBattleScene extends BaseScene {
     } catch (error) {
       console.error('Failed to process AI turn:', error);
       this.enablePlayerUI();
-      
-      const errorMessage = error instanceof ApiError 
-        ? error.message 
+
+      const errorMessage = error instanceof ApiError
+        ? error.message
         : 'Failed to process AI turn. Please try again.';
       navigation.presentPopup(ErrorPopup, {
         message: errorMessage
@@ -682,7 +643,7 @@ export class CardBattleScene extends BaseScene {
       // Handle draw card animation for AI
       const cardCount = log.drawn_cards?.length || 0;
       console.log('AI drew cards:', cardCount);
-      
+
       // Show notification
       this.battleLogZone.showNotification(`AI drew ${cardCount} card${cardCount !== 1 ? 's' : ''}`, Colors.EFFECT_DRAW_BLUE);
 
@@ -700,17 +661,17 @@ export class CardBattleScene extends BaseScene {
     } else if (log.action_type === 'discard_card') {
       // Handle discard card animation for AI
       console.log('AI discarded a card');
-      
+
       // Store previous energy count for animation
       let aiPlayer = this.battleState?.players.find(p => p.team === 2);
       const previousEnergy = aiPlayer?.deck.current_energy || 0;
-      
+
       // Show notification
       this.battleLogZone.showNotification('AI discarded a card', Colors.EFFECT_DISCARD_RED);
 
       // Animate the last card in AI's hand (or random)
       const cardToAnimate = this.p2HandZone.getRandomHandCard();
-      
+
       // Animate card to AI's discard zone before updating zones
       if (cardToAnimate) {
         const discardTarget = this.p2CharacterZone.toGlobal({ x: 0, y: 0 });
@@ -737,10 +698,10 @@ export class CardBattleScene extends BaseScene {
     } else if (log.action_type === 'play_card' && log.card && log.targets) {
       // Handle play card animation for AI
       console.log(`AI played card: ${log.card.name}`);
-      
+
       // Show notification
       this.battleLogZone.showNotification(`AI played: ${log.card.name}`, Colors.EFFECT_PLAY_ORANGE);
-      
+
       // Update battle state from after_state if available
       if (log.after_state) {
         this.updateBattleStateFromAfterState(log.after_state);
@@ -757,11 +718,11 @@ export class CardBattleScene extends BaseScene {
     } else if (log.action_type === 'effect_trigger') {
       // Handle effect_trigger animation for AI
       console.log('AI effect triggered:', log);
-      
+
       // Show notification if card/effect name is available
       const effectName = log.card?.name || 'Effect';
       this.battleLogZone.showNotification(`${effectName} triggered!`, Colors.EFFECT_PLAY_ORANGE);
-      
+
       // Update battle state from after_state if available
       if (log.after_state) {
         this.updateBattleStateFromAfterState(log.after_state);
@@ -775,14 +736,14 @@ export class CardBattleScene extends BaseScene {
       if (effectActorId) {
         await this.animateCardPlay(effectActorId, [log]);
       }
-      
+
       // Brief delay
       await new Promise(resolve => setTimeout(resolve, 300));
       return false; // Game hasn't ended
     } else if (log.action_type === 'end_turn') {
       // Handle end turn for AI
       console.log('AI ended its turn');
-      
+
       // Show notification
       this.battleLogZone.showNotification('AI ended its turn', Colors.TEXT_PRIMARY, 1500);
 
@@ -813,20 +774,20 @@ export class CardBattleScene extends BaseScene {
 
   private showBattleResult(): void {
     if (!this.battleState) return;
-    
+
     const resultContainer = new Container();
-    
+
     const overlay = new Graphics();
     overlay.rect(0, 0, this.gameWidth, this.gameHeight)
       .fill(Colors.BATTLE_LOG_BG, 0.7);
-    
+
     const resultBg = new Graphics();
     resultBg.roundRect(0, 0, 300, 200, 20)
       .fill(Colors.UI_BACKGROUND)
       .stroke({ width: 3, color: Colors.UI_BORDER });
     resultBg.x = (this.gameWidth - 300) / 2;
     resultBg.y = (this.gameHeight - 200) / 2;
-    
+
     const isVictory = this.battleState.winner_team === 1;
     const resultText = new Text({
       text: isVictory ? 'VICTORY!' : 'DEFEAT!',
@@ -840,13 +801,13 @@ export class CardBattleScene extends BaseScene {
     resultText.anchor.set(0.5);
     resultText.x = this.gameWidth / 2;
     resultText.y = this.gameHeight / 2 - 30;
-    
+
     const backButton = new Container();
     const backBg = new Graphics();
     backBg.roundRect(0, 0, 100, 40, 8)
       .fill(Colors.BUTTON_PRIMARY)
       .stroke({ width: 2, color: Colors.BUTTON_BORDER });
-    
+
     const backText = new Text({
       text: 'BACK',
       style: {
@@ -859,17 +820,17 @@ export class CardBattleScene extends BaseScene {
     backText.anchor.set(0.5);
     backText.x = 50;
     backText.y = 20;
-    
+
     backButton.addChild(backBg, backText);
     backButton.x = this.gameWidth / 2 - 50;
     backButton.y = this.gameHeight / 2 + 40;
-    
+
     backButton.interactive = true;
     backButton.cursor = 'pointer';
     backButton.on('pointertap', () => {
       navigation.showScreen(HomeScene);
     });
-    
+
     resultContainer.addChild(overlay, resultBg, resultText, backButton);
     this.addChild(resultContainer);
   }
@@ -897,7 +858,7 @@ export class CardBattleScene extends BaseScene {
 
     // Update battle log with turn number
     this.battleLogZone.updatePhase(this.currentPhase, this.battleState.current_player, this.battleState.current_turn);
-    
+
     // Enable/disable UI based on current player
     this.updateUIState();
   }
@@ -954,64 +915,69 @@ export class CardBattleScene extends BaseScene {
     this.p1HandZone.setInteractable(true);
   }
 
-  /** Resize handler */
+  /**
+  * Update method called every frame
+  */
+  public update(ticker: Ticker): void {
+    // Update battlefield animations
+    this.battlefield.update(ticker);
+
+    // You can add other per-frame updates here
+    // e.g., VFX updates, character animations, etc.
+  }
+
+  /** Resize handler - Exactly 700px optimized */
   resize(width: number, height: number): void {
     this.gameWidth = width;
     this.gameHeight = height;
 
+    // Resize battlefield background
+    this.battlefield.resize(width, height);
+
     // Update loading manager dimensions
     this.loadingManager.updateDimensions(width, height);
 
-    // Calculate layout optimized for 400x700
-    const TOP_PADDING = this.STANDARD_PADDING * 1.5; // Reduced multiplier
-    const BETWEEN_AREAS = this.STANDARD_PADDING * 1.5; // Reduced multiplier  
-    const BOTTOM_PADDING = this.STANDARD_PADDING * 1.5; // Reduced multiplier
+    // Layout constants for exactly 700px
+    const PADDING = this.STANDARD_PADDING; // 8px
+    const SPACING = this.STANDARD_PADDING; // 8px between zones
 
-    const characterZoneHeight = 100; // Reduced from 120
-    const battleLogHeight = 90; // Reduced from 120
-    const handZoneHeight = (height - characterZoneHeight * 2 - battleLogHeight - TOP_PADDING - BOTTOM_PADDING - BETWEEN_AREAS * 5) / 2;
+    // Fixed heights for zones
+    const CHARACTER_ZONE_HEIGHT = 120; // Character zones
+    const BATTLE_LOG_HEIGHT = 90; // Battle log
 
-    // Calculate available height and distribute remaining space
-    const fixedHeight = handZoneHeight * 2 + characterZoneHeight * 2 + battleLogHeight;
-    const totalPadding = TOP_PADDING + BETWEEN_AREAS * 5 + BOTTOM_PADDING;
-    const remainingHeight = height - fixedHeight - totalPadding;
-    const extraSpacing = Math.max(0, remainingHeight / 2); // Distribute remaining space equally between the 2 inter-player gaps
+    const handZoneHeight = Math.floor((height - CHARACTER_ZONE_HEIGHT * 2 - BATTLE_LOG_HEIGHT - PADDING * 2 - SPACING * 4) / 2);
 
-    let currentY = TOP_PADDING;
+    // Start layout from top
+    let currentY = PADDING;
 
-    // PLAYER 2 HAND ZONE (Skill Cards)
-    this.p2HandZone.x = this.STANDARD_PADDING;
+    // PLAYER 2 HAND ZONE (includes BACK button space at top)
+    this.p2HandZone.x = PADDING;
     this.p2HandZone.y = currentY;
-    this.p2HandZone.resize(width - 2 * this.STANDARD_PADDING, handZoneHeight);
-    currentY += handZoneHeight + BETWEEN_AREAS;
+    this.p2HandZone.resize(width - 2 * PADDING, handZoneHeight);
+    currentY += handZoneHeight + SPACING;
 
-    // PLAYER 2 INFO + 3 CHARACTERS ZONE (now includes DiscardZone)
-    this.p2CharacterZone.resize(width - 2 * this.STANDARD_PADDING, characterZoneHeight);
-    this.p2CharacterZone.x = this.STANDARD_PADDING;
+    // PLAYER 2 CHARACTER ZONE
+    this.p2CharacterZone.x = PADDING;
     this.p2CharacterZone.y = currentY;
-    currentY += characterZoneHeight + BETWEEN_AREAS + extraSpacing;
+    this.p2CharacterZone.resize(width - 2 * PADDING, CHARACTER_ZONE_HEIGHT);
+    currentY += CHARACTER_ZONE_HEIGHT + SPACING;
 
     // BATTLE LOG ZONE (center)
-    this.battleLogZone.resize(width - 2 * this.STANDARD_PADDING, battleLogHeight);
-    this.battleLogZone.x = this.STANDARD_PADDING;
+    this.battleLogZone.x = PADDING;
     this.battleLogZone.y = currentY;
-    currentY += battleLogHeight + BETWEEN_AREAS + extraSpacing;
+    this.battleLogZone.resize(width - 2 * PADDING, BATTLE_LOG_HEIGHT);
+    currentY += BATTLE_LOG_HEIGHT + SPACING;
 
-    // PLAYER 1 INFO + 3 CHARACTERS ZONE
-    this.p1CharacterZone.resize(width - 2 * this.STANDARD_PADDING, characterZoneHeight);
-    this.p1CharacterZone.x = this.STANDARD_PADDING;
+    // PLAYER 1 CHARACTER ZONE
+    this.p1CharacterZone.x = PADDING;
     this.p1CharacterZone.y = currentY;
-    currentY += characterZoneHeight + BETWEEN_AREAS;
+    this.p1CharacterZone.resize(width - 2 * PADDING, CHARACTER_ZONE_HEIGHT);
+    currentY += CHARACTER_ZONE_HEIGHT + SPACING;
 
-    // PLAYER 1 HAND ZONE anchored to bottom
-    this.p1HandZone.x = this.STANDARD_PADDING;
+    // PLAYER 1 HAND ZONE (includes END TURN button space at bottom)
+    this.p1HandZone.x = PADDING;
     this.p1HandZone.y = currentY;
-    this.p1HandZone.resize(width - 2 * this.STANDARD_PADDING, handZoneHeight);
-
-    // Reposition back button
-    if (this.backButton) {
-      this.backButton.x = this.STANDARD_PADDING;
-      this.backButton.y = this.STANDARD_PADDING;
-    }
+    this.p1HandZone.resize(width - 2 * PADDING, handZoneHeight);
+    currentY += handZoneHeight + PADDING;
   }
 }
