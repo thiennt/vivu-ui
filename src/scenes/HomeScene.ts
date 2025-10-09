@@ -277,7 +277,6 @@ export class HomeScene extends BaseScene {
       { text: '📅 Daily Check-In', screen: CheckinScene },
       { text: '🗼 Tower (Card Battle)', screen: TowerScene },
       { text: '👥 Characters', screen: CharactersScene },
-      { text: '⚔️ Battle Arena', screen: BattleScene },
       { text: '🃏 Card Battle', screen: CardBattleScene },
       { text: '🧑‍🤝‍🧑 Lineup', screen: LineupScene },
     ];
@@ -320,8 +319,8 @@ export class HomeScene extends BaseScene {
     // Add some floating magical elements
     for (let i = 0; i < 8; i++) {
       const decoration = new Graphics();
-      decoration.fill({ color: Colors.DECORATION_MAGIC, alpha: 0.6 })
-        .circle(0, 0, 3 + Math.random() * 5);
+      decoration.circle(0, 0, 3 + Math.random() * 5)
+        .fill({ color: Colors.DECORATION_MAGIC, alpha: 0.6 });
       
       decoration.x = Math.random() * this.gameWidth;
       decoration.y = Math.random() * this.gameHeight;
