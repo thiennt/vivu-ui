@@ -15,6 +15,7 @@ export type CharacterCardOptions = typeof defaultCharacterCardOptions;
  * - ATK/DEF stats in top corners (above avatar)
  * - Large avatar sprite in center
  * - HP and Energy bars at bottom
+ * - Active effects icons displayed below avatar
  * - Visual states for dead/acted
  * - Draggable only when active (not acted)
  */
@@ -24,8 +25,11 @@ export class CharacterCard extends Container {
   private glowEffect: Graphics;
   private stateOverlay: Graphics;
   private avatarContainer: Container;
+  private activeEffectsContainer: Container; // NEW: Container for effect icons
   private isDead: boolean;
   private hasActed: boolean;
+  private cardWidth: number;
+  private cardHeight: number;
 
   constructor(character: any, options: Partial<CharacterCardOptions> = {}) {
     super();
@@ -33,27 +37,26 @@ export class CharacterCard extends Container {
     const opts = { ...defaultCharacterCardOptions, ...options };
     this.character = character;
     const { width, height } = opts;
+    this.cardWidth = width;
+    this.cardHeight = height;
 
     // Check character state
     this.isDead = character.hp <= 0;
     this.hasActed = character.has_acted || character.hasActed || false;
 
-    // Main background - vibrant gradient style (different from DeckCard)
+    // Main background - vibrant gradient style
     const bg = new Graphics();
     
-    // Deep shadows for dramatic effect
     bg.roundRect(4, 4, width, height, 8)
       .fill({ color: 0x000000, alpha: 0.5 });
     
     bg.roundRect(2, 2, width, height, 8)
       .fill({ color: 0x000000, alpha: 0.25 });
     
-    // Main card background - warm purple-blue gradient style
     bg.roundRect(0, 0, width, height, 8)
-      .fill({ color: 0x2a1f3d, alpha: 0.98 })  // Deep purple (vs DeckCard's grey)
-      .stroke({ width: 2.5, color: 0x6a4c93 });  // Purple border
+      .fill({ color: 0x2a1f3d, alpha: 0.98 })
+      .stroke({ width: 2.5, color: 0x6a4c93 });
     
-    // Inner frame with gradient effect
     bg.roundRect(3, 3, width - 6, height - 6, 6)
       .stroke({ width: 1.5, color: 0x9d7cc3, alpha: 0.4 });
 
@@ -62,20 +65,18 @@ export class CharacterCard extends Container {
     // State overlay for dead/acted
     this.stateOverlay = new Graphics();
     if (this.isDead) {
-      // Dark red overlay for dead state
       this.stateOverlay.roundRect(0, 0, width, height, 8)
         .fill({ color: 0x000000, alpha: 0.7 });
     } else if (this.hasActed) {
-      // Semi-transparent overlay for acted state
       this.stateOverlay.roundRect(0, 0, width, height, 8)
         .fill({ color: 0x000000, alpha: 0.4 });
     }
     this.addChild(this.stateOverlay);
 
-    // Glow effect for hover (initially hidden)
+    // Glow effect for hover
     this.glowEffect = new Graphics();
     this.glowEffect.roundRect(0, 0, width, height, 8)
-      .stroke({ width: 3, color: 0xb57edc, alpha: 0 });  // Purple glow
+      .stroke({ width: 3, color: 0xb57edc, alpha: 0 });
     this.addChild(this.glowEffect);
 
     // Hover overlay
@@ -84,28 +85,27 @@ export class CharacterCard extends Container {
       .fill({ color: 0xffffff, alpha: 0 });
     this.addChild(this.hoverOverlay);
 
-    // Avatar frame (center, large) - positioned to leave room for stats at top
-    const avatarFrameY = 38;  // More space from top for stats
-    const avatarFrameHeight = height - 66;  // Leave room for stats and bars
+    // Avatar frame
+    const avatarFrameY = 38;
+    const avatarFrameHeight = height - 66;
     const avatarFrame = new Graphics()
       .roundRect(10, avatarFrameY, width - 20, avatarFrameHeight, 6)
-      .fill({ color: 0x150a25, alpha: 0.95 })  // Very dark purple
+      .fill({ color: 0x150a25, alpha: 0.95 })
       .stroke({ width: 1.5, color: 0x4a2f5f, alpha: 0.7 });
     
-    // Inner glow on avatar frame
     const avatarFrameGlow = new Graphics()
       .roundRect(11, avatarFrameY + 1, width - 22, avatarFrameHeight - 2, 5)
       .stroke({ width: 1, color: 0x6a4c93, alpha: 0.3 });
     
     this.addChild(avatarFrame, avatarFrameGlow);
 
-    // Avatar container for applying filters/effects
+    // Avatar container
     this.avatarContainer = new Container();
     this.avatarContainer.x = width / 2;
     this.avatarContainer.y = avatarFrameY + avatarFrameHeight / 2;
     this.addChild(this.avatarContainer);
 
-    // Load avatar sprite from character data - constrained to frame
+    // Load avatar sprite
     this.loadAvatar(character, 0, 0, width - 24, avatarFrameHeight - 4);
 
     // Apply grayscale for dead/acted states
@@ -113,23 +113,19 @@ export class CharacterCard extends Container {
       this.avatarContainer.alpha = this.isDead ? 0.3 : 0.6;
     }
 
-    // ATK stat (top-left corner) - ABOVE avatar frame
+    // ATK stat (top-left)
     const atkX = 8;
     const atkY = 8;
-    const statBadgeSize = 28;  // Slightly larger for better readability
+    const statBadgeSize = 28;
     
     const atkBadgeBg = new Graphics()
       .roundRect(atkX - 2, atkY - 2, statBadgeSize + 4, statBadgeSize + 4, 5)
-      .fill({ color: 0x1a0f2e, alpha: 0.98 })  // More opaque
-      .stroke({ width: 2, color: 0xe74c3c, alpha: this.isDead ? 0.5 : 1 });  // Dimmed if dead
+      .fill({ color: 0x1a0f2e, alpha: 0.98 })
+      .stroke({ width: 2, color: 0xe74c3c, alpha: this.isDead ? 0.5 : 1 });
     
     const atkIcon = new Text({
       text: '⚔️',
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 13,
-        fill: 0xe74c3c
-      }
+      style: { fontFamily: 'Kalam', fontSize: 13, fill: 0xe74c3c }
     });
     atkIcon.anchor.set(0.5);
     atkIcon.x = atkX + statBadgeSize / 2;
@@ -153,7 +149,7 @@ export class CharacterCard extends Container {
 
     this.addChild(atkBadgeBg, atkIcon, atkValue);
 
-    // DEF stat (top-right corner) - ABOVE avatar frame
+    // DEF stat (top-right)
     const defX = width - statBadgeSize - 8;
     const defY = 8;
     
@@ -164,11 +160,7 @@ export class CharacterCard extends Container {
     
     const defIcon = new Text({
       text: '🛡️',
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 13,
-        fill: 0x4a90e2
-      }
+      style: { fontFamily: 'Kalam', fontSize: 13, fill: 0x4a90e2 }
     });
     defIcon.anchor.set(0.5);
     defIcon.x = defX + statBadgeSize / 2;
@@ -192,7 +184,7 @@ export class CharacterCard extends Container {
 
     this.addChild(defBadgeBg, defIcon, defValue);
 
-    // State indicator badge (center-top of avatar frame)
+    // State indicator badge
     if (this.isDead) {
       const deadBadge = new Graphics()
         .circle(width / 2, avatarFrameY + 15, 18)
@@ -201,11 +193,7 @@ export class CharacterCard extends Container {
       
       const deadIcon = new Text({
         text: '💀',
-        style: {
-          fontFamily: 'Kalam',
-          fontSize: 20,
-          fill: 0xffffff
-        }
+        style: { fontFamily: 'Kalam', fontSize: 20, fill: 0xffffff }
       });
       deadIcon.anchor.set(0.5);
       deadIcon.x = width / 2;
@@ -234,12 +222,19 @@ export class CharacterCard extends Container {
       this.addChild(actedBadge, actedIcon);
     }
 
+    // NEW: Active Effects Container (below avatar, above HP bar)
+    this.activeEffectsContainer = new Container();
+    this.activeEffectsContainer.x = width / 2;
+    this.activeEffectsContainer.y = avatarFrameY + avatarFrameHeight - 8; // Just above HP bar
+    this.addChild(this.activeEffectsContainer);
+    this.drawActiveEffects(character);
+
     // Bottom stats section
     const bottomStatsY = height - 24;
     
     // HP Bar
     const hpBarWidth = width - 20;
-    const hpBarHeight = 11;  // Slightly taller for better visibility
+    const hpBarHeight = 11;
     const hpBarX = 10;
     const hpBarY = bottomStatsY;
 
@@ -252,11 +247,11 @@ export class CharacterCard extends Container {
 
     // HP Bar fill
     const hpPercent = Math.max(0, character.hp / character.max_hp);
-    let hpColor = 0x26de81; // Green
+    let hpColor = 0x26de81;
     if (hpPercent <= 0.25) {
-      hpColor = 0xe74c3c; // Red
+      hpColor = 0xe74c3c;
     } else if (hpPercent <= 0.5) {
-      hpColor = 0xf39c12; // Orange
+      hpColor = 0xf39c12;
     }
 
     if (hpPercent > 0) {
@@ -267,7 +262,7 @@ export class CharacterCard extends Container {
       this.addChild(hpBarFill);
     }
 
-    // HP Text overlay
+    // HP Text
     const hpText = new Text({
       text: `${Math.max(0, character.hp)}/${character.max_hp}`,
       style: {
@@ -283,9 +278,9 @@ export class CharacterCard extends Container {
     hpText.y = hpBarY + hpBarHeight / 2;
     this.addChild(hpText);
 
-    // Energy Bar (below HP) - NO TEXT
+    // Energy Bar
     const energyBarY = hpBarY + hpBarHeight + 3;
-    const energyBarHeight = 8;  // Taller without text
+    const energyBarHeight = 8;
 
     const energyBarBg = new Graphics()
       .roundRect(hpBarX, energyBarY, hpBarWidth, energyBarHeight, 4)
@@ -294,11 +289,11 @@ export class CharacterCard extends Container {
     
     this.addChild(energyBarBg);
 
-    // Energy Bar fill (visual only, no text)
+    // Energy Bar fill
     const maxEnergy = character.max_energy || 10;
     const currentEnergy = character.energy || maxEnergy;
     const energyPercent = currentEnergy / maxEnergy;
-    const energyColor = 0xb57edc; // Purple-blue
+    const energyColor = 0xb57edc;
 
     const energyBarFill = new Graphics()
       .roundRect(hpBarX + 2, energyBarY + 2, (hpBarWidth - 4) * energyPercent, energyBarHeight - 4, 3)
@@ -306,16 +301,164 @@ export class CharacterCard extends Container {
     
     this.addChild(energyBarFill);
 
-    // Setup interactivity based on state
+    // Setup interactivity
     this.setupInteractivity();
+  }
+
+  /**
+   * NEW: Draw active effects icons below the avatar
+   */
+  private drawActiveEffects(character: any): void {
+    this.activeEffectsContainer.removeChildren();
+
+    // Get active effects from character
+    const activeEffects = character.active_effects || character.activeEffects || [];
+    
+    if (activeEffects.length === 0) return;
+
+    // Display up to 4 effects horizontally
+    const maxEffects = 4;
+    const effectsToShow = activeEffects.slice(0, maxEffects);
+    const iconSize = 16;
+    const spacing = 3;
+    const totalWidth = (iconSize * effectsToShow.length) + (spacing * (effectsToShow.length - 1));
+    
+    let startX = -totalWidth / 2;
+
+    effectsToShow.forEach((effect: any, index: number) => {
+      const effectIcon = this.createEffectIcon(effect, iconSize);
+      effectIcon.x = startX + (index * (iconSize + spacing));
+      effectIcon.y = 0;
+      this.activeEffectsContainer.addChild(effectIcon);
+    });
+  }
+
+  /**
+   * NEW: Create an effect icon with badge
+   */
+  private createEffectIcon(effect: any, size: number): Container {
+    const iconContainer = new Container();
+
+    // Background badge
+    const badge = new Graphics();
+    badge.circle(size / 2, size / 2, size / 2)
+      .fill({ color: 0x1a0f2e, alpha: 0.95 });
+
+    // Effect type determines border color
+    const effectType = effect.type || 'buff';
+    let borderColor = 0x26de81; // Green for buffs
+    
+    if (effectType.includes('debuff') || effectType.includes('damage')) {
+      borderColor = 0xe74c3c; // Red for debuffs
+    } else if (effectType.includes('heal') || effectType.includes('shield')) {
+      borderColor = 0x4a90e2; // Blue for healing/protection
+    }
+
+    badge.circle(size / 2, size / 2, size / 2)
+      .stroke({ width: 1.5, color: borderColor, alpha: 0.9 });
+
+    iconContainer.addChild(badge);
+
+    // Effect icon/emoji
+    const iconText = this.getEffectIcon(effect);
+    const icon = new Text({
+      text: iconText,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: size * 0.7,
+        fill: 0xffffff
+      }
+    });
+    icon.anchor.set(0.5);
+    icon.x = size / 2;
+    icon.y = size / 2;
+    iconContainer.addChild(icon);
+
+    // Duration/stack count badge (bottom-right corner)
+    if (effect.duration || effect.stacks) {
+      const countBadge = new Graphics();
+      countBadge.circle(size - 3, size - 3, 5)
+        .fill({ color: 0x000000, alpha: 0.9 })
+        .stroke({ width: 1, color: borderColor, alpha: 1 });
+
+      const countText = new Text({
+        text: `${effect.stacks || effect.duration || ''}`,
+        style: {
+          fontFamily: 'Kalam',
+          fontSize: 7,
+          fontWeight: 'bold',
+          fill: 0xffffff
+        }
+      });
+      countText.anchor.set(0.5);
+      countText.x = size - 3;
+      countText.y = size - 3;
+
+      iconContainer.addChild(countBadge, countText);
+    }
+
+    return iconContainer;
+  }
+
+  /**
+   * NEW: Get appropriate icon for effect type
+   */
+  private getEffectIcon(effect: any): string {
+    const effectName = (effect.name || effect.effect_name || '').toLowerCase();
+    const effectType = (effect.type || '').toLowerCase();
+
+    // Map effect names/types to icons
+    const iconMap: Record<string, string> = {
+      // Buffs
+      'strength': '💪',
+      'attack': '⚔️',
+      'power': '⚡',
+      'shield': '🛡️',
+      'defense': '🛡️',
+      'armor': '🛡️',
+      'regen': '💚',
+      'heal': '💚',
+      'speed': '⚡',
+      'haste': '⚡',
+      
+      // Debuffs
+      'poison': '🧪',
+      'burn': '🔥',
+      'bleed': '🩸',
+      'stun': '💫',
+      'freeze': '❄️',
+      'slow': '🐌',
+      'weakness': '💔',
+      'curse': '☠️',
+      'silence': '🔇',
+      
+      // Special
+      'barrier': '✨',
+      'taunt': '🎯',
+      'stealth': '👁️',
+      'reflect': '🔄'
+    };
+
+    // Check effect name first
+    for (const [key, icon] of Object.entries(iconMap)) {
+      if (effectName.includes(key)) {
+        return icon;
+      }
+    }
+
+    // Fallback based on type
+    if (effectType.includes('buff')) return '✨';
+    if (effectType.includes('debuff')) return '💀';
+    if (effectType.includes('damage')) return '🔥';
+    if (effectType.includes('heal')) return '💚';
+
+    return '⭐'; // Default icon
   }
 
   private async loadAvatar(character: any, centerX: number, centerY: number, maxWidth: number, maxHeight: number): Promise<void> {
     try {
-      // Try to load character avatar from various possible sources
       let avatarTexture = null;
       
-      // Priority 1: character.avatar_url or character.avatarUrl
       const avatarUrl = character.avatar_url || character.avatarUrl;
       if (avatarUrl) {
         try {
@@ -325,7 +468,6 @@ export class CharacterCard extends Container {
         }
       }
       
-      // Priority 2: character.avatar (texture key)
       if (!avatarTexture && character.avatar) {
         try {
           avatarTexture = await Assets.load(character.avatar);
@@ -334,17 +476,13 @@ export class CharacterCard extends Container {
         }
       }
       
-      // Priority 3: Fallback to placeholder based on character ID or class
       if (!avatarTexture) {
-        // Use emoji as fallback
         this.loadFallbackAvatar(character, centerX, centerY);
         return;
       }
 
-      // Create sprite from texture
       const avatarSprite = new Sprite(avatarTexture);
       
-      // Scale to fit within frame while maintaining aspect ratio
       const scale = Math.min(
         maxWidth / avatarSprite.width,
         maxHeight / avatarSprite.height
@@ -355,7 +493,6 @@ export class CharacterCard extends Container {
       avatarSprite.x = centerX;
       avatarSprite.y = centerY;
 
-      // Apply drop shadow filter
       const dropShadow = new DropShadowFilter({
         offset: { x: 3, y: 3 },
         blur: 4,
@@ -373,7 +510,6 @@ export class CharacterCard extends Container {
   }
 
   private loadFallbackAvatar(character: any, centerX: number, centerY: number): void {
-    // Fallback avatar icon based on character class/type
     let avatarIcon = '👤';
     
     if (character.class) {
@@ -392,7 +528,7 @@ export class CharacterCard extends Container {
       text: avatarIcon,
       style: {
         fontFamily: 'Kalam',
-        fontSize: 32,  // Smaller to fit in constrained frame
+        fontSize: 32,
         align: 'center',
         fill: 0xffffff
       }
@@ -401,7 +537,6 @@ export class CharacterCard extends Container {
     avatar.x = centerX;
     avatar.y = centerY;
 
-    // Apply drop shadow filter
     const dropShadow = new DropShadowFilter({
       offset: { x: 3, y: 3 },
       blur: 4,
@@ -414,86 +549,43 @@ export class CharacterCard extends Container {
   }
 
   private setupInteractivity(): void {
-    // Only enable interactivity if character is alive AND has not acted
     const isInteractive = !this.isDead && !this.hasActed;
     
     this.interactive = isInteractive;
     this.cursor = isInteractive ? 'pointer' : 'default';
 
     if (!isInteractive) {
-      return; // Skip hover effects if not interactive
+      return;
     }
 
     this.on('pointerover', () => {
-      // Subtle overlay
-      gsap.to(this.hoverOverlay, {
-        alpha: 0.08,
-        duration: 0.35,
-        ease: 'power2.out'
-      });
-      
-      // Glow border
-      gsap.to(this.glowEffect, {
-        alpha: 0.8,
-        duration: 0.35,
-        ease: 'power2.out'
-      });
-      
-      // Slight scale
-      gsap.to(this.scale, {
-        x: 1.03,
-        y: 1.03,
-        duration: 0.35,
-        ease: 'power2.out'
-      });
+      gsap.to(this.hoverOverlay, { alpha: 0.08, duration: 0.35, ease: 'power2.out' });
+      gsap.to(this.glowEffect, { alpha: 0.8, duration: 0.35, ease: 'power2.out' });
+      gsap.to(this.scale, { x: 1.03, y: 1.03, duration: 0.35, ease: 'power2.out' });
     });
 
     this.on('pointerout', () => {
-      gsap.to(this.hoverOverlay, {
-        alpha: 0,
-        duration: 0.35,
-        ease: 'power2.out'
-      });
-      
-      gsap.to(this.glowEffect, {
-        alpha: 0,
-        duration: 0.35,
-        ease: 'power2.out'
-      });
-      
-      gsap.to(this.scale, {
-        x: 1.0,
-        y: 1.0,
-        duration: 0.35,
-        ease: 'power2.out'
-      });
+      gsap.to(this.hoverOverlay, { alpha: 0, duration: 0.35, ease: 'power2.out' });
+      gsap.to(this.glowEffect, { alpha: 0, duration: 0.35, ease: 'power2.out' });
+      gsap.to(this.scale, { x: 1.0, y: 1.0, duration: 0.35, ease: 'power2.out' });
     });
   }
 
-  /**
-   * Check if this character card is draggable
-   * @returns true if character is alive and hasn't acted
-   */
   public isDraggable(): boolean {
     return !this.isDead && !this.hasActed;
   }
 
-  /**
-   * Update character state and refresh visual accordingly
-   */
   public updateState(character: any): void {
     this.character = character;
     this.isDead = character.hp <= 0;
     this.hasActed = character.has_acted || character.hasActed || false;
     
-    // Update interactivity
-    this.setupInteractivity();
+    // Redraw active effects
+    this.drawActiveEffects(character);
     
-    // Update visual state (you may need to rebuild the card or update specific elements)
-    // For now, this is a placeholder - implement full visual update if needed
+    this.setupInteractivity();
   }
 
-  // Keep the original hexagon drawing method if needed elsewhere
   private drawHexagon(graphics: Graphics, x: number, y: number, radius: number): void {
     const points: number[] = [];
     for (let i = 0; i < 6; i++) {

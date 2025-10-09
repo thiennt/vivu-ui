@@ -5,9 +5,9 @@ import { BaseScene } from "@/ui/BaseScene";
 
 export class PlayerCharacterZone extends Container {
   private zoneBg: Graphics;
-
   private playerInfoZone: Container;
   private playerInfoBg: Graphics;
+  private playerInfoGlow: Graphics; // NEW: Add glow effect
   private playerInfoLabel: Text;
   private energyText: Text;
   private energyCount: number = 0;
@@ -25,7 +25,6 @@ export class PlayerCharacterZone extends Container {
   private charactersWidth: number = 0;
   private charactersHeight: number = 0;
 
-  // Discard zone functionality - playerInfoBg will act as discard drop target
   private discardTooltip: Text | null = null;
 
   constructor(params?: { playerNo: number }) {
@@ -38,6 +37,10 @@ export class PlayerCharacterZone extends Container {
 
     this.playerInfoZone = new Container();
     this.addChild(this.playerInfoZone);
+
+    // Add glow layer before background
+    this.playerInfoGlow = new Graphics();
+    this.playerInfoZone.addChild(this.playerInfoGlow);
 
     this.playerInfoBg = new Graphics();
     this.playerInfoZone.addChild(this.playerInfoBg);
@@ -58,77 +61,101 @@ export class PlayerCharacterZone extends Container {
   resize(width: number, height: number): void {
     this.zoneBg.clear();
     
-    // Store fixed dimensions to prevent changes during highlighting
     this.infoWidth = width * 0.18;
     this.infoHeight = height;
 
-    // Simplified character zone background
-    // Main background
-    this.zoneBg.roundRect(0, 0, width, height, 8)
-      .fill(Colors.UI_BACKGROUND);
+    // Enhanced background with gradient feel
+    const accentColor = this.playerNo === 1 
+      ? Colors.TEAM_ALLY 
+      : Colors.TEAM_ENEMY;
     
-    // Simple team-colored border
-    const accentColor = this.playerNo === 1 ? Colors.TEAM_ALLY : Colors.TEAM_ENEMY;
+    // Semi-transparent background with subtle gradient
+    const bgAlpha = 0.3;
     this.zoneBg.roundRect(0, 0, width, height, 8)
-      .stroke({ width: 2, color: accentColor, alpha: 0.7 });
+      .fill({ color: Colors.UI_BACKGROUND, alpha: bgAlpha });
+    
+    // Add inner shadow effect
+    this.zoneBg.roundRect(2, 2, width - 4, height - 4, 6)
+      .stroke({ width: 1, color: 0x000000, alpha: 0.2 });
+    
+    // Team-colored border with glow
+    this.zoneBg.roundRect(0, 0, width, height, 8)
+      .stroke({ width: 3, color: accentColor, alpha: 0.6 });
+    
+    // Outer glow
+    this.zoneBg.roundRect(-2, -2, width + 4, height + 4, 10)
+      .stroke({ width: 2, color: accentColor, alpha: 0.2 });
     
     // Layout player info zone at the left
     this.playerInfoZone.x = 0;
     this.playerInfoZone.y = 0;
 
-    const infoBgBorder = this.playerNo === 1 ? Colors.TEAM_ALLY : Colors.TEAM_ENEMY;
-    
-    this.playerInfoBg.clear();
-    
-    // Simplified player info background
-    this.playerInfoBg.roundRect(0, 0, this.infoWidth, this.height, 6)
-      .fill(Colors.PANEL_BACKGROUND)
-      .stroke({ width: 1, color: infoBgBorder, alpha: 0.8 });
+    this.drawPlayerInfoBackground(false);
 
-    // Simplified player label
-    this.playerInfoLabel.text = this.playerNo === 1 ? 'P1' : 'P2';
+    // Enhanced player label with shadow
+    this.playerInfoLabel.text = this.playerNo === 1 ? 'PLAYER' : 'ENEMY';
     this.playerInfoLabel.style = {
       fontFamily: 'Kalam',
-      fontSize: 20,
+      fontSize: 16,
       fontWeight: 'bold',
-      fill: infoBgBorder,
-      align: 'center'
+      fill: accentColor,
+      align: 'center',
+      dropShadow: {
+        color: 0x000000,
+        blur: 4,
+        angle: Math.PI / 4,
+        distance: 2,
+        alpha: 0.5
+      }
     };
     this.playerInfoLabel.anchor.set(0.5);
     this.playerInfoLabel.x = this.infoWidth / 2;
-    this.playerInfoLabel.y = this.infoHeight * 0.2;
+    this.playerInfoLabel.y = this.infoHeight * 0.15;
 
-    // Simplified energy display
+    // Enhanced energy display with glow
     this.energyText.text = `⚡${this.energyCount}`;
     this.energyText.style = {
       fontFamily: 'Kalam',
-      fontSize: 14,
+      fontSize: 18,
       fontWeight: 'bold',
       fill: Colors.ENERGY_TEXT,
-      align: 'center'
+      align: 'center',
+      dropShadow: {
+        color: Colors.ENERGY_ACTIVE,
+        blur: 6,
+        angle: 0,
+        distance: 0,
+        alpha: 0.8
+      }
     };
     this.energyText.anchor.set(0.5);
     this.energyText.x = this.infoWidth / 2;
-    this.energyText.y = this.infoHeight * 0.5;
+    this.energyText.y = this.infoHeight * 0.45;
 
-    // Simplified deck display
+    // Enhanced deck display
     this.deckText.text = `🃏${this.deckCount}`;
     this.deckText.style = {
       fontFamily: 'Kalam',
-      fontSize: 14,
+      fontSize: 16,
       fontWeight: 'bold',
       fill: Colors.TEXT_PRIMARY,
-      align: 'center'
+      align: 'center',
+      dropShadow: {
+        color: 0x000000,
+        blur: 3,
+        angle: Math.PI / 4,
+        distance: 1,
+        alpha: 0.5
+      }
     };
     this.deckText.anchor.set(0.5);
     this.deckText.x = this.infoWidth / 2;
     this.deckText.y = this.infoHeight * 0.75;
 
-    // Make playerInfoBg interactive for discard functionality
     this.playerInfoBg.interactive = true;
-    this.updateDiscardHighlight(false); // Initialize without highlight
+    this.updateDiscardHighlight(false);
 
-    // Layout characters zone to the right of player info
+    // Layout characters zone
     this.charactersWidth = width - this.infoWidth;
     this.charactersHeight = height;
     this.charactersZone.x = this.infoWidth;
@@ -137,32 +164,105 @@ export class PlayerCharacterZone extends Container {
     this.updateCharactersDisplay();
   }
 
+  private drawPlayerInfoBackground(highlight: boolean): void {
+    const accentColor = this.playerNo === 1 ? Colors.TEAM_ALLY : Colors.TEAM_ENEMY;
+    
+    this.playerInfoGlow.clear();
+    this.playerInfoBg.clear();
+
+    if (highlight) {
+      // Glowing border when highlighted for discard
+      this.playerInfoGlow.roundRect(-4, -4, this.infoWidth + 8, this.infoHeight + 8, 10)
+        .fill({ color: Colors.CARD_DISCARD, alpha: 0.2 });
+      
+      this.playerInfoBg.roundRect(0, 0, this.infoWidth, this.infoHeight, 6)
+        .fill({ color: Colors.PANEL_BACKGROUND, alpha: 0.9 })
+        .stroke({ width: 3, color: Colors.CARD_DISCARD, alpha: 0.9 });
+      
+      // Animated dashed border effect
+      const dashLength = 8;
+      const spacing = 4;
+      for (let i = 0; i < this.infoWidth; i += dashLength + spacing) {
+        this.playerInfoBg.roundRect(i + 2, 2, Math.min(dashLength, this.infoWidth - i - 4), 3, 1)
+          .fill(Colors.CARD_DISCARD);
+      }
+      for (let i = 0; i < this.infoHeight; i += dashLength + spacing) {
+        this.playerInfoBg.roundRect(2, i + 2, 3, Math.min(dashLength, this.infoHeight - i - 4), 1)
+          .fill(Colors.CARD_DISCARD);
+        this.playerInfoBg.roundRect(this.infoWidth - 5, i + 2, 3, Math.min(dashLength, this.infoHeight - i - 4), 1)
+          .fill(Colors.CARD_DISCARD);
+      }
+      for (let i = 0; i < this.infoWidth; i += dashLength + spacing) {
+        this.playerInfoBg.roundRect(i + 2, this.infoHeight - 5, Math.min(dashLength, this.infoWidth - i - 4), 3, 1)
+          .fill(Colors.CARD_DISCARD);
+      }
+
+      // Show tooltip
+      if (!this.discardTooltip) {
+        this.discardTooltip = new Text({
+          text: '♻️ DISCARD',
+          style: {
+            fontFamily: 'Kalam',
+            fontSize: 11,
+            fontWeight: 'bold',
+            fill: Colors.CARD_DISCARD,
+            align: 'center',
+            dropShadow: {
+              color: 0x000000,
+              blur: 3,
+              distance: 1,
+              alpha: 0.8
+            }
+          }
+        });
+        this.discardTooltip.anchor.set(0.5);
+        this.playerInfoZone.addChild(this.discardTooltip);
+      }
+      
+      this.discardTooltip.visible = true;
+      this.discardTooltip.x = this.infoWidth / 2;
+      this.discardTooltip.y = this.infoHeight - 15;
+      
+    } else {
+      // Normal styling with subtle glow
+      this.playerInfoGlow.roundRect(-3, -3, this.infoWidth + 6, this.infoHeight + 6, 9)
+        .fill({ color: accentColor, alpha: 0.15 });
+      
+      this.playerInfoBg.roundRect(0, 0, this.infoWidth, this.infoHeight, 6)
+        .fill({ color: Colors.PANEL_BACKGROUND, alpha: 0.85 })
+        .stroke({ width: 2, color: accentColor, alpha: 0.7 });
+      
+      // Inner highlight
+      this.playerInfoBg.roundRect(2, 2, this.infoWidth - 4, this.infoHeight - 4, 4)
+        .stroke({ width: 1, color: accentColor, alpha: 0.3 });
+        
+      if (this.discardTooltip) {
+        this.discardTooltip.visible = false;
+      }
+    }
+  }
+
   updateBattleState(playerState: CardBattlePlayerState): void {
     this.playerState = playerState;
     
-    // Update energy and deck counts
     this.energyCount = playerState.deck.current_energy || 0;
     this.deckCount = playerState.deck.remaining_cards || 0;
     
-    // Update text displays
-    this.energyText.text = `⚡x ${this.energyCount}`;
-    this.deckText.text = `🃏x ${this.deckCount}`;
-
+    this.energyText.text = `⚡ ${this.energyCount}`;
+    this.deckText.text = `🃏 ${this.deckCount}`;
 
     this.updateCharactersDisplay();
   }
 
   private updateCharactersDisplay(): void {
-    // Clear existing character cards
     this.characterCards.forEach(card => card.destroy());
     this.characterCards = [];
     
     if (!this.playerState || !this.playerState.characters) return;
     
-    const characters = this.playerState.characters.slice(0, 3); // Max 3 characters
+    const characters = this.playerState.characters.slice(0, 3);
     if (characters.length === 0) return;
     
-    // Calculate optimal card dimensions to fit within the zone
     const spacing = 10;
     const cardWidth = Math.floor(this.charactersWidth / characters.length) - 10;
     const cardHeight = this.charactersHeight * 0.95;
@@ -170,12 +270,11 @@ export class PlayerCharacterZone extends Container {
     const startX = spacing;
     
     characters.forEach((character, index) => {
-      const x = startX + (index * (cardWidth + spacing)) + cardWidth / 2; // Center horizontally
-      const y = Math.max(5, (this.charactersHeight - cardHeight) / 2) + cardHeight / 2; // Center vertically
+      const x = startX + (index * (cardWidth + spacing)) + cardWidth / 2;
+      const y = Math.max(5, (this.charactersHeight - cardHeight) / 2) + cardHeight / 2;
       
       const characterCard = this.createCharacterCard(character, x, y, cardWidth, cardHeight);
       
-      // Store character ID for drag/drop targeting
       (characterCard as Container & { characterId: string }).characterId = character.id;
       
       this.charactersZone.addChild(characterCard);
@@ -193,7 +292,6 @@ export class PlayerCharacterZone extends Container {
     return card;
   }
 
-  // Method to check if coordinates are within a character card bounds
   getCharacterDropTarget(globalX: number, globalY: number): string | null {
     for (const characterCard of this.characterCards) {
       const bounds = characterCard.getBounds();
@@ -205,115 +303,43 @@ export class PlayerCharacterZone extends Container {
     return null;
   }
 
-  // Method to highlight character cards when dragging cards over them
   updateCharacterHover(globalX: number, globalY: number, isDragging: boolean): void {
     if (!isDragging) {
-      // Reset all character cards to normal scale
       this.characterCards.forEach(card => {
         card.scale.set(1.0);
       });
       return;
     }
 
-    // Check which character card is being hovered
     for (const characterCard of this.characterCards) {
       const bounds = characterCard.getBounds();
       const isHovering = globalX >= bounds.x && globalX <= bounds.x + bounds.width &&
                         globalY >= bounds.y && globalY <= bounds.y + bounds.height;
       
       if (isHovering) {
-        // Zoom in the hovered character card
         characterCard.scale.set(1.15);
       } else {
-        // Reset non-hovered cards
         characterCard.scale.set(1.0);
       }
     }
   }
 
-  // Method to check if coordinates are within player info zone bounds (discard functionality)
   isPointInPlayerInfo(globalX: number, globalY: number): boolean {
-    // Use fixed dimensions and position for consistent hit detection
     const globalPos = this.toGlobal({ x: 0, y: 0 });
     return globalX >= globalPos.x && globalX <= globalPos.x + this.infoWidth &&
            globalY >= globalPos.y && globalY <= globalPos.y + this.infoHeight;
   }
 
-  // Method to highlight/unhighlight player info zone for discard
-  updateDiscardHighlight(highlight: boolean): void {    
-    // Use fixed dimensions instead of getBounds to prevent size changes
-    const infoWidth = this.infoWidth;
-    const height = this.infoHeight;
-    
-    const infoBgBorder = this.playerNo === 1 ? Colors.TEAM_ALLY : Colors.TEAM_ENEMY;
-    
-    this.playerInfoBg.clear();
-    
-    if (highlight) {
-      // Dashed border when highlighted for discard
-      this.playerInfoBg.roundRect(0, 0, infoWidth, height, 6)
-        .fill(Colors.PANEL_BACKGROUND)
-        .stroke({ width: 3, color: Colors.CARD_DISCARD, alpha: 0.8 });
-        
-      // Add dashed border effect by drawing small rectangles
-      const dashLength = 8;
-      const spacing = 4;
-      for (let i = 0; i < infoWidth; i += dashLength + spacing) {
-        this.playerInfoBg.roundRect(i + 2, 2, Math.min(dashLength, infoWidth - i - 4), 2, 1)
-          .fill(Colors.CARD_DISCARD);
-      }
-      for (let i = 0; i < height; i += dashLength + spacing) {
-        this.playerInfoBg.roundRect(2, i + 2, 2, Math.min(dashLength, height - i - 4), 1)
-          .fill(Colors.CARD_DISCARD);
-        this.playerInfoBg.roundRect(infoWidth - 4, i + 2, 2, Math.min(dashLength, height - i - 4), 1)
-          .fill(Colors.CARD_DISCARD);
-      }
-      for (let i = 0; i < infoWidth; i += dashLength + spacing) {
-        this.playerInfoBg.roundRect(i + 2, height - 4, Math.min(dashLength, infoWidth - i - 4), 2, 1)
-          .fill(Colors.CARD_DISCARD);
-      }
-
-      // Add "Discard here" tooltip
-      if (!this.discardTooltip) {
-        this.discardTooltip = new Text({
-          text: 'Discard here',
-          style: {
-            fontFamily: 'Kalam',
-            fontSize: 12,
-            fontWeight: 'bold',
-            fill: Colors.TEXT_PRIMARY,
-            align: 'center'
-          }
-        });
-        this.discardTooltip.anchor.set(0.5);
-        this.playerInfoZone.addChild(this.discardTooltip);
-      }
-      
-      this.discardTooltip.visible = true;
-      this.discardTooltip.x = infoWidth / 2;
-      this.discardTooltip.y = height - 20;
-      
-    } else {
-      // Normal styling
-      this.playerInfoBg.roundRect(0, 0, infoWidth, height, 6)
-        .fill(Colors.PANEL_BACKGROUND)
-        .stroke({ width: 1, color: infoBgBorder, alpha: 0.8 });
-        
-      // Hide tooltip
-      if (this.discardTooltip) {
-        this.discardTooltip.visible = false;
-      }
-    }
+  updateDiscardHighlight(highlight: boolean): void {
+    this.drawPlayerInfoBackground(highlight);
   }
 
-  // Method to find character card by ID for animations
   public findCharacterCard(characterId: string): Container | null {
     return this.characterCards.find(card => 
       (card as Container & { characterId: string }).characterId === characterId
     ) || null;
   }
 
-  // Method to get energy text for animations
   public getEnergyText(): Text {
     return this.energyText;
   }
