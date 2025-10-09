@@ -96,7 +96,7 @@ export class HandZone extends Container {
     if (handCards.length === 0) return;
 
     // Keep card size fixed as requested
-    const cardWidth = 60;
+    const cardWidth = 70;
     const cardHeight = 90;
     const availableWidth = width - 20; // Padding on both sides
     

@@ -34,7 +34,7 @@ export class CardBattleScene extends BaseScene {
   private loadingManager: LoadingStateManager;
 
   // Zone components following the layout order:
-  // PLAYER 2 HAND ZONE (Skill Cards)  
+  // PLAYER 2 HAND ZONE (Skill Cards)
   // PLAYER 2 INFO (P2 + Energy count + Deck count + DISCARD ZONE) + 3 CHARACTERS ZONE
   // BATTLE LOG ZONE
   // PLAYER 1 INFO (P1 + Energy count + Deck count + DISCARD ZONE) + 3 CHARACTERS ZONE

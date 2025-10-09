@@ -3,8 +3,8 @@ import { Colors } from '@/utils/colors';
 import { gsap } from 'gsap';
 
 const defaultFaceDownCardOptions = {
-  width: 120,
-  height: 160,
+  width: 70,
+  height: 100,
 };
 
 export type FaceDownCardOptions = typeof defaultFaceDownCardOptions;
