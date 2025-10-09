@@ -133,8 +133,39 @@ export class PlayerDetailScene extends BaseScene {
     this.createCharacterCollection();
     this.createBackButton();
     
-    // Add non-scrollable content directly to container
-    this.container.addChild(this.scrollContent);
+    // Calculate content height for scrolling
+    const contentHeight = this.calculateTotalContentHeight();
+    
+    // Create vertical ScrollBox for entire scene content
+    if (contentHeight > this.gameHeight) {
+      this.mainScrollBox = new ScrollBox({
+        width: this.gameWidth,
+        height: this.gameHeight,
+      });
+      this.mainScrollBox.addItem(this.scrollContent);
+      this.container.addChild(this.mainScrollBox);
+    } else {
+      // If content fits, just add directly without scrolling
+      this.container.addChild(this.scrollContent);
+    }
+  }
+  
+  private calculateTotalContentHeight(): number {
+    // Calculate the total height of all content
+    let maxY = 0;
+    
+    // Check all children of scrollContent to find the bottom-most element
+    this.scrollContent.children.forEach(child => {
+      child.children.forEach(grandchild => {
+        const bounds = grandchild.getBounds();
+        const bottomY = bounds.y + bounds.height;
+        if (bottomY > maxY) {
+          maxY = bottomY;
+        }
+      });
+    });
+    
+    return maxY + this.STANDARD_PADDING; // Add some padding at the bottom
   }
 
 
@@ -153,7 +184,7 @@ export class PlayerDetailScene extends BaseScene {
   private createPlayerStats(): void {
     if (!this.player) return;
     
-    // Calculate responsive panel sizes with standard padding
+    // Calculate responsive panel sizes with reduced padding
     const availableWidth = this.gameWidth - 2 * this.STANDARD_PADDING;
     const panelWidth = Math.min(280, (availableWidth - this.STANDARD_SPACING) / 2);
     const totalWidth = (panelWidth * 2) + this.STANDARD_SPACING;
@@ -189,12 +220,12 @@ export class PlayerDetailScene extends BaseScene {
       panelWidth, 200
     );
     
-    // Center both panels horizontally
+    // Center both panels horizontally with reduced vertical spacing
     mainPanel.x = startX;
-    mainPanel.y = 120;
+    mainPanel.y = 100; // Reduced from 120
     
     statsPanel.x = startX + panelWidth + this.STANDARD_SPACING;
-    statsPanel.y = 120;
+    statsPanel.y = 100; // Reduced from 120
     
     this.statsContainer.addChild(mainPanel, statsPanel);
   }
@@ -215,20 +246,20 @@ export class PlayerDetailScene extends BaseScene {
       fontWeight: 'bold',
       fill: Colors.TEXT_PRIMARY
     }});
-    titleText.x = 15;
-    titleText.y = 15;
+    titleText.x = 12; // Reduced from 15
+    titleText.y = 12; // Reduced from 15
     
     panel.addChild(bg, titleText);
     
-    // Stats
+    // Stats with reduced spacing
     stats.forEach((stat, index) => {
       const statText = new Text({text: stat, style: {
         fontFamily: 'Kalam',
         fontSize: 16,
         fill: Colors.TEXT_SECONDARY
       }});
-      statText.x = 15;
-      statText.y = 50 + (index * 22);
+      statText.x = 12; // Reduced from 15
+      statText.y = 45 + (index * 20); // Reduced from 50 + (index * 22)
       panel.addChild(statText);
     });
     
@@ -242,7 +273,7 @@ export class PlayerDetailScene extends BaseScene {
     const panelWidth = Math.min(600, this.gameWidth - 2 * this.STANDARD_PADDING);
     const panelHeight = 200;
     const startX = (this.gameWidth - panelWidth) / 2;
-    const startY = 340; // Position below the stats panels
+    const startY = 310; // Position below the stats panels (reduced from 340)
 
     const panel = new Container();
     
@@ -259,8 +290,8 @@ export class PlayerDetailScene extends BaseScene {
       fontWeight: 'bold',
       fill: Colors.TEXT_PRIMARY
     }});
-    titleText.x = 15;
-    titleText.y = 15;
+    titleText.x = 12; // Reduced from 15
+    titleText.y = 12; // Reduced from 15
 
     // Show different message if no points available
     if (this.player.points <= 0) {
@@ -270,8 +301,8 @@ export class PlayerDetailScene extends BaseScene {
         fill: Colors.TEXT_SECONDARY,
         fontStyle: 'italic'
       }});
-      noPointsText.x = 15;
-      noPointsText.y = 50;
+      noPointsText.x = 12; // Reduced from 15
+      noPointsText.y = 45; // Reduced from 50
       
       panel.addChild(bg, titleText, noPointsText);
       panel.x = startX;
@@ -299,7 +330,7 @@ export class PlayerDetailScene extends BaseScene {
     ];
     
     stats.forEach((stat, index) => {
-      const yPos = 60 + (index * 40);
+      const yPos = 50 + (index * 35); // Reduced from 60 + (index * 40)
       
       // Stat name
       const nameText = new Text({text: stat.name, style: {
@@ -307,7 +338,7 @@ export class PlayerDetailScene extends BaseScene {
         fontSize: 16,
         fill: Colors.TEXT_PRIMARY
       }});
-      nameText.x = 20;
+      nameText.x = 15; // Reduced from 20
       nameText.y = yPos;
       
       // Current value display
@@ -476,7 +507,7 @@ export class PlayerDetailScene extends BaseScene {
     };
 
     // Calculate Y position - always account for point distribution panel since it's always shown
-    const baseY = 560; // Always add offset since point panel is always shown
+    const baseY = 520; // Always add offset since point panel is always shown (reduced from 560)
 
     // Title - centered
     const collectionTitle = new Text({ text: 'Character Collection', style: {

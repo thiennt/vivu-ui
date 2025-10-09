@@ -238,10 +238,11 @@ export class LineupScene extends BaseScene {
     this.poolContainer.label = 'characterPool';
 
     // Calculate available area - lineup is now single row instead of 2x2
-    // Calculate slot height based on layout
+    // Calculate slot height based on layout - USE SAME SIZE AS LINEUP GRID
     const availableWidth = this.gameWidth - 2 * this.STANDARD_PADDING;
-    const layout = this.calculateThreeCardsLayout(availableWidth, this.STANDARD_SPACING);
-    const slotWidth = Math.min(layout.itemWidth, 120);
+    const gap = 6; // Same gap as lineup grid
+    const layout = this.calculateThreeCardsLayout(availableWidth, gap);
+    const slotWidth = Math.min(layout.itemWidth, 100); // Same as lineup grid
     const slotHeight = slotWidth * 1.25; // Use 1:1.25 aspect ratio for consistency
     const poolTop = 150 + slotHeight + 2 * this.STANDARD_SPACING; // lineup grid bottom (single row height)
     const actionButtonHeight = 50;
@@ -250,13 +251,13 @@ export class LineupScene extends BaseScene {
     const poolHeight = poolBottom - poolTop;
     const poolWidth = this.gameWidth - 2 * this.STANDARD_PADDING;
 
-    const spacing = this.STANDARD_SPACING;
+    const spacing = gap; // Use same spacing as lineup grid
     const padding = this.STANDARD_PADDING; // Use for left/right padding
     const marginTop = 45;
 
-    // Calculate cards per row - force 3 cards per row for character pool
+    // Calculate cards per row - force 3 cards per row for character pool, using SAME SIZE as lineup grid
     const poolLayout = this.calculateThreeCardsLayout(poolWidth - 2 * padding, spacing);
-    const cardWidth = poolLayout.itemWidth;
+    const cardWidth = Math.min(poolLayout.itemWidth, 100); // Same as lineup grid
     const cardHeight = cardWidth * 1.25; // Use 1:1.25 aspect ratio for consistency
     const cardsPerRow = poolLayout.itemsPerRow;
 
@@ -298,9 +299,7 @@ export class LineupScene extends BaseScene {
       const x = padding + col * (cardWidth + spacing);
       const y = row * (cardHeight + spacing);
 
-      const characterCard = this.createPoolCharacterCard(character, x, y);
-      characterCard.width = cardWidth;
-      characterCard.height = cardHeight;
+      const characterCard = this.createPoolCharacterCard(character, x, y, cardWidth, cardHeight);
       content.addChild(characterCard);
     });
 
@@ -317,12 +316,9 @@ export class LineupScene extends BaseScene {
     this.poolContainer.y = poolTop;
   }
 
-  private createPoolCharacterCard(character: any, x: number, y: number): Container {
-    // Pool cards use consistent aspect ratio - we'll set the width and height dynamically
-    // The parent will set the actual dimensions via width/height properties after creation
-    const tempWidth = 90;
-    const tempHeight = tempWidth * 1.25; // Use 1:1.25 aspect ratio for consistency
-    const card = this.createCharacterCard(character, x, y, tempWidth, tempHeight);
+  private createPoolCharacterCard(character: any, x: number, y: number, width: number, height: number): Container {
+    // Pool cards use same size as lineup grid cards
+    const card = this.createCharacterCard(character, x, y, width, height);
     card.interactive = true;
     card.cursor = 'pointer';
     card.on('pointertap', () => {
