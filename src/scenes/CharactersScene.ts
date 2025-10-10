@@ -90,7 +90,7 @@ export class CharactersScene extends BaseScene {
   }
   
   private updateLayout(): void {
-    // Clear and recreate layout - this is more efficient than destroying/recreating all elements
+    // Clear and recreate layout
     this.backgroundContainer.removeChildren();
     this.headerContainer.removeChildren();
     this.gridContainer.removeChildren();
@@ -153,45 +153,97 @@ export class CharactersScene extends BaseScene {
 
   private createBackground(): void {
     const bg = new Graphics();
-    bg.rect(0, 0, this.gameWidth, this.gameHeight).fill(Colors.BACKGROUND_PRIMARY);
+    
+    // Dark fantasy background
+    bg.rect(0, 0, this.gameWidth, this.gameHeight)
+      .fill({ color: 0x1a0f0a, alpha: 1.0 });
+    
+    // Subtle brown texture
+    bg.rect(0, 0, this.gameWidth, this.gameHeight)
+      .fill({ color: 0x2a1810, alpha: 0.3 });
+    
     this.backgroundContainer.addChild(bg);
   }
 
   private createHeader(): void {
-    const title = this.createTitle('Character Collection', this.gameWidth / 2, 45); // Reduced Y from 60
+    // Fantasy banner for title
+    const bannerWidth = Math.min(340, this.gameWidth - 40);
+    const bannerHeight = 50;
+    const bannerX = (this.gameWidth - bannerWidth) / 2;
+    const bannerY = 20;
+    
+    const banner = new Graphics();
+    // Ribbon banner
+    banner.moveTo(bannerX + 12, bannerY)
+      .lineTo(bannerX, bannerY + bannerHeight / 2)
+      .lineTo(bannerX + 12, bannerY + bannerHeight)
+      .lineTo(bannerX + bannerWidth - 12, bannerY + bannerHeight)
+      .lineTo(bannerX + bannerWidth, bannerY + bannerHeight / 2)
+      .lineTo(bannerX + bannerWidth - 12, bannerY)
+      .lineTo(bannerX + 12, bannerY)
+      .fill({ color: 0x8b4513, alpha: 0.95 })
+      .stroke({ width: 2.5, color: 0xd4af37 });
+    
+    // Inner highlight
+    banner.moveTo(bannerX + 15, bannerY + 3)
+      .lineTo(bannerX + bannerWidth - 15, bannerY + 3)
+      .lineTo(bannerX + bannerWidth - 4, bannerY + bannerHeight / 2)
+      .lineTo(bannerX + bannerWidth - 15, bannerY + bannerHeight - 3)
+      .lineTo(bannerX + 15, bannerY + bannerHeight - 3)
+      .lineTo(bannerX + 4, bannerY + bannerHeight / 2)
+      .lineTo(bannerX + 15, bannerY + 3)
+      .stroke({ width: 1, color: 0xffd700, alpha: 0.6 });
 
-    const subtitle = new Text({
-      text: `${this.characters.length} Characters`,
+    const title = new Text({
+      text: '🎭 Character Gallery 🎭',
       style: {
         fontFamily: 'Kalam',
-        fontSize: 14, // Reduced from 18
-        fill: Colors.TEXT_SECONDARY,
+        fontSize: 24,
+        fontWeight: 'bold',
+        fill: 0xffffff,
+        stroke: { color: 0x2a1810, width: 2 },
+        dropShadow: {
+          color: 0xffd700,
+          blur: 3,
+          angle: Math.PI / 4,
+          distance: 2,
+          alpha: 0.6
+        }
+      }
+    });
+    title.anchor.set(0.5);
+    title.x = this.gameWidth / 2;
+    title.y = bannerY + bannerHeight / 2;
+
+    const subtitle = new Text({
+      text: `${this.characters.length} Heroes`,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 14,
+        fill: 0xd4af37,
         align: 'center'
       }
     });
     subtitle.anchor.set(0.5);
     subtitle.x = this.gameWidth / 2;
-    subtitle.y = 75; // Reduced from 100
+    subtitle.y = bannerY + bannerHeight + 12;
     
-    this.headerContainer.addChild(title, subtitle);
+    this.headerContainer.addChild(banner, title, subtitle);
   }
 
   private createCharacterGrid(): void {
-    // Calculate area for grid (leave space for back button) - optimized for 400x700
-    const gridTop = 100; // Reduced from 140
-    const backButtonHeight = 45; // Reduced from 50
-    const backButtonMargin = 20; // Reduced from 30
+    // Calculate area for grid
+    const gridTop = 95;
+    const backButtonHeight = 45;
+    const backButtonMargin = 20;
     const gridHeight = this.gameHeight - gridTop - backButtonHeight - backButtonMargin - this.STANDARD_PADDING;
 
-    // Mobile-optimized card layout using the specified formula
     const availableWidth = this.gameWidth - 2 * this.STANDARD_PADDING;
-    const isMobile = this.gameWidth < 768; // Mobile detection
-    const gap = isMobile ? 6 : this.STANDARD_SPACING; // Reduced gap from 8 to 6 for 400x700
-    const cardCount = 3; // Force 3 cards per row
+    const isMobile = this.gameWidth < 768;
+    const gap = isMobile ? 6 : this.STANDARD_SPACING;
+    const cardCount = 3;
     
-    // Apply mobile formula: card_width = (screen_width - (gap * (card_count - 1))) / card_count
     const cardWidth = (availableWidth - (gap * (cardCount - 1))) / cardCount;
-    // Use 4:5 aspect ratio for card height
     const cardHeight = cardWidth * 1.25;
 
     const layout = {
@@ -200,7 +252,7 @@ export class CharactersScene extends BaseScene {
       totalWidth: availableWidth
     };
 
-    // Create a container for all cards
+    // Create grid container
     const gridContent = new Container();
 
     for (let index = 0; index < this.characters.length; index++) {
@@ -223,11 +275,11 @@ export class CharactersScene extends BaseScene {
       gridContent.addChild(characterCard);
     }
 
-    // Set content height for scrolling
+    // Calculate content height
     const totalRows = Math.ceil(this.characters.length / layout.itemsPerRow);
     const contentHeight = totalRows * (cardHeight + gap);
 
-    // Create ScrollBox for vertical scrolling
+    // Create ScrollBox
     const scrollBox = new ScrollBox({
       width: availableWidth,
       height: gridHeight,
@@ -236,31 +288,11 @@ export class CharactersScene extends BaseScene {
     scrollBox.y = gridTop;
     scrollBox.addItem(gridContent);
 
-    // Set gridContent height for proper scrolling
     gridContent.height = contentHeight;
 
     this.gridContainer.addChild(scrollBox);
     scrollBox.label = 'gridContainer';
   }
-
-  // private createDetailedCharacterCard(character: any, x: number, y: number): Container {
-  //   const card = this.createHeroCard(character, x, y, 'detailed');
-    
-  //   // Click handler
-  //   card.on('pointerdown', () => {
-  //     navigation.showScreen(CharacterDetailScene, { selectedCharacter: character });
-  //   });
-    
-  //   // Hover effects
-  //   // card.on('pointerover', () => {
-  //   //   card.scale.set(1.05);
-  //   // });
-  //   // card.on('pointerout', () => {
-  //   //   card.scale.set(1.0);
-  //   // });
-    
-  //   return card;
-  // }
 
   private setupScrolling(): void {
     this.interactive = true;
@@ -277,20 +309,86 @@ export class CharactersScene extends BaseScene {
   }
 
   private createBackButton(): void {
-    // Responsive button sizing - optimized for 400x700
-    const buttonWidth = Math.min(120, this.gameWidth - 2 * this.STANDARD_PADDING); // Reduced from 140
-    const buttonHeight = 40; // Fixed height for consistency
+    const buttonWidth = Math.min(120, this.gameWidth - 2 * this.STANDARD_PADDING);
+    const buttonHeight = 40;
     
-    const backButton = this.createButton(
+    const backButton = this.createFantasyButton(
       '← Back',
       this.STANDARD_PADDING,
       this.gameHeight - buttonHeight - this.STANDARD_PADDING,
       buttonWidth,
       buttonHeight,
-      () => navigation.showScreen(HomeScene),
-      14 // Base font size
+      () => navigation.showScreen(HomeScene)
     );
     this.buttonContainer.addChild(backButton);
+  }
+
+  private createFantasyButton(
+    text: string,
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    onClick: () => void
+  ): Container {
+    const button = new Container();
+    
+    const bg = new Graphics();
+    bg.roundRect(2, 2, width, height, 8)
+      .fill({ color: 0x000000, alpha: 0.4 });
+    bg.roundRect(0, 0, width, height, 8)
+      .fill({ color: 0x8b4513, alpha: 0.95 })
+      .stroke({ width: 2, color: 0xd4af37 });
+    bg.roundRect(2, 2, width - 4, height - 4, 6)
+      .stroke({ width: 1, color: 0xffd700, alpha: 0.6 });
+    
+    const buttonText = new Text({
+      text: text,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 14,
+        fontWeight: 'bold',
+        fill: 0xffffff,
+        stroke: { color: 0x2a1810, width: 2 }
+      }
+    });
+    buttonText.anchor.set(0.5);
+    buttonText.x = width / 2;
+    buttonText.y = height / 2;
+    
+    button.addChild(bg, buttonText);
+    button.x = x;
+    button.y = y;
+    button.interactive = true;
+    button.cursor = 'pointer';
+    
+    button.on('pointerover', () => {
+      bg.clear();
+      bg.roundRect(2, 2, width, height, 8)
+        .fill({ color: 0x000000, alpha: 0.4 });
+      bg.roundRect(0, 0, width, height, 8)
+        .fill({ color: 0xa0632a, alpha: 0.95 })
+        .stroke({ width: 2, color: 0xffd700 });
+      bg.roundRect(2, 2, width - 4, height - 4, 6)
+        .stroke({ width: 1, color: 0xffd700, alpha: 0.9 });
+      button.scale.set(1.02);
+    });
+    
+    button.on('pointerout', () => {
+      bg.clear();
+      bg.roundRect(2, 2, width, height, 8)
+        .fill({ color: 0x000000, alpha: 0.4 });
+      bg.roundRect(0, 0, width, height, 8)
+        .fill({ color: 0x8b4513, alpha: 0.95 })
+        .stroke({ width: 2, color: 0xd4af37 });
+      bg.roundRect(2, 2, width - 4, height - 4, 6)
+        .stroke({ width: 1, color: 0xffd700, alpha: 0.6 });
+      button.scale.set(1.0);
+    });
+    
+    button.on('pointerdown', onClick);
+    
+    return button;
   }
 
   update(): void {

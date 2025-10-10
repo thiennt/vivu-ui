@@ -50,7 +50,7 @@ export class PrepareScene extends BaseScene {
       if (response.errors) {
         response.errors.forEach((error: any) => console.error(`   Error: ${error}`));
       }
-      this.battleStage = null; // Use null as fallback
+      this.battleStage = null;
     }
 
     this.loadingManager.hideLoading();
@@ -72,39 +72,68 @@ export class PrepareScene extends BaseScene {
   }
 
   private createBackground(): void {
-    const background = new Graphics()
-      .rect(0, 0, this.gameWidth, this.gameHeight)
-      .fill(Colors.BACKGROUND_PRIMARY);
+    const background = new Graphics();
+    
+    // Dark fantasy battlefield background
+    background.rect(0, 0, this.gameWidth, this.gameHeight)
+      .fill({ color: 0x1a0f0a, alpha: 1.0 });
+    
+    // Battle texture overlay
+    background.rect(0, 0, this.gameWidth, this.gameHeight)
+      .fill({ color: 0x2a1810, alpha: 0.3 });
     
     this.container.addChild(background);
   }
 
   private createHeader(): void {
+    // Fantasy battle banner
+    const bannerWidth = Math.min(360, this.gameWidth - 40);
+    const bannerHeight = 52;
+    const bannerX = (this.gameWidth - bannerWidth) / 2;
+    const bannerY = 18;
+    
+    const banner = new Graphics();
+    banner.moveTo(bannerX + 12, bannerY)
+      .lineTo(bannerX, bannerY + bannerHeight / 2)
+      .lineTo(bannerX + 12, bannerY + bannerHeight)
+      .lineTo(bannerX + bannerWidth - 12, bannerY + bannerHeight)
+      .lineTo(bannerX + bannerWidth, bannerY + bannerHeight / 2)
+      .lineTo(bannerX + bannerWidth - 12, bannerY)
+      .lineTo(bannerX + 12, bannerY)
+      .fill({ color: 0x8b4513, alpha: 0.95 })
+      .stroke({ width: 2.5, color: 0xd4af37 });
+    
+    banner.moveTo(bannerX + 15, bannerY + 3)
+      .lineTo(bannerX + bannerWidth - 15, bannerY + 3)
+      .lineTo(bannerX + bannerWidth - 4, bannerY + bannerHeight / 2)
+      .lineTo(bannerX + bannerWidth - 15, bannerY + bannerHeight - 3)
+      .lineTo(bannerX + 15, bannerY + bannerHeight - 3)
+      .lineTo(bannerX + 4, bannerY + bannerHeight / 2)
+      .lineTo(bannerX + 15, bannerY + 3)
+      .stroke({ width: 1, color: 0xffd700, alpha: 0.6 });
+
     const title = new Text({
-      text: this.stage.name,
+      text: `⚔️ ${this.stage.name} ⚔️`,
       style: {
         fontFamily: 'Kalam',
-        fontSize: 32,
+        fontSize: 24,
         fontWeight: 'bold',
-        fill: Colors.TEXT_PRIMARY,
-        stroke: {
-          color: Colors.BACKGROUND_SECONDARY,
-          width: 2,
-        },
+        fill: 0xffffff,
+        stroke: { color: 0x2a1810, width: 2 },
         dropShadow: {
-          color: Colors.SHADOW_COLOR,
+          color: 0xffd700,
           blur: 4,
-          angle: Math.PI / 6,
-          distance: 4,
-          alpha: 0.5,
-        },
+          angle: Math.PI / 4,
+          distance: 2,
+          alpha: 0.6
+        }
       }
     });
     title.anchor.set(0.5);
     title.x = this.gameWidth / 2;
-    title.y = 40;
+    title.y = bannerY + bannerHeight / 2;
     
-    this.container.addChild(title);
+    this.container.addChild(banner, title);
   }
 
   private createPlayerLineup(): void {
@@ -115,42 +144,70 @@ export class PrepareScene extends BaseScene {
       0
     );
 
+    // Calculate card dimensions FIRST
+    const chars = this.player.lineup || [];
+    const maxPerRow = Math.min(chars.length, 3) || 1;
+    const cardSpacing = 8; // Spacing between cards
+    const panelPadding = 12; // Padding inside panel
+    
+    // Calculate available width for cards (panel width - padding on both sides)
+    const panelWidth = this.gameWidth - 40;
+    const availableCardWidth = panelWidth - (panelPadding * 2);
+    
+    // Calculate card width based on available space and spacing
+    const cardWidth = (availableCardWidth - (cardSpacing * (maxPerRow - 1))) / maxPerRow;
+    const cardHeight = cardWidth * 1.25;
+    
+    // Calculate panel height based on actual card height
+    const titleHeight = 40;
+    const panelHeight = titleHeight + cardHeight + panelPadding;
+    
+    // Parchment panel for lineup
+    const panel = new Graphics();
+    
+    panel.roundRect(3, 3, panelWidth, panelHeight, 10)
+      .fill({ color: 0x000000, alpha: 0.4 });
+    
+    panel.roundRect(0, 0, panelWidth, panelHeight, 10)
+      .fill({ color: 0xf5e6d3, alpha: 0.98 })
+      .stroke({ width: 2, color: 0xd4af37 });
+    
+    panel.roundRect(3, 3, panelWidth - 6, panelHeight - 6, 8)
+      .fill({ color: 0xe8d4b8, alpha: 0.6 });
+    
+    panel.roundRect(5, 5, panelWidth - 10, panelHeight - 10, 7)
+      .stroke({ width: 1, color: 0xffd700, alpha: 0.5 });
+    
+    lineupContainer.addChild(panel);
+
     const lineupTitle = new Text({
       text: `🧑‍🤝‍🧑 Your Lineup ⚡${lineup_power}`,
       style: {
         fontFamily: 'Kalam',
-        fontSize: 18,
+        fontSize: 16,
         fontWeight: 'bold',
-        fill: Colors.TEXT_PRIMARY
+        fill: 0x2a1810,
+        stroke: { color: 0xffd700, width: 0.5 }
       }
     });
-    lineupTitle.x = 20;
-    lineupTitle.y = 0;
+    lineupTitle.x = panelPadding;
+    lineupTitle.y = 12;
     lineupContainer.addChild(lineupTitle);
 
-    const chars = this.player.lineup || [];
-    const maxPerRow = Math.min(chars.length, 3) || 1; // up to 3 per row, at least 1
-    const spacing = 10;
-    const availableWidth = this.gameWidth - 40 - (maxPerRow - 1) * spacing;
-    const cardWidth = availableWidth / maxPerRow;
-    const cardHeight = cardWidth * 1.25;
-
+    // Position cards inside the panel with proper spacing
     chars.forEach((char: Character, index: number) => {
-      const row = 0; // single row for lineup
       const col = index;
-
-      const x = 20 + col * (cardWidth + spacing);
-      const y = lineupTitle.height + 10 + row * (cardHeight + spacing);
+      const x = panelPadding + col * (cardWidth + cardSpacing);
+      const y = titleHeight;
       const charCard = this.createCharacterCard(char, x, y, cardWidth, cardHeight);
 
       lineupContainer.addChild(charCard);
     });
 
-    lineupContainer.x = 0;
-    lineupContainer.y = 90; // Just below the header
+    lineupContainer.x = 20;
+    lineupContainer.y = 85;
 
-    // Store the height for use in deck preview positioning
-    this.lineupContainerHeight = lineupTitle.height + 10 + cardHeight + (chars.length > 0 ? 0 : 0);
+    this.lineupContainerHeight = panelHeight;
 
     this.container.addChild(lineupContainer);
   }
@@ -158,13 +215,22 @@ export class PrepareScene extends BaseScene {
   private createDeckPreview(): void {
     this.deckContainer = new Container();
 
+    // Title with icon
     const deckTitle = new Text({
-      text: `Your Battle Deck (${this.battleStage?.cards.length || 0} cards)`,
+      text: `🃏 Battle Deck (${this.battleStage?.cards.length || 0} cards)`,
       style: {
         fontFamily: 'Kalam',
-        fontSize: 20,
+        fontSize: 18,
         fontWeight: 'bold',
-        fill: Colors.TEXT_PRIMARY
+        fill: 0xffffff,
+        stroke: { color: 0x2a1810, width: 2 },
+        dropShadow: {
+          color: 0xffd700,
+          blur: 3,
+          angle: Math.PI / 4,
+          distance: 2,
+          alpha: 0.6
+        }
       }
     });
     deckTitle.x = 20;
@@ -174,7 +240,7 @@ export class PrepareScene extends BaseScene {
 
     // Responsive card grid
     const cardsPerRow = 3;
-    const spacing = 10;
+    const spacing = 8;
     const scrollBoxWidth = this.gameWidth - 40;
     const cardWidth = (scrollBoxWidth - (cardsPerRow - 1) * spacing) / cardsPerRow;
     const cardHeight = 160;
@@ -188,22 +254,20 @@ export class PrepareScene extends BaseScene {
         onClick: (clickedCard) => this.showCardDetails(clickedCard)
       });
       cardContainer.x = col * (cardWidth + spacing);
-      cardContainer.y = 40 + row * (cardHeight + spacing);
+      cardContainer.y = 35 + row * (cardHeight + spacing);
 
       gridContainer.addChild(cardContainer);
     });
 
     // Calculate grid size
     const totalRows = Math.ceil(((this.battleStage?.cards?.length ?? 0) / cardsPerRow));
-    const cardGridTop = 40; // space below deckTitle
-    const headerHeight = 40 + 32 + 20; // 40 (title y) + 32 (title font) + 20 (margin)
+    const cardGridTop = 35;
+    const headerHeight = 85 + 12;
     const lineupHeight = this.lineupContainerHeight || 150;
-    const buttonHeight = 50 + 40; // button height + bottom margin
+    const buttonHeight = 50 + 40;
 
-    // Set gridHeight so that scrollbox fits between header+lineup and buttons
     const gridHeight = this.gameHeight - headerHeight - lineupHeight - buttonHeight - cardGridTop;
 
-    // Create ScrollBox
     const scrollBoxHeight = Math.min(
       cardGridTop + totalRows * (cardHeight + spacing),
       gridHeight
@@ -221,7 +285,7 @@ export class PrepareScene extends BaseScene {
     this.deckContainer.addChild(scrollBox);
 
     this.deckContainer.x = 0;
-    this.deckContainer.y = 90 + lineupHeight + 20;
+    this.deckContainer.y = 85 + lineupHeight + 25;
 
     this.container.addChild(this.deckContainer);
   }
@@ -229,16 +293,15 @@ export class PrepareScene extends BaseScene {
   private createActionButtons(): void {
     const buttonContainer = new Container();
 
-    // Responsive: 2 buttons, spacing, fit to screen width
     const buttonCount = 2;
     const spacing = 20;
     const totalSpacing = spacing * (buttonCount - 1);
-    const buttonWidth = (this.gameWidth - 2 * 40 - totalSpacing) / buttonCount; // 40px side margin
+    const buttonWidth = (this.gameWidth - 2 * 40 - totalSpacing) / buttonCount;
     const buttonHeight = 50;
 
-    // Back button
-    const backButton = this.createButton(
-      '← Back to Stages',
+    // Back button with fantasy style
+    const backButton = this.createFantasyButton(
+      '← Back',
       0,
       0,
       buttonWidth,
@@ -248,9 +311,9 @@ export class PrepareScene extends BaseScene {
       }
     );
 
-    // Start Battle button
-    const startButton = this.createButton(
-      'Start Battle',
+    // Start Battle button with special styling
+    const startButton = this.createFantasyButton(
+      '⚔️ Start Battle',
       this.gameWidth - buttonWidth - 40,
       0,
       buttonWidth,
@@ -259,28 +322,98 @@ export class PrepareScene extends BaseScene {
         await this.startBattle();
       }
     );
-
-    // Style the start button differently
+    
+    // Make start button more prominent
     const startBg = startButton.children[0] as Graphics;
-    startBg.clear()
-      .roundRect(0, 0, buttonWidth, buttonHeight, 8)
-      .fill(Colors.BUTTON_PRIMARY)
-      .stroke({ width: 2, color: Colors.RARITY_LEGENDARY });
+    startBg.clear();
+    startBg.roundRect(2, 2, buttonWidth, buttonHeight, 8)
+      .fill({ color: 0x000000, alpha: 0.4 });
+    startBg.roundRect(0, 0, buttonWidth, buttonHeight, 8)
+      .fill({ color: 0xc23616, alpha: 0.95 })
+      .stroke({ width: 2, color: 0xffd700 });
+    startBg.roundRect(2, 2, buttonWidth - 4, buttonHeight - 4, 6)
+      .stroke({ width: 1, color: 0xffd700, alpha: 0.8 });
 
     buttonContainer.addChild(backButton, startButton);
 
-    // Center the buttons with side margin
     buttonContainer.x = 20;
     buttonContainer.y = this.gameHeight - buttonHeight - 40;
 
     this.container.addChild(buttonContainer);
   }
 
+  private createFantasyButton(
+    text: string,
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    onClick: () => void
+  ): Container {
+    const button = new Container();
+    
+    const bg = new Graphics();
+    bg.roundRect(2, 2, width, height, 8)
+      .fill({ color: 0x000000, alpha: 0.4 });
+    bg.roundRect(0, 0, width, height, 8)
+      .fill({ color: 0x8b4513, alpha: 0.95 })
+      .stroke({ width: 2, color: 0xd4af37 });
+    bg.roundRect(2, 2, width - 4, height - 4, 6)
+      .stroke({ width: 1, color: 0xffd700, alpha: 0.6 });
+
+    const buttonText = new Text({
+      text: text,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 16,
+        fontWeight: 'bold',
+        fill: 0xffffff,
+        stroke: { color: 0x2a1810, width: 2 }
+      }
+    });
+    buttonText.anchor.set(0.5);
+    buttonText.x = width / 2;
+    buttonText.y = height / 2;
+    
+    button.addChild(bg, buttonText);
+    button.x = x;
+    button.y = y;
+    button.interactive = true;
+    button.cursor = 'pointer';
+    
+    button.on('pointerover', () => {
+      bg.clear();
+      bg.roundRect(2, 2, width, height, 8)
+        .fill({ color: 0x000000, alpha: 0.4 });
+      bg.roundRect(0, 0, width, height, 8)
+        .fill({ color: 0xa0632a, alpha: 0.95 })
+        .stroke({ width: 2, color: 0xffd700 });
+      bg.roundRect(2, 2, width - 4, height - 4, 6)
+        .stroke({ width: 1, color: 0xffd700, alpha: 0.9 });
+      button.scale.set(1.02);
+    });
+    
+    button.on('pointerout', () => {
+      bg.clear();
+      bg.roundRect(2, 2, width, height, 8)
+        .fill({ color: 0x000000, alpha: 0.4 });
+      bg.roundRect(0, 0, width, height, 8)
+        .fill({ color: 0x8b4513, alpha: 0.95 })
+        .stroke({ width: 2, color: 0xd4af37 });
+      bg.roundRect(2, 2, width - 4, height - 4, 6)
+        .stroke({ width: 1, color: 0xffd700, alpha: 0.6 });
+      button.scale.set(1.0);
+    });
+    
+    button.on('pointerdown', onClick);
+    
+    return button;
+  }
+
   private async startBattle(): Promise<void> {
     const response = await battleApi.startBattle(this.battleStage?.battle_id || '');
     if (response.success) {
       console.log(`✅ Battle started successfully: ${response.message}`);
-      // Navigate to card battle scene with battle data
       navigation.showScreen(CardBattleScene, {
         battleId: this.battleStage?.battle_id,
       });
@@ -289,7 +422,6 @@ export class PrepareScene extends BaseScene {
       if (response.errors) {
         response.errors.forEach((error: any) => console.error(`   Error: ${error}`));
       }
-      // Could show an error message to the user here
     }
   }
 

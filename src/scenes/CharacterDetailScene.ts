@@ -115,7 +115,7 @@ export class CharacterDetailScene extends BaseScene {
   }
   
   private updateLayout(): void {
-    // Clear and recreate layout - this is more efficient than destroying/recreating all elements
+    // Clear and recreate layout
     this.backgroundContainer.removeChildren();
     this.headerContainer.removeChildren();
     this.infoContainer.removeChildren();
@@ -136,150 +136,270 @@ export class CharacterDetailScene extends BaseScene {
 
   private createBackground(): void {
     const bg = new Graphics();
-    bg.fill(Colors.BACKGROUND_PRIMARY).rect(0, 0, this.gameWidth, this.gameHeight);
+    
+    // Dark hero portrait background
+    bg.rect(0, 0, this.gameWidth, this.gameHeight)
+      .fill({ color: 0x1a1a2e, alpha: 1.0 });
+    
+    // Darker overlay for portrait feel
+    bg.rect(0, 0, this.gameWidth, this.gameHeight)
+      .fill({ color: 0x16213e, alpha: 0.5 });
+    
     this.backgroundContainer.addChild(bg);
   }
 
   private createHeader(): void {
-    const title = this.createTitle(this.character!.name, this.gameWidth / 2, 60);
-    this.headerContainer.addChild(title);
-  }
-
-  private async createCharacterInfo(): Promise<void> {
-    const padding = 15;
-    const panelWidth = this.gameWidth - 2 * padding;
-
-    // Panel container
-    const headerPanelContainer = new Container();
+    // Fantasy banner for character name
+    const bannerWidth = Math.min(340, this.gameWidth - 40);
+    const bannerHeight = 50;
+    const bannerX = (this.gameWidth - bannerWidth) / 2;
+    const bannerY = 20;
     
-    // Header panel background
-    const headerPanel = new Graphics();
-    headerPanel.roundRect(0, 0, panelWidth, 120, 12)
-      .fill({ color: Colors.PANEL_BACKGROUND, alpha: 0.9 })
-      .stroke({ width: 3, color: Colors.BUTTON_PRIMARY });
+    const banner = new Graphics();
+    banner.moveTo(bannerX + 12, bannerY)
+      .lineTo(bannerX, bannerY + bannerHeight / 2)
+      .lineTo(bannerX + 12, bannerY + bannerHeight)
+      .lineTo(bannerX + bannerWidth - 12, bannerY + bannerHeight)
+      .lineTo(bannerX + bannerWidth, bannerY + bannerHeight / 2)
+      .lineTo(bannerX + bannerWidth - 12, bannerY)
+      .lineTo(bannerX + 12, bannerY)
+      .fill({ color: 0x4a2f5f, alpha: 0.95 })
+      .stroke({ width: 2.5, color: 0x8b9dc3 });
     
-    // Avatar placeholder (left side)
-    const avatarSize = 80;
-    const avatar = new Graphics();
-    avatar.roundRect(padding, 20, avatarSize, avatarSize, 8)
-      .fill({ color: this.getRarityColor(this.character!.rarity), alpha: 0.8 })
-      .stroke({ width: 2, color: Colors.BUTTON_PRIMARY });
+    banner.moveTo(bannerX + 15, bannerY + 3)
+      .lineTo(bannerX + bannerWidth - 15, bannerY + 3)
+      .lineTo(bannerX + bannerWidth - 4, bannerY + bannerHeight / 2)
+      .lineTo(bannerX + bannerWidth - 15, bannerY + bannerHeight - 3)
+      .lineTo(bannerX + 15, bannerY + bannerHeight - 3)
+      .lineTo(bannerX + 4, bannerY + bannerHeight / 2)
+      .lineTo(bannerX + 15, bannerY + 3)
+      .stroke({ width: 1, color: 0x6b8cae, alpha: 0.6 });
 
-    // Avatar text (ticker symbol)
-    const avatarTexture = await Assets.load(this.character!.avatar_url || 'https://pixijs.com/assets/bunny.png');
-    const avatarIcon = new Sprite(avatarTexture);
-    avatarIcon.width = avatarSize - 10;
-    avatarIcon.height = avatarSize - 10;
-    avatarIcon.anchor.set(0.5);
-    avatarIcon.x = padding + avatarSize / 2;
-    avatarIcon.y = 20 + avatarSize / 2;
-
-    // Character name (center-left)
-    const nameText = new Text({
+    const title = new Text({
       text: this.character!.name,
       style: {
         fontFamily: 'Kalam',
-        fontSize: 28,
+        fontSize: 26,
         fontWeight: 'bold',
-        fill: Colors.TEXT_PRIMARY
+        fill: 0xffffff,
+        stroke: { color: 0x1a1a2e, width: 2 },
+        dropShadow: {
+          color: 0x6b8cae,
+          blur: 4,
+          angle: Math.PI / 4,
+          distance: 2,
+          alpha: 0.7
+        }
       }
     });
-    nameText.x = padding + avatarSize + 20;
-    nameText.y = 25;
+    title.anchor.set(0.5);
+    title.x = this.gameWidth / 2;
+    title.y = bannerY + bannerHeight / 2;
+    
+    this.headerContainer.addChild(banner, title);
+  }
+
+  private async createCharacterInfo(): Promise<void> {
+    const padding = 12;
+    const panelWidth = this.gameWidth - 2 * padding;
+
+    const headerPanelContainer = new Container();
+    
+    // Fantasy hero info panel
+    const headerPanel = new Graphics();
+    
+    // Shadow
+    headerPanel.roundRect(3, 3, panelWidth, 125, 10)
+      .fill({ color: 0x000000, alpha: 0.5 });
+    
+    // Main portrait panel
+    headerPanel.roundRect(0, 0, panelWidth, 125, 10)
+      .fill({ color: 0x1a1a2e, alpha: 0.98 })
+      .stroke({ width: 2, color: 0x4a5f7f });
+    
+    // Inner layer
+    headerPanel.roundRect(3, 3, panelWidth - 6, 119, 8)
+      .fill({ color: 0x16213e, alpha: 0.7 });
+    
+    // Steel highlight
+    headerPanel.roundRect(5, 5, panelWidth - 10, 115, 7)
+      .stroke({ width: 1, color: 0x6b8cae, alpha: 0.4 });
+    
+    // Avatar with ornate frame
+    const avatarSize = 90;
+    const avatar = new Graphics();
+    
+    // Avatar frame shadow
+    avatar.roundRect(padding + 2, 17 + 2, avatarSize, avatarSize, 8)
+      .fill({ color: 0x000000, alpha: 0.5 });
+    
+    // Avatar frame
+    avatar.roundRect(padding, 17, avatarSize, avatarSize, 8)
+      .fill({ color: 0x0f0f1e, alpha: 0.95 })
+      .stroke({ width: 2, color: 0x4a5f7f });
+    
+    // Inner avatar frame
+    avatar.roundRect(padding + 2, 19, avatarSize - 4, avatarSize - 4, 6)
+      .stroke({ width: 1, color: 0x6b8cae, alpha: 0.5 });
+
+    // Avatar sprite
+    const avatarTexture = await Assets.load(this.character!.avatar_url || 'https://pixijs.com/assets/bunny.png');
+    const avatarIcon = new Sprite(avatarTexture);
+    avatarIcon.width = avatarSize - 8;
+    avatarIcon.height = avatarSize - 8;
+    avatarIcon.anchor.set(0.5);
+    avatarIcon.x = padding + avatarSize / 2;
+    avatarIcon.y = 17 + avatarSize / 2;
+
+    // Rarity indicator gem
+    const rarityBadge = new Graphics();
+    rarityBadge.circle(padding + avatarSize - 12, 27, 10)
+      .fill({ color: 0x1a1a2e, alpha: 0.95 })
+      .stroke({ width: 2, color: this.getRarityColor(this.character!.rarity) });
 
     headerPanelContainer.addChild(
       headerPanel,
       avatar,
-      avatarIcon,
-      nameText
+      rarityBadge,
+      avatarIcon
     );
 
-    // Core stats: HP, ATK, DEF, AGI (prominent display)
+    // Core stats with fantasy badges
     const coreStats = [
-      { name: '❤️', value: this.character!.hp, color: Colors.STAT_HP },
-      { name: '⚔️', value: this.character!.atk, color: Colors.STAT_ATK },
-      { name: '🛡️', value: this.character!.def, color: Colors.STAT_DEF },
-      { name: '⚡', value: this.character!.agi, color: Colors.STAT_AGI }
+      { name: '❤️', value: this.character!.hp, color: Colors.STAT_HP, label: 'HP' },
+      { name: '⚔️', value: this.character!.atk, color: Colors.STAT_ATK, label: 'ATK' },
+      { name: '🛡️', value: this.character!.def, color: Colors.STAT_DEF, label: 'DEF' },
+      { name: '⚡', value: this.character!.agi, color: Colors.STAT_AGI, label: 'AGI' }
     ];
 
-    const statWidth = (panelWidth - 2 * padding - avatar.width) / 4;
+    const statStartX = padding + avatarSize + 15;
+    const statWidth = (panelWidth - statStartX - padding) / 2;
+    
     coreStats.forEach((stat, index) => {
-      const x = padding + avatarSize + 20 + (index * statWidth);
+      const col = index % 2;
+      const row = Math.floor(index / 2);
+      const x = statStartX + (col * statWidth);
+      const y = 25 + (row * 48);
 
-      // Stat name
-      const statNameText = new Text({
+      // Stat badge
+      const statBadge = new Graphics();
+      statBadge.roundRect(x, y, statWidth - 8, 40, 6)
+        .fill({ color: 0x0f0f1e, alpha: 0.95 })
+        .stroke({ width: 1.5, color: 0x4a5f7f });
+      
+      statBadge.roundRect(x + 2, y + 2, statWidth - 12, 36, 4)
+        .stroke({ width: 1, color: stat.color, alpha: 0.6 });
+
+      // Icon
+      const iconText = new Text({
         text: stat.name,
         style: {
-          fontFamily: 'Kalam',
+          fontFamily: 'Arial',
           fontSize: 18,
-          fontWeight: 'bold',
-          fill: Colors.TEXT_SECONDARY
+          fill: stat.color
         }
       });
-      statNameText.x = x;
-      statNameText.y = 60;
+      iconText.x = x + 6;
+      iconText.y = y + 11;
 
-      // Stat value
+      // Label
+      const labelText = new Text({
+        text: stat.label,
+        style: {
+          fontFamily: 'Kalam',
+          fontSize: 10,
+          fill: 0x8b9dc3
+        }
+      });
+      labelText.x = x + 30;
+      labelText.y = y + 8;
+
+      // Value
       const valueText = new Text({
         text: stat.value.toString(),
         style: {
           fontFamily: 'Kalam',
-          fontSize: 20,
+          fontSize: 16,
           fontWeight: 'bold',
-          fill: stat.color
+          fill: 0xffffff
         }
       });
-      valueText.x = x;
-      valueText.y = 80;
+      valueText.x = x + 30;
+      valueText.y = y + 20;
 
-      headerPanelContainer.addChild(statNameText, valueText);
+      headerPanelContainer.addChild(statBadge, iconText, labelText, valueText);
     });
 
     this.infoContainer.x = padding;
-    this.infoContainer.y = 120;
+    this.infoContainer.y = 85;
     this.infoContainer.addChild(headerPanelContainer);
   }
 
   private createStatsDisplay(): void {
-    const padding = 15;
+    const padding = 12;
     const panelWidth = this.gameWidth - 2 * padding;
 
-    // Other Stats Section
     const otherStatsContainer = new Container();
-    const otherStatsHeight = 120;
+    const otherStatsHeight = 115;
+    
+    // Fantasy stats panel
     const otherStatsPanel = new Graphics();
-    otherStatsPanel.roundRect(0, 0, panelWidth, otherStatsHeight, 12)
-      .fill({ color: Colors.PANEL_BACKGROUND, alpha: 0.9 })
-      .stroke({ width: 3, color: Colors.BUTTON_PRIMARY });
+    
+    otherStatsPanel.roundRect(2, 2, panelWidth, otherStatsHeight, 10)
+      .fill({ color: 0x000000, alpha: 0.5 });
+    
+    otherStatsPanel.roundRect(0, 0, panelWidth, otherStatsHeight, 10)
+      .fill({ color: 0x1a1a2e, alpha: 0.98 })
+      .stroke({ width: 2, color: 0x4a5f7f });
+    
+    otherStatsPanel.roundRect(3, 3, panelWidth - 6, otherStatsHeight - 6, 8)
+      .fill({ color: 0x16213e, alpha: 0.7 });
+    
+    otherStatsPanel.roundRect(5, 5, panelWidth - 10, otherStatsHeight - 10, 7)
+      .stroke({ width: 1, color: 0x6b8cae, alpha: 0.4 });
+    
     otherStatsContainer.addChild(otherStatsPanel);
 
-    // Other stats in grid layout
+    // Title
+    const title = new Text({
+      text: '📊 Detailed Stats',
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 14,
+        fontWeight: 'bold',
+        fill: 0x8b9dc3
+      }
+    });
+    title.x = 10;
+    title.y = 10;
+    otherStatsContainer.addChild(title);
+
+    // Stats grid
     const otherStats = [
-      { name: 'CritRate', value: this.character!.crit_rate + '%', color: Colors.STAT_CRIT_RATE },
-      { name: 'CritDmg', value: this.character!.crit_dmg + '%', color: Colors.STAT_CRIT_DMG },
-      { name: 'Res', value: this.character!.res, color: Colors.STAT_RES },
+      { name: 'Crit Rate', value: this.character!.crit_rate + '%', color: Colors.STAT_CRIT_RATE },
+      { name: 'Crit Dmg', value: this.character!.crit_dmg + '%', color: Colors.STAT_CRIT_DMG },
+      { name: 'Resist', value: this.character!.res, color: Colors.STAT_RES },
       { name: 'Damage', value: this.character!.damage, color: Colors.STAT_DAMAGE },
       { name: 'Mitig', value: this.character!.mitigation, color: Colors.STAT_MITIGATION },
       { name: 'Hit', value: this.character!.hit_rate, color: Colors.STAT_HIT },
       { name: 'Dodge', value: this.character!.dodge, color: Colors.STAT_DODGE }
     ];
 
-    const colWidth = (panelWidth - 2 * padding) / 3;
-    const rowHeight = 35;
+    const colWidth = (panelWidth - 24) / 3;
+    const rowHeight = 28;
     
     otherStats.forEach((stat, index) => {
       const col = index % 3;
       const row = Math.floor(index / 3);
-      const x = padding + (col * colWidth);
-      const y = 20 + (row * rowHeight);
+      const x = 12 + (col * colWidth);
+      const y = 35 + (row * rowHeight);
       
-      // Stat name and value on same line
       const statText = new Text({
         text: `${stat.name}: ${stat.value}`,
         style: {
           fontFamily: 'Kalam',
-          fontSize: 14,
-          fill: stat.color
+          fontSize: 12,
+          fill: 0xffffff
         }
       });
       statText.x = x;
@@ -288,199 +408,209 @@ export class CharacterDetailScene extends BaseScene {
       otherStatsContainer.addChild(statText);
     });
 
-    // Position both panels vertically
-    const startY = 260; // Below info panel
-
     this.statsContainer.x = padding;
-    this.statsContainer.y = startY;
+    this.statsContainer.y = 225;
     this.statsContainer.addChild(otherStatsContainer);
   }
 
   private createSkillsDisplay(): void {
-    const padding = 15;
+    const padding = 12;
     const panelWidth = this.gameWidth - 2 * padding;
-    const panelHeight = 180; // Reduced height since we're only showing skill names
+    const panelHeight = 170;
 
-    // Skills panel background
+    // Fantasy skills panel
     const skillsPanel = new Graphics();
-    skillsPanel.roundRect(0, 0, panelWidth, panelHeight, 12)
-      .fill({ color: Colors.PANEL_BACKGROUND, alpha: 0.9 })
-      .stroke({ width: 3, color: Colors.BUTTON_PRIMARY });
+    
+    skillsPanel.roundRect(2, 2, panelWidth, panelHeight, 10)
+      .fill({ color: 0x000000, alpha: 0.5 });
+    
+    skillsPanel.roundRect(0, 0, panelWidth, panelHeight, 10)
+      .fill({ color: 0x1a1a2e, alpha: 0.98 })
+      .stroke({ width: 2, color: 0x4a5f7f });
+    
+    skillsPanel.roundRect(3, 3, panelWidth - 6, panelHeight - 6, 8)
+      .fill({ color: 0x16213e, alpha: 0.7 });
+    
+    skillsPanel.roundRect(5, 5, panelWidth - 10, panelHeight - 10, 7)
+      .stroke({ width: 1, color: 0x6b8cae, alpha: 0.4 });
 
     // Title
     const title = new Text({
-      text: 'Skills:',
+      text: '📜 Skills',
       style: {
         fontFamily: 'Kalam',
-        fontSize: 18,
+        fontSize: 14,
         fontWeight: 'bold',
-        fill: Colors.TEXT_PRIMARY
+        fill: 0x8b9dc3
       }
     });
-    title.x = padding;
-    title.y = 15;
+    title.x = 10;
+    title.y = 12;
 
     this.skillsContainer.addChild(skillsPanel, title);
 
-    // Define all skill types that should always be shown
     const skillTypes = [
       { type: 'normal_attack', label: 'Normal', color: Colors.SKILL_NORMAL },
       { type: 'active_skill', label: 'Active', color: Colors.SKILL_ACTIVE },
       { type: 'passive_skill', label: 'Passive', color: Colors.SKILL_PASSIVE }
     ];
 
-    // Skills layout - always show 3 skill types
-    let y = 50;
+    let y = 42;
     
     skillTypes.forEach((skillType) => {
-      // Find existing skill of this type
       const charSkill = this.characterSkills.find(cs => 
         cs && cs.skill && cs.skill.skill_type === skillType.type
       );
       
-      // Badge background
+      // Skill type badge
       const badge = new Graphics();
-      badge.roundRect(padding, y - 5, 70, 20, 4)
-        .fill({ color: skillType.color, alpha: 0.8 })
-        .stroke({ width: 1, color: Colors.TEXT_WHITE });
+      badge.roundRect(10, y - 4, 60, 18, 4)
+        .fill({ color: skillType.color, alpha: 0.9 })
+        .stroke({ width: 1, color: 0x8b9dc3 });
       
-      // Badge text
       const badgeText = new Text({
         text: skillType.label,
         style: {
           fontFamily: 'Kalam',
           fontSize: 10,
           fontWeight: 'bold',
-          fill: Colors.TEXT_WHITE
+          fill: 0xffffff
         }
       });
       badgeText.anchor.set(0.5);
-      badgeText.x = padding + 35;
+      badgeText.x = 40;
       badgeText.y = y + 5;
 
       if (charSkill && charSkill.skill) {
-        // Skill exists - show skill name only (no description)
         const skill = charSkill.skill;
         
-        // Create a container for the skill to make it clickable
         const skillContainer = new Container();
         
-        // Skill name - made clickable to show details
+        // Skill name
         const skillName = new Text({
           text: skill.name,
           style: {
             fontFamily: 'Kalam',
-            fontSize: 14,
+            fontSize: 13,
             fontWeight: 'bold',
-            fill: Colors.TEXT_PRIMARY
+            fill: 0xffffff
           }
         });
-        skillName.x = padding + 80;
+        skillName.x = 78;
         skillName.y = y;
         
-        // Make skill name clickable to show detail popup
         skillName.interactive = true;
         skillName.cursor = 'pointer';
         skillName.on('pointerdown', () => {
           this.showSkillDetailPopup(skill);
         });
         
-        // Add hover effect for skill name
         skillName.on('pointerover', () => {
-          skillName.style.fill = Colors.BUTTON_PRIMARY;
+          skillName.style.fill = 0x6b8cae;
         });
         skillName.on('pointerout', () => {
-          skillName.style.fill = Colors.TEXT_PRIMARY;
+          skillName.style.fill = 0xffffff;
         });
 
-        // Add change skill button for active and passive skills
+        // Change button for active/passive
         if (skillType.type === 'active_skill' || skillType.type === 'passive_skill') {
-          const changeButton = new Container();
-          const buttonBg = new Graphics();
-          buttonBg.roundRect(0, 0, 60, 18, 4) // Reduced button size
-            .fill({ color: Colors.BUTTON_HOVER, alpha: 0.7 })
-            .stroke({ width: 1, color: Colors.BUTTON_BORDER });
-          
-          const buttonText = new Text({
-            text: 'Change',
-            style: {
-              fontFamily: 'Kalam',
-              fontSize: 9, // Reduced font size
-              fill: Colors.TEXT_BUTTON
-            }
-          });
-          buttonText.anchor.set(0.5);
-          buttonText.x = 30;
-          buttonText.y = 9;
-
-          changeButton.addChild(buttonBg, buttonText);
-          changeButton.x = panelWidth - padding - 70;
-          changeButton.y = y - 1;
-          
-          // Make change button interactive
-          changeButton.interactive = true;
-          changeButton.cursor = 'pointer';
-          changeButton.on('pointerdown', () => {
-            this.showSkillChangeDialog(skillType.type, skill);
-          });
-
+          const changeButton = this.createSmallButton(
+            'Change',
+            panelWidth - 65,
+            y - 2,
+            55,
+            16,
+            () => this.showSkillChangeDialog(skillType.type, skill)
+          );
           skillContainer.addChild(changeButton);
         }
 
         skillContainer.addChild(skillName);
         this.skillsContainer.addChild(badge, badgeText, skillContainer);
       } else {
-        // Skill slot is empty - show learn option
+        // Empty skill slot
         const emptyText = new Text({
           text: '(Empty)',
           style: {
             fontFamily: 'Kalam',
-            fontSize: 14,
+            fontSize: 13,
             fontStyle: 'italic',
-            fill: Colors.TEXT_TERTIARY
+            fill: 0x6b8cae
           }
         });
-        emptyText.x = padding + 80;
+        emptyText.x = 78;
         emptyText.y = y;
 
-        // Learn skill button
-        const learnButton = new Container();
-        const buttonBg = new Graphics();
-        buttonBg.roundRect(0, 0, 70, 18, 4) // Reduced button size
-          .fill({ color: Colors.BUTTON_PRIMARY, alpha: 0.7 })
-          .stroke({ width: 1, color: Colors.BUTTON_BORDER });
-        
-        const buttonText = new Text({
-          text: 'Learn Skill',
-          style: {
-            fontFamily: 'Kalam',
-            fontSize: 9, // Reduced font size
-            fill: Colors.TEXT_BUTTON
-          }
-        });
-        buttonText.anchor.set(0.5);
-        buttonText.x = 35;
-        buttonText.y = 9;
-
-        learnButton.addChild(buttonBg, buttonText);
-        learnButton.x = padding + 80 + emptyText.width + 10;
-        learnButton.y = y - 1;
-        
-        // Make learn button interactive
-        learnButton.interactive = true;
-        learnButton.cursor = 'pointer';
-        learnButton.on('pointerdown', () => {
-          this.showLearnSkillDialog(skillType.type);
-        });
+        const learnButton = this.createSmallButton(
+          'Learn',
+          panelWidth - 58,
+          y - 2,
+          50,
+          16,
+          () => this.showLearnSkillDialog(skillType.type)
+        );
 
         this.skillsContainer.addChild(badge, badgeText, emptyText, learnButton);
       }
 
-      y += 40; // Reduced spacing since we removed descriptions
+      y += 38;
     });
 
     this.skillsContainer.x = padding;
-    this.skillsContainer.y = 400; // Below stats sections
+    this.skillsContainer.y = 355;
+  }
+
+  private createSmallButton(
+    text: string,
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    onClick: () => void
+  ): Container {
+    const button = new Container();
+    
+    const bg = new Graphics();
+    bg.roundRect(0, 0, width, height, 4)
+      .fill({ color: 0x4a2f5f, alpha: 0.9 })
+      .stroke({ width: 1, color: 0x6b8cae });
+    
+    const buttonText = new Text({
+      text: text,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 9,
+        fontWeight: 'bold',
+        fill: 0xffffff
+      }
+    });
+    buttonText.anchor.set(0.5);
+    buttonText.x = width / 2;
+    buttonText.y = height / 2;
+    
+    button.addChild(bg, buttonText);
+    button.x = x;
+    button.y = y;
+    button.interactive = true;
+    button.cursor = 'pointer';
+    
+    button.on('pointerover', () => {
+      bg.clear();
+      bg.roundRect(0, 0, width, height, 4)
+        .fill({ color: 0x6b4a7f, alpha: 0.95 })
+        .stroke({ width: 1, color: 0x8b9dc3 });
+    });
+    
+    button.on('pointerout', () => {
+      bg.clear();
+      bg.roundRect(0, 0, width, height, 4)
+        .fill({ color: 0x4a2f5f, alpha: 0.9 })
+        .stroke({ width: 1, color: 0x6b8cae });
+    });
+    
+    button.on('pointerdown', onClick);
+    
+    return button;
   }
 
   private showSkillDetailPopup(skill: any): void {
@@ -508,11 +638,8 @@ export class CharacterDetailScene extends BaseScene {
   }
 
   private learnSkill(skillType: string, skill: {name: string, description: string}): void {
-    // This is where you would add the skill to the character
-    // For now, just log and refresh the display
     console.log(`Learned ${skillType}: ${skill.name}`);
     
-    // Update the skills display
     this.skillsContainer.removeChildren();
     this.createSkillsDisplay();
   }
@@ -533,83 +660,91 @@ export class CharacterDetailScene extends BaseScene {
   }
 
   private changeSkill(skillType: string, skill: {name: string, description: string}): void {
-    // This is where you would update the character's skill
-    // For now, just log and refresh the display
     console.log(`Changed ${skillType} to ${skill.name}`);
     
-    // Update the skills display
     this.skillsContainer.removeChildren();
     this.createSkillsDisplay();
   }
 
   private createEquipmentDisplay(): void {
-    const padding = 15;
+    const padding = 12;
     const panelWidth = this.gameWidth - 2 * padding;
-    const panelHeight = 100;
+    const panelHeight = 95;
 
-    // Equipment panel background
+    // Fantasy equipment panel
     const equipmentPanel = new Graphics();
-    equipmentPanel.roundRect(0, 0, panelWidth, panelHeight, 12)
-      .fill({ color: Colors.PANEL_BACKGROUND, alpha: 0.9 })
-      .stroke({ width: 3, color: Colors.BUTTON_PRIMARY });
+    
+    equipmentPanel.roundRect(2, 2, panelWidth, panelHeight, 10)
+      .fill({ color: 0x000000, alpha: 0.5 });
+    
+    equipmentPanel.roundRect(0, 0, panelWidth, panelHeight, 10)
+      .fill({ color: 0x1a1a2e, alpha: 0.98 })
+      .stroke({ width: 2, color: 0x4a5f7f });
+    
+    equipmentPanel.roundRect(3, 3, panelWidth - 6, panelHeight - 6, 8)
+      .fill({ color: 0x16213e, alpha: 0.7 });
+    
+    equipmentPanel.roundRect(5, 5, panelWidth - 10, panelHeight - 10, 7)
+      .stroke({ width: 1, color: 0x6b8cae, alpha: 0.4 });
 
     // Title
     const title = new Text({
-      text: 'Equipment:',
+      text: '⚔️ Equipment',
       style: {
         fontFamily: 'Kalam',
-        fontSize: 18,
+        fontSize: 14,
         fontWeight: 'bold',
-        fill: Colors.TEXT_PRIMARY
+        fill: 0x8b9dc3
       }
     });
-    title.x = padding;
-    title.y = 15;
+    title.x = 10;
+    title.y = 12;
 
     this.equipmentContainer.addChild(equipmentPanel, title);
 
-    // Equipment slots
     const equipmentSlots = [
       { name: 'Weapon', item: 'Sword', type: 'weapon' },
       { name: 'Armor', item: 'Plate', type: 'armor' },
       { name: 'Accessory', item: '(empty)', type: 'accessory' }
     ];
 
-    const slotWidth = (panelWidth - 2 * padding) / 3;
+    const slotWidth = (panelWidth - 30) / 3;
     
     equipmentSlots.forEach((slot, index) => {
-      const x = padding + (index * slotWidth);
-      const y = 45;
+      const x = 10 + (index * (slotWidth + 5));
+      const y = 38;
       
-      // Create equipment slot container for click handling
       const slotContainer = new Container();
       
-      // Slot background
+      // Equipment slot
       const slotBg = new Graphics();
-      slotBg.roundRect(0, 0, slotWidth - 10, 40, 6)
-        .fill({ color: slot.item === '(empty)' ? Colors.EMPTY_SLOT : Colors.BUTTON_BORDER, alpha: 0.8 })
-        .stroke({ width: 1, color: Colors.BUTTON_PRIMARY });
+      slotBg.roundRect(0, 0, slotWidth, 42, 6)
+        .fill({ color: slot.item === '(empty)' ? 0x2a2a2a : 0x0f0f1e, alpha: 0.95 })
+        .stroke({ width: 1.5, color: 0x4a5f7f });
       
-      // Slot type label
+      slotBg.roundRect(2, 2, slotWidth - 4, 38, 4)
+        .stroke({ width: 1, color: 0x6b8cae, alpha: 0.4 });
+      
+      // Label
       const slotLabel = new Text({
-        text: `[${slot.name}]`,
+        text: slot.name,
         style: {
           fontFamily: 'Kalam',
-          fontSize: 12,
-          fontWeight: 'bold',
-          fill: Colors.TEXT_SECONDARY
+          fontSize: 10,
+          fill: 0x8b9dc3
         }
       });
       slotLabel.x = 5;
       slotLabel.y = 5;
       
-      // Item name
+      // Item
       const itemText = new Text({
         text: slot.item,
         style: {
           fontFamily: 'Kalam',
-          fontSize: 14,
-          fill: slot.item === '(empty)' ? Colors.TEXT_TERTIARY : Colors.TEXT_PRIMARY
+          fontSize: 12,
+          fontWeight: slot.item === '(empty)' ? 'normal' : 'bold',
+          fill: slot.item === '(empty)' ? 0x6b8cae : 0xffffff
         }
       });
       itemText.x = 5;
@@ -619,26 +754,24 @@ export class CharacterDetailScene extends BaseScene {
       slotContainer.x = x;
       slotContainer.y = y;
       
-      // Make equipment slot interactive
       slotContainer.interactive = true;
       slotContainer.cursor = 'pointer';
       slotContainer.on('pointerdown', () => {
         this.showEquipmentChangeDialog(slot.type, slot.name, slot.item);
       });
       
-      // Add hover effect
       slotContainer.on('pointerover', () => {
-        slotBg.tint = Colors.HOVER_TINT;
+        slotBg.tint = 0xcccccc;
       });
       slotContainer.on('pointerout', () => {
-        slotBg.tint = Colors.ACTIVE_WHITE;
+        slotBg.tint = 0xffffff;
       });
       
       this.equipmentContainer.addChild(slotContainer);
     });
 
     this.equipmentContainer.x = padding;
-    this.equipmentContainer.y = 600; // Adjusted for smaller skills panel (reduced from 655)
+    this.equipmentContainer.y = 540;
   }
 
   private showEquipmentChangeDialog(equipmentType: string, slotName: string, currentItem: string): void {
@@ -658,11 +791,8 @@ export class CharacterDetailScene extends BaseScene {
   }
 
   private equipItem(equipmentType: string, equipment: {name: string, description: string}): void {
-    // This is where you would update the character's equipment
-    // For now, just refresh the display
     console.log(`Equipped ${equipment.name} in ${equipmentType} slot`);
     
-    // Update the equipment display
     this.equipmentContainer.removeChildren();
     this.createEquipmentDisplay();
   }
@@ -679,20 +809,86 @@ export class CharacterDetailScene extends BaseScene {
   }
 
   private createBackButton(): void {
-    // Responsive button sizing - improved for small screens
-    const buttonWidth = Math.min(180, this.gameWidth - 2 * this.STANDARD_PADDING);
-    const buttonHeight = Math.max(40, Math.min(46, this.gameHeight * 0.07));
+    const buttonWidth = Math.min(160, this.gameWidth - 2 * this.STANDARD_PADDING);
+    const buttonHeight = 40;
     
-    const backButton = this.createButton(
-      '← Back to Characters',
+    const backButton = this.createFantasyButton(
+      '← Back',
       this.STANDARD_PADDING,
       this.gameHeight - buttonHeight - this.STANDARD_PADDING,
       buttonWidth,
       buttonHeight,
-      () => navigation.showScreen(CharactersScene),
-      14 // Reduced base font size
+      () => navigation.showScreen(CharactersScene)
     );
     this.buttonContainer.addChild(backButton);
+  }
+
+  private createFantasyButton(
+    text: string,
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    onClick: () => void
+  ): Container {
+    const button = new Container();
+    
+    const bg = new Graphics();
+    bg.roundRect(2, 2, width, height, 8)
+      .fill({ color: 0x000000, alpha: 0.5 });
+    bg.roundRect(0, 0, width, height, 8)
+      .fill({ color: 0x4a2f5f, alpha: 0.95 })
+      .stroke({ width: 2, color: 0x8b9dc3 });
+    bg.roundRect(2, 2, width - 4, height - 4, 6)
+      .stroke({ width: 1, color: 0x6b8cae, alpha: 0.6 });
+    
+    const buttonText = new Text({
+      text: text,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 14,
+        fontWeight: 'bold',
+        fill: 0xffffff,
+        stroke: { color: 0x1a1a2e, width: 2 }
+      }
+    });
+    buttonText.anchor.set(0.5);
+    buttonText.x = width / 2;
+    buttonText.y = height / 2;
+    
+    button.addChild(bg, buttonText);
+    button.x = x;
+    button.y = y;
+    button.interactive = true;
+    button.cursor = 'pointer';
+    
+    button.on('pointerover', () => {
+      bg.clear();
+      bg.roundRect(2, 2, width, height, 8)
+        .fill({ color: 0x000000, alpha: 0.5 });
+      bg.roundRect(0, 0, width, height, 8)
+        .fill({ color: 0x6b4a7f, alpha: 0.95 })
+        .stroke({ width: 2, color: 0x8b9dc3 });
+      bg.roundRect(2, 2, width - 4, height - 4, 6)
+        .stroke({ width: 1, color: 0x6b8cae, alpha: 0.9 });
+      button.scale.set(1.02);
+    });
+    
+    button.on('pointerout', () => {
+      bg.clear();
+      bg.roundRect(2, 2, width, height, 8)
+        .fill({ color: 0x000000, alpha: 0.5 });
+      bg.roundRect(0, 0, width, height, 8)
+        .fill({ color: 0x4a2f5f, alpha: 0.95 })
+        .stroke({ width: 2, color: 0x8b9dc3 });
+      bg.roundRect(2, 2, width - 4, height - 4, 6)
+        .stroke({ width: 1, color: 0x6b8cae, alpha: 0.6 });
+      button.scale.set(1.0);
+    });
+    
+    button.on('pointerdown', onClick);
+    
+    return button;
   }
 
   update(): void {

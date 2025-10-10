@@ -34,7 +34,6 @@ export class LineupScene extends BaseScene {
     const lineUpIds = this.lineupPositions.map((char: any) => char ? char.id : null);
     console.log('Initial lineup:', this.lineupPositions);
     this.availableCharacters = this.player?.characters || [];
-    // Get available characters (all characters not in lineup)
     this.availableCharacters = this.availableCharacters.filter(char => !lineUpIds.includes(char.id));
 
     // Create containers once
@@ -58,7 +57,6 @@ export class LineupScene extends BaseScene {
     this.initializeUI();
   }
 
-  // Utility: Clean up any floating/dragged card and any card that is a direct child of the scene
   private cleanUpFloatingCards() {
     if (this.dragTarget && this.dragTarget.parent) {
       this.dragTarget.parent.removeChild(this.dragTarget);
@@ -89,19 +87,16 @@ export class LineupScene extends BaseScene {
     this.gameWidth = width;
     this.gameHeight = height;
     
-    // Update UI layout without recreating
     this.updateLayout();
   }
   
   private updateLayout(): void {
-    // Clear and recreate layout - this is more efficient than destroying/recreating all elements
     this.backgroundContainer.removeChildren();
     this.headerContainer.removeChildren();
     this.lineupContainer.removeChildren();
     this.poolContainer.removeChildren();
     this.buttonContainer.removeChildren();
     
-    // Recreate layout with current dimensions
     this.createBackground();
     this.createHeader();
     this.createLineupGrid();
@@ -111,13 +106,19 @@ export class LineupScene extends BaseScene {
 
   private createBackground(): void {
     const bg = new Graphics();
-    const backgroundGradient = Colors.BACKGROUND_PRIMARY;
-    bg.rect(0, 0, this.gameWidth, this.gameHeight).fill(backgroundGradient);
+    
+    // Dark fantasy battlefield background
+    bg.rect(0, 0, this.gameWidth, this.gameHeight)
+      .fill({ color: 0x1a0f0a, alpha: 1.0 });
+    
+    // Battle texture overlay
+    bg.rect(0, 0, this.gameWidth, this.gameHeight)
+      .fill({ color: 0x2a1810, alpha: 0.3 });
 
-    // Battle field grid lines with orange theme
+    // Tactical grid with golden lines
     const gridSpacing = 40;
     const grid = new Graphics();
-    grid.stroke({ width: 1, color: Colors.BACKGROUND_SECONDARY, alpha: 0.3 });
+    grid.stroke({ width: 1, color: 0xd4af37, alpha: 0.15 });
 
     for (let x = 0; x <= this.gameWidth; x += gridSpacing) {
       grid.moveTo(x, 0);
@@ -132,42 +133,81 @@ export class LineupScene extends BaseScene {
   }
 
   private createHeader(): void {
-    const title = this.createTitle('Battle Lineup', this.gameWidth / 2, 45); // Reduced Y from 60
-    title.anchor.set(0.5, 0.5);
-    title.x = this.gameWidth / 2;
-    title.y = 45;
+    // Fantasy banner
+    const bannerWidth = Math.min(340, this.gameWidth - 40);
+    const bannerHeight = 48;
+    const bannerX = (this.gameWidth - bannerWidth) / 2;
+    const bannerY = 15;
+    
+    const banner = new Graphics();
+    banner.moveTo(bannerX + 12, bannerY)
+      .lineTo(bannerX, bannerY + bannerHeight / 2)
+      .lineTo(bannerX + 12, bannerY + bannerHeight)
+      .lineTo(bannerX + bannerWidth - 12, bannerY + bannerHeight)
+      .lineTo(bannerX + bannerWidth, bannerY + bannerHeight / 2)
+      .lineTo(bannerX + bannerWidth - 12, bannerY)
+      .lineTo(bannerX + 12, bannerY)
+      .fill({ color: 0x8b4513, alpha: 0.95 })
+      .stroke({ width: 2.5, color: 0xd4af37 });
+    
+    banner.moveTo(bannerX + 15, bannerY + 3)
+      .lineTo(bannerX + bannerWidth - 15, bannerY + 3)
+      .lineTo(bannerX + bannerWidth - 4, bannerY + bannerHeight / 2)
+      .lineTo(bannerX + bannerWidth - 15, bannerY + bannerHeight - 3)
+      .lineTo(bannerX + 15, bannerY + bannerHeight - 3)
+      .lineTo(bannerX + 4, bannerY + bannerHeight / 2)
+      .lineTo(bannerX + 15, bannerY + 3)
+      .stroke({ width: 1, color: 0xffd700, alpha: 0.6 });
 
-    const subtitle = new Text({
-      text: 'Drag to swap positions in lineup. Click to move between lineup and pool.',
+    const title = new Text({
+      text: '⚔️ Battle Lineup ⚔️',
       style: {
         fontFamily: 'Kalam',
-        fontSize: 12, // Reduced from 16 for 400x700
-        fill: Colors.TEXT_SECONDARY,
-        align: 'center',
-        wordWrap: true,
-        wordWrapWidth: this.gameWidth - 40
+        fontSize: 24,
+        fontWeight: 'bold',
+        fill: 0xffffff,
+        stroke: { color: 0x2a1810, width: 2 },
+        dropShadow: {
+          color: 0xffd700,
+          blur: 3,
+          angle: Math.PI / 4,
+          distance: 2,
+          alpha: 0.6
+        }
       }
     });
-    subtitle.anchor.set(0.5, 0.5);
-    subtitle.x = this.gameWidth / 2;
-    subtitle.y = 100;
+    title.anchor.set(0.5);
+    title.x = this.gameWidth / 2;
+    title.y = bannerY + bannerHeight / 2;
 
-    this.headerContainer.addChild(title, subtitle);
+    const subtitle = new Text({
+      text: 'Drag to swap • Click to move',
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 12,
+        fill: 0xd4af37,
+        align: 'center'
+      }
+    });
+    subtitle.anchor.set(0.5);
+    subtitle.x = this.gameWidth / 2;
+    subtitle.y = bannerY + bannerHeight + 12;
+
+    this.headerContainer.addChild(banner, title, subtitle);
   }
 
   private createLineupGrid(): void {
     this.lineupContainer.label = 'lineupContainer';
 
-    // Lineup positions (single row of 3) with tighter spacing for 400x700
     const cols = 3;
     const availableWidth = this.gameWidth - 2 * this.STANDARD_PADDING;
-    const gap = 6; // Tighter gap for 400x700
+    const gap = 6;
     const layout = this.calculateThreeCardsLayout(availableWidth, gap);
-    const slotWidth = Math.min(layout.itemWidth, 100); // Reduced cap from 120 to 100
-    const slotHeight = slotWidth * 1.25; // Use 1:1.25 aspect ratio for consistency
+    const slotWidth = Math.min(layout.itemWidth, 100);
+    const slotHeight = slotWidth * 1.25;
     const gridWidth = cols * slotWidth + (cols - 1) * gap;
     const startX = (this.gameWidth - gridWidth) / 2;
-    const startY = 110; // Reduced from 150
+    const startY = 95;
 
     this.lineupSlotHitBoxes = [];
     for (let col = 0; col < cols; col++) {
@@ -180,7 +220,6 @@ export class LineupScene extends BaseScene {
       const slot = this.createLineupSlot(x, y, slotWidth, slotHeight, positionIndex);
       this.lineupContainer.addChild(slot);
 
-      // Add character if present
       const character = this.lineupPositions[positionIndex];
       if (character) {
         const characterCard = this.createLineupCharacterCard(character, x, y, slotWidth, slotHeight, positionIndex);
@@ -188,7 +227,6 @@ export class LineupScene extends BaseScene {
       }
     }
 
-    // Center the grid container horizontally
     this.lineupContainer.x = startX;
     this.lineupContainer.y = startY;
 
@@ -200,18 +238,31 @@ export class LineupScene extends BaseScene {
 
   private createLineupSlot(x: number, y: number, width: number, height: number, positionIndex: number): Container {
     const slot = new Container();
+    
+    // Fantasy slot with parchment style
     const bg = new Graphics();
+    
+    // Shadow
+    bg.roundRect(2, 2, width, height, 8)
+      .fill({ color: 0x000000, alpha: 0.4 });
+    
+    // Main slot - parchment
     bg.roundRect(0, 0, width, height, 8)
-      .fill({ color: Colors.BACKGROUND_SECONDARY, alpha: 0.5 })
-      .stroke({ width: 2, color: Colors.BUTTON_PRIMARY, alpha: 0.8 });
+      .fill({ color: 0xf5e6d3, alpha: 0.5 })
+      .stroke({ width: 2, color: 0xd4af37, alpha: 0.8 });
+    
+    // Inner layer
+    bg.roundRect(2, 2, width - 4, height - 4, 6)
+      .stroke({ width: 1, color: 0xffd700, alpha: 0.4 });
 
     const positionText = new Text({
       text: `${positionIndex + 1}`,
       style: {
         fontFamily: 'Kalam',
-        fontSize: 20, // Reduced from 24 for 400x700
-        fill: Colors.BUTTON_PRIMARY,
-        align: 'center'
+        fontSize: 28,
+        fontWeight: 'bold',
+        fill: 0x8b4513,
+        stroke: { color: 0xffd700, width: 1 }
       }
     });
     positionText.anchor.set(0.5);
@@ -237,50 +288,62 @@ export class LineupScene extends BaseScene {
   private createCharacterPool(): void {
     this.poolContainer.label = 'characterPool';
 
-    // Calculate available area - lineup is now single row instead of 2x2
-    // Calculate slot height based on layout - USE SAME SIZE AS LINEUP GRID
     const availableWidth = this.gameWidth - 2 * this.STANDARD_PADDING;
-    const gap = 6; // Same gap as lineup grid
+    const gap = 6;
     const layout = this.calculateThreeCardsLayout(availableWidth, gap);
-    const slotWidth = Math.min(layout.itemWidth, 100); // Same as lineup grid
-    const slotHeight = slotWidth * 1.25; // Use 1:1.25 aspect ratio for consistency
-    const poolTop = 150 + slotHeight + 2 * this.STANDARD_SPACING; // lineup grid bottom (single row height)
+    const slotWidth = Math.min(layout.itemWidth, 100);
+    const slotHeight = slotWidth * 1.25;
+    const poolTop = 150 + slotHeight + 2 * this.STANDARD_SPACING;
     const actionButtonHeight = 50;
     const actionButtonY = this.gameHeight - 80;
     const poolBottom = actionButtonY - this.STANDARD_SPACING * 2;
     const poolHeight = poolBottom - poolTop;
     const poolWidth = this.gameWidth - 2 * this.STANDARD_PADDING;
 
-    const spacing = gap; // Use same spacing as lineup grid
-    const padding = this.STANDARD_PADDING; // Use for left/right padding
+    const spacing = gap;
+    const padding = this.STANDARD_PADDING;
     const marginTop = 45;
 
-    // Calculate cards per row - force 3 cards per row for character pool, using SAME SIZE as lineup grid
     const poolLayout = this.calculateThreeCardsLayout(poolWidth - 2 * padding, spacing);
-    const cardWidth = Math.min(poolLayout.itemWidth, 100); // Same as lineup grid
-    const cardHeight = cardWidth * 1.25; // Use 1:1.25 aspect ratio for consistency
+    const cardWidth = Math.min(poolLayout.itemWidth, 100);
+    const cardHeight = cardWidth * 1.25;
     const cardsPerRow = poolLayout.itemsPerRow;
 
-    // Background
+    // Fantasy pool panel
     const poolBg = new Graphics();
+    
+    // Shadow
+    poolBg.roundRect(3, 3, poolWidth, poolHeight, 12)
+      .fill({ color: 0x000000, alpha: 0.4 });
+    
+    // Main parchment panel
     poolBg.roundRect(0, 0, poolWidth, poolHeight, 12)
-      .fill({ color: Colors.PANEL_BACKGROUND, alpha: 0.8 })
-      .stroke({ width: 2, color: Colors.BUTTON_PRIMARY });
+      .fill({ color: 0xf5e6d3, alpha: 0.95 })
+      .stroke({ width: 2, color: 0xd4af37 });
+    
+    // Inner layer
+    poolBg.roundRect(3, 3, poolWidth - 6, poolHeight - 6, 10)
+      .fill({ color: 0xe8d4b8, alpha: 0.6 });
+    
+    // Golden highlight
+    poolBg.roundRect(5, 5, poolWidth - 10, poolHeight - 10, 9)
+      .stroke({ width: 1, color: 0xffd700, alpha: 0.5 });
 
     // Title
     const poolTitle = new Text({
-      text: 'Available Characters',
+      text: '🎭 Available Heroes',
       style: {
         fontFamily: 'Kalam',
         fontSize: 18,
         fontWeight: 'bold',
-        fill: Colors.TEXT_PRIMARY
+        fill: 0x2a1810,
+        stroke: { color: 0xffd700, width: 0.5 }
       }
     });
-    poolTitle.x = padding;
+    poolTitle.x = padding + 5;
     poolTitle.y = 15;
 
-    // ScrollBox for vertical scrolling
+    // ScrollBox
     const scrollBox = new ScrollBox({
       width: poolWidth,
       height: poolHeight - marginTop,
@@ -288,14 +351,12 @@ export class LineupScene extends BaseScene {
     scrollBox.x = 0;
     scrollBox.y = marginTop;
 
-    // Content container for cards
     const content = new Container();
 
     this.availableCharacters.forEach((character, index) => {
       const col = index % cardsPerRow;
       const row = Math.floor(index / cardsPerRow);
 
-      // Start from left padding
       const x = padding + col * (cardWidth + spacing);
       const y = row * (cardHeight + spacing);
 
@@ -303,7 +364,6 @@ export class LineupScene extends BaseScene {
       content.addChild(characterCard);
     });
 
-    // Set content height for scrolling
     const totalRows = Math.ceil(this.availableCharacters.length / cardsPerRow);
     content.height = totalRows * (cardHeight + spacing);
 
@@ -311,13 +371,11 @@ export class LineupScene extends BaseScene {
 
     this.poolContainer.addChild(poolBg, poolTitle, scrollBox);
 
-    // Align pool to fit screen
     this.poolContainer.x = this.STANDARD_PADDING;
     this.poolContainer.y = poolTop;
   }
 
   private createPoolCharacterCard(character: any, x: number, y: number, width: number, height: number): Container {
-    // Pool cards use same size as lineup grid cards
     const card = this.createCharacterCard(character, x, y, width, height);
     card.interactive = true;
     card.cursor = 'pointer';
@@ -346,14 +404,12 @@ export class LineupScene extends BaseScene {
     card.alpha = 0.5;
     this.dragTarget = card;
 
-    // Calculate and store drag offset
     const globalCardPos = card.parent?.toGlobal({ x: card.x, y: card.y });
     this.dragOffset = {
       x: event.global.x - (globalCardPos?.x || 0),
       y: event.global.y - (globalCardPos?.y || 0)
     };
 
-    // Move card to top layer (app.stage) for dragging above all
     const globalPos = card.parent?.toGlobal({ x: card.x, y: card.y });
     if (card.parent) {
       card.parent.removeChild(card);
@@ -363,13 +419,11 @@ export class LineupScene extends BaseScene {
       card.position.set(globalPos.x, globalPos.y);
     }
 
-    // Attach pointermove to stage
     app.stage.on('pointermove', this.onDragMove, this);
   }
 
   private onDragMove(event: any) {
     if (this.dragTarget) {
-      // Use dragOffset to keep the pointer at the same relative position on the card
       const parent = this.dragTarget.parent;
       if (parent) {
         const newPos = parent.toLocal({
@@ -385,13 +439,10 @@ export class LineupScene extends BaseScene {
   private onDragEnd(event?: any) {
     if (!this.dragTarget) return;
 
-    // Restore card appearance
     this.dragTarget.alpha = 1;
 
-    // Get pointer position
     const pointer = event?.global ?? app.renderer.events.pointer.global;
 
-    // Find which slot (if any) the pointer is over
     let targetSlotIndex: number | null = null;
     for (const slot of this.lineupSlotHitBoxes) {
       if (
@@ -403,7 +454,6 @@ export class LineupScene extends BaseScene {
       }
     }
 
-    // Find the original slot index of the dragged card
     let originalSlotIndex: number | null = null;
     for (let i = 0; i < this.lineupPositions.length; i++) {
       const slotChar = this.lineupPositions[i];
@@ -418,7 +468,6 @@ export class LineupScene extends BaseScene {
     }
 
     if (this.isDragging) {
-      // If dropped on a different slot, swap
       if (
         targetSlotIndex !== null &&
         originalSlotIndex !== null &&
@@ -429,13 +478,11 @@ export class LineupScene extends BaseScene {
         this.lineupPositions[targetSlotIndex] = temp;
         this.refreshLineup();
       } else {
-        // Snap back to original position if not swapped
         if (this.dragTarget.parent) {
           this.refreshLineup();
         }
       }
     } else if (originalSlotIndex !== null) {
-      // Not a drag: treat as click, move to Character pool
       this.lineupPositions[originalSlotIndex] = null;
       if (!this.availableCharacters.find(c => c.id === (this.dragTarget as any).character?.id)) {
         this.availableCharacters.push((this.dragTarget as any).character);
@@ -450,7 +497,6 @@ export class LineupScene extends BaseScene {
 
   private refreshLineup(): void {
     this.cleanUpFloatingCards();
-    // Clear and recreate only lineup and pool containers
     this.lineupContainer.removeChildren();
     this.poolContainer.removeChildren();
     this.createLineupGrid();
@@ -461,7 +507,6 @@ export class LineupScene extends BaseScene {
     try {
       const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
       
-      // Convert lineup to character IDs for API
       const lineupIds = this.lineupPositions.map(char => char ? char.id : null);
       
       await playerApi.updateLineup(playerId, lineupIds);
@@ -473,46 +518,40 @@ export class LineupScene extends BaseScene {
   }
 
   private createActionButtons(): void {
-    const buttonWidth = Math.min(115, (this.gameWidth - 4 * this.STANDARD_PADDING) / 3); // Reduced from 130 for 400x700
-    const buttonHeight = 40; // Fixed height for consistency
+    const buttonWidth = Math.min(115, (this.gameWidth - 4 * this.STANDARD_PADDING) / 3);
+    const buttonHeight = 40;
     const buttonCount = 3;
 
-    // Calculate total width for all buttons with standard spacing
     const totalWidth = buttonWidth * buttonCount + this.STANDARD_PADDING * (buttonCount - 1);
     const startX = (this.gameWidth - totalWidth) / 2;
     const y = this.gameHeight - buttonHeight - this.STANDARD_PADDING;
 
-    // Back button - positioned separately at left with standard padding
-    const backButton = this.createButton(
+    // Fantasy buttons
+    const backButton = this.createFantasyButton(
       '← Back',
       this.STANDARD_PADDING,
       y,
       buttonWidth,
       buttonHeight,
-      () => navigation.showScreen(HomeScene),
-      13 // Reduced font size
+      () => navigation.showScreen(HomeScene)
     );
 
-    // Save button - centered
-    const saveButton = this.createButton(
-      'Save Lineup',
+    const saveButton = this.createFantasyButton(
+      '💾 Save',
       startX + buttonWidth + this.STANDARD_SPACING,
       y,
       buttonWidth,
       buttonHeight,
-      () => this.saveLineup(),
-      14 // Added base font size
+      () => this.saveLineup()
     );
 
-    // Auto button - centered
-    const autoButton = this.createButton(
-      'Auto',
+    const autoButton = this.createFantasyButton(
+      '⚡ Auto',
       startX + (buttonWidth + this.STANDARD_SPACING) * 2,
       y,
       buttonWidth,
       buttonHeight,
       () => {
-        // Fill empty slots in lineup with available characters
         const available = [...this.availableCharacters];
         this.lineupPositions = this.lineupPositions.map(pos => {
           if (pos) return pos;
@@ -524,5 +563,73 @@ export class LineupScene extends BaseScene {
     );
 
     this.buttonContainer.addChild(backButton, saveButton, autoButton);
+  }
+
+  private createFantasyButton(
+    text: string,
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    onClick: () => void
+  ): Container {
+    const button = new Container();
+    
+    const bg = new Graphics();
+    bg.roundRect(2, 2, width, height, 8)
+      .fill({ color: 0x000000, alpha: 0.4 });
+    bg.roundRect(0, 0, width, height, 8)
+      .fill({ color: 0x8b4513, alpha: 0.95 })
+      .stroke({ width: 2, color: 0xd4af37 });
+    bg.roundRect(2, 2, width - 4, height - 4, 6)
+      .stroke({ width: 1, color: 0xffd700, alpha: 0.6 });
+    
+    const buttonText = new Text({
+      text: text,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 13,
+        fontWeight: 'bold',
+        fill: 0xffffff,
+        stroke: { color: 0x2a1810, width: 2 }
+      }
+    });
+    buttonText.anchor.set(0.5);
+    buttonText.x = width / 2;
+    buttonText.y = height / 2;
+    
+    button.addChild(bg, buttonText);
+    button.x = x;
+    button.y = y;
+    button.interactive = true;
+    button.cursor = 'pointer';
+    
+    button.on('pointerover', () => {
+      bg.clear();
+      bg.roundRect(2, 2, width, height, 8)
+        .fill({ color: 0x000000, alpha: 0.4 });
+      bg.roundRect(0, 0, width, height, 8)
+        .fill({ color: 0xa0632a, alpha: 0.95 })
+        .stroke({ width: 2, color: 0xffd700 });
+      bg.roundRect(2, 2, width - 4, height - 4, 6)
+        .stroke({ width: 1, color: 0xffd700, alpha: 0.9 });
+      button.scale.set(1.02);
+    });
+    
+    button.on('pointerout', () => {
+      bg.clear();
+      bg.roundRect(2, 2, width, height, 8)
+        .fill({ color: 0x000000, alpha: 0.4 });
+      bg.roundRect(0, 0, width, height, 8)
+        .fill({ color: 0x8b4513, alpha: 0.95 })
+        .stroke({ width: 2, color: 0xd4af37 });
+      bg.roundRect(2, 2, width - 4, height - 4, 6)
+        .stroke({ width: 1, color: 0xffd700, alpha: 0.6 });
+      button.scale.set(1.0);
+    });
+    
+    button.on('pointerdown', onClick);
+    
+    return button;
   }
 }

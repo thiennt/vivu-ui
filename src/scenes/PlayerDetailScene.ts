@@ -59,9 +59,6 @@ export class PlayerDetailScene extends BaseScene {
     
     // Initialize loading manager
     this.loadingManager = new LoadingStateManager(this.container, this.gameWidth, this.gameHeight);
-    
-    // Load data and create UI
-    //this.loadPlayerData();
   }
   
   private async loadPlayerData(): Promise<void> {
@@ -79,7 +76,7 @@ export class PlayerDetailScene extends BaseScene {
       this.loadingManager.showMockDataIndicator();
     }
     
-    //this.initializeUI();
+    this.initializeUI();
   }
 
   private initializeUI(): void {
@@ -111,7 +108,7 @@ export class PlayerDetailScene extends BaseScene {
   }
   
   private updateLayout(): void {
-    // Clear and recreate layout - this is more efficient than destroying/recreating all elements
+    // Clear and recreate layout
     this.backgroundContainer.removeChildren();
     this.headerContainer.removeChildren();
     this.statsContainer.removeChildren();
@@ -151,10 +148,8 @@ export class PlayerDetailScene extends BaseScene {
   }
   
   private calculateTotalContentHeight(): number {
-    // Calculate the total height of all content
     let maxY = 0;
     
-    // Check all children of scrollContent to find the bottom-most element
     this.scrollContent.children.forEach(child => {
       child.children.forEach(grandchild => {
         const bounds = grandchild.getBounds();
@@ -165,101 +160,205 @@ export class PlayerDetailScene extends BaseScene {
       });
     });
     
-    return maxY + this.STANDARD_PADDING; // Add some padding at the bottom
+    return maxY + this.STANDARD_PADDING;
   }
-
-
 
   private createBackground(): void {
     const bg = new Graphics();
-    bg.fill(Colors.BACKGROUND_PRIMARY).rect(0, 0, this.gameWidth, this.gameHeight);
+    
+    // Dark fantasy background
+    bg.rect(0, 0, this.gameWidth, this.gameHeight)
+      .fill({ color: 0x1a0f0a, alpha: 1.0 });
+    
+    // Brown texture overlay
+    bg.rect(0, 0, this.gameWidth, this.gameHeight)
+      .fill({ color: 0x2a1810, alpha: 0.3 });
+    
     this.backgroundContainer.addChild(bg);
   }
 
   private createHeader(): void {
-    const title = this.createTitle('Player Profile', this.gameWidth / 2, 60);
-    this.headerContainer.addChild(title);
+    // Fantasy banner
+    const bannerWidth = Math.min(320, this.gameWidth - 40);
+    const bannerHeight = 48;
+    const bannerX = (this.gameWidth - bannerWidth) / 2;
+    const bannerY = 20;
+    
+    const banner = new Graphics();
+    banner.moveTo(bannerX + 12, bannerY)
+      .lineTo(bannerX, bannerY + bannerHeight / 2)
+      .lineTo(bannerX + 12, bannerY + bannerHeight)
+      .lineTo(bannerX + bannerWidth - 12, bannerY + bannerHeight)
+      .lineTo(bannerX + bannerWidth, bannerY + bannerHeight / 2)
+      .lineTo(bannerX + bannerWidth - 12, bannerY)
+      .lineTo(bannerX + 12, bannerY)
+      .fill({ color: 0x8b4513, alpha: 0.95 })
+      .stroke({ width: 2.5, color: 0xd4af37 });
+    
+    banner.moveTo(bannerX + 15, bannerY + 3)
+      .lineTo(bannerX + bannerWidth - 15, bannerY + 3)
+      .lineTo(bannerX + bannerWidth - 4, bannerY + bannerHeight / 2)
+      .lineTo(bannerX + bannerWidth - 15, bannerY + bannerHeight - 3)
+      .lineTo(bannerX + 15, bannerY + bannerHeight - 3)
+      .lineTo(bannerX + 4, bannerY + bannerHeight / 2)
+      .lineTo(bannerX + 15, bannerY + 3)
+      .stroke({ width: 1, color: 0xffd700, alpha: 0.6 });
+
+    const title = new Text({
+      text: '👤 Player Profile 👤',
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 22,
+        fontWeight: 'bold',
+        fill: 0xffffff,
+        stroke: { color: 0x2a1810, width: 2 },
+        dropShadow: {
+          color: 0xffd700,
+          blur: 3,
+          angle: Math.PI / 4,
+          distance: 2,
+          alpha: 0.6
+        }
+      }
+    });
+    title.anchor.set(0.5);
+    title.x = this.gameWidth / 2;
+    title.y = bannerY + bannerHeight / 2;
+    
+    this.headerContainer.addChild(banner, title);
   }
 
   private createPlayerStats(): void {
     if (!this.player) return;
     
-    // Calculate responsive panel sizes with reduced padding
-    const availableWidth = this.gameWidth - 2 * this.STANDARD_PADDING;
-    const panelWidth = Math.min(280, (availableWidth - this.STANDARD_SPACING) / 2);
-    const totalWidth = (panelWidth * 2) + this.STANDARD_SPACING;
-    const startX = (this.gameWidth - totalWidth) / 2;
+    const startY = 85;
+    const padding = this.STANDARD_PADDING;
     
-    // Main info panel
-    const mainPanel = this.createStatsPanel(
-      'Player Information',
-      [
-        `Username: ${this.player.username}`,
-        `Level: ${this.player.level}`,
-        `Experience: ${this.player.exp}`,
-        `Characters: ${this.characters.length}`
-      ],
-      panelWidth, 160
-    );
+    // Single combined panel
+    const availableWidth = this.gameWidth - 2 * padding;
+    const panelWidth = Math.min(580, availableWidth);
+    const panelX = (this.gameWidth - panelWidth) / 2;
     
-    // Stats panel with temporary changes applied
+    // Calculate current stats with changes
     const currentSta = this.player.sta + this.tempStatChanges.sta;
     const currentStr = this.player.str + this.tempStatChanges.str;
     const currentAgi = this.player.agi + this.tempStatChanges.agi;
     
-    const statsText = [
-      `Stamina: ${currentSta}${this.tempStatChanges.sta !== 0 ? ` (${this.tempStatChanges.sta > 0 ? '+' : ''}${this.tempStatChanges.sta})` : ''}`,
-      `Strength: ${currentStr}${this.tempStatChanges.str !== 0 ? ` (${this.tempStatChanges.str > 0 ? '+' : ''}${this.tempStatChanges.str})` : ''}`,
-      `Agility: ${currentAgi}${this.tempStatChanges.agi !== 0 ? ` (${this.tempStatChanges.agi > 0 ? '+' : ''}${this.tempStatChanges.agi})` : ''}`,
-      `Luck: ${this.player.luck}`
-    ];
-    
-    const statsPanel = this.createStatsPanel(
-      'Statistics',
-      statsText,
-      panelWidth, 200
+    // Combined stats panel
+    const statsPanel = this.createCombinedStatsPanel(
+      panelWidth,
+      [
+        { label: '👤 Username:', value: this.player.username },
+        { label: '⭐ Level:', value: this.player.level.toString() },
+        { label: '✨ Experience:', value: this.player.exp.toString() },
+        { label: '🎭 Characters:', value: this.characters.length.toString() },
+      ],
+      [
+        { label: '❤️ Stamina:', value: `${currentSta}${this.tempStatChanges.sta !== 0 ? ` (+${this.tempStatChanges.sta})` : ''}` },
+        { label: '💪 Strength:', value: `${currentStr}${this.tempStatChanges.str !== 0 ? ` (+${this.tempStatChanges.str})` : ''}` },
+        { label: '⚡ Agility:', value: `${currentAgi}${this.tempStatChanges.agi !== 0 ? ` (+${this.tempStatChanges.agi})` : ''}` },
+        { label: '🍀 Luck:', value: this.player.luck.toString() }
+      ]
     );
     
-    // Center both panels horizontally with reduced vertical spacing
-    mainPanel.x = startX;
-    mainPanel.y = 100; // Reduced from 120
+    statsPanel.x = panelX;
+    statsPanel.y = startY;
     
-    statsPanel.x = startX + panelWidth + this.STANDARD_SPACING;
-    statsPanel.y = 100; // Reduced from 120
-    
-    this.statsContainer.addChild(mainPanel, statsPanel);
+    this.statsContainer.addChild(statsPanel);
   }
 
-  private createStatsPanel(title: string, stats: string[], width: number, height: number): Container {
+  private createCombinedStatsPanel(
+    width: number,
+    playerInfo: Array<{label: string, value: string}>,
+    statistics: Array<{label: string, value: string}>
+  ): Container {
     const panel = new Container();
     
-    // Background
+    // Calculate height based on content
+    const sectionHeight = Math.max(playerInfo.length, statistics.length) * 22 + 50;
+    const height = sectionHeight + 20;
+    
+    // Parchment panel
     const bg = new Graphics();
-    bg.fill({ color: Colors.BACKGROUND_SECONDARY, alpha: 0.9 })
-      .stroke({ width: 3, color: Colors.BUTTON_PRIMARY })
-      .roundRect(0, 0, width, height, 12);
     
-    // Title
-    const titleText = new Text({text: title, style: {
-      fontFamily: 'Kalam',
-      fontSize: 20,
-      fontWeight: 'bold',
-      fill: Colors.TEXT_PRIMARY
-    }});
-    titleText.x = 12; // Reduced from 15
-    titleText.y = 12; // Reduced from 15
+    bg.roundRect(3, 3, width, height, 10)
+      .fill({ color: 0x000000, alpha: 0.4 });
     
-    panel.addChild(bg, titleText);
+    bg.roundRect(0, 0, width, height, 10)
+      .fill({ color: 0xf5e6d3, alpha: 0.98 })
+      .stroke({ width: 2, color: 0xd4af37 });
     
-    // Stats with reduced spacing
-    stats.forEach((stat, index) => {
-      const statText = new Text({text: stat, style: {
+    bg.roundRect(3, 3, width - 6, height - 6, 8)
+      .fill({ color: 0xe8d4b8, alpha: 0.6 });
+    
+    bg.roundRect(5, 5, width - 10, height - 10, 7)
+      .stroke({ width: 1, color: 0xffd700, alpha: 0.5 });
+    
+    panel.addChild(bg);
+    
+    // Divider line in the middle
+    const dividerX = width / 2;
+    const divider = new Graphics();
+    divider.moveTo(dividerX, 15)
+      .lineTo(dividerX, height - 15)
+      .stroke({ width: 2, color: 0xd4af37, alpha: 0.5 });
+    panel.addChild(divider);
+    
+    // Left section - Player Info
+    const leftTitle = new Text({
+      text: '📜 Player Info',
+      style: {
         fontFamily: 'Kalam',
         fontSize: 16,
-        fill: Colors.TEXT_SECONDARY
-      }});
-      statText.x = 12; // Reduced from 15
-      statText.y = 45 + (index * 20); // Reduced from 50 + (index * 22)
+        fontWeight: 'bold',
+        fill: 0x2a1810,
+        stroke: { color: 0xffd700, width: 0.5 }
+      }
+    });
+    leftTitle.x = 12;
+    leftTitle.y = 12;
+    panel.addChild(leftTitle);
+    
+    playerInfo.forEach((item, index) => {
+      const statText = new Text({
+        text: `${item.label} ${item.value}`,
+        style: {
+          fontFamily: 'Kalam',
+          fontSize: 13,
+          fill: 0x3d2817
+        }
+      });
+      statText.x = 12;
+      statText.y = 40 + (index * 22);
+      panel.addChild(statText);
+    });
+    
+    // Right section - Statistics
+    const rightTitle = new Text({
+      text: '⚔️ Statistics',
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 16,
+        fontWeight: 'bold',
+        fill: 0x2a1810,
+        stroke: { color: 0xffd700, width: 0.5 }
+      }
+    });
+    rightTitle.x = dividerX + 12;
+    rightTitle.y = 12;
+    panel.addChild(rightTitle);
+    
+    statistics.forEach((item, index) => {
+      const statText = new Text({
+        text: `${item.label} ${item.value}`,
+        style: {
+          fontFamily: 'Kalam',
+          fontSize: 13,
+          fill: 0x3d2817
+        }
+      });
+      statText.x = dividerX + 12;
+      statText.y = 40 + (index * 22);
       panel.addChild(statText);
     });
     
@@ -269,91 +368,125 @@ export class PlayerDetailScene extends BaseScene {
   private createPointDistributionPanel(): void {
     if (!this.player) return;
 
-    // Always show the panel - this meets the requirement to always display it
-    const panelWidth = Math.min(600, this.gameWidth - 2 * this.STANDARD_PADDING);
-    const panelHeight = 200;
-    const startX = (this.gameWidth - panelWidth) / 2;
-    const startY = 310; // Position below the stats panels (reduced from 340)
+    const padding = this.STANDARD_PADDING;
+    
+    // Position below the combined stats panel (height ~158) + gap
+    const startY = 260;
+    
+    const panelWidth = Math.min(580, this.gameWidth - 2 * padding);
+    const panelHeight = this.player.points <= 0 ? 90 : 190;
+    const panelX = (this.gameWidth - panelWidth) / 2;
 
     const panel = new Container();
     
-    // Background
+    // Fantasy parchment panel
     const bg = new Graphics();
-    bg.fill({ color: Colors.BACKGROUND_SECONDARY, alpha: 0.9 })
-      .stroke({ width: 3, color: Colors.BUTTON_PRIMARY })
-      .roundRect(0, 0, panelWidth, panelHeight, 12);
+    
+    bg.roundRect(3, 3, panelWidth, panelHeight, 10)
+      .fill({ color: 0x000000, alpha: 0.4 });
+    
+    bg.roundRect(0, 0, panelWidth, panelHeight, 10)
+      .fill({ color: 0xf5e6d3, alpha: 0.98 })
+      .stroke({ width: 2, color: 0xd4af37 });
+    
+    bg.roundRect(3, 3, panelWidth - 6, panelHeight - 6, 8)
+      .fill({ color: 0xe8d4b8, alpha: 0.6 });
+    
+    bg.roundRect(5, 5, panelWidth - 10, panelHeight - 10, 7)
+      .stroke({ width: 1, color: 0xffd700, alpha: 0.5 });
     
     // Title
-    const titleText = new Text({text: 'Distribute Attribute Points', style: {
-      fontFamily: 'Kalam',
-      fontSize: 20,
-      fontWeight: 'bold',
-      fill: Colors.TEXT_PRIMARY
-    }});
-    titleText.x = 12; // Reduced from 15
-    titleText.y = 12; // Reduced from 15
-
-    // Show different message if no points available
-    if (this.player.points <= 0) {
-      const noPointsText = new Text({text: 'No points available to distribute', style: {
+    const titleText = new Text({
+      text: '✨ Attribute Points ✨',
+      style: {
         fontFamily: 'Kalam',
         fontSize: 16,
-        fill: Colors.TEXT_SECONDARY,
-        fontStyle: 'italic'
-      }});
-      noPointsText.x = 12; // Reduced from 15
-      noPointsText.y = 45; // Reduced from 50
+        fontWeight: 'bold',
+        fill: 0x2a1810,
+        stroke: { color: 0xffd700, width: 0.5 }
+      }
+    });
+    titleText.x = 12;
+    titleText.y = 12;
+
+    panel.addChild(bg, titleText);
+
+    if (this.player.points <= 0) {
+      const noPointsText = new Text({
+        text: 'No points available to distribute',
+        style: {
+          fontFamily: 'Kalam',
+          fontSize: 14,
+          fill: 0x8b4513,
+          fontStyle: 'italic'
+        }
+      });
+      noPointsText.x = 12;
+      noPointsText.y = 45;
       
-      panel.addChild(bg, titleText, noPointsText);
-      panel.x = startX;
+      panel.addChild(noPointsText);
+      panel.x = panelX;
       panel.y = startY;
       this.pointDistributionContainer.addChild(panel);
       return;
     }
 
-    // Remaining points display
-    const remainingText = new Text({text: `Remaining Points: ${this.remainingPoints}`, style: {
-      fontFamily: 'Kalam',
-      fontSize: 16,
-      fill: Colors.TEXT_SECONDARY
-    }});
-    remainingText.x = panelWidth - 200;
-    remainingText.y = 20;
+    // Remaining points
+    const remainingText = new Text({
+      text: `⭐ ${this.remainingPoints} pts`,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 14,
+        fontWeight: 'bold',
+        fill: 0x2a1810,
+        stroke: { color: 0xffd700, width: 0.5 }
+      }
+    });
+    remainingText.anchor.set(1, 0);
+    remainingText.x = panelWidth - 12;
+    remainingText.y = 15;
     
-    panel.addChild(bg, titleText, remainingText);
+    panel.addChild(remainingText);
     
     // Stat controls
     const stats = [
-      { name: 'Stamina', key: 'sta' as keyof typeof this.tempStatChanges, current: this.player.sta },
-      { name: 'Strength', key: 'str' as keyof typeof this.tempStatChanges, current: this.player.str },
-      { name: 'Agility', key: 'agi' as keyof typeof this.tempStatChanges, current: this.player.agi }
+      { name: '❤️ Stamina', key: 'sta' as keyof typeof this.tempStatChanges, current: this.player.sta },
+      { name: '💪 Strength', key: 'str' as keyof typeof this.tempStatChanges, current: this.player.str },
+      { name: '⚡ Agility', key: 'agi' as keyof typeof this.tempStatChanges, current: this.player.agi }
     ];
     
     stats.forEach((stat, index) => {
-      const yPos = 50 + (index * 35); // Reduced from 60 + (index * 40)
+      const yPos = 50 + (index * 36);
       
       // Stat name
-      const nameText = new Text({text: stat.name, style: {
-        fontFamily: 'Kalam',
-        fontSize: 16,
-        fill: Colors.TEXT_PRIMARY
-      }});
-      nameText.x = 15; // Reduced from 20
+      const nameText = new Text({
+        text: stat.name,
+        style: {
+          fontFamily: 'Kalam',
+          fontSize: 14,
+          fontWeight: 'bold',
+          fill: 0x2a1810
+        }
+      });
+      nameText.x = 12;
       nameText.y = yPos;
       
-      // Current value display
+      // Current value
       const currentValue = stat.current + this.tempStatChanges[stat.key];
-      const valueText = new Text({text: `${currentValue}`, style: {
-        fontFamily: 'Kalam',
-        fontSize: 16,
-        fontWeight: 'bold',
-        fill: Colors.TEXT_PRIMARY
-      }});
-      valueText.x = 150;
-      valueText.y = yPos;
+      const valueText = new Text({
+        text: `${currentValue}`,
+        style: {
+          fontFamily: 'Kalam',
+          fontSize: 16,
+          fontWeight: 'bold',
+          fill: 0x2a1810
+        }
+      });
+      valueText.x = 140;
+      valueText.y = yPos - 2;
       
-      // Minus button
-      const minusButton = this.createStatButton('-', 200, yPos - 5, 30, 30, () => {
+      // Buttons
+      const minusButton = this.createFantasyStatButton('-', 180, yPos - 3, 30, 28, () => {
         if (this.tempStatChanges[stat.key] > 0) {
           this.tempStatChanges[stat.key]--;
           this.remainingPoints++;
@@ -361,8 +494,7 @@ export class PlayerDetailScene extends BaseScene {
         }
       });
       
-      // Plus button
-      const plusButton = this.createStatButton('+', 240, yPos - 5, 30, 30, () => {
+      const plusButton = this.createFantasyStatButton('+', 218, yPos - 3, 30, 28, () => {
         if (this.remainingPoints > 0) {
           this.tempStatChanges[stat.key]++;
           this.remainingPoints--;
@@ -373,34 +505,31 @@ export class PlayerDetailScene extends BaseScene {
       panel.addChild(nameText, valueText, minusButton, plusButton);
     });
 
-    // Action buttons - responsive sizing
-    const buttonHeight = Math.min(35, panelHeight * 0.15); // Responsive button height
-    const resetButtonWidth = Math.min(70, panelWidth * 0.15);
-    const confirmButtonWidth = Math.min(90, panelWidth * 0.2);
+    // Action buttons
+    const buttonY = panelHeight - 40;
+    const buttonHeight = 34;
     
-    const resetButton = this.createButton(
+    const resetButton = this.createFantasyButton(
       'Reset',
-      panelWidth - resetButtonWidth - confirmButtonWidth - 20,
-      panelHeight - buttonHeight - 10,
-      resetButtonWidth,
+      panelWidth - 155,
+      buttonY,
+      70,
       buttonHeight,
       () => {
         this.tempStatChanges = { sta: 0, str: 0, agi: 0 };
         this.remainingPoints = this.player.points;
         this.refreshPointDistributionPanel();
-      },
-      12 // Base font size
+      }
     );
     
-    const confirmButton = this.createButton(
+    const confirmButton = this.createFantasyButton(
       'Confirm',
-      panelWidth - confirmButtonWidth - 10,
-      panelHeight - buttonHeight - 10,
-      confirmButtonWidth,
+      panelWidth - 77,
+      buttonY,
+      70,
       buttonHeight,
       async () => {
         try {
-          // Apply changes to player data via API
           const updatedStats = {
             sta_point: this.tempStatChanges.sta,
             str_point: this.tempStatChanges.str,
@@ -410,11 +539,9 @@ export class PlayerDetailScene extends BaseScene {
           this.loadingManager.showLoading();
           this.player = await playerApi.updatePlayerStats(this.player.id, updatedStats);
           
-          // Reset temporary changes
           this.tempStatChanges = { sta: 0, str: 0, agi: 0 };
           
           this.loadingManager.hideLoading();
-          // Refresh the entire UI
           this.updateLayout();
         } catch (error) {
           console.error('Failed to update player stats:', error);
@@ -423,36 +550,36 @@ export class PlayerDetailScene extends BaseScene {
             : 'Failed to update stats. Please try again.';
           this.loadingManager.showError(errorMessage);
         }
-      },
-      12 // Base font size
+      }
     );
     
     panel.addChild(resetButton, confirmButton);
     
-    panel.x = startX;
+    panel.x = panelX;
     panel.y = startY;
     
     this.pointDistributionContainer.addChild(panel);
   }
 
-  private createStatButton(text: string, x: number, y: number, width: number, height: number, onClick: () => void): Container {
+  private createFantasyStatButton(text: string, x: number, y: number, width: number, height: number, onClick: () => void): Container {
     const button = new Container();
     
-    // Button background
     const bg = new Graphics();
-    bg.roundRect(0, 0, width, height, 4)
-      .fill(Colors.BUTTON_PRIMARY)
-      .stroke({ width: 2, color: Colors.BUTTON_BORDER });
+    bg.roundRect(0, 0, width, height, 6)
+      .fill({ color: 0x8b4513, alpha: 0.95 })
+      .stroke({ width: 2, color: 0xd4af37 });
+    
+    bg.roundRect(2, 2, width - 4, height - 4, 4)
+      .stroke({ width: 1, color: 0xffd700, alpha: 0.5 });
 
-    // Button text
     const buttonText = new Text({
       text: text,
       style: {
         fontFamily: 'Kalam',
         fontSize: 16,
         fontWeight: 'bold',
-        fill: Colors.TEXT_BUTTON,
-        align: 'center'
+        fill: 0xffffff,
+        stroke: { color: 0x2a1810, width: 1.5 }
       }
     });
     buttonText.anchor.set(0.5);
@@ -465,12 +592,85 @@ export class PlayerDetailScene extends BaseScene {
     button.interactive = true;
     button.cursor = 'pointer';
     
-    // Hover effects
     button.on('pointerover', () => {
-      bg.tint = Colors.BUTTON_HOVER;
+      bg.clear();
+      bg.roundRect(0, 0, width, height, 6)
+        .fill({ color: 0xa0632a, alpha: 0.95 })
+        .stroke({ width: 2, color: 0xffd700 });
+      bg.roundRect(2, 2, width - 4, height - 4, 4)
+        .stroke({ width: 1, color: 0xffd700, alpha: 0.8 });
     });
+    
     button.on('pointerout', () => {
-      bg.tint = Colors.ACTIVE_WHITE;
+      bg.clear();
+      bg.roundRect(0, 0, width, height, 6)
+        .fill({ color: 0x8b4513, alpha: 0.95 })
+        .stroke({ width: 2, color: 0xd4af37 });
+      bg.roundRect(2, 2, width - 4, height - 4, 4)
+        .stroke({ width: 1, color: 0xffd700, alpha: 0.5 });
+    });
+    
+    button.on('pointerdown', onClick);
+    
+    return button;
+  }
+
+  private createFantasyButton(
+    text: string,
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    onClick: () => void
+  ): Container {
+    const button = new Container();
+    
+    const bg = new Graphics();
+    bg.roundRect(0, 0, width, height, 8)
+      .fill({ color: 0x8b4513, alpha: 0.95 })
+      .stroke({ width: 2, color: 0xd4af37 });
+    
+    bg.roundRect(2, 2, width - 4, height - 4, 6)
+      .stroke({ width: 1, color: 0xffd700, alpha: 0.6 });
+
+    const buttonText = new Text({
+      text: text,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 13,
+        fontWeight: 'bold',
+        fill: 0xffffff,
+        stroke: { color: 0x2a1810, width: 2 }
+      }
+    });
+    buttonText.anchor.set(0.5);
+    buttonText.x = width / 2;
+    buttonText.y = height / 2;
+    
+    button.addChild(bg, buttonText);
+    button.x = x;
+    button.y = y;
+    button.interactive = true;
+    button.cursor = 'pointer';
+    
+    button.on('pointerover', () => {
+      bg.clear();
+      bg.roundRect(0, 0, width, height, 8)
+        .fill({ color: 0xa0632a, alpha: 0.95 })
+        .stroke({ width: 2, color: 0xffd700 });
+      bg.roundRect(2, 2, width - 4, height - 4, 6)
+        .stroke({ width: 1, color: 0xffd700, alpha: 0.9 });
+      button.scale.set(1.02);
+    });
+    
+    button.on('pointerout', () => {
+      bg.clear();
+      bg.roundRect(0, 0, width, height, 8)
+        .fill({ color: 0x8b4513, alpha: 0.95 })
+        .stroke({ width: 2, color: 0xd4af37 });
+      bg.roundRect(2, 2, width - 4, height - 4, 6)
+        .stroke({ width: 1, color: 0xffd700, alpha: 0.6 });
+      button.scale.set(1.0);
     });
     
     button.on('pointerdown', onClick);
@@ -479,7 +679,6 @@ export class PlayerDetailScene extends BaseScene {
   }
 
   private refreshPointDistributionPanel(): void {
-    // Clear and recreate just the point distribution panel and stats
     this.pointDistributionContainer.removeChildren();
     this.statsContainer.removeChildren();
     this.createPlayerStats();
@@ -489,84 +688,77 @@ export class PlayerDetailScene extends BaseScene {
   private createCharacterCollection(): void {
     if (!this.player) return;
     
-    // Mobile-optimized card layout using the specified formula
-    const availableWidth = this.gameWidth - 2 * this.STANDARD_PADDING;
-    const isMobile = this.gameWidth < 768; // Mobile detection
-    const gap = isMobile ? 8 : this.STANDARD_SPACING; // Use 8px gap on mobile
-    const cardCount = 3; // Force 3 cards per row
+    // Position after point distribution panel
+    // Stats: 85 + 158 = 243
+    // Point: 260 + (90 or 190) = 350 or 450
+    const pointPanelHeight = this.player.points <= 0 ? 90 : 190;
+    const baseY = 260 + pointPanelHeight + 15;
     
-    // Apply mobile formula: card_width = (screen_width - (gap * (card_count - 1))) / card_count
+    const availableWidth = this.gameWidth - 2 * this.STANDARD_PADDING;
+    const gap = 10;
+    const cardCount = 3;
+    
     const cardWidth = (availableWidth - (gap * (cardCount - 1))) / cardCount;
-    // Use 4:5 aspect ratio for card height
     const cardHeight = cardWidth * 1.25;
 
-    const layout = {
-      itemsPerRow: cardCount,
-      itemWidth: cardWidth,
-      totalWidth: availableWidth
-    };
-
-    // Calculate Y position - always account for point distribution panel since it's always shown
-    const baseY = 520; // Always add offset since point panel is always shown (reduced from 560)
-
-    // Title - centered
-    const collectionTitle = new Text({ text: 'Character Collection', style: {
-      fontFamily: 'Kalam',
-      fontSize: 24,
-      fontWeight: 'bold',
-      fill: Colors.TEXT_PRIMARY
-    }});
+    // Title
+    const collectionTitle = new Text({ 
+      text: '🎭 Character Collection', 
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 20,
+        fontWeight: 'bold',
+        fill: 0xffffff,
+        stroke: { color: 0x2a1810, width: 2 },
+        dropShadow: {
+          color: 0xffd700,
+          blur: 3,
+          angle: Math.PI / 4,
+          distance: 2,
+          alpha: 0.6
+        }
+      }
+    });
     collectionTitle.anchor.set(0.5, 0);
     collectionTitle.x = this.gameWidth / 2;
     collectionTitle.y = baseY;
 
-    // Create a container for all cards
     const gridContent = new Container();
 
     this.characters.forEach((character, index) => {
-      const row = Math.floor(index / layout.itemsPerRow);
-      const col = index % layout.itemsPerRow;
+      const row = Math.floor(index / cardCount);
+      const col = index % cardCount;
 
-      const x = col * (layout.itemWidth + gap);
+      const x = col * (cardWidth + gap);
       const y = row * (cardHeight + gap);
 
       const card = this.createCharacterPreviewCard(character, x, y, cardWidth);
       gridContent.addChild(card);
     });
 
-    // Set content height for scrolling
-    const totalRows = Math.ceil(this.characters.length / layout.itemsPerRow);
+    const totalRows = Math.ceil(this.characters.length / cardCount);
     const contentHeight = totalRows * (cardHeight + gap);
+    const maxScrollHeight = 160;
 
-    // Calculate available height for scrolling (remaining screen space)
-    const titleHeight = 40;
-    const footerButtonHeight = 50; // Renamed to avoid conflict
-    const buttonMargin = this.STANDARD_SPACING * 2;
-    const maxScrollHeight = 150;
-
-    // Create ScrollBox for vertical scrolling (only for character collection)
     const scrollBox = new ScrollBox({
       width: availableWidth,
-      height: Math.min(maxScrollHeight, contentHeight), // Limit height to available space
+      height: Math.min(maxScrollHeight, contentHeight),
     });
 
     scrollBox.addItem(gridContent);
-
-    // Position ScrollBox centered horizontally
     scrollBox.x = this.STANDARD_PADDING;
-    scrollBox.y = baseY + titleHeight;
+    scrollBox.y = baseY + 35;
 
-    // View all button - responsive sizing
-    const buttonWidth = Math.min(200, this.gameWidth - 2 * this.STANDARD_PADDING); // Reduced from 250
-    const buttonHeight = Math.max(40, Math.min(46, this.gameHeight * 0.07));
-    const viewAllButton = this.createButton(
-      'View All Characters',
+    // View all button
+    const buttonWidth = 180;
+    const buttonHeight = 40;
+    const viewAllButton = this.createFantasyButton(
+      'View All',
       (this.gameWidth - buttonWidth) / 2,
-      scrollBox.y + Math.min(maxScrollHeight, contentHeight) + this.STANDARD_SPACING,
+      scrollBox.y + Math.min(maxScrollHeight, contentHeight) + 12,
       buttonWidth,
       buttonHeight,
-      () => navigation.showScreen(CharactersScene),
-      14 // Base font size
+      () => navigation.showScreen(CharactersScene)
     );
 
     this.collectionContainer.addChild(collectionTitle, scrollBox, viewAllButton);
@@ -574,10 +766,9 @@ export class PlayerDetailScene extends BaseScene {
 
   private createCharacterPreviewCard(character: any, x: number, y: number, customWidth?: number): Container {
     const cardWidth = customWidth || 120;
-    const cardHeight = cardWidth * 1.25; // 4:5 aspect ratio as used in preview cards
+    const cardHeight = cardWidth * 1.25;
     const card = this.createCharacterCard(character, x, y, cardWidth, cardHeight);
     
-    // Click handler
     card.on('pointerdown', () => {
       navigation.showScreen(CharacterDetailScene, { selectedCharacter: character });
     });
@@ -586,23 +777,21 @@ export class PlayerDetailScene extends BaseScene {
   }
 
   private createBackButton(): void {
-    // Responsive button sizing - improved for small screens
     const buttonWidth = Math.min(160, this.gameWidth - 2 * this.STANDARD_PADDING);
-    const buttonHeight = Math.max(40, Math.min(46, this.gameHeight * 0.07));
+    const buttonHeight = 40;
     
-    const backButton = this.createButton(
-      '← Back to Home',
+    const backButton = this.createFantasyButton(
+      '← Back',
       this.STANDARD_PADDING,
       this.gameHeight - buttonHeight - this.STANDARD_PADDING,
       buttonWidth,
       buttonHeight,
-      () => navigation.showScreen(HomeScene),
-      14 // Added base font size
+      () => navigation.showScreen(HomeScene)
     );
     this.buttonContainer.addChild(backButton);
   }
 
   update(_time: Ticker): void {
-    // No animations needed for this scene
+    // No animations needed
   }
 }

@@ -21,118 +21,187 @@ export class TowerFloorPopup extends Container {
   }
 
   private createDialog(): void {
-    // Create semi-transparent background
+    // Create semi-transparent dark overlay
     this.dialogBg = new Graphics();
     this.dialogBg.rect(0, 0, this.gameWidth, this.gameHeight)
-      .fill({ color: Colors.OVERLAY_DARK, alpha: 0.7 });
+      .fill({ color: 0x000000, alpha: 0.85 });
     
     const dialogWidth = Math.min(500, this.gameWidth - 40);
     const dialogHeight = Math.min(600, this.gameHeight - 40);
     const dialogX = (this.gameWidth - dialogWidth) / 2;
     const dialogY = (this.gameHeight - dialogHeight) / 2;
     
-    // Create dialog panel
+    // Fantasy parchment dialog panel
     this.dialogPanel = new Graphics();
+    
+    // Shadow
+    this.dialogPanel.roundRect(dialogX + 4, dialogY + 4, dialogWidth, dialogHeight, 12)
+      .fill({ color: 0x000000, alpha: 0.6 });
+    
+    // Main parchment panel
     this.dialogPanel.roundRect(dialogX, dialogY, dialogWidth, dialogHeight, 12)
-      .fill({ color: Colors.PANEL_BACKGROUND })
-      .stroke({ width: 3, color: Colors.BUTTON_PRIMARY });
+      .fill({ color: 0xf5e6d3, alpha: 0.98 })
+      .stroke({ width: 3, color: 0xd4af37 });
+    
+    // Inner layer
+    this.dialogPanel.roundRect(dialogX + 4, dialogY + 4, dialogWidth - 8, dialogHeight - 8, 10)
+      .fill({ color: 0xe8d4b8, alpha: 0.6 });
+    
+    // Golden highlight
+    this.dialogPanel.roundRect(dialogX + 6, dialogY + 6, dialogWidth - 12, dialogHeight - 12, 9)
+      .stroke({ width: 1, color: 0xffd700, alpha: 0.5 });
+    
+    // Decorative corners
+    this.drawPanelCorners(this.dialogPanel, dialogX, dialogY, dialogWidth, dialogHeight, 0xffd700);
 
-    // Dialog title
+    // Dialog title banner
+    const bannerWidth = dialogWidth - 80;
+    const bannerHeight = 44;
+    const bannerX = dialogX + 40;
+    const bannerY = dialogY + 20;
+    
+    const titleBanner = new Graphics();
+    titleBanner.moveTo(bannerX + 10, bannerY)
+      .lineTo(bannerX, bannerY + bannerHeight / 2)
+      .lineTo(bannerX + 10, bannerY + bannerHeight)
+      .lineTo(bannerX + bannerWidth - 10, bannerY + bannerHeight)
+      .lineTo(bannerX + bannerWidth, bannerY + bannerHeight / 2)
+      .lineTo(bannerX + bannerWidth - 10, bannerY)
+      .lineTo(bannerX + 10, bannerY)
+      .fill({ color: 0x8b4513, alpha: 0.95 })
+      .stroke({ width: 2, color: 0xd4af37 });
+    
+    titleBanner.moveTo(bannerX + 12, bannerY + 2)
+      .lineTo(bannerX + bannerWidth - 12, bannerY + 2)
+      .lineTo(bannerX + bannerWidth - 3, bannerY + bannerHeight / 2)
+      .lineTo(bannerX + bannerWidth - 12, bannerY + bannerHeight - 2)
+      .lineTo(bannerX + 12, bannerY + bannerHeight - 2)
+      .lineTo(bannerX + 3, bannerY + bannerHeight / 2)
+      .lineTo(bannerX + 12, bannerY + 2)
+      .stroke({ width: 1, color: 0xffd700, alpha: 0.6 });
+
     const dialogTitle = new Text({
       text: `🗼 ${this.stage.name}`,
       style: {
         fontFamily: 'Kalam',
-        fontSize: 24,
+        fontSize: 22,
         fontWeight: 'bold',
-        fill: Colors.TEXT_PRIMARY,
+        fill: 0xffffff,
+        stroke: { color: 0x2a1810, width: 2 },
         align: 'center'
       }
     });
-    dialogTitle.anchor.set(0.5, 0);
+    dialogTitle.anchor.set(0.5);
     dialogTitle.x = this.gameWidth / 2;
-    dialogTitle.y = dialogY + 20;
+    dialogTitle.y = bannerY + bannerHeight / 2;
 
     const lineup_power = (this.stage.characters || []).reduce(
       (sum, c) => sum + (c.atk || 0) + (c.def || 0) + (c.hp || 0),
       0
     );
 
-    // Enemy lineup section
+    // Enemy lineup section with parchment panel
+    const enemySectionY = dialogY + 85;
+    const enemySectionHeight = 190;
+    
+    const enemyPanel = new Graphics();
+    enemyPanel.roundRect(dialogX + 15, enemySectionY, dialogWidth - 30, enemySectionHeight, 8)
+      .fill({ color: 0xe8d4b8, alpha: 0.5 })
+      .stroke({ width: 2, color: 0xd4af37, alpha: 0.7 });
+
     const enemyTitle = new Text({
       text: `⚔️ Enemy Lineup ⚡${lineup_power}`,
       style: {
         fontFamily: 'Kalam',
-        fontSize: 18,
+        fontSize: 16,
         fontWeight: 'bold',
-        fill: Colors.TEXT_PRIMARY
+        fill: 0x2a1810,
+        stroke: { color: 0xffd700, width: 0.5 }
       }
     });
-    enemyTitle.x = dialogX + 20;
-    enemyTitle.y = dialogY + 110;
+    enemyTitle.x = dialogX + 25;
+    enemyTitle.y = enemySectionY + 10;
 
     // Create enemy display container
     const enemyContainer = new Container();
-    enemyContainer.x = dialogX + 20;
-    enemyContainer.y = dialogY + 150;
+    enemyContainer.x = dialogX + 25;
+    enemyContainer.y = enemySectionY + 40;
     
-    this.createEnemyLineup(enemyContainer, dialogWidth - 40);
+    this.createEnemyLineup(enemyContainer, dialogWidth - 50);
 
-    // Rewards section
+    // Rewards section with treasure panel
+    const rewardSectionY = dialogY + 290;
+    const rewardSectionHeight = 120;
+    
+    const rewardPanel = new Graphics();
+    
+    // Golden treasure panel
+    rewardPanel.roundRect(dialogX + 15 + 2, rewardSectionY + 2, dialogWidth - 30, rewardSectionHeight, 8)
+      .fill({ color: 0x000000, alpha: 0.3 });
+    
+    rewardPanel.roundRect(dialogX + 15, rewardSectionY, dialogWidth - 30, rewardSectionHeight, 8)
+      .fill({ color: 0xffd700, alpha: 0.25 })
+      .stroke({ width: 2, color: 0xd4af37 });
+    
+    rewardPanel.roundRect(dialogX + 17, rewardSectionY + 2, dialogWidth - 34, rewardSectionHeight - 4, 7)
+      .stroke({ width: 1, color: 0xffd700, alpha: 0.8 });
+
     const rewardTitle = new Text({
-      text: '🏆 Rewards',
+      text: '🏆 Battle Rewards',
       style: {
         fontFamily: 'Kalam',
-        fontSize: 18,
+        fontSize: 16,
         fontWeight: 'bold',
-        fill: Colors.TEXT_PRIMARY
+        fill: 0x2a1810,
+        stroke: { color: 0xffd700, width: 0.5 }
       }
     });
-    rewardTitle.x = dialogX + 20;
-    rewardTitle.y = dialogY + 300;
+    rewardTitle.x = dialogX + 25;
+    rewardTitle.y = rewardSectionY + 10;
 
-    // Locked treasure chest
+    // Treasure chest icon
     const treasureChest = new Text({
       text: this.stage.is_completed ? '🎟️ x1' : '🎟️ x10',
       style: {
         fontFamily: 'Kalam',
-        fontSize: 32,
-        fill: Colors.RARITY_LEGENDARY
+        fontSize: 28,
+        fill: 0x2a1810
       }
     });
-    treasureChest.x = dialogX + 20;
-    treasureChest.y = dialogY + 340;
+    treasureChest.x = dialogX + 30;
+    treasureChest.y = rewardSectionY + 50;
 
     const chestText = new Text({
       text: 'Crystal Ball',
       style: {
         fontFamily: 'Kalam',
         fontSize: 14,
-        fill: Colors.TEXT_SECONDARY,
+        fontWeight: 'bold',
+        fill: 0x2a1810,
         align: 'left',
         wordWrap: true,
-        wordWrapWidth: dialogWidth - 120
+        wordWrapWidth: dialogWidth - 140
       }
     });
-    chestText.x = dialogX + 80;
-    chestText.y = dialogY + 350;
+    chestText.x = dialogX + 95;
+    chestText.y = rewardSectionY + 60;
 
     // Challenge button
-    const challengeButton = this.createButton(
+    const challengeButton = this.createFantasyButton(
       '⚔️ Challenge',
       dialogX + (dialogWidth - 200) / 2,
-      dialogY + dialogHeight - 100,
+      dialogY + dialogHeight - 80,
       200,
       50,
       () => this.startChallenge()
     );
 
-    // Close button
-    const closeButton = this.createButton(
-      '✕ Close',
-      dialogX + dialogWidth - 80,
-      dialogY + 10,
-      60,
-      40,
+    // Close button (X in corner)
+    const closeButton = this.createCloseButton(
+      dialogX + dialogWidth - 45,
+      dialogY + 15,
+      30,
+      30,
       () => this.closeDialog()
     );
 
@@ -144,28 +213,63 @@ export class TowerFloorPopup extends Container {
     this.addChild(
       this.dialogBg,
       this.dialogPanel,
+      titleBanner,
       dialogTitle,
+      enemyPanel,
       enemyTitle,
       enemyContainer,
+      rewardPanel,
       rewardTitle,
       treasureChest,
+      chestText,
       challengeButton,
       closeButton
     );
+  }
+
+  private drawPanelCorners(graphics: Graphics, x: number, y: number, width: number, height: number, color: number): void {
+    const cornerSize = 12;
+    
+    // Top-left
+    graphics.moveTo(x, y + cornerSize)
+      .lineTo(x, y)
+      .lineTo(x + cornerSize, y)
+      .stroke({ width: 2, color: color, alpha: 0.8 });
+    graphics.circle(x + 4, y + 4, 2).fill({ color: color, alpha: 0.9 });
+    
+    // Top-right
+    graphics.moveTo(x + width - cornerSize, y)
+      .lineTo(x + width, y)
+      .lineTo(x + width, y + cornerSize)
+      .stroke({ width: 2, color: color, alpha: 0.8 });
+    graphics.circle(x + width - 4, y + 4, 2).fill({ color: color, alpha: 0.9 });
+    
+    // Bottom-left
+    graphics.moveTo(x, y + height - cornerSize)
+      .lineTo(x, y + height)
+      .lineTo(x + cornerSize, y + height)
+      .stroke({ width: 2, color: color, alpha: 0.8 });
+    graphics.circle(x + 4, y + height - 4, 2).fill({ color: color, alpha: 0.9 });
+    
+    // Bottom-right
+    graphics.moveTo(x + width - cornerSize, y + height)
+      .lineTo(x + width, y + height)
+      .lineTo(x + width, y + height - cornerSize)
+      .stroke({ width: 2, color: color, alpha: 0.8 });
+    graphics.circle(x + width - 4, y + height - 4, 2).fill({ color: color, alpha: 0.9 });
   }
 
   private createEnemyLineup(container: Container, maxWidth: number): void {
     const enemies = this.stage.characters || [];
     
     if (enemies.length === 0) {
-      // Show placeholder enemies if none defined
       const placeholderText = new Text({
         text: '👹 Mysterious Enemies Await...',
         style: {
           fontFamily: 'Kalam',
           fontSize: 16,
           fontStyle: 'italic',
-          fill: Colors.TEXT_TERTIARY
+          fill: 0x8b4513
         }
       });
       container.addChild(placeholderText);
@@ -175,15 +279,14 @@ export class TowerFloorPopup extends Container {
     const enemyWidth = 80;
     const enemyHeight = 100;
     const spacing = 10;
-    const maxEnemiesPerRow = 3; // Force 3 cards per row
+    const maxEnemiesPerRow = 3;
     
     enemies.forEach((enemy: Character, index: number) => {
       const row = Math.floor(index / maxEnemiesPerRow);
       const col = index % maxEnemiesPerRow;
       
       const enemyCard = this.createEnemyCard(enemy, enemyWidth, enemyHeight);
-      // Center the lineup in the available width
-      const totalRowWidth = enemies.length * enemyWidth + (enemies.length - 1) * spacing;
+      const totalRowWidth = Math.min(enemies.length, maxEnemiesPerRow) * enemyWidth + (Math.min(enemies.length, maxEnemiesPerRow) - 1) * spacing;
       const offsetX = Math.max(0, (maxWidth - totalRowWidth) / 2);
 
       enemyCard.x = offsetX + col * (enemyWidth + spacing);
@@ -195,16 +298,24 @@ export class TowerFloorPopup extends Container {
 
   private createEnemyCard(enemy: Character, width: number, height: number): Container {
     const card = new Container();
-    // Background
+    
+    // Dark enemy card
     const bg = new Graphics();
+    
+    bg.roundRect(2, 2, width, height, 8)
+      .fill({ color: 0x000000, alpha: 0.4 });
+    
     bg.roundRect(0, 0, width, height, 8)
-      .fill({ color: Colors.BACKGROUND_SECONDARY, alpha: 0.9 })
-      .stroke({ width: 2, color: Colors.ELEMENT_FIRE });
+      .fill({ color: 0x2a1810, alpha: 0.95 })
+      .stroke({ width: 2, color: 0xc23616 });
+    
+    bg.roundRect(2, 2, width - 4, height - 4, 6)
+      .stroke({ width: 1, color: 0xe74c3c, alpha: 0.5 });
+    
     card.addChild(bg);
 
     (async () => {
       if (enemy.avatar_url && typeof enemy.avatar_url === 'string') {
-        // create async here to load image from URL
         const texture = await Assets.load(enemy.avatar_url as string);
         const sprite = new Sprite(texture);
         sprite.width = 40;
@@ -219,7 +330,7 @@ export class TowerFloorPopup extends Container {
           style: {
             fontFamily: 'Kalam',
             fontSize: 24,
-            fill: Colors.ELEMENT_FIRE
+            fill: 0xe74c3c
           }
         });
         enemyIcon.anchor.set(0.5);
@@ -233,9 +344,9 @@ export class TowerFloorPopup extends Container {
         text: enemy.name,
         style: {
           fontFamily: 'Kalam',
-          fontSize: 14,
+          fontSize: 11,
           fontWeight: 'bold',
-          fill: Colors.TEXT_PRIMARY,
+          fill: 0xffffff,
           align: 'center',
           wordWrap: true,
           wordWrapWidth: width - 10
@@ -243,29 +354,29 @@ export class TowerFloorPopup extends Container {
       });
       nameText.anchor.set(0.5, 0);
       nameText.x = width / 2;
-      nameText.y = 45;
+      nameText.y = 48;
       
-      // Stats: hp, atk, def
+      // Stats
       const statsText = new Text({
-        text: `❤️ ${enemy.hp}\n⚔️ ${enemy.atk}\n🛡️ ${enemy.def}`,
+        text: `❤️${enemy.hp} ⚔️${enemy.atk} 🛡️${enemy.def}`,
         style: {
           fontFamily: 'Kalam',
-          fontSize: 13,
-          fill: Colors.TEXT_SECONDARY,
+          fontSize: 10,
+          fill: 0xe8d4b8,
           align: 'center'
         }
       });
       statsText.anchor.set(0.5);
       statsText.x = width / 2;
-      statsText.y = height - 38;
+      statsText.y = height - 15;
 
-      card.addChild(nameText);
+      card.addChild(nameText, statsText);
     })();
     
     return card;
   }
 
-  private createButton(
+  private createFantasyButton(
     text: string,
     x: number,
     y: number,
@@ -276,17 +387,22 @@ export class TowerFloorPopup extends Container {
     const button = new Container();
     
     const bg = new Graphics();
-    bg.roundRect(0, 0, width, height, 8);
-    bg.fill({ color: Colors.BUTTON_PRIMARY });
-    bg.stroke({ width: 2, color: Colors.BUTTON_BORDER });
+    bg.roundRect(2, 2, width, height, 8)
+      .fill({ color: 0x000000, alpha: 0.5 });
+    bg.roundRect(0, 0, width, height, 8)
+      .fill({ color: 0xc23616, alpha: 0.95 })
+      .stroke({ width: 2, color: 0xffd700 });
+    bg.roundRect(2, 2, width - 4, height - 4, 6)
+      .stroke({ width: 1, color: 0xffd700, alpha: 0.8 });
     
     const buttonText = new Text({
       text,
       style: {
         fontFamily: 'Kalam',
-        fontSize: 16,
+        fontSize: 18,
         fontWeight: 'bold',
-        fill: Colors.TEXT_BUTTON
+        fill: 0xffffff,
+        stroke: { color: 0x2a1810, width: 2 }
       }
     });
     buttonText.anchor.set(0.5);
@@ -301,12 +417,76 @@ export class TowerFloorPopup extends Container {
     button.cursor = 'pointer';
     button.on('pointerdown', onClick);
     
-    // Add hover effect
     button.on('pointerover', () => {
-      bg.tint = Colors.HOVER_TINT;
+      bg.clear();
+      bg.roundRect(2, 2, width, height, 8)
+        .fill({ color: 0x000000, alpha: 0.5 });
+      bg.roundRect(0, 0, width, height, 8)
+        .fill({ color: 0xe74c3c, alpha: 0.95 })
+        .stroke({ width: 2, color: 0xffd700 });
+      bg.roundRect(2, 2, width - 4, height - 4, 6)
+        .stroke({ width: 1, color: 0xffd700, alpha: 1 });
+      button.scale.set(1.03);
     });
+    
     button.on('pointerout', () => {
-      bg.tint = Colors.ACTIVE_WHITE;
+      bg.clear();
+      bg.roundRect(2, 2, width, height, 8)
+        .fill({ color: 0x000000, alpha: 0.5 });
+      bg.roundRect(0, 0, width, height, 8)
+        .fill({ color: 0xc23616, alpha: 0.95 })
+        .stroke({ width: 2, color: 0xffd700 });
+      bg.roundRect(2, 2, width - 4, height - 4, 6)
+        .stroke({ width: 1, color: 0xffd700, alpha: 0.8 });
+      button.scale.set(1.0);
+    });
+    
+    return button;
+  }
+
+  private createCloseButton(
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    onClick: () => void
+  ): Container {
+    const button = new Container();
+    
+    const bg = new Graphics();
+    bg.circle(width / 2, height / 2, width / 2)
+      .fill({ color: 0x8b4513, alpha: 0.95 })
+      .stroke({ width: 2, color: 0xd4af37 });
+    
+    const buttonText = new Text({
+      text: '✕',
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 18,
+        fontWeight: 'bold',
+        fill: 0xffffff
+      }
+    });
+    buttonText.anchor.set(0.5);
+    buttonText.x = width / 2;
+    buttonText.y = height / 2;
+    
+    button.addChild(bg, buttonText);
+    button.x = x;
+    button.y = y;
+    
+    button.interactive = true;
+    button.cursor = 'pointer';
+    button.on('pointerdown', onClick);
+    
+    button.on('pointerover', () => {
+      bg.tint = 0xcccccc;
+      button.scale.set(1.1);
+    });
+    
+    button.on('pointerout', () => {
+      bg.tint = 0xffffff;
+      button.scale.set(1.0);
     });
     
     return button;
@@ -314,18 +494,15 @@ export class TowerFloorPopup extends Container {
 
   private async startChallenge(): Promise<void> {
     try {
-      // Close popup and navigate to battle
       this.closeDialog();
       console.log('Entering tower floor:', this.stage.name);
       
-      // Navigate to PrepareScene to review deck before tower battle
       navigation.showScreen(PrepareScene, {
         stage: this.stage,
-        mode: 'tower' // Indicate this is tower mode
+        mode: 'tower'
       });
     } catch (error) {
       console.error('Failed to enter tower floor:', error);
-      // Fallback to direct battle navigation
       alert(`Error entering tower floor: ${error}. Starting battle anyway...`);
       navigation.showScreen(CardBattleScene, { stage: this.stage, mode: 'tower' });
     }
@@ -338,7 +515,6 @@ export class TowerFloorPopup extends Container {
   resize(width: number, height: number): void {
     this.gameWidth = width;
     this.gameHeight = height;
-    // Recreate dialog with new dimensions
     this.removeChildren();
     this.createDialog();
   }

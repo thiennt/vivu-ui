@@ -34,36 +34,70 @@ export class EquipmentChangePopup extends Container {
   }
 
   private createDialog(): void {
-    // Create semi-transparent background
+    // Dark overlay
     this.dialogBg = new Graphics();
     this.dialogBg.rect(0, 0, this.gameWidth, this.gameHeight)
-      .fill({ color: Colors.OVERLAY_DARK, alpha: 0.7 });
+      .fill({ color: 0x000000, alpha: 0.85 });
     
     const dialogWidth = Math.min(500, this.gameWidth - 40);
-    const dialogHeight = 400;
+    const dialogHeight = 500;
     const dialogX = (this.gameWidth - dialogWidth) / 2;
     const dialogY = (this.gameHeight - dialogHeight) / 2;
     
-    // Create dialog panel
+    // Fantasy parchment panel
     this.dialogPanel = new Graphics();
+    
+    // Shadow
+    this.dialogPanel.roundRect(dialogX + 4, dialogY + 4, dialogWidth, dialogHeight, 12)
+      .fill({ color: 0x000000, alpha: 0.6 });
+    
+    // Main parchment
     this.dialogPanel.roundRect(dialogX, dialogY, dialogWidth, dialogHeight, 12)
-      .fill({ color: Colors.PANEL_BACKGROUND })
-      .stroke({ width: 3, color: Colors.BUTTON_PRIMARY });
+      .fill({ color: 0xf5e6d3, alpha: 0.98 })
+      .stroke({ width: 3, color: 0xd4af37 });
+    
+    // Inner layer
+    this.dialogPanel.roundRect(dialogX + 4, dialogY + 4, dialogWidth - 8, dialogHeight - 8, 10)
+      .fill({ color: 0xe8d4b8, alpha: 0.6 });
+    
+    // Golden highlight
+    this.dialogPanel.roundRect(dialogX + 6, dialogY + 6, dialogWidth - 12, dialogHeight - 12, 9)
+      .stroke({ width: 1, color: 0xffd700, alpha: 0.5 });
+    
+    // Decorative corners
+    this.drawPanelCorners(this.dialogPanel, dialogX, dialogY, dialogWidth, dialogHeight, 0xffd700);
 
-    // Dialog title
+    // Title banner
+    const bannerWidth = dialogWidth - 80;
+    const bannerHeight = 40;
+    const bannerX = dialogX + 40;
+    const bannerY = dialogY + 20;
+    
+    const titleBanner = new Graphics();
+    titleBanner.moveTo(bannerX + 10, bannerY)
+      .lineTo(bannerX, bannerY + bannerHeight / 2)
+      .lineTo(bannerX + 10, bannerY + bannerHeight)
+      .lineTo(bannerX + bannerWidth - 10, bannerY + bannerHeight)
+      .lineTo(bannerX + bannerWidth, bannerY + bannerHeight / 2)
+      .lineTo(bannerX + bannerWidth - 10, bannerY)
+      .lineTo(bannerX + 10, bannerY)
+      .fill({ color: 0x8b4513, alpha: 0.95 })
+      .stroke({ width: 2, color: 0xd4af37 });
+
     const dialogTitle = new Text({
-      text: `Change ${this.slotName}`,
+      text: `⚔️ Change ${this.slotName}`,
       style: {
         fontFamily: 'Kalam',
-        fontSize: 20,
+        fontSize: 18,
         fontWeight: 'bold',
-        fill: Colors.TEXT_PRIMARY,
+        fill: 0xffffff,
+        stroke: { color: 0x2a1810, width: 2 },
         align: 'center'
       }
     });
-    dialogTitle.anchor.set(0.5, 0);
+    dialogTitle.anchor.set(0.5);
     dialogTitle.x = this.gameWidth / 2;
-    dialogTitle.y = dialogY + 20;
+    dialogTitle.y = bannerY + bannerHeight / 2;
 
     // Current equipment
     const currentText = new Text({
@@ -71,28 +105,42 @@ export class EquipmentChangePopup extends Container {
       style: {
         fontFamily: 'Kalam',
         fontSize: 14,
-        fill: Colors.TEXT_SECONDARY,
+        fill: 0x8b4513,
         align: 'center'
       }
     });
     currentText.anchor.set(0.5, 0);
     currentText.x = this.gameWidth / 2;
-    currentText.y = dialogY + 55;
+    currentText.y = dialogY + 75;
 
     // Available equipment options
     const availableEquipment = this.getAvailableEquipment(this.equipmentType);
-    let optionY = dialogY + 90;
+    let optionY = dialogY + 105;
 
     const equipmentOptions: Container[] = [];
 
     availableEquipment.forEach((equipment) => {
       const optionContainer = new Container();
       
-      const optionBg = new Graphics();
       const isCurrentItem = equipment.name === this.currentItem;
-      optionBg.roundRect(0, 0, dialogWidth - 40, 40, 6)
-        .fill({ color: isCurrentItem ? Colors.BUTTON_PRIMARY : Colors.CONTAINER_BACKGROUND, alpha: 0.8 })
-        .stroke({ width: 1, color: Colors.BUTTON_BORDER });
+      
+      // Equipment option card
+      const optionBg = new Graphics();
+      
+      if (isCurrentItem) {
+        // Highlight current item
+        optionBg.roundRect(0, 0, dialogWidth - 40, 55, 6)
+          .fill({ color: 0xffd700, alpha: 0.3 })
+          .stroke({ width: 2, color: 0xd4af37 });
+        
+        optionBg.roundRect(2, 2, dialogWidth - 44, 51, 5)
+          .stroke({ width: 1, color: 0xffd700, alpha: 0.6 });
+      } else {
+        // Regular equipment card
+        optionBg.roundRect(0, 0, dialogWidth - 40, 55, 6)
+          .fill({ color: 0xe8d4b8, alpha: 0.5 })
+          .stroke({ width: 2, color: 0xd4af37, alpha: 0.5 });
+      }
       
       const equipmentName = new Text({
         text: equipment.name,
@@ -100,24 +148,25 @@ export class EquipmentChangePopup extends Container {
           fontFamily: 'Kalam',
           fontSize: 14,
           fontWeight: 'bold',
-          fill: isCurrentItem ? Colors.TEXT_BUTTON : Colors.TEXT_PRIMARY
+          fill: isCurrentItem ? 0x2a1810 : 0x3d2817,
+          stroke: isCurrentItem ? { color: 0xffd700, width: 0.5 } : undefined
         }
       });
       equipmentName.x = 10;
-      equipmentName.y = 5;
+      equipmentName.y = 8;
       
       const equipmentDescription = new Text({
         text: equipment.description,
         style: {
           fontFamily: 'Kalam',
-          fontSize: 12,
-          fill: isCurrentItem ? Colors.TEXT_BUTTON : Colors.TEXT_SECONDARY,
+          fontSize: 11,
+          fill: 0x5d4b37,
           wordWrap: true,
           wordWrapWidth: dialogWidth - 60
         }
       });
       equipmentDescription.x = 10;
-      equipmentDescription.y = 20;
+      equipmentDescription.y = 28;
       
       optionContainer.addChild(optionBg, equipmentName, equipmentDescription);
       optionContainer.x = dialogX + 20;
@@ -132,28 +181,34 @@ export class EquipmentChangePopup extends Container {
           navigation.dismissPopup();
         });
         
-        // Add hover effect
         optionContainer.on('pointerover', () => {
-          optionBg.tint = Colors.HOVER_LIGHT;
+          optionBg.clear();
+          optionBg.roundRect(0, 0, dialogWidth - 40, 55, 6)
+            .fill({ color: 0xffd700, alpha: 0.4 })
+            .stroke({ width: 2, color: 0xd4af37 });
+          optionBg.roundRect(2, 2, dialogWidth - 44, 51, 5)
+            .stroke({ width: 1, color: 0xffd700, alpha: 0.8 });
         });
+        
         optionContainer.on('pointerout', () => {
-          optionBg.tint = Colors.ACTIVE_WHITE;
+          optionBg.clear();
+          optionBg.roundRect(0, 0, dialogWidth - 40, 55, 6)
+            .fill({ color: 0xe8d4b8, alpha: 0.5 })
+            .stroke({ width: 2, color: 0xd4af37, alpha: 0.5 });
         });
       }
       
       equipmentOptions.push(optionContainer);
-      optionY += 50;
+      optionY += 60;
     });
 
-    const closeButton = this.createButton(
+    const closeButton = this.createFantasyButton(
       'Close',
-      dialogX + (dialogWidth - 100) / 2,
+      dialogX + (dialogWidth - 120) / 2,
       dialogY + dialogHeight - 60,
-      100,
+      120,
       40,
-      () => {
-        navigation.dismissPopup();
-      }
+      () => navigation.dismissPopup()
     );
 
     // Make background clickable to close
@@ -162,10 +217,38 @@ export class EquipmentChangePopup extends Container {
       navigation.dismissPopup();
     });
     
-    this.addChild(this.dialogBg, this.dialogPanel, dialogTitle, currentText, ...equipmentOptions, closeButton);
+    this.addChild(this.dialogBg, this.dialogPanel, titleBanner, dialogTitle, currentText, ...equipmentOptions, closeButton);
   }
 
-  private createButton(
+  private drawPanelCorners(graphics: Graphics, x: number, y: number, width: number, height: number, color: number): void {
+    const cornerSize = 12;
+    
+    graphics.moveTo(x, y + cornerSize)
+      .lineTo(x, y)
+      .lineTo(x + cornerSize, y)
+      .stroke({ width: 2, color: color, alpha: 0.8 });
+    graphics.circle(x + 4, y + 4, 2).fill({ color: color, alpha: 0.9 });
+    
+    graphics.moveTo(x + width - cornerSize, y)
+      .lineTo(x + width, y)
+      .lineTo(x + width, y + cornerSize)
+      .stroke({ width: 2, color: color, alpha: 0.8 });
+    graphics.circle(x + width - 4, y + 4, 2).fill({ color: color, alpha: 0.9 });
+    
+    graphics.moveTo(x, y + height - cornerSize)
+      .lineTo(x, y + height)
+      .lineTo(x + cornerSize, y + height)
+      .stroke({ width: 2, color: color, alpha: 0.8 });
+    graphics.circle(x + 4, y + height - 4, 2).fill({ color: color, alpha: 0.9 });
+    
+    graphics.moveTo(x + width - cornerSize, y + height)
+      .lineTo(x + width, y + height)
+      .lineTo(x + width, y + height - cornerSize)
+      .stroke({ width: 2, color: color, alpha: 0.8 });
+    graphics.circle(x + width - 4, y + height - 4, 2).fill({ color: color, alpha: 0.9 });
+  }
+
+  private createFantasyButton(
     text: string,
     x: number,
     y: number,
@@ -176,9 +259,13 @@ export class EquipmentChangePopup extends Container {
     const button = new Container();
     
     const bg = new Graphics();
-    bg.roundRect(0, 0, width, height, 5);
-    bg.fill({ color: Colors.BUTTON_PRIMARY });
-    bg.stroke({ width: 2, color: Colors.BUTTON_BORDER });
+    bg.roundRect(2, 2, width, height, 8)
+      .fill({ color: 0x000000, alpha: 0.4 });
+    bg.roundRect(0, 0, width, height, 8)
+      .fill({ color: 0x8b4513, alpha: 0.95 })
+      .stroke({ width: 2, color: 0xd4af37 });
+    bg.roundRect(2, 2, width - 4, height - 4, 6)
+      .stroke({ width: 1, color: 0xffd700, alpha: 0.6 });
     
     const buttonText = new Text({
       text,
@@ -186,7 +273,8 @@ export class EquipmentChangePopup extends Container {
         fontFamily: 'Kalam',
         fontSize: 14,
         fontWeight: 'bold',
-        fill: Colors.TEXT_BUTTON
+        fill: 0xffffff,
+        stroke: { color: 0x2a1810, width: 2 }
       }
     });
     buttonText.anchor.set(0.5);
@@ -201,19 +289,34 @@ export class EquipmentChangePopup extends Container {
     button.cursor = 'pointer';
     button.on('pointerdown', onClick);
     
-    // Add hover effect
     button.on('pointerover', () => {
-      bg.tint = Colors.HOVER_TINT;
+      bg.clear();
+      bg.roundRect(2, 2, width, height, 8)
+        .fill({ color: 0x000000, alpha: 0.4 });
+      bg.roundRect(0, 0, width, height, 8)
+        .fill({ color: 0xa0632a, alpha: 0.95 })
+        .stroke({ width: 2, color: 0xffd700 });
+      bg.roundRect(2, 2, width - 4, height - 4, 6)
+        .stroke({ width: 1, color: 0xffd700, alpha: 0.9 });
+      button.scale.set(1.02);
     });
+    
     button.on('pointerout', () => {
-      bg.tint = Colors.ACTIVE_WHITE;
+      bg.clear();
+      bg.roundRect(2, 2, width, height, 8)
+        .fill({ color: 0x000000, alpha: 0.4 });
+      bg.roundRect(0, 0, width, height, 8)
+        .fill({ color: 0x8b4513, alpha: 0.95 })
+        .stroke({ width: 2, color: 0xd4af37 });
+      bg.roundRect(2, 2, width - 4, height - 4, 6)
+        .stroke({ width: 1, color: 0xffd700, alpha: 0.6 });
+      button.scale.set(1.0);
     });
     
     return button;
   }
 
   private getAvailableEquipment(equipmentType: string): Array<{name: string, description: string}> {
-    // Mock available equipment data - this could be fetched from API later
     const equipmentData: Record<string, Array<{name: string, description: string}>> = {
       weapon: [
         { name: 'Sword', description: '+10 Attack. Balanced weapon for versatile combat.' },
@@ -245,7 +348,6 @@ export class EquipmentChangePopup extends Container {
   resize(width: number, height: number): void {
     this.gameWidth = width;
     this.gameHeight = height;
-    // Recreate dialog with new dimensions
     this.removeChildren();
     this.createDialog();
   }

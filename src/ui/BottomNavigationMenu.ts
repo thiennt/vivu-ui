@@ -14,16 +14,25 @@ export class BottomNavigationMenu extends Container {
   }
 
   private createBottomMenu(): void {
-    // Background for the bottom menu with orange gradient
+    // Fantasy wooden bar background
     const menuBg = new Graphics();
-    const panelGradient = Colors.PANEL_BACKGROUND;
+    
+    // Shadow at top
+    menuBg.rect(0, 0, this.gameWidth, 2)
+      .fill({ color: 0x000000, alpha: 0.5 });
+    
+    // Main wooden bar
     menuBg.rect(0, 0, this.gameWidth, this.menuHeight)
-      .fill(panelGradient)
-      .stroke({ width: 3, color: Colors.BUTTON_BORDER }); // Orange theme border
+      .fill({ color: 0x5d4037, alpha: 0.98 })
+      .stroke({ width: 2, color: 0x8b6914, alpha: 0.9 });
+    
+    // Top golden border
+    menuBg.rect(0, 0, this.gameWidth, 3)
+      .fill({ color: 0xd4af37, alpha: 0.7 });
 
     this.addChild(menuBg);
 
-    // Menu items
+    // Menu items with fantasy icons
     const menuItems = [
       { text: '🏠', label: 'Home', action: 'home' },
       { text: '👤', label: 'Player', action: 'player' },
@@ -34,7 +43,7 @@ export class BottomNavigationMenu extends Container {
     const itemWidth = this.gameWidth / menuItems.length;
 
     menuItems.forEach((item, index) => {
-      const menuItem = this.createMenuItem(
+      const menuItem = this.createFantasyMenuItem(
         item.text,
         item.label,
         index * itemWidth,
@@ -48,7 +57,7 @@ export class BottomNavigationMenu extends Container {
 
     // Position at bottom of screen
     this.y = this.gameHeight - this.menuHeight;
-    this.zIndex = 9999; // Even higher z-index
+    this.zIndex = 9999;
   }
 
   private handleNavigation(action: string): void {
@@ -85,7 +94,7 @@ export class BottomNavigationMenu extends Container {
     }
   }
 
-  private createMenuItem(
+  private createFantasyMenuItem(
     icon: string,
     label: string,
     x: number,
@@ -99,34 +108,42 @@ export class BottomNavigationMenu extends Container {
     // Item background (for hover effect)
     const itemBg = new Graphics();
     itemBg.rect(0, 0, width, height)
-      .fill({ color: Colors.TRANSPARENT, alpha: 0 }); // Transparent by default
+      .fill({ color: 0x000000, alpha: 0 });
 
-    // Icon
+    // Icon with glow
     const iconText = new Text({
       text: icon,
       style: {
         fontFamily: 'Arial',
-        fontSize: 24,
-        align: 'center'
+        fontSize: 26,
+        align: 'center',
+        dropShadow: {
+          color: 0xffd700,
+          blur: 3,
+          angle: 0,
+          distance: 0,
+          alpha: 0.5
+        }
       }
     });
     iconText.anchor.set(0.5);
     iconText.x = width / 2;
     iconText.y = height / 2 - 8;
 
-    // Label
+    // Label with fantasy style
     const labelText = new Text({
       text: label,
       style: {
         fontFamily: 'Kalam',
         fontSize: 10,
-        fill: Colors.TEXT_SECONDARY,
-        align: 'center'
+        fill: 0xf0e6d3,
+        align: 'center',
+        stroke: { color: 0x2a1810, width: 1 }
       }
     });
     labelText.anchor.set(0.5);
     labelText.x = width / 2;
-    labelText.y = height - 12;
+    labelText.y = height - 10;
 
     item.addChild(itemBg, iconText, labelText);
     item.x = x;
@@ -134,17 +151,19 @@ export class BottomNavigationMenu extends Container {
     item.interactive = true;
     item.cursor = 'pointer';
 
-    // Hover effects
+    // Hover effects - golden highlight
     item.on('pointerover', () => {
       itemBg.clear();
       itemBg.rect(0, 0, width, height)
-        .fill({ color: Colors.BUTTON_HOVER, alpha: 0.3 });
+        .fill({ color: 0xffd700, alpha: 0.2 });
+      iconText.scale.set(1.1);
     });
 
     item.on('pointerout', () => {
       itemBg.clear();
       itemBg.rect(0, 0, width, height)
-        .fill({ color: Colors.TRANSPARENT, alpha: 0 });
+        .fill({ color: 0x000000, alpha: 0 });
+      iconText.scale.set(1.0);
     });
 
     item.on('pointerdown', onClick);

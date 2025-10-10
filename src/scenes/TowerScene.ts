@@ -57,7 +57,7 @@ export class TowerScene extends BaseScene {
       if (response.errors) {
         response.errors.forEach((error: any) => console.error(`   Error: ${error}`));
       }
-      this.stages = []; // Use empty array as fallback
+      this.stages = [];
     }
     
     this.loadingManager.hideLoading();
@@ -107,93 +107,115 @@ export class TowerScene extends BaseScene {
   }
 
   private createBackground(): void {
-    // Create a mystical tower-themed background
     const bgContainer = new Container();
-    
     const availableHeight = this.getContentHeight();
     
-    // Dark tower background with purple/blue gradient
+    // Dark tower background
     const bg = new Graphics();
-    const towerGradient = Colors.BACKGROUND_PRIMARY;
-    bg.fill(towerGradient).rect(0, 0, this.gameWidth, availableHeight);
+    bg.rect(0, 0, this.gameWidth, availableHeight)
+      .fill({ color: 0x0f0a1a, alpha: 1.0 });
+    
+    // Purple mystical overlay
+    bg.rect(0, 0, this.gameWidth, availableHeight)
+      .fill({ color: 0x1a0f2e, alpha: 0.4 });
+    
     bgContainer.addChild(bg);
     
-    // Add tower-themed decorative elements
-    for (let i = 0; i < 20; i++) {
-      const star = new Graphics();
-      star.fill({ color: Colors.DECORATION_MAGIC, alpha: 0.2 + Math.random() * 0.4 })
-        .circle(0, 0, 1 + Math.random() * 3);
-      star.x = Math.random() * this.gameWidth;
-      star.y = Math.random() * availableHeight;
-      bgContainer.addChild(star);
+    // Mystical floating particles
+    for (let i = 0; i < 25; i++) {
+      const particle = new Graphics();
+      const size = 1 + Math.random() * 2;
+      particle.circle(0, 0, size)
+        .fill({ color: 0x9b59b6, alpha: 0.3 + Math.random() * 0.4 });
+      particle.x = Math.random() * this.gameWidth;
+      particle.y = Math.random() * availableHeight;
+      bgContainer.addChild(particle);
     }
     
     this.backgroundContainer.addChild(bgContainer);
   }
 
   private createHeader(): void {
+    // Fantasy banner
+    const bannerWidth = Math.min(320, this.gameWidth - 40);
+    const bannerHeight = 50;
+    const bannerX = (this.gameWidth - bannerWidth) / 2;
+    const bannerY = 15;
+    
+    const banner = new Graphics();
+    banner.moveTo(bannerX + 12, bannerY)
+      .lineTo(bannerX, bannerY + bannerHeight / 2)
+      .lineTo(bannerX + 12, bannerY + bannerHeight)
+      .lineTo(bannerX + bannerWidth - 12, bannerY + bannerHeight)
+      .lineTo(bannerX + bannerWidth, bannerY + bannerHeight / 2)
+      .lineTo(bannerX + bannerWidth - 12, bannerY)
+      .lineTo(bannerX + 12, bannerY)
+      .fill({ color: 0x4a2f5f, alpha: 0.95 })
+      .stroke({ width: 2.5, color: 0x9b59b6 });
+    
+    banner.moveTo(bannerX + 15, bannerY + 3)
+      .lineTo(bannerX + bannerWidth - 15, bannerY + 3)
+      .lineTo(bannerX + bannerWidth - 4, bannerY + bannerHeight / 2)
+      .lineTo(bannerX + bannerWidth - 15, bannerY + bannerHeight - 3)
+      .lineTo(bannerX + 15, bannerY + bannerHeight - 3)
+      .lineTo(bannerX + 4, bannerY + bannerHeight / 2)
+      .lineTo(bannerX + 15, bannerY + 3)
+      .stroke({ width: 1, color: 0xb57edc, alpha: 0.6 });
+    
     const title = new Text({
-      text: '🗼 Battle Tower',
+      text: '🗼 Battle Tower 🗼',
       style: {
         fontFamily: 'Kalam',
-        fontSize: 32,
+        fontSize: 26,
         fontWeight: 'bold',
-        fill: Colors.TEXT_PRIMARY,
-        stroke: {
-          color: Colors.BACKGROUND_SECONDARY,
-          width: 2,
-        },
+        fill: 0xffffff,
+        stroke: { color: 0x1a0f2e, width: 2 },
         dropShadow: {
-          color: Colors.SHADOW_COLOR,
+          color: 0x9b59b6,
           blur: 4,
-          angle: Math.PI / 6,
-          distance: 4,
-          alpha: 0.5,
-        },
+          angle: Math.PI / 4,
+          distance: 2,
+          alpha: 0.7
+        }
       }
     });
     title.anchor.set(0.5);
     title.x = this.gameWidth / 2;
-    title.y = 40;
+    title.y = bannerY + bannerHeight / 2;
     
-    this.headerContainer.addChild(title);
+    this.headerContainer.addChild(banner, title);
   }
 
   private createTowerList(): void {
     this.towerContainer.label = 'towerContainer';
     
     const stages = this.stages;
-    // Calculate responsive tower layout with updated card dimensions
-    const cardWidth = Math.min(200, this.gameWidth - 60); // Updated to match new card width
+    const cardWidth = Math.min(200, this.gameWidth - 60);
     const cardHeight = 120;
-    const floorSpacing = 50; // Space between tower floors
+    const floorSpacing = 50;
     
-    let firstFloorY = 0; // To track the Y position of the first floor for scrolling
+    let firstFloorY = 0;
     
     if (stages.length > 0) {  
-      // Calculate total tower height and starting position
       const totalHeight = stages.length * cardHeight + (stages.length - 1) * floorSpacing;
-      const availableHeight = this.gameHeight - 220; // Leave space for header and back button
+      const availableHeight = this.gameHeight - 220;
       const startY = Math.max(20, (availableHeight - totalHeight) / 2);
 
       stages.forEach((stage, index) => {
         const floorCard = this.createFloorCard(stage, index);
         
-        // Position cards vertically - bottom to top (like climbing a tower)
-        // Reverse the order so first stage (floor 1) is at the bottom
         const reverseIndex = stages.length - 1 - index;
-        floorCard.x = 0; // Centered horizontally
+        floorCard.x = 0;
         floorCard.y = startY + reverseIndex * (cardHeight + floorSpacing);
         
-        // Set firstFloorY to the first (bottom-most) not completed stage only once
         if (stage.is_current) {
           firstFloorY = floorCard.y;
         }
 
-        // Add tower floor connecting line
+        // Tower connection line
         if (index < stages.length) {
           const connectionLine = this.createTowerConnection(cardWidth, cardHeight);
-          connectionLine.x = cardWidth / 2 - 2; // Center the line
+          connectionLine.x = cardWidth / 2 - 2;
           connectionLine.y = floorCard.y + cardHeight;
           this.towerContainer.addChild(connectionLine);
         }
@@ -202,23 +224,21 @@ export class TowerScene extends BaseScene {
       });
     }
 
-    const scrollBoxWidth = cardWidth + 40; // Add some padding
+    const scrollBoxWidth = cardWidth + 40;
     const scrollBoxHeight = this.gameHeight - 180;
 
     this.towerContainer.width = scrollBoxWidth;
 
-    // Create ScrollBox for vertical scrolling
     const scrollBox = new ScrollBox({
       width: scrollBoxWidth,
       height: scrollBoxHeight
     });
     scrollBox.x = (this.gameWidth - scrollBoxWidth) / 2;
-    scrollBox.y = 60;
+    scrollBox.y = 80;
 
     const maxScrollY = Math.max(this.towerContainer.height - scrollBoxHeight, 0);
     const targetY = Math.min(Math.max(firstFloorY - (scrollBoxHeight - cardHeight), 0), maxScrollY);
 
-    // scroll to the first uncompleted floor, ensuring we don't exceed scroll bounds
     scrollBox.scrollToPosition({ x: 0, y: targetY });
     scrollBox.addItem(this.towerContainer);
 
@@ -228,25 +248,25 @@ export class TowerScene extends BaseScene {
   private createTowerConnection(cardWidth: number, cardHeight: number): Container {
     const connection = new Container();
     
-    // Vertical connecting line with tower theme
+    // Mystical purple connection line
     const line = new Graphics();
     line.moveTo(0, 0)
-        .lineTo(0, 50) // Height of the floor spacing
-        .stroke({ width: 6, color: Colors.BUTTON_PRIMARY, alpha: 0.7 });
+        .lineTo(0, 50)
+        .stroke({ width: 6, color: 0x9b59b6, alpha: 0.7 });
     
-    // Decorative tower nodes at top and bottom
+    // Glowing nodes
     const topNode = new Graphics();
-    topNode.circle(0, 0, 4)
-           .fill({ color: Colors.BUTTON_PRIMARY, alpha: 0.9 });
+    topNode.circle(0, 0, 5)
+           .fill({ color: 0xb57edc, alpha: 0.95 });
     
     const bottomNode = new Graphics();
-    bottomNode.circle(0, 50, 4)
-              .fill({ color: Colors.BUTTON_PRIMARY, alpha: 0.9 });
+    bottomNode.circle(0, 50, 5)
+              .fill({ color: 0xb57edc, alpha: 0.95 });
     
-    // Add mystical energy effect
+    // Energy pulse effect
     const energy = new Graphics();
-    energy.circle(0, 25, 6)
-          .fill({ color: Colors.DECORATION_MAGIC, alpha: 0.3 });
+    energy.circle(0, 25, 8)
+          .fill({ color: 0x9b59b6, alpha: 0.4 });
     
     connection.addChild(line, topNode, bottomNode, energy);
     return connection;
@@ -255,43 +275,77 @@ export class TowerScene extends BaseScene {
   private createFloorCard(stage: Stage, index: number): Container {
     const card = new Container();
     
-    // Simplified dimensions for tower layout - smaller cards with just floor number and icon
     const cardWidth = Math.min(200, this.gameWidth - 60);
     const cardHeight = 120;
 
-    // Choose color based on completion
-    const bgColor = stage.is_completed ? Colors.ELEMENT_DEFAULT : Colors.BACKGROUND_SECONDARY;
-
-    // Background with tower floor styling
-    const bg = new Graphics();
-    bg.roundRect(0, 0, cardWidth, cardHeight, 12)
-      .fill({ color: bgColor, alpha: 0.95 })
-      .stroke({ width: 4, color: Colors.BUTTON_PRIMARY });
+    const isAccessible = stage.is_completed || stage.is_current;
     
-    // Floor number at the top
+    // Fantasy floor card styling
+    const bg = new Graphics();
+    
+    // Shadow
+    bg.roundRect(3, 3, cardWidth, cardHeight, 10)
+      .fill({ color: 0x000000, alpha: 0.5 });
+    
+    if (isAccessible) {
+      // Accessible floor - mystical purple parchment
+      bg.roundRect(0, 0, cardWidth, cardHeight, 10)
+        .fill({ color: 0xf5e6f3, alpha: 0.98 })
+        .stroke({ width: 3, color: 0x9b59b6 });
+      
+      bg.roundRect(3, 3, cardWidth - 6, cardHeight - 6, 8)
+        .fill({ color: 0xe8d4e8, alpha: 0.6 });
+      
+      bg.roundRect(5, 5, cardWidth - 10, cardHeight - 10, 7)
+        .stroke({ width: 1, color: 0xb57edc, alpha: 0.5 });
+    } else {
+      // Locked floor - dark stone
+      bg.roundRect(0, 0, cardWidth, cardHeight, 10)
+        .fill({ color: 0x2a2a2a, alpha: 0.95 })
+        .stroke({ width: 3, color: 0x4a4a4a });
+      
+      bg.roundRect(3, 3, cardWidth - 6, cardHeight - 6, 8)
+        .fill({ color: 0x1a1a1a, alpha: 0.8 });
+    }
+    
+    // Decorative corners
+    this.drawFloorCorners(bg, 0, 0, cardWidth, cardHeight, isAccessible ? 0xb57edc : 0x666666);
+    
+    // Floor number
     const floorNumber = new Text({
       text: stage.name,
       style: {
         fontFamily: 'Kalam',
         fontSize: 16,
         fontWeight: 'bold',
-        fill: Colors.TEXT_PRIMARY,
-        align: 'center'
+        fill: isAccessible ? 0x4a2f5f : 0x666666,
+        align: 'center',
+        stroke: isAccessible ? { color: 0xb57edc, width: 0.5 } : undefined
       }
     });
     floorNumber.anchor.set(0.5, 0);
     floorNumber.x = cardWidth / 2;
     floorNumber.y = 15;
     
-    // Tower icon: locked if not completed and not current
+    // Icon
     let towerIcon: Text;
-    if (!stage.is_completed && !stage.is_current) {
+    if (!isAccessible) {
       towerIcon = new Text({
         text: '🔒',
         style: {
           fontFamily: 'Kalam',
           fontSize: 48,
-          fill: Colors.BUTTON_PRIMARY
+          fill: 0x666666
+        }
+      });
+    } else if (stage.is_completed) {
+      towerIcon = new Text({
+        text: '✓',
+        style: {
+          fontFamily: 'Kalam',
+          fontSize: 48,
+          fill: 0x26de81,
+          stroke: { color: 0x1a9e5a, width: 2 }
         }
       });
     } else {
@@ -300,7 +354,7 @@ export class TowerScene extends BaseScene {
         style: {
           fontFamily: 'Kalam',
           fontSize: 48,
-          fill: Colors.BUTTON_PRIMARY
+          fill: 0x9b59b6
         }
       });
     }
@@ -310,20 +364,40 @@ export class TowerScene extends BaseScene {
     
     card.addChild(bg, floorNumber, towerIcon);
     
-    // Only allow click/hover for completed or current stage
-    const isClickable = stage.is_completed || stage.is_current;
-    card.interactive = isClickable;
-    card.cursor = isClickable ? 'pointer' : 'not-allowed';
+    card.interactive = isAccessible;
+    card.cursor = isAccessible ? 'pointer' : 'not-allowed';
 
-    if (isClickable) {
+    if (isAccessible) {
       card.on('pointerover', () => {
-        bg.tint = Colors.HOVER_BLUE;
+        bg.clear();
+        bg.roundRect(3, 3, cardWidth, cardHeight, 10)
+          .fill({ color: 0x000000, alpha: 0.5 });
+        bg.roundRect(0, 0, cardWidth, cardHeight, 10)
+          .fill({ color: 0xf5e6f3, alpha: 1.0 })
+          .stroke({ width: 3, color: 0xb57edc });
+        bg.roundRect(3, 3, cardWidth - 6, cardHeight - 6, 8)
+          .fill({ color: 0xe8d4e8, alpha: 0.8 });
+        bg.roundRect(5, 5, cardWidth - 10, cardHeight - 10, 7)
+          .stroke({ width: 1, color: 0xb57edc, alpha: 0.8 });
+        this.drawFloorCorners(bg, 0, 0, cardWidth, cardHeight, 0xb57edc);
         towerIcon.scale.set(1.1);
       });
+      
       card.on('pointerout', () => {
-        bg.tint = Colors.ACTIVE_WHITE;
+        bg.clear();
+        bg.roundRect(3, 3, cardWidth, cardHeight, 10)
+          .fill({ color: 0x000000, alpha: 0.5 });
+        bg.roundRect(0, 0, cardWidth, cardHeight, 10)
+          .fill({ color: 0xf5e6f3, alpha: 0.98 })
+          .stroke({ width: 3, color: 0x9b59b6 });
+        bg.roundRect(3, 3, cardWidth - 6, cardHeight - 6, 8)
+          .fill({ color: 0xe8d4e8, alpha: 0.6 });
+        bg.roundRect(5, 5, cardWidth - 10, cardHeight - 10, 7)
+          .stroke({ width: 1, color: 0xb57edc, alpha: 0.5 });
+        this.drawFloorCorners(bg, 0, 0, cardWidth, cardHeight, 0xb57edc);
         towerIcon.scale.set(1.0);
       });
+      
       card.on('pointerdown', () => {
         this.showFloorPopup(stage);
       });
@@ -332,21 +406,111 @@ export class TowerScene extends BaseScene {
     return card;
   }
 
-  private createBackButton(): void {
-    // Responsive button sizing
-    const buttonWidth = Math.min(180, this.gameWidth - 2 * this.STANDARD_PADDING);
-    const buttonHeight = Math.max(40, Math.min(50, this.gameHeight * 0.07));
+  private drawFloorCorners(graphics: Graphics, x: number, y: number, width: number, height: number, color: number): void {
+    const cornerSize = 10;
     
-    const backButton = this.createButton(
+    graphics.moveTo(x, y + cornerSize)
+      .lineTo(x, y)
+      .lineTo(x + cornerSize, y)
+      .stroke({ width: 2, color: color, alpha: 0.8 });
+    
+    graphics.moveTo(x + width - cornerSize, y)
+      .lineTo(x + width, y)
+      .lineTo(x + width, y + cornerSize)
+      .stroke({ width: 2, color: color, alpha: 0.8 });
+    
+    graphics.moveTo(x, y + height - cornerSize)
+      .lineTo(x, y + height)
+      .lineTo(x + cornerSize, y + height)
+      .stroke({ width: 2, color: color, alpha: 0.8 });
+    
+    graphics.moveTo(x + width - cornerSize, y + height)
+      .lineTo(x + width, y + height)
+      .lineTo(x + width, y + height - cornerSize)
+      .stroke({ width: 2, color: color, alpha: 0.8 });
+  }
+
+  private createBackButton(): void {
+    const buttonWidth = Math.min(160, this.gameWidth - 2 * this.STANDARD_PADDING);
+    const buttonHeight = 42;
+    
+    const backButton = this.createFantasyButton(
       '← Back to Home',
       this.STANDARD_PADDING,
       this.gameHeight - buttonHeight - this.STANDARD_PADDING,
       buttonWidth,
       buttonHeight,
-      () => navigation.showScreen(HomeScene),
-      14
+      () => navigation.showScreen(HomeScene)
     );
     this.buttonContainer.addChild(backButton);
+  }
+
+  private createFantasyButton(
+    text: string,
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    onClick: () => void
+  ): Container {
+    const button = new Container();
+    
+    const bg = new Graphics();
+    bg.roundRect(2, 2, width, height, 8)
+      .fill({ color: 0x000000, alpha: 0.5 });
+    bg.roundRect(0, 0, width, height, 8)
+      .fill({ color: 0x4a2f5f, alpha: 0.95 })
+      .stroke({ width: 2, color: 0x9b59b6 });
+    bg.roundRect(2, 2, width - 4, height - 4, 6)
+      .stroke({ width: 1, color: 0xb57edc, alpha: 0.6 });
+    
+    const buttonText = new Text({
+      text: text,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 14,
+        fontWeight: 'bold',
+        fill: 0xffffff,
+        stroke: { color: 0x1a0f2e, width: 2 }
+      }
+    });
+    buttonText.anchor.set(0.5);
+    buttonText.x = width / 2;
+    buttonText.y = height / 2;
+    
+    button.addChild(bg, buttonText);
+    button.x = x;
+    button.y = y;
+    button.interactive = true;
+    button.cursor = 'pointer';
+    
+    button.on('pointerover', () => {
+      bg.clear();
+      bg.roundRect(2, 2, width, height, 8)
+        .fill({ color: 0x000000, alpha: 0.5 });
+      bg.roundRect(0, 0, width, height, 8)
+        .fill({ color: 0x6b4a7f, alpha: 0.95 })
+        .stroke({ width: 2, color: 0xb57edc });
+      bg.roundRect(2, 2, width - 4, height - 4, 6)
+        .stroke({ width: 1, color: 0xb57edc, alpha: 0.9 });
+      button.scale.set(1.02);
+    });
+    
+    button.on('pointerout', () => {
+      bg.clear();
+      bg.roundRect(2, 2, width, height, 8)
+        .fill({ color: 0x000000, alpha: 0.5 });
+      bg.roundRect(0, 0, width, height, 8)
+        .fill({ color: 0x4a2f5f, alpha: 0.95 })
+        .stroke({ width: 2, color: 0x9b59b6 });
+      bg.roundRect(2, 2, width - 4, height - 4, 6)
+        .stroke({ width: 1, color: 0xb57edc, alpha: 0.6 });
+      button.scale.set(1.0);
+    });
+    
+    button.on('pointerdown', onClick);
+    
+    return button;
   }
 
   private showFloorPopup(stage: Stage): void {
@@ -354,7 +518,6 @@ export class TowerScene extends BaseScene {
   }
 
   update(time: Ticker): void {
-    // Tower-specific animations could go here
-    // For example, subtle floating animations for the magical energy effects
+    // Tower animations
   }
 }
