@@ -2,7 +2,6 @@ import { Application } from 'pixi.js';
 import { initDevtools } from '@pixi/devtools';
 import { navigation } from './utils/navigation';
 import { HomeScene } from './scenes/HomeScene';
-import { QuickAuthSignInScene } from './scenes/QuickAuthSignInScene';
 import { initAssets } from "./utils/assets";
 import { getUrlParam } from './utils/getUrlParams';
 import { Colors } from './utils/colors';
