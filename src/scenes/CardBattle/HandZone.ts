@@ -4,7 +4,7 @@ import { CardBattlePlayerState, Card } from "@/types";
 import { BaseScene } from "@/ui/BaseScene";
 import { app } from "@/app";
 import { gsap } from "gsap";
-import { CardDetailPopup, cardToBattleCard } from "@/popups/CardDetailPopup";
+import { CardDetailPopup } from "@/popups/CardDetailPopup";
 
 
 export class HandZone extends Container {
@@ -463,11 +463,8 @@ export class HandZone extends Container {
     // Remove existing tooltip if any
     this.hideCardTooltip();
 
-    // Convert Card to BattleCard for the popup
-    const battleCard = cardToBattleCard(card);
-
     // Create new tooltip in tooltip mode
-    this.cardTooltip = new CardDetailPopup({ card: battleCard, tooltipMode: true });
+    this.cardTooltip = new CardDetailPopup({ card, tooltipMode: true });
 
     // Add tooltip to app.stage so it appears above everything
     app.stage.addChild(this.cardTooltip);
