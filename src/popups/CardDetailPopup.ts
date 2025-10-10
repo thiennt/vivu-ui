@@ -30,100 +30,140 @@ export class CardDetailPopup extends Container {
   }
 
   private createTooltipMode(): void {
-    // Compact tooltip with DeckCard style
+    // Compact tooltip with Slay the Spire style
     const tooltipWidth = 320;
-    const tooltipHeight = 200; // Increased from 180 to fit avatar
+    const tooltipHeight = 200;
 
-    // Multi-layer shadow for depth (matching DeckCard)
+    // Deep shadow layers for depth (Slay the Spire style)
     const shadowPanel = new Graphics();
-    shadowPanel.roundRect(2.5, 2.5, tooltipWidth, tooltipHeight, 8)
+    shadowPanel.roundRect(4, 4, tooltipWidth, tooltipHeight, 8)
+      .fill({ color: 0x000000, alpha: 0.5 });
+    shadowPanel.roundRect(2, 2, tooltipWidth, tooltipHeight, 8)
       .fill({ color: 0x000000, alpha: 0.3 });
-    shadowPanel.roundRect(1.5, 1.5, tooltipWidth, tooltipHeight, 8)
-      .fill({ color: 0x000000, alpha: 0.15 });
     this.addChild(shadowPanel);
 
-    // Main tooltip background - charcoal grey (matching DeckCard)
+    // Main background - aged parchment color
     this.dialogPanel = new Graphics();
     this.dialogPanel.roundRect(0, 0, tooltipWidth, tooltipHeight, 8)
-      .fill({ color: 0x2d3436, alpha: 0.98 })
-      .stroke({ width: 2, color: 0x636e72 });
+      .fill({ color: 0xf5e6d3, alpha: 0.98 })
+      .stroke({ width: 3, color: 0xd4af37 }); // Golden border
 
-    // Inner glow
-    this.dialogPanel.roundRect(2, 2, tooltipWidth - 4, tooltipHeight - 4, 6)
-      .stroke({ width: 1, color: 0x95a5a6, alpha: 0.3 });
+    // Inner darker parchment layer for depth
+    this.dialogPanel.roundRect(4, 4, tooltipWidth - 8, tooltipHeight - 8, 6)
+      .fill({ color: 0xe8d4b8, alpha: 0.6 });
+
+    // Inner golden highlight
+    this.dialogPanel.roundRect(6, 6, tooltipWidth - 12, tooltipHeight - 12, 5)
+      .stroke({ width: 1, color: 0xffd700, alpha: 0.5 });
 
     this.addChild(this.dialogPanel);
 
-    // Top accent bar
+    // Ornamental top banner - ribbon style
     const rarityColor = this.getRarityColor(this.card.rarity);
-    const accentBar = new Graphics();
-    accentBar.roundRect(8, 8, tooltipWidth - 16, 3, 1.5)
-      .fill({ color: rarityColor, alpha: 0.7 });
-    this.addChild(accentBar);
+    const bannerGraphics = new Graphics();
+    
+    // Banner background with decorative ends
+    bannerGraphics.moveTo(8, 12)
+      .lineTo(4, 18)
+      .lineTo(8, 24)
+      .lineTo(tooltipWidth - 8, 24)
+      .lineTo(tooltipWidth - 4, 18)
+      .lineTo(tooltipWidth - 8, 12)
+      .lineTo(8, 12)
+      .fill({ color: rarityColor, alpha: 0.8 })
+      .stroke({ width: 1, color: 0x8b4513 });
 
-    // Energy cost badge (top-left)
+    this.addChild(bannerGraphics);
+
+    // Energy cost badge - gem/crystal style
     const energyX = 12;
-    const energyY = 18;
-    const energyBadge = this.createEnergyBadge(energyX, energyY, 30, 22);
+    const energyY = 35;
+    const energyBadge = this.createEnergyGem(energyX, energyY, 32, 28);
     this.addChild(energyBadge);
 
-    // Group icon (top-right)
+    // Group icon (top-right) - ornate frame
     const groupIcon = this.getGroupIcon(this.card.group);
     const groupColor = this.getGroupColor(this.card.group);
+    
+    // Ornate circle with golden border
     const groupIconBg = new Graphics()
-      .circle(tooltipWidth - 20, 28, 14)
-      .fill({ color: 0x1a1d1f, alpha: 0.95 })
-      .stroke({ width: 1.5, color: groupColor, alpha: 0.85 });
+      .circle(tooltipWidth - 20, 40, 16)
+      .fill({ color: 0x2a1810, alpha: 0.95 })
+      .stroke({ width: 2, color: 0xd4af37, alpha: 0.9 });
+    
+    // Inner glow
+    groupIconBg.circle(tooltipWidth - 20, 40, 14)
+      .stroke({ width: 1, color: groupColor, alpha: 0.6 });
 
     const groupIconText = new Text({
       text: groupIcon,
       style: {
         fontFamily: 'Kalam',
-        fontSize: 16,
-        fill: 0xffffff
+        fontSize: 18,
+        fill: 0xffffff,
+        dropShadow: {
+          color: 0x000000,
+          blur: 2,
+          angle: Math.PI / 4,
+          distance: 1,
+          alpha: 0.8
+        }
       }
     });
     groupIconText.anchor.set(0.5);
     groupIconText.x = tooltipWidth - 20;
-    groupIconText.y = 28;
+    groupIconText.y = 40;
     this.addChild(groupIconBg, groupIconText);
 
-    // Card name
+    // Card name with fantasy styling
     const cardNameText = new Text({
       text: this.card.name,
       style: {
         fontFamily: 'Kalam',
         fontSize: 18,
         fontWeight: 'bold',
-        fill: 0xffffff,
+        fill: 0x2a1810, // Dark brown text on parchment
         align: 'left',
         wordWrap: true,
         wordWrapWidth: 200,
+        stroke: {
+          color: 0xffd700,
+          width: 1
+        },
         dropShadow: {
-          color: 0x000000,
-          blur: 3,
+          color: 0xd4af37,
+          blur: 2,
           angle: Math.PI / 4,
-          distance: 2,
-          alpha: 0.6
+          distance: 1,
+          alpha: 0.3
         }
       }
     });
-    cardNameText.x = 50;
-    cardNameText.y = 20;
+    cardNameText.x = 52;
+    cardNameText.y = 36;
     this.addChild(cardNameText);
 
-    // Avatar frame (left side, below energy badge)
+    // Avatar frame with ornate border
     const avatarFrameX = 12;
-    const avatarFrameY = 55;
+    const avatarFrameY = 70;
     const avatarFrameSize = 70;
 
+    // Dark background with golden border
     const avatarFrame = new Graphics()
-      .roundRect(avatarFrameX, avatarFrameY, avatarFrameSize, avatarFrameSize, 6)
-      .fill({ color: 0x1a1d1f, alpha: 0.95 })
-      .stroke({ width: 1.5, color: 0x636e72, alpha: 0.6 });
+      .roundRect(avatarFrameX, avatarFrameY, avatarFrameSize, avatarFrameSize, 4)
+      .fill({ color: 0x2a1810, alpha: 0.95 })
+      .stroke({ width: 2, color: 0xd4af37, alpha: 0.9 });
+    
+    // Inner bevel effect
+    avatarFrame.roundRect(avatarFrameX + 2, avatarFrameY + 2, avatarFrameSize - 4, avatarFrameSize - 4, 3)
+      .stroke({ width: 1, color: 0x8b4513, alpha: 0.5 });
+    
     this.addChild(avatarFrame);
 
-    // Avatar icon with shadow
+    // Draw ornate corners on avatar frame
+    this.drawFantasyCorners(avatarFrameX, avatarFrameY, avatarFrameSize, avatarFrameSize, 0xffd700);
+
+    // Avatar icon with glow
     const avatarIcon = new Text({
       text: groupIcon,
       style: {
@@ -137,54 +177,69 @@ export class CardDetailPopup extends Container {
     avatarIcon.y = avatarFrameY + avatarFrameSize / 2;
 
     const avatarShadow = new DropShadowFilter({
-      offset: { x: 2, y: 2 },
-      blur: 3,
-      alpha: 0.6,
-      color: 0x000000
+      offset: { x: 0, y: 0 },
+      blur: 8,
+      alpha: 0.8,
+      color: this.getGroupColor(this.card.group)
     });
     avatarIcon.filters = [avatarShadow];
     this.addChild(avatarIcon);
 
-    // Type and rarity badges (right side, next to avatar)
+    // Type and rarity badges with fantasy styling
     const badgeX = avatarFrameX + avatarFrameSize + 10;
-    let badgeY = 60;
+    let badgeY = 75;
 
     if (this.card.card_type || this.card.group) {
-      const typeBadge = this.createSmallBadge(
+      const typeBadge = this.createFantasyBadge(
         (this.card.card_type || this.card.group).toString().toUpperCase(),
         badgeX,
         badgeY,
-        0x636e72
+        0x8b4513,
+        true
       );
       this.addChild(typeBadge);
       badgeY += 30;
     }
 
-    const rarityBadge = this.createSmallBadge(
+    const rarityBadge = this.createFantasyBadge(
       (this.card.rarity || 'common').toString().toUpperCase(),
       badgeX,
       badgeY,
-      rarityColor
+      rarityColor,
+      true
     );
     this.addChild(rarityBadge);
 
-    // Description (below avatar frame)
+    // Decorative divider
+    const divider = new Graphics();
+    divider.moveTo(12, 150)
+      .lineTo(tooltipWidth - 12, 150)
+      .stroke({ width: 1, color: 0x8b4513, alpha: 0.5 });
+    
+    // Decorative dots
+    divider.circle(tooltipWidth / 2, 150, 2)
+      .fill({ color: 0xd4af37 });
+    
+    this.addChild(divider);
+
+    // Description on parchment style
     const descText = new Text({
       text: this.card.description,
       style: {
         fontFamily: 'Kalam',
         fontSize: 11,
-        fill: 0xe0e0e0,
+        fill: 0x3d2817, // Darker brown for readability
         align: 'left',
         wordWrap: true,
-        wordWrapWidth: tooltipWidth - 24
+        wordWrapWidth: tooltipWidth - 24,
+        lineHeight: 14
       }
     });
     descText.x = 12;
-    descText.y = 135;
+    descText.y = 157;
     this.addChild(descText);
 
-    // Effects summary (compact, at bottom)
+    // Effects summary with glowing effect
     if (this.card.effects && this.card.effects.length > 0) {
       const effectsText = this.card.effects
         .slice(0, 2)
@@ -196,10 +251,14 @@ export class CardDetailPopup extends Container {
         style: {
           fontFamily: 'Kalam',
           fontSize: 10,
-          fill: 0xf39c12,
+          fill: 0xcc6600,
           align: 'left',
           wordWrap: true,
-          wordWrapWidth: tooltipWidth - 24
+          wordWrapWidth: tooltipWidth - 24,
+          stroke: {
+            color: 0xffd700,
+            width: 0.5
+          }
         }
       });
       effectsSummary.x = 12;
@@ -209,113 +268,155 @@ export class CardDetailPopup extends Container {
   }
 
   private createPopupMode(): void {
-    // Create semi-transparent background
+    // Create semi-transparent background with vignette
     this.dialogBg = new Graphics();
     this.dialogBg.rect(0, 0, this.gameWidth, this.gameHeight)
-      .fill({ color: Colors.OVERLAY_DARK, alpha: 0.8 });
+      .fill({ color: 0x1a0f0a, alpha: 0.85 });
 
     const cardWidth = Math.min(400, this.gameWidth - 40);
-    const cardHeight = Math.min(650, this.gameHeight - 60);
+    const cardHeight = Math.min(680, this.gameHeight - 60);
     const cardX = (this.gameWidth - cardWidth) / 2;
     const cardY = (this.gameHeight - cardHeight) / 2;
 
-    // Create card with DeckCard style
+    // Create card with Slay the Spire style
     this.dialogPanel = new Graphics();
 
-    // Multi-layer shadow for depth
-    this.dialogPanel.roundRect(cardX + 4, cardY + 4, cardWidth, cardHeight, 12)
+    // Multiple shadow layers for dramatic depth
+    this.dialogPanel.roundRect(cardX + 8, cardY + 8, cardWidth, cardHeight, 16)
+      .fill({ color: 0x000000, alpha: 0.6 });
+
+    this.dialogPanel.roundRect(cardX + 5, cardY + 5, cardWidth, cardHeight, 16)
       .fill({ color: 0x000000, alpha: 0.4 });
 
-    this.dialogPanel.roundRect(cardX + 2, cardY + 2, cardWidth, cardHeight, 12)
+    this.dialogPanel.roundRect(cardX + 2, cardY + 2, cardWidth, cardHeight, 16)
       .fill({ color: 0x000000, alpha: 0.2 });
 
-    // Main card background - charcoal grey (matching DeckCard)
-    this.dialogPanel.roundRect(cardX, cardY, cardWidth, cardHeight, 12)
-      .fill({ color: 0x2d3436, alpha: 0.98 })
-      .stroke({ width: 3, color: 0x636e72 });
+    // Main card background - aged parchment
+    this.dialogPanel.roundRect(cardX, cardY, cardWidth, cardHeight, 16)
+      .fill({ color: 0xf5e6d3, alpha: 0.98 })
+      .stroke({ width: 4, color: 0xd4af37 }); // Golden border
 
-    // Inner glow/highlight
-    this.dialogPanel.roundRect(cardX + 3, cardY + 3, cardWidth - 6, cardHeight - 6, 9)
-      .stroke({ width: 1.5, color: 0x95a5a6, alpha: 0.3 });
+    // Inner darker parchment layer
+    this.dialogPanel.roundRect(cardX + 6, cardY + 6, cardWidth - 12, cardHeight - 12, 12)
+      .fill({ color: 0xe8d4b8, alpha: 0.7 });
 
-    // Top decorative bar with rarity color
+    // Inner golden highlight/trim
+    this.dialogPanel.roundRect(cardX + 8, cardY + 8, cardWidth - 16, cardHeight - 16, 10)
+      .stroke({ width: 2, color: 0xffd700, alpha: 0.6 });
+
+    // Ornate decorative corners on main card
+    this.drawOrnateCorners(cardX, cardY, cardWidth, cardHeight);
+
+    // Top decorative banner with rarity color
     const rarityColor = this.getRarityColor(this.card.rarity);
-    this.dialogPanel.roundRect(cardX + 12, cardY + 12, cardWidth - 24, 4, 2)
-      .fill({ color: rarityColor, alpha: 0.7 });
+    const bannerHeight = 40;
+    
+    // Banner with decorative shape
+    this.dialogPanel.moveTo(cardX + 20, cardY + 20)
+      .lineTo(cardX + 15, cardY + 30)
+      .lineTo(cardX + 20, cardY + 20 + bannerHeight)
+      .lineTo(cardX + cardWidth - 20, cardY + 20 + bannerHeight)
+      .lineTo(cardX + cardWidth - 15, cardY + 30)
+      .lineTo(cardX + cardWidth - 20, cardY + 20)
+      .lineTo(cardX + 20, cardY + 20)
+      .fill({ color: rarityColor, alpha: 0.85 })
+      .stroke({ width: 2, color: 0x8b4513 });
 
-    // Avatar/Art frame with decorative corners
-    const frameMargin = 20;
-    const frameY = cardY + 100;
-    const frameHeight = 180;
+    // Avatar/Art frame with ornate decorative border
+    const frameMargin = 25;
+    const frameY = cardY + 120;
+    const frameHeight = 200;
     const frameWidth = cardWidth - (frameMargin * 2);
 
-    // Dark inner frame
-    this.dialogPanel.roundRect(cardX + frameMargin, frameY, frameWidth, frameHeight, 8)
-      .fill({ color: 0x1a1d1f, alpha: 0.95 })
-      .stroke({ width: 2, color: 0x636e72, alpha: 0.6 });
+    // Dark inner frame with golden border
+    this.dialogPanel.roundRect(cardX + frameMargin, frameY, frameWidth, frameHeight, 12)
+      .fill({ color: 0x2a1810, alpha: 0.95 })
+      .stroke({ width: 3, color: 0xd4af37, alpha: 0.95 });
 
-    // Decorative corner accents (matching DeckCard)
-    this.drawCornerAccents(cardX + frameMargin, frameY, frameWidth, frameHeight);
+    // Inner bevel/emboss effect
+    this.dialogPanel.roundRect(cardX + frameMargin + 3, frameY + 3, frameWidth - 6, frameHeight - 6, 10)
+      .stroke({ width: 2, color: 0x8b4513, alpha: 0.6 });
+
+    // Decorative fantasy corners on art frame
+    this.drawFantasyCorners(cardX + frameMargin, frameY, frameWidth, frameHeight, 0xffd700);
 
     this.addChild(this.dialogBg, this.dialogPanel);
 
-    // Energy cost (top left) - larger version
-    const energyBadge = this.createEnergyBadge(cardX + 20, cardY + 30, 50, 40);
+    // Energy cost (top left) - crystal gem style
+    const energyBadge = this.createEnergyGem(cardX + 25, cardY + 75, 55, 45);
     this.addChild(energyBadge);
 
-    // Group icon (top right) - larger version
+    // Group icon (top right) - ornate version
     const groupIcon = this.getGroupIcon(this.card.group);
     const groupColor = this.getGroupColor(this.card.group);
+    
     const groupIconBg = new Graphics()
-      .circle(cardX + cardWidth - 35, cardY + 50, 22)
-      .fill({ color: 0x1a1d1f, alpha: 0.95 })
-      .stroke({ width: 2, color: groupColor, alpha: 0.9 });
+      .circle(cardX + cardWidth - 40, cardY + 97, 25)
+      .fill({ color: 0x2a1810, alpha: 0.95 })
+      .stroke({ width: 3, color: 0xd4af37, alpha: 0.95 });
+    
+    // Inner magical glow
+    groupIconBg.circle(cardX + cardWidth - 40, cardY + 97, 22)
+      .stroke({ width: 2, color: groupColor, alpha: 0.7 });
 
     const groupIconText = new Text({
       text: groupIcon,
       style: {
         fontFamily: 'Kalam',
-        fontSize: 28,
+        fontSize: 32,
         fill: 0xffffff
       }
     });
     groupIconText.anchor.set(0.5);
-    groupIconText.x = cardX + cardWidth - 35;
-    groupIconText.y = cardY + 50;
+    groupIconText.x = cardX + cardWidth - 40;
+    groupIconText.y = cardY + 97;
+
+    // Glowing effect
+    const groupIconGlow = new DropShadowFilter({
+      offset: { x: 0, y: 0 },
+      blur: 12,
+      alpha: 0.9,
+      color: groupColor
+    });
+    groupIconText.filters = [groupIconGlow];
 
     this.addChild(groupIconBg, groupIconText);
 
-    // Card name
+    // Card name with fantasy styling and stroke
     const cardNameText = new Text({
       text: this.card.name,
       style: {
         fontFamily: 'Kalam',
-        fontSize: 26,
+        fontSize: 28,
         fontWeight: 'bold',
-        fill: 0xffffff,
+        fill: 0x2a1810, // Dark brown on parchment
         align: 'center',
         wordWrap: true,
-        wordWrapWidth: cardWidth - 140,
+        wordWrapWidth: cardWidth - 160,
+        stroke: {
+          color: 0xffd700,
+          width: 2
+        },
         dropShadow: {
-          color: 0x000000,
-          blur: 4,
+          color: 0xd4af37,
+          blur: 3,
           angle: Math.PI / 4,
-          distance: 3,
-          alpha: 0.7
+          distance: 2,
+          alpha: 0.5
         }
       }
     });
     cardNameText.anchor.set(0.5, 0);
     cardNameText.x = cardX + cardWidth / 2;
-    cardNameText.y = cardY + 28;
+    cardNameText.y = cardY + 30;
     this.addChild(cardNameText);
 
-    // Large avatar icon in frame
+    // Large avatar icon in frame with dramatic glow
     const avatarIcon = new Text({
       text: groupIcon,
       style: {
         fontFamily: 'Kalam',
-        fontSize: 120,
+        fontSize: 130,
         fill: 0xffffff
       }
     });
@@ -324,43 +425,58 @@ export class CardDetailPopup extends Container {
     avatarIcon.y = frameY + frameHeight / 2;
 
     const avatarShadow = new DropShadowFilter({
-      offset: { x: 3, y: 3 },
-      blur: 6,
-      alpha: 0.6,
-      color: 0x000000
+      offset: { x: 0, y: 0 },
+      blur: 20,
+      alpha: 0.9,
+      color: groupColor
     });
     avatarIcon.filters = [avatarShadow];
     this.addChild(avatarIcon);
 
-    // Type and rarity badges below frame
-    const badgeY = frameY + frameHeight + 15;
-    const typeBadge = this.createBadge(
+    // Type and rarity badges with fantasy style
+    const badgeY = frameY + frameHeight + 20;
+    const typeBadge = this.createFantasyBadge(
       (this.card.card_type || this.card.group).toString().toUpperCase(),
-      cardX + cardWidth / 2 - 125,
+      cardX + cardWidth / 2 - 130,
       badgeY,
-      0x636e72
+      0x8b4513,
+      false
     );
 
-    const rarityBadge = this.createBadge(
+    const rarityBadge = this.createFantasyBadge(
       (this.card.rarity || 'common').toString().toUpperCase(),
-      cardX + cardWidth / 2 + 5,
+      cardX + cardWidth / 2 + 10,
       badgeY,
-      rarityColor
+      rarityColor,
+      false
     );
 
     this.addChild(typeBadge, rarityBadge);
 
+    // Decorative divider line
+    const divider = new Graphics();
+    divider.moveTo(cardX + 40, badgeY + 50)
+      .lineTo(cardX + cardWidth - 40, badgeY + 50)
+      .stroke({ width: 2, color: 0x8b4513, alpha: 0.5 });
+    
+    // Center ornament
+    divider.circle(cardX + cardWidth / 2, badgeY + 50, 3)
+      .fill({ color: 0xd4af37 });
+    
+    this.addChild(divider);
+
     // Description
-    const descY = badgeY + 50;
+    const descY = badgeY + 65;
     const descText = new Text({
       text: this.card.description,
       style: {
         fontFamily: 'Kalam',
-        fontSize: 14,
-        fill: 0xe0e0e0,
+        fontSize: 15,
+        fill: 0x3d2817, // Dark brown for readability
         align: 'center',
         wordWrap: true,
-        wordWrapWidth: cardWidth - 50
+        wordWrapWidth: cardWidth - 60,
+        lineHeight: 20
       }
     });
     descText.anchor.set(0.5, 0);
@@ -368,17 +484,21 @@ export class CardDetailPopup extends Container {
     descText.y = descY;
     this.addChild(descText);
 
-    // Effects list
-    let effectsY = descY + descText.height + 20;
+    // Effects list with ornate styling
+    let effectsY = descY + descText.height + 25;
     if (this.card.effects && this.card.effects.length > 0) {
       const effectsTitle = new Text({
         text: '⚡ EFFECTS ⚡',
         style: {
           fontFamily: 'Kalam',
-          fontSize: 16,
+          fontSize: 18,
           fontWeight: 'bold',
-          fill: 0xf39c12,
-          align: 'center'
+          fill: 0xcc6600,
+          align: 'center',
+          stroke: {
+            color: 0xffd700,
+            width: 1
+          }
         }
       });
       effectsTitle.anchor.set(0.5, 0);
@@ -386,22 +506,22 @@ export class CardDetailPopup extends Container {
       effectsTitle.y = effectsY;
       this.addChild(effectsTitle);
 
-      effectsY += 30;
+      effectsY += 35;
 
       this.card.effects.forEach((effect, index) => {
         const effectBadge = this.createEffectBadge(
           effect,
           cardX + cardWidth / 2 - 140,
-          effectsY + (index * 32)
+          effectsY + (index * 36)
         );
         this.addChild(effectBadge);
       });
     }
 
-    // Close button at bottom
-    const closeButton = this.createCloseButton(
-      cardX + cardWidth / 2 - 60,
-      cardY + cardHeight - 60
+    // Close button with fantasy styling
+    const closeButton = this.createFantasyCloseButton(
+      cardX + cardWidth / 2 - 70,
+      cardY + cardHeight - 70
     );
     this.addChild(closeButton);
 
@@ -412,20 +532,34 @@ export class CardDetailPopup extends Container {
     });
   }
 
-  private createEnergyBadge(x: number, y: number, width: number, height: number): Container {
-    const badge = new Container();
+  private createEnergyGem(x: number, y: number, width: number, height: number): Container {
+    const gem = new Container();
 
-    const bg = new Graphics()
-      .roundRect(0, 0, width, height, 8)
-      .fill({ color: 0x1a1d1f, alpha: 0.95 })
-      .stroke({ width: 2, color: 0xf39c12, alpha: 0.9 });
+    // Gem shape (hexagonal/diamond style)
+    const gemBg = new Graphics();
+    
+    // Dark background
+    gemBg.roundRect(0, 0, width, height, height / 4)
+      .fill({ color: 0x2a1810, alpha: 0.95 })
+      .stroke({ width: 2, color: 0xd4af37, alpha: 0.95 });
+    
+    // Inner shine/highlight
+    gemBg.roundRect(2, 2, width - 4, height - 4, height / 4 - 1)
+      .stroke({ width: 1, color: 0xffd700, alpha: 0.6 });
 
     const energyIcon = new Text({
       text: '⚡',
       style: {
         fontFamily: 'Kalam',
-        fontSize: height * 0.4,
-        fill: 0xf39c12
+        fontSize: height * 0.45,
+        fill: 0xf39c12,
+        dropShadow: {
+          color: 0xffd700,
+          blur: 4,
+          angle: 0,
+          distance: 0,
+          alpha: 0.8
+        }
       }
     });
     energyIcon.anchor.set(0.5);
@@ -436,73 +570,56 @@ export class CardDetailPopup extends Container {
       text: this.card.energy_cost.toString(),
       style: {
         fontFamily: 'Kalam',
-        fontSize: height * 0.5,
+        fontSize: height * 0.55,
         fontWeight: 'bold',
         fill: 0xffffff,
-        stroke: { color: 0x000000, width: 2 }
+        stroke: { color: 0x2a1810, width: 3 }
       }
     });
     energyText.anchor.set(0.5);
     energyText.x = width * 0.7;
     energyText.y = height / 2;
 
-    badge.addChild(bg, energyIcon, energyText);
-    badge.x = x;
-    badge.y = y;
+    gem.addChild(gemBg, energyIcon, energyText);
+    gem.x = x;
+    gem.y = y;
 
-    return badge;
+    return gem;
   }
 
-  private createBadge(text: string, x: number, y: number, color: number): Container {
+  private createFantasyBadge(text: string, x: number, y: number, color: number, isSmall: boolean): Container {
     const badge = new Container();
+    const badgeWidth = isSmall ? 100 : 120;
+    const badgeHeight = isSmall ? 24 : 36;
+    const fontSize = isSmall ? 11 : 14;
 
+    // Badge background - parchment style with colored border
     const bg = new Graphics()
-      .roundRect(0, 0, 115, 35, 8)
-      .fill({ color: 0x1a1d1f, alpha: 0.95 })
-      .stroke({ width: 2, color: color, alpha: 0.9 });
+      .roundRect(0, 0, badgeWidth, badgeHeight, 6)
+      .fill({ color: 0xf5e6d3, alpha: 0.95 })
+      .stroke({ width: 2, color: color, alpha: 0.95 });
+    
+    // Inner accent
+    bg.roundRect(2, 2, badgeWidth - 4, badgeHeight - 4, 4)
+      .stroke({ width: 1, color: 0xd4af37, alpha: 0.4 });
 
     const badgeText = new Text({
       text,
       style: {
         fontFamily: 'Kalam',
-        fontSize: 13,
+        fontSize: fontSize,
         fontWeight: 'bold',
-        fill: 0xffffff,
-        align: 'center'
+        fill: 0x2a1810,
+        align: 'center',
+        stroke: {
+          color: 0xffd700,
+          width: 0.5
+        }
       }
     });
     badgeText.anchor.set(0.5);
-    badgeText.x = 57.5;
-    badgeText.y = 17.5;
-
-    badge.addChild(bg, badgeText);
-    badge.x = x;
-    badge.y = y;
-
-    return badge;
-  }
-
-  private createSmallBadge(text: string, x: number, y: number, color: number): Container {
-    const badge = new Container();
-
-    const bg = new Graphics()
-      .roundRect(0, 0, 100, 24, 6)
-      .fill({ color: 0x1a1d1f, alpha: 0.95 })
-      .stroke({ width: 1.5, color: color, alpha: 0.9 });
-
-    const badgeText = new Text({
-      text,
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 11,
-        fontWeight: 'bold',
-        fill: 0xffffff,
-        align: 'center'
-      }
-    });
-    badgeText.anchor.set(0.5);
-    badgeText.x = 50;
-    badgeText.y = 12;
+    badgeText.x = badgeWidth / 2;
+    badgeText.y = badgeHeight / 2;
 
     badge.addChild(bg, badgeText);
     badge.x = x;
@@ -513,23 +630,31 @@ export class CardDetailPopup extends Container {
 
   private createEffectBadge(effect: any, x: number, y: number): Container {
     const badge = new Container();
+    const badgeWidth = 280;
+    const badgeHeight = 32;
 
+    // Parchment background with ornate border
     const bg = new Graphics()
-      .roundRect(0, 0, 280, 28, 6)
-      .fill({ color: 0x1a1d1f, alpha: 0.95 })
-      .stroke({ width: 1.5, color: 0xf39c12, alpha: 0.7 });
+      .roundRect(0, 0, badgeWidth, badgeHeight, 6)
+      .fill({ color: 0xf5e6d3, alpha: 0.95 })
+      .stroke({ width: 2, color: 0xcc6600, alpha: 0.8 });
+    
+    // Inner golden accent
+    bg.roundRect(2, 2, badgeWidth - 4, badgeHeight - 4, 4)
+      .stroke({ width: 1, color: 0xffd700, alpha: 0.4 });
 
     const effectText = new Text({
       text: `${effect.type}: ${effect.value}`,
       style: {
         fontFamily: 'Kalam',
-        fontSize: 13,
-        fill: 0xe0e0e0,
-        align: 'left'
+        fontSize: 14,
+        fill: 0x3d2817,
+        align: 'left',
+        fontWeight: 'bold'
       }
     });
-    effectText.x = 12;
-    effectText.y = 14;
+    effectText.x = 14;
+    effectText.y = badgeHeight / 2;
     effectText.anchor.set(0, 0.5);
 
     badge.addChild(bg, effectText);
@@ -539,26 +664,37 @@ export class CardDetailPopup extends Container {
     return badge;
   }
 
-  private createCloseButton(x: number, y: number): Container {
+  private createFantasyCloseButton(x: number, y: number): Container {
     const button = new Container();
+    const buttonWidth = 140;
+    const buttonHeight = 50;
 
+    // Ornate button with parchment and golden trim
     const bg = new Graphics()
-      .roundRect(0, 0, 120, 45, 8)
-      .fill({ color: 0x636e72 })
-      .stroke({ width: 2, color: 0x95a5a6 });
+      .roundRect(0, 0, buttonWidth, buttonHeight, 10)
+      .fill({ color: 0x8b4513 })
+      .stroke({ width: 3, color: 0xd4af37 });
+    
+    // Inner highlight
+    bg.roundRect(3, 3, buttonWidth - 6, buttonHeight - 6, 8)
+      .stroke({ width: 1, color: 0xffd700, alpha: 0.6 });
 
     const buttonText = new Text({
       text: 'CLOSE',
       style: {
         fontFamily: 'Kalam',
-        fontSize: 16,
+        fontSize: 18,
         fontWeight: 'bold',
-        fill: 0xffffff
+        fill: 0xffffff,
+        stroke: {
+          color: 0x2a1810,
+          width: 2
+        }
       }
     });
     buttonText.anchor.set(0.5);
-    buttonText.x = 60;
-    buttonText.y = 22.5;
+    buttonText.x = buttonWidth / 2;
+    buttonText.y = buttonHeight / 2;
 
     button.addChild(bg, buttonText);
     button.x = x;
@@ -571,42 +707,111 @@ export class CardDetailPopup extends Container {
     });
 
     button.on('pointerover', () => {
-      bg.tint = 0x95a5a6;
+      bg.clear();
+      bg.roundRect(0, 0, buttonWidth, buttonHeight, 10)
+        .fill({ color: 0xa0632a })
+        .stroke({ width: 3, color: 0xffd700 });
+      bg.roundRect(3, 3, buttonWidth - 6, buttonHeight - 6, 8)
+        .stroke({ width: 1, color: 0xffd700, alpha: 0.8 });
     });
+    
     button.on('pointerout', () => {
-      bg.tint = 0xffffff;
+      bg.clear();
+      bg.roundRect(0, 0, buttonWidth, buttonHeight, 10)
+        .fill({ color: 0x8b4513 })
+        .stroke({ width: 3, color: 0xd4af37 });
+      bg.roundRect(3, 3, buttonWidth - 6, buttonHeight - 6, 8)
+        .stroke({ width: 1, color: 0xffd700, alpha: 0.6 });
     });
 
     return button;
   }
 
-  private drawCornerAccents(x: number, y: number, width: number, height: number): void {
-    const cornerSize = 8;
-    const cornerColor = 0x95a5a6;
+  private drawOrnateCorners(x: number, y: number, width: number, height: number): void {
+    const cornerSize = 20;
+    const cornerColor = 0xffd700;
 
-    // Top-left
+    // Top-left ornate corner
     this.dialogPanel.moveTo(x, y + cornerSize)
       .lineTo(x, y)
       .lineTo(x + cornerSize, y)
-      .stroke({ width: 1.5, color: cornerColor, alpha: 0.8 });
+      .stroke({ width: 3, color: cornerColor, alpha: 0.9 });
+    
+    // Small decorative flourish
+    this.dialogPanel.circle(x + 8, y + 8, 2)
+      .fill({ color: cornerColor });
 
     // Top-right
     this.dialogPanel.moveTo(x + width - cornerSize, y)
       .lineTo(x + width, y)
       .lineTo(x + width, y + cornerSize)
-      .stroke({ width: 1.5, color: cornerColor, alpha: 0.8 });
+      .stroke({ width: 3, color: cornerColor, alpha: 0.9 });
+    
+    this.dialogPanel.circle(x + width - 8, y + 8, 2)
+      .fill({ color: cornerColor });
 
     // Bottom-left
     this.dialogPanel.moveTo(x, y + height - cornerSize)
       .lineTo(x, y + height)
       .lineTo(x + cornerSize, y + height)
-      .stroke({ width: 1.5, color: cornerColor, alpha: 0.8 });
+      .stroke({ width: 3, color: cornerColor, alpha: 0.9 });
+    
+    this.dialogPanel.circle(x + 8, y + height - 8, 2)
+      .fill({ color: cornerColor });
 
     // Bottom-right
     this.dialogPanel.moveTo(x + width - cornerSize, y + height)
       .lineTo(x + width, y + height)
       .lineTo(x + width, y + height - cornerSize)
-      .stroke({ width: 1.5, color: cornerColor, alpha: 0.8 });
+      .stroke({ width: 3, color: cornerColor, alpha: 0.9 });
+    
+    this.dialogPanel.circle(x + width - 8, y + height - 8, 2)
+      .fill({ color: cornerColor });
+  }
+
+  private drawFantasyCorners(x: number, y: number, width: number, height: number, color: number): void {
+    const cornerSize = 12;
+
+    // More elaborate corner decorations
+    const cornerGraphics = new Graphics();
+
+    // Top-left L-shape with ornament
+    cornerGraphics.moveTo(x, y + cornerSize)
+      .lineTo(x, y)
+      .lineTo(x + cornerSize, y)
+      .stroke({ width: 2, color: color, alpha: 0.9 });
+    
+    cornerGraphics.circle(x + 5, y + 5, 1.5)
+      .fill({ color: color });
+
+    // Top-right
+    cornerGraphics.moveTo(x + width - cornerSize, y)
+      .lineTo(x + width, y)
+      .lineTo(x + width, y + cornerSize)
+      .stroke({ width: 2, color: color, alpha: 0.9 });
+    
+    cornerGraphics.circle(x + width - 5, y + 5, 1.5)
+      .fill({ color: color });
+
+    // Bottom-left
+    cornerGraphics.moveTo(x, y + height - cornerSize)
+      .lineTo(x, y + height)
+      .lineTo(x + cornerSize, y + height)
+      .stroke({ width: 2, color: color, alpha: 0.9 });
+    
+    cornerGraphics.circle(x + 5, y + height - 5, 1.5)
+      .fill({ color: color });
+
+    // Bottom-right
+    cornerGraphics.moveTo(x + width - cornerSize, y + height)
+      .lineTo(x + width, y + height)
+      .lineTo(x + width, y + height - cornerSize)
+      .stroke({ width: 2, color: color, alpha: 0.9 });
+    
+    cornerGraphics.circle(x + width - 5, y + height - 5, 1.5)
+      .fill({ color: color });
+
+    this.addChild(cornerGraphics);
   }
 
   private getGroupIcon(group: string): string {
@@ -629,11 +834,11 @@ export class CardDetailPopup extends Container {
 
   private getRarityColor(rarity?: string): number {
     const rarityColors: { [key: string]: number } = {
-      common: 0x95a5a6,
-      uncommon: 0x26de81,
-      rare: 0x4a90e2,
-      epic: 0xa55eea,
-      legendary: 0xf39c12
+      common: 0x95a5a6,    // Grey
+      uncommon: 0x26de81,  // Green
+      rare: 0x4a90e2,      // Blue
+      epic: 0xa55eea,      // Purple
+      legendary: 0xf39c12  // Gold/Orange
     };
     return rarityColors[rarity?.toLowerCase() || 'common'] || rarityColors.common;
   }
@@ -651,14 +856,4 @@ export class CardDetailPopup extends Container {
       this.y = screenHeight * 0.25;
     }
   }
-}
-
-// Helper function to convert Card to battle card format
-export function cardToBattleCard(card: Card): Card {
-  return {
-    ...card,
-    energy_cost: card.energy_cost || 0,
-    card_type: card.card_type || card.group,
-    rarity: card.rarity || 'common'
-  };
 }
