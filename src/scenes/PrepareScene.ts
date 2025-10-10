@@ -294,11 +294,7 @@ export class PrepareScene extends BaseScene {
   }
 
   private showCardDetails(card: Card): void {
-    navigation.presentPopup(class extends CardDetailPopup {
-      constructor() {
-        super({ card });
-      }
-    });
+    navigation.presentPopup(CardDetailPopup, { card: card });
   }
 
   /** Resize handler */
