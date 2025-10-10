@@ -1,4 +1,4 @@
-import { BattleCard } from '../types';
+import { Card } from '../types';
 
 export const mockCards = [
   {
@@ -404,7 +404,7 @@ export const mockCards = [
 ]
 
 // Helper function to draw cards from deck
-export function drawCards(deck: BattleCard[], count: number): { drawnCards: BattleCard[], remainingDeck: BattleCard[] } {
+export function drawCards(deck: Card[], count: number): { drawnCards: Card[], remainingDeck: Card[] } {
   const drawnCards = deck.slice(0, count);
   const remainingDeck = deck.slice(count);
   return { drawnCards, remainingDeck };

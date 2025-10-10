@@ -169,17 +169,7 @@ export interface Card {
   rarity?: string;
   actions?: unknown[]; // Define specific actions/effects of the card
   position?: number; // position in hand or deck
-}
-
-export interface BattleCard {
-  id: string;
-  name: string;
-  description: string;
-  energyCost: number;
-  group: CardType;
-  rarity: CardRarity;
-  effects: CardEffect[];
-  cardType?: string; // Optional for backward compatibility
+  effects?: CardEffect[]; // Optional card effects for UI display
 }
 
 export interface CardEffect {
@@ -360,19 +350,6 @@ export interface CardBattleLogPlayer {
   player_id?: string;
 }
 
-// Complete card information for animations and UI
-export interface CardBattleLogCard {
-  id: string;
-  name: string;
-  group: string;
-  description: string;
-  icon_url?: string;
-  card_type: string;
-  energy_cost: number;
-  rarity?: string;
-  actions?: unknown[]; // full detail of card
-}
-
 // Impact event for detailed tracking
 export interface LogImpact {
   type: 'damage' | 'heal' | 'effect' | 'energy' | 'status';
@@ -399,7 +376,7 @@ export interface CardBattleLog {
   phase: BattlePhaseName;
   action_type: string;                    // 'effect_trigger', 'draw_card', 'play_card', etc.
   actor: CardBattleLogPlayer;
-  card?: CardBattleLogCard;
+  card?: Card;                            // Complete card information for animations and UI
   targets?: CardBattleLogTarget[];
   impacts?: LogImpact[];                  // Top-level impacts for non-target actions
   result?: LogResult;

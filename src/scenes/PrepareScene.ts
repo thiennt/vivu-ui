@@ -3,7 +3,7 @@ import { navigation } from '@/utils/navigation';
 import { BaseScene } from '@/ui/BaseScene';
 import { Colors } from '@/utils/colors';
 import { CardBattleScene } from './CardBattleScene';
-import { BattleCard, BattleStageResponse, Card, CardType, CardRarity, Character } from '@/types';
+import { BattleStageResponse, Card, Character } from '@/types';
 import { battleApi } from '@/services/api';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
 import { TowerScene } from './TowerScene';
@@ -294,63 +294,11 @@ export class PrepareScene extends BaseScene {
   }
 
   private showCardDetails(card: Card): void {
-    const battleCard = this.convertCardToBattleCard(card);
     navigation.presentPopup(class extends CardDetailPopup {
       constructor() {
-        super({ card: battleCard });
+        super({ card });
       }
     });
-  }
-
-  private convertCardToBattleCard(card: Card): BattleCard {
-    // Convert Card to BattleCard format
-    return {
-      id: card.id,
-      name: card.name,
-      description: card.description,
-      energyCost: card.energy_cost,
-      group: this.mapCardGroup(card.group),
-      rarity: this.mapCardRarity(card.rarity || 'common'),
-      effects: [] // Empty effects array since we don't have card effects in the Card interface
-    };
-  }
-
-  private mapCardGroup(group: string): CardType {
-    switch (group.toLowerCase()) {
-      case 'attack':
-      case 'high damage':
-        return CardType.ATTACK;
-      case 'heal':
-      case 'healing & support':
-        return CardType.HEAL;
-      case 'buff':
-      case 'buffs & enhancements':
-        return CardType.BUFF;
-      case 'debuff':
-      case 'control & debuff':
-        return CardType.DEBUFF;
-      case 'special':
-        return CardType.SPECIAL;
-      default:
-        return CardType.SPECIAL;
-    }
-  }
-
-  private mapCardRarity(rarity: string): CardRarity {
-    switch (rarity.toLowerCase()) {
-      case 'common':
-        return CardRarity.COMMON;
-      case 'uncommon':
-        return CardRarity.UNCOMMON;
-      case 'rare':
-        return CardRarity.RARE;
-      case 'epic':
-        return CardRarity.EPIC;
-      case 'legendary':
-        return CardRarity.LEGENDARY;
-      default:
-        return CardRarity.COMMON;
-    }
   }
 
   /** Resize handler */

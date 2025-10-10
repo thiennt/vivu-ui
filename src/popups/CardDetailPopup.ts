@@ -1,31 +1,17 @@
 import { Container, Graphics, Text } from 'pixi.js';
 import { navigation } from '@/utils/navigation';
 import { Colors } from '@/utils/colors';
-import { BattleCard, Card, CardType, CardRarity } from '@/types';
-
-// Utility function to convert Card to BattleCard for tooltip display
-export function cardToBattleCard(card: Card): BattleCard {
-  return {
-    id: card.id,
-    name: card.name,
-    description: card.description,
-    energyCost: card.energy_cost,
-    group: card.group as CardType,
-    rarity: (card.rarity as CardRarity) || CardRarity.COMMON,
-    effects: [], // Card type doesn't have effects, so empty array
-    cardType: card.card_type
-  };
-}
+import { Card, CardType, CardRarity } from '@/types';
 
 export class CardDetailPopup extends Container {
   private dialogBg!: Graphics;
   private dialogPanel!: Graphics;
-  private card: BattleCard;
+  private card: Card;
   private gameWidth: number;
   private gameHeight: number;
   private isTooltipMode: boolean;
 
-  constructor(params: { card: BattleCard, tooltipMode?: boolean }) {
+  constructor(params: { card: Card, tooltipMode?: boolean }) {
     super();
     this.card = params.card;
     this.isTooltipMode = params.tooltipMode || false;
@@ -72,7 +58,7 @@ export class CardDetailPopup extends Container {
 
     // Energy cost
     const energyCostText = new Text({
-      text: `Energy: ${this.card.energyCost}`,
+      text: `Energy: ${this.card.energy_cost}`,
       style: {
         fontFamily: 'Kalam',
         fontSize: 12,
@@ -85,9 +71,9 @@ export class CardDetailPopup extends Container {
     this.addChild(energyCostText);
 
     // Card type
-    if (this.card.cardType || this.card.group) {
+    if (this.card.card_type || this.card.group) {
       const typeText = new Text({
-        text: `Type: ${this.card.cardType || this.card.group}`,
+        text: `Type: ${this.card.card_type || this.card.group}`,
         style: {
           fontFamily: 'Kalam',
           fontSize: 12,
@@ -143,7 +129,7 @@ export class CardDetailPopup extends Container {
       epic: Colors.RARITY_EPIC,
       legendary: Colors.RARITY_LEGENDARY
     };
-    const rarityColor = rarityColors[this.card.rarity] || rarityColors.common;
+    const rarityColor = rarityColors[this.card.rarity || 'common'] || rarityColors.common;
     
     // Main card background with rarity color
     this.dialogPanel.roundRect(cardX, cardY, cardWidth, cardHeight, 16)
@@ -171,7 +157,7 @@ export class CardDetailPopup extends Container {
       .stroke({ width: 2, color: Colors.TEXT_WHITE, alpha: 0.5 });
     
     const energyText = new Text({
-      text: this.card.energyCost.toString(),
+      text: this.card.energy_cost.toString(),
       style: {
         fontFamily: 'Kalam',
         fontSize: 24,
@@ -185,21 +171,17 @@ export class CardDetailPopup extends Container {
 
     // Group icon at top right - larger version
     let groupIcon = '';
-    switch (this.card.group) {
-      case CardType.ATTACK:
-        groupIcon = '⚔️';
-        break;
-      case CardType.HEAL:
-        groupIcon = '✨';
-        break;
-      case CardType.DEBUFF:
-        groupIcon = '🌀';
-        break;
-      case CardType.BUFF:
-        groupIcon = '🔼';
-        break;
-      default:
-        groupIcon = '⭐';
+    const groupLower = this.card.group.toLowerCase();
+    if (groupLower.includes('attack') || groupLower.includes('damage')) {
+      groupIcon = '⚔️';
+    } else if (groupLower.includes('heal')) {
+      groupIcon = '✨';
+    } else if (groupLower.includes('debuff') || groupLower.includes('control')) {
+      groupIcon = '🌀';
+    } else if (groupLower.includes('buff') || groupLower.includes('enhancement')) {
+      groupIcon = '🔼';
+    } else {
+      groupIcon = '⭐';
     }
     const groupIconText = new Text({
       text: groupIcon,
@@ -233,9 +215,9 @@ export class CardDetailPopup extends Container {
 
     // Card type and rarity badge - enhanced
     let cardTypeBadge: Container | null = null;
-    if (this.card.cardType || this.card.group) {
+    if (this.card.card_type || this.card.group) {
       cardTypeBadge = this.createCardTypeBadge(
-        (this.card.cardType || this.card.group).toString().toUpperCase(),
+        (this.card.card_type || this.card.group).toString().toUpperCase(),
         cardX + cardWidth / 2 - 60,
         cardY + 130
       );
@@ -243,7 +225,7 @@ export class CardDetailPopup extends Container {
 
     // Rarity badge
     const rarityBadge = this.createRarityBadge(
-      this.card.rarity.toString().toUpperCase(),
+      (this.card.rarity || 'common').toString().toUpperCase(),
       cardX + cardWidth / 2 + 20,
       cardY + 130
     );
