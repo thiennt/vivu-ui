@@ -7,7 +7,7 @@ export class PlayerCharacterZone extends Container {
   private zoneBg: Graphics;
   private playerInfoZone: Container;
   private playerInfoBg: Graphics;
-  private playerInfoGlow: Graphics; // NEW: Add glow effect
+  private playerInfoGlow: Graphics;
   private playerInfoLabel: Text;
   private energyText: Text;
   private energyCount: number = 0;
@@ -38,7 +38,6 @@ export class PlayerCharacterZone extends Container {
     this.playerInfoZone = new Container();
     this.addChild(this.playerInfoZone);
 
-    // Add glow layer before background
     this.playerInfoGlow = new Graphics();
     this.playerInfoZone.addChild(this.playerInfoGlow);
 
@@ -64,98 +63,99 @@ export class PlayerCharacterZone extends Container {
     this.infoWidth = width * 0.18;
     this.infoHeight = height;
 
-    // Enhanced background with gradient feel
     const accentColor = this.playerNo === 1 
       ? Colors.TEAM_ALLY 
       : Colors.TEAM_ENEMY;
     
-    // Semi-transparent background with subtle gradient
-    const bgAlpha = 0.3;
+    // Dark wooden frame background
     this.zoneBg.roundRect(0, 0, width, height, 8)
-      .fill({ color: Colors.UI_BACKGROUND, alpha: bgAlpha });
+      .fill({ color: 0x2a1810, alpha: 0.4 });
     
-    // Add inner shadow effect
+    // Inner wooden texture
     this.zoneBg.roundRect(2, 2, width - 4, height - 4, 6)
-      .stroke({ width: 1, color: 0x000000, alpha: 0.2 });
+      .stroke({ width: 1, color: 0x8b4513, alpha: 0.3 });
     
-    // Team-colored border with glow
+    // Team-colored border
     this.zoneBg.roundRect(0, 0, width, height, 8)
-      .stroke({ width: 3, color: accentColor, alpha: 0.6 });
+      .stroke({ width: 3, color: accentColor, alpha: 0.8 });
     
-    // Outer glow
+    // Outer mystical glow
     this.zoneBg.roundRect(-2, -2, width + 4, height + 4, 10)
-      .stroke({ width: 2, color: accentColor, alpha: 0.2 });
+      .stroke({ width: 2, color: accentColor, alpha: 0.3 });
     
-    // Layout player info zone at the left
     this.playerInfoZone.x = 0;
     this.playerInfoZone.y = 0;
 
     this.drawPlayerInfoBackground(false);
 
-    // Enhanced player label with shadow
-    this.playerInfoLabel.text = this.playerNo === 1 ? 'PLAYER' : 'ENEMY';
+    // Player label with better contrast - white text
+    const labelIcon = this.playerNo === 1 ? '🛡️' : '⚔️';
+    this.playerInfoLabel.text = this.playerNo === 1 ? `${labelIcon}\nYOU` : `${labelIcon}\nENEMY`;
     this.playerInfoLabel.style = {
       fontFamily: 'Kalam',
-      fontSize: 16,
+      fontSize: 14,
       fontWeight: 'bold',
-      fill: accentColor,
+      fill: 0xffffff,
+      stroke: { color: 0x000000, width: 2.5 },
       align: 'center',
+      lineHeight: 16,
       dropShadow: {
         color: 0x000000,
         blur: 4,
         angle: Math.PI / 4,
         distance: 2,
-        alpha: 0.5
+        alpha: 0.8
       }
     };
     this.playerInfoLabel.anchor.set(0.5);
     this.playerInfoLabel.x = this.infoWidth / 2;
-    this.playerInfoLabel.y = this.infoHeight * 0.15;
+    this.playerInfoLabel.y = this.infoHeight * 0.18;
 
-    // Enhanced energy display with glow
+    // Energy display - bright and readable
     this.energyText.text = `⚡${this.energyCount}`;
     this.energyText.style = {
       fontFamily: 'Kalam',
-      fontSize: 18,
+      fontSize: 20,
       fontWeight: 'bold',
-      fill: Colors.ENERGY_TEXT,
+      fill: 0xffd700,
       align: 'center',
+      stroke: { color: 0x000000, width: 3 },
       dropShadow: {
-        color: Colors.ENERGY_ACTIVE,
-        blur: 6,
+        color: 0xffd700,
+        blur: 8,
         angle: 0,
         distance: 0,
-        alpha: 0.8
+        alpha: 0.9
       }
     };
     this.energyText.anchor.set(0.5);
     this.energyText.x = this.infoWidth / 2;
-    this.energyText.y = this.infoHeight * 0.45;
+    this.energyText.y = this.infoHeight * 0.50;
 
-    // Enhanced deck display
+    // Deck display - white text for readability
     this.deckText.text = `🃏${this.deckCount}`;
     this.deckText.style = {
       fontFamily: 'Kalam',
       fontSize: 16,
       fontWeight: 'bold',
-      fill: Colors.TEXT_PRIMARY,
+      fill: 0xffffff,
       align: 'center',
+      stroke: { color: 0x000000, width: 2.5 },
       dropShadow: {
         color: 0x000000,
         blur: 3,
         angle: Math.PI / 4,
         distance: 1,
-        alpha: 0.5
+        alpha: 0.7
       }
     };
     this.deckText.anchor.set(0.5);
     this.deckText.x = this.infoWidth / 2;
-    this.deckText.y = this.infoHeight * 0.75;
+    this.deckText.y = this.infoHeight * 0.78;
 
     this.playerInfoBg.interactive = true;
     this.updateDiscardHighlight(false);
 
-    // Layout characters zone
     this.charactersWidth = width - this.infoWidth;
     this.charactersHeight = height;
     this.charactersZone.x = this.infoWidth;
@@ -171,46 +171,57 @@ export class PlayerCharacterZone extends Container {
     this.playerInfoBg.clear();
 
     if (highlight) {
-      // Glowing border when highlighted for discard
-      this.playerInfoGlow.roundRect(-4, -4, this.infoWidth + 8, this.infoHeight + 8, 10)
-        .fill({ color: Colors.CARD_DISCARD, alpha: 0.2 });
+      // Glowing discard area - red glow
+      this.playerInfoGlow.roundRect(-5, -5, this.infoWidth + 10, this.infoHeight + 10, 10)
+        .fill({ color: 0xff6b6b, alpha: 0.3 });
       
+      // Dark background with red discard border
       this.playerInfoBg.roundRect(0, 0, this.infoWidth, this.infoHeight, 6)
-        .fill({ color: Colors.PANEL_BACKGROUND, alpha: 0.9 })
-        .stroke({ width: 3, color: Colors.CARD_DISCARD, alpha: 0.9 });
+        .fill({ color: 0x3d2817, alpha: 0.95 })
+        .stroke({ width: 3, color: 0xff6b6b, alpha: 0.95 });
+      
+      // Inner darker layer
+      this.playerInfoBg.roundRect(2, 2, this.infoWidth - 4, this.infoHeight - 4, 4)
+        .fill({ color: 0x2a1810, alpha: 0.7 });
+      
+      // Inner red glow
+      this.playerInfoBg.roundRect(2, 2, this.infoWidth - 4, this.infoHeight - 4, 4)
+        .stroke({ width: 2, color: 0xff6b6b, alpha: 0.7 });
       
       // Animated dashed border effect
       const dashLength = 8;
       const spacing = 4;
       for (let i = 0; i < this.infoWidth; i += dashLength + spacing) {
         this.playerInfoBg.roundRect(i + 2, 2, Math.min(dashLength, this.infoWidth - i - 4), 3, 1)
-          .fill(Colors.CARD_DISCARD);
+          .fill({ color: 0xff6b6b, alpha: 0.9 });
       }
       for (let i = 0; i < this.infoHeight; i += dashLength + spacing) {
         this.playerInfoBg.roundRect(2, i + 2, 3, Math.min(dashLength, this.infoHeight - i - 4), 1)
-          .fill(Colors.CARD_DISCARD);
+          .fill({ color: 0xff6b6b, alpha: 0.9 });
         this.playerInfoBg.roundRect(this.infoWidth - 5, i + 2, 3, Math.min(dashLength, this.infoHeight - i - 4), 1)
-          .fill(Colors.CARD_DISCARD);
+          .fill({ color: 0xff6b6b, alpha: 0.9 });
       }
       for (let i = 0; i < this.infoWidth; i += dashLength + spacing) {
         this.playerInfoBg.roundRect(i + 2, this.infoHeight - 5, Math.min(dashLength, this.infoWidth - i - 4), 3, 1)
-          .fill(Colors.CARD_DISCARD);
+          .fill({ color: 0xff6b6b, alpha: 0.9 });
       }
 
-      // Show tooltip
+      // Show tooltip - white text on dark
       if (!this.discardTooltip) {
         this.discardTooltip = new Text({
-          text: '♻️ DISCARD',
+          text: '♻️ DISCARD\n+1 ⚡',
           style: {
             fontFamily: 'Kalam',
             fontSize: 11,
             fontWeight: 'bold',
-            fill: Colors.CARD_DISCARD,
+            fill: 0xffffff,
             align: 'center',
+            lineHeight: 14,
+            stroke: { color: 0x000000, width: 2.5 },
             dropShadow: {
-              color: 0x000000,
-              blur: 3,
-              distance: 1,
+              color: 0xff6b6b,
+              blur: 4,
+              distance: 0,
               alpha: 0.8
             }
           }
@@ -221,20 +232,25 @@ export class PlayerCharacterZone extends Container {
       
       this.discardTooltip.visible = true;
       this.discardTooltip.x = this.infoWidth / 2;
-      this.discardTooltip.y = this.infoHeight - 15;
+      this.discardTooltip.y = this.infoHeight - 20;
       
     } else {
-      // Normal styling with subtle glow
+      // Normal dark fantasy styling
       this.playerInfoGlow.roundRect(-3, -3, this.infoWidth + 6, this.infoHeight + 6, 9)
         .fill({ color: accentColor, alpha: 0.15 });
       
+      // Dark brown background
       this.playerInfoBg.roundRect(0, 0, this.infoWidth, this.infoHeight, 6)
-        .fill({ color: Colors.PANEL_BACKGROUND, alpha: 0.85 })
-        .stroke({ width: 2, color: accentColor, alpha: 0.7 });
+        .fill({ color: 0x3d2817, alpha: 0.95 })
+        .stroke({ width: 2, color: 0xd4af37, alpha: 0.7 });
       
-      // Inner highlight
+      // Inner darker texture
       this.playerInfoBg.roundRect(2, 2, this.infoWidth - 4, this.infoHeight - 4, 4)
-        .stroke({ width: 1, color: accentColor, alpha: 0.3 });
+        .fill({ color: 0x2a1810, alpha: 0.6 });
+      
+      // Team-colored inner border (subtle)
+      this.playerInfoBg.roundRect(3, 3, this.infoWidth - 6, this.infoHeight - 6, 3)
+        .stroke({ width: 1, color: accentColor, alpha: 0.4 });
         
       if (this.discardTooltip) {
         this.discardTooltip.visible = false;

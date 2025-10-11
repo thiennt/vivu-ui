@@ -5,14 +5,14 @@ import { gsap } from "gsap";
 
 export class BattleLogZone extends Container {
   private logBg: Graphics;
-  private logGlow: Graphics; // NEW: Glow effect layer
-  private borderPulse: Graphics; // NEW: Animated border
+  private logGlow: Graphics;
+  private borderPulse: Graphics;
   private logTitle: Text;
   private phaseText: Text;
   private turnText: Text;
   private notificationText: Text;
   private notificationContainer: Container;
-  private notificationBg: Graphics; // NEW: Background for notifications
+  private notificationBg: Graphics;
 
   private zoneWidth: number = 0;
   private zoneHeight: number = 0;
@@ -22,11 +22,9 @@ export class BattleLogZone extends Container {
   constructor() {
     super();
 
-    // Add glow layer first (behind everything)
     this.logGlow = new Graphics();
     this.addChild(this.logGlow);
 
-    // Add animated border pulse
     this.borderPulse = new Graphics();
     this.addChild(this.borderPulse);
 
@@ -42,7 +40,6 @@ export class BattleLogZone extends Container {
     this.turnText = new Text();
     this.addChild(this.turnText);
 
-    // Notification container for temporary messages
     this.notificationContainer = new Container();
 
     this.notificationBg = new Graphics();
@@ -61,69 +58,74 @@ export class BattleLogZone extends Container {
 
     this.drawBackground();
 
-    // Enhanced title with glow
-    this.logTitle.text = '⚔️ BATTLE LOG ⚔️';
+    // Golden title - easier to read
+    this.logTitle.text = '📜 BATTLE LOG 📜';
     this.logTitle.style = {
       fontFamily: 'Kalam',
       fontSize: 18,
       fontWeight: 'bold',
-      fill: 0xffd700, // Gold color
+      fill: 0xffd700,
+      stroke: { color: 0x000000, width: 3 },
       align: 'center',
       dropShadow: {
         color: 0x000000,
         blur: 4,
         angle: Math.PI / 4,
         distance: 2,
-        alpha: 0.6
+        alpha: 0.8
       }
     };
     this.logTitle.anchor.set(0.5);
     this.logTitle.x = width / 2;
     this.logTitle.y = height * 0.2;
 
-    // Enhanced turn text
+    // Turn display - bright and readable
     this.turnText.style = {
       fontFamily: 'Kalam',
       fontSize: 16,
       fontWeight: 'bold',
-      fill: Colors.TEXT_PRIMARY,
+      fill: 0xffffff,
+      stroke: { color: 0x000000, width: 2.5 },
       align: 'center',
       dropShadow: {
         color: 0x000000,
         blur: 3,
         angle: Math.PI / 4,
-        distance: 1,
-        alpha: 0.5
+        distance: 2,
+        alpha: 0.7
       }
     };
     this.turnText.anchor.set(0.5);
     this.turnText.x = width / 2;
     this.turnText.y = height * 0.45;
 
-    // Enhanced phase text with dynamic color
+    // Phase text - bright with strong contrast
     this.phaseText.style = {
       fontFamily: 'Kalam',
       fontSize: 13,
-      fill: Colors.TEXT_SECONDARY,
+      fontWeight: 'bold',
+      fill: 0xffffff,
+      stroke: { color: 0x000000, width: 2 },
       align: 'center',
       dropShadow: {
         color: 0x000000,
         blur: 2,
         angle: Math.PI / 4,
         distance: 1,
-        alpha: 0.4
+        alpha: 0.6
       }
     };
     this.phaseText.anchor.set(0.5);
     this.phaseText.x = width / 2;
     this.phaseText.y = height * 0.68;
 
-    // Notification styling
+    // Notification styling - bright colors
     this.notificationText.style = {
       fontFamily: 'Kalam',
       fontSize: 14,
       fontWeight: 'bold',
-      fill: Colors.SUCCESS,
+      fill: 0xffffff,
+      stroke: { color: 0x000000, width: 3 },
       align: 'center',
       dropShadow: {
         color: 0x000000,
@@ -148,47 +150,81 @@ export class BattleLogZone extends Container {
 
     const playerColor = this.currentPlayer === 1 ? Colors.TEAM_ALLY : Colors.TEAM_ENEMY;
 
-    // Outer glow
+    // Outer mystical glow (team-colored)
     this.logGlow.roundRect(-4, -4, width + 8, height + 8, 12)
-      .fill({ color: playerColor, alpha: 0.15 });
+      .fill({ color: playerColor, alpha: 0.2 });
 
-    // Pulsing border layer
+    // Pulsing animated border
     this.borderPulse.roundRect(-2, -2, width + 4, height + 4, 10)
-      .stroke({ width: 2, color: playerColor, alpha: 0.4 });
+      .stroke({ width: 3, color: playerColor, alpha: 0.4 });
 
-    // Dark neutral background
-    const darkBg = 0x1a1a2e;
+    // Dark brown/wooden background - much better contrast
     this.logBg.roundRect(0, 0, width, height, 8)
-      .fill({ color: darkBg, alpha: 0.92 });
+      .fill({ color: 0x3d2817, alpha: 0.95 });
 
-    // Subtle gradient overlay (team-colored)
+    // Darker inner layer
+    this.logBg.roundRect(2, 2, width - 4, height - 4, 6)
+      .fill({ color: 0x2a1810, alpha: 0.7 });
+
+    // Very subtle gradient
     const segmentHeight = height / 8;
     for (let i = 0; i < 8; i++) {
-      const alpha = 0.12 - (i * 0.015);
+      const alpha = 0.05 - (i * 0.006);
       this.logBg.rect(4, 4 + i * segmentHeight, width - 8, segmentHeight)
-        .fill({ color: playerColor, alpha });
+        .fill({ color: 0x000000, alpha });
     }
 
-    // Inner shadow for depth
-    this.logBg.roundRect(2, 2, width - 4, height - 4, 6)
-      .stroke({ width: 1, color: 0x000000, alpha: 0.5 });
-
-    // Team-colored border (prominent)
+    // Golden border (main)
     this.logBg.roundRect(0, 0, width, height, 8)
-      .stroke({ width: 3, color: playerColor, alpha: 0.85 });
+      .stroke({ width: 3, color: 0xd4af37, alpha: 0.8 });
 
-    // Inner highlight
+    // Team-colored inner border (subtle)
     this.logBg.roundRect(3, 3, width - 6, height - 6, 5)
-      .stroke({ width: 1, color: playerColor, alpha: 0.5 });
+      .stroke({ width: 2, color: playerColor, alpha: 0.5 });
 
-    // Gold accent bars (decorative & prominent)
-    this.logBg.roundRect(10, 6, width - 20, 4, 2)
-      .fill({ color: 0xffd700, alpha: 0.7 })
-      .stroke({ width: 1, color: 0xffd700, alpha: 0.3 });
+    // Decorative golden corner accents
+    this.drawParchmentCorners(this.logBg, 0, 0, width, height, 0xffd700);
 
-    this.logBg.roundRect(10, height - 10, width - 20, 4, 2)
-      .fill({ color: 0xffd700, alpha: 0.7 })
-      .stroke({ width: 1, color: 0xffd700, alpha: 0.3 });
+    // Top and bottom golden accent bars
+    this.logBg.roundRect(12, 8, width - 24, 3, 1.5)
+      .fill({ color: 0xffd700, alpha: 0.6 })
+      .stroke({ width: 1, color: 0xd4af37, alpha: 0.4 });
+
+    this.logBg.roundRect(12, height - 11, width - 24, 3, 1.5)
+      .fill({ color: 0xffd700, alpha: 0.6 })
+      .stroke({ width: 1, color: 0xd4af37, alpha: 0.4 });
+  }
+
+  private drawParchmentCorners(graphics: Graphics, x: number, y: number, width: number, height: number, color: number): void {
+    const cornerSize = 10;
+    
+    // Top-left corner
+    graphics.moveTo(x, y + cornerSize)
+      .lineTo(x, y)
+      .lineTo(x + cornerSize, y)
+      .stroke({ width: 2, color: color, alpha: 0.6 });
+    graphics.circle(x + 3, y + 3, 1.5).fill({ color: color, alpha: 0.7 });
+    
+    // Top-right corner
+    graphics.moveTo(x + width - cornerSize, y)
+      .lineTo(x + width, y)
+      .lineTo(x + width, y + cornerSize)
+      .stroke({ width: 2, color: color, alpha: 0.6 });
+    graphics.circle(x + width - 3, y + 3, 1.5).fill({ color: color, alpha: 0.7 });
+    
+    // Bottom-left corner
+    graphics.moveTo(x, y + height - cornerSize)
+      .lineTo(x, y + height)
+      .lineTo(x + cornerSize, y + height)
+      .stroke({ width: 2, color: color, alpha: 0.6 });
+    graphics.circle(x + 3, y + height - 3, 1.5).fill({ color: color, alpha: 0.7 });
+    
+    // Bottom-right corner
+    graphics.moveTo(x + width - cornerSize, y + height)
+      .lineTo(x + width, y + height)
+      .lineTo(x + width, y + height - cornerSize)
+      .stroke({ width: 2, color: color, alpha: 0.6 });
+    graphics.circle(x + width - 3, y + height - 3, 1.5).fill({ color: color, alpha: 0.7 });
   }
 
   updatePhase(phase: BattlePhaseName, currentPlayer: number, currentTurn?: number): void {
@@ -202,12 +238,10 @@ export class BattleLogZone extends Container {
       'ai_turn': '🤖 AI Turn'
     };
 
-    // Update phase text with player-specific styling
+    // Update phase text - keep white for readability
     const playerName = currentPlayer === 1 ? 'PLAYER' : 'ENEMY';
-    const playerColor = currentPlayer === 1 ? Colors.TEAM_ALLY : Colors.TEAM_ENEMY;
 
     this.phaseText.text = `${playerName} - ${phaseNames[phase] || phase}`;
-    this.phaseText.style.fill = playerColor;
 
     // Update turn text if provided
     if (currentTurn !== undefined) {
@@ -224,51 +258,60 @@ export class BattleLogZone extends Container {
   public update(ticker: Ticker): void {
     this.time += ticker.deltaTime * 0.05;
 
-    // Animate border pulse
+    // Animate border pulse (mystical breathing effect)
     const pulse = Math.sin(this.time) * 0.3 + 0.7;
     this.borderPulse.alpha = pulse;
   }
 
   showNotification(message: string, color?: number | string, duration: number = 2000): void {
-    // Update notification text
     this.notificationText.text = message;
 
     const notificationColor = color !== undefined ? color : Colors.SUCCESS;
-    this.notificationText.style.fill = notificationColor;
 
-    // Draw notification background
+    // Draw fantasy notification badge with dark background
     this.notificationBg.clear();
 
-    // Measure text to size background
-    const padding = 12;
+    const padding = 14;
     const bgWidth = this.notificationText.width + padding * 2;
     const bgHeight = this.notificationText.height + padding;
 
-    // Background with glow
-    this.notificationBg.roundRect(-bgWidth / 2 - 2, -bgHeight / 2 - 2, bgWidth + 4, bgHeight + 4, 6)
-      .fill({ color: notificationColor, alpha: 0.2 });
+    // Outer glow
+    this.notificationBg.roundRect(-bgWidth / 2 - 3, -bgHeight / 2 - 3, bgWidth + 6, bgHeight + 6, 8)
+      .fill({ color: notificationColor, alpha: 0.3 });
 
-    this.notificationBg.roundRect(-bgWidth / 2, -bgHeight / 2, bgWidth, bgHeight, 4)
-      .fill({ color: Colors.PANEL_BACKGROUND, alpha: 0.95 })
-      .stroke({ width: 2, color: notificationColor, alpha: 0.8 });
+    // Dark badge background for better contrast
+    this.notificationBg.roundRect(-bgWidth / 2, -bgHeight / 2, bgWidth, bgHeight, 6)
+      .fill({ color: 0x2a1810, alpha: 0.95 })
+      .stroke({ width: 2, color: notificationColor, alpha: 0.9 });
+
+    // Inner darker texture
+    this.notificationBg.roundRect(-bgWidth / 2 + 2, -bgHeight / 2 + 2, bgWidth - 4, bgHeight - 4, 4)
+      .fill({ color: 0x1a0f0a, alpha: 0.6 });
+
+    // Inner highlight border
+    this.notificationBg.roundRect(-bgWidth / 2 + 2, -bgHeight / 2 + 2, bgWidth - 4, bgHeight - 4, 4)
+      .stroke({ width: 1, color: notificationColor, alpha: 0.7 });
 
     // Cancel any existing animation
     gsap.killTweensOf(this.notificationContainer);
 
-    // Enhanced bounce-in animation
+    // Enhanced bounce-in with rotation
     this.notificationContainer.alpha = 0;
-    this.notificationContainer.scale.set(0.5);
+    this.notificationContainer.scale.set(0.3);
+    this.notificationContainer.rotation = -0.2;
 
     gsap.timeline()
       .to(this.notificationContainer, {
         alpha: 1,
         scale: 1,
-        duration: 0.4,
-        ease: 'back.out(2)'
+        rotation: 0,
+        duration: 0.5,
+        ease: 'back.out(2.5)'
       })
       .to(this.notificationContainer, {
         alpha: 0,
         scale: 0.8,
+        rotation: 0.1,
         duration: 0.4,
         delay: duration / 1000,
         ease: 'back.in(1.5)'

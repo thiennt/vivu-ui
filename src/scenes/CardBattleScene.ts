@@ -772,67 +772,196 @@ export class CardBattleScene extends BaseScene {
     return false;
   }
 
-  private showBattleResult(): void {
+   private showBattleResult(): void {
     if (!this.battleState) return;
 
     const resultContainer = new Container();
 
+    // Dark fantasy overlay
     const overlay = new Graphics();
     overlay.rect(0, 0, this.gameWidth, this.gameHeight)
-      .fill(Colors.BATTLE_LOG_BG, 0.7);
+      .fill({ color: 0x000000, alpha: 0.9 });
 
+    // Victory/Defeat banner dimensions
+    const bannerWidth = Math.min(400, this.gameWidth - 60);
+    const bannerHeight = 280;
+    const bannerX = (this.gameWidth - bannerWidth) / 2;
+    const bannerY = (this.gameHeight - bannerHeight) / 2;
+
+    // Fantasy parchment result panel
     const resultBg = new Graphics();
-    resultBg.roundRect(0, 0, 300, 200, 20)
-      .fill(Colors.UI_BACKGROUND)
-      .stroke({ width: 3, color: Colors.UI_BORDER });
-    resultBg.x = (this.gameWidth - 300) / 2;
-    resultBg.y = (this.gameHeight - 200) / 2;
-
+    
+    // Shadow
+    resultBg.roundRect(bannerX + 5, bannerY + 5, bannerWidth, bannerHeight, 15)
+      .fill({ color: 0x000000, alpha: 0.7 });
+    
     const isVictory = this.battleState.winner_team === 1;
+    
+    // Main panel with victory/defeat colors
+    const panelColor = isVictory ? 0xffd700 : 0x8b4513;
+    resultBg.roundRect(bannerX, bannerY, bannerWidth, bannerHeight, 15)
+      .fill({ color: 0xf5e6d3, alpha: 0.98 })
+      .stroke({ width: 4, color: panelColor });
+    
+    // Inner layer
+    resultBg.roundRect(bannerX + 5, bannerY + 5, bannerWidth - 10, bannerHeight - 10, 12)
+      .fill({ color: 0xe8d4b8, alpha: 0.6 });
+    
+    // Golden/brown highlight
+    resultBg.roundRect(bannerX + 8, bannerY + 8, bannerWidth - 16, bannerHeight - 16, 10)
+      .stroke({ width: 2, color: panelColor, alpha: 0.8 });
+    
+    // Decorative corners
+    this.drawResultCorners(resultBg, bannerX, bannerY, bannerWidth, bannerHeight, panelColor);
+
+    // Victory/Defeat icon
+    const iconText = new Text({
+      text: isVictory ? '🏆' : '💀',
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 64,
+        fill: 0xffffff
+      }
+    });
+    iconText.anchor.set(0.5);
+    iconText.x = this.gameWidth / 2;
+    iconText.y = bannerY + 70;
+
+    // Result text
     const resultText = new Text({
       text: isVictory ? 'VICTORY!' : 'DEFEAT!',
       style: {
         fontFamily: 'Kalam',
-        fontSize: 32,
-        fill: isVictory ? Colors.SUCCESS : Colors.ERROR,
+        fontSize: 42,
+        fontWeight: 'bold',
+        fill: isVictory ? 0x2a7d2e : 0x8b1a1a,
+        stroke: { color: isVictory ? 0xffd700 : 0x2a1810, width: 3 },
+        dropShadow: {
+          color: isVictory ? 0xffd700 : 0x000000,
+          blur: 5,
+          angle: Math.PI / 4,
+          distance: 3,
+          alpha: 0.8
+        },
         align: 'center'
       }
     });
     resultText.anchor.set(0.5);
     resultText.x = this.gameWidth / 2;
-    resultText.y = this.gameHeight / 2 - 30;
+    resultText.y = bannerY + 140;
 
-    const backButton = new Container();
-    const backBg = new Graphics();
-    backBg.roundRect(0, 0, 100, 40, 8)
-      .fill(Colors.BUTTON_PRIMARY)
-      .stroke({ width: 2, color: Colors.BUTTON_BORDER });
-
-    const backText = new Text({
-      text: 'BACK',
+    // Subtitle
+    const subtitleText = new Text({
+      text: isVictory ? 'Well fought, hero!' : 'Try again, brave warrior!',
       style: {
         fontFamily: 'Kalam',
-        fontSize: 14,
-        fill: Colors.TEXT_PRIMARY,
+        fontSize: 16,
+        fill: 0x5d4b37,
+        align: 'center'
+      }
+    });
+    subtitleText.anchor.set(0.5);
+    subtitleText.x = this.gameWidth / 2;
+    subtitleText.y = bannerY + 185;
+
+    // Back button with fantasy style
+    const backButton = new Container();
+    const buttonWidth = 140;
+    const buttonHeight = 45;
+    
+    const backBg = new Graphics();
+    backBg.roundRect(2, 2, buttonWidth, buttonHeight, 8)
+      .fill({ color: 0x000000, alpha: 0.4 });
+    backBg.roundRect(0, 0, buttonWidth, buttonHeight, 8)
+      .fill({ color: 0x8b4513, alpha: 0.95 })
+      .stroke({ width: 2, color: 0xd4af37 });
+    backBg.roundRect(2, 2, buttonWidth - 4, buttonHeight - 4, 6)
+      .stroke({ width: 1, color: 0xffd700, alpha: 0.6 });
+
+    const backText = new Text({
+      text: '← Back Home',
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 16,
+        fontWeight: 'bold',
+        fill: 0xffffff,
+        stroke: { color: 0x2a1810, width: 2 },
         align: 'center'
       }
     });
     backText.anchor.set(0.5);
-    backText.x = 50;
-    backText.y = 20;
+    backText.x = buttonWidth / 2;
+    backText.y = buttonHeight / 2;
 
     backButton.addChild(backBg, backText);
-    backButton.x = this.gameWidth / 2 - 50;
-    backButton.y = this.gameHeight / 2 + 40;
+    backButton.x = this.gameWidth / 2 - buttonWidth / 2;
+    backButton.y = bannerY + 215;
 
     backButton.interactive = true;
     backButton.cursor = 'pointer';
+    
+    backButton.on('pointerover', () => {
+      backBg.clear();
+      backBg.roundRect(2, 2, buttonWidth, buttonHeight, 8)
+        .fill({ color: 0x000000, alpha: 0.4 });
+      backBg.roundRect(0, 0, buttonWidth, buttonHeight, 8)
+        .fill({ color: 0xa0632a, alpha: 0.95 })
+        .stroke({ width: 2, color: 0xffd700 });
+      backBg.roundRect(2, 2, buttonWidth - 4, buttonHeight - 4, 6)
+        .stroke({ width: 1, color: 0xffd700, alpha: 0.9 });
+      backButton.scale.set(1.03);
+    });
+    
+    backButton.on('pointerout', () => {
+      backBg.clear();
+      backBg.roundRect(2, 2, buttonWidth, buttonHeight, 8)
+        .fill({ color: 0x000000, alpha: 0.4 });
+      backBg.roundRect(0, 0, buttonWidth, buttonHeight, 8)
+        .fill({ color: 0x8b4513, alpha: 0.95 })
+        .stroke({ width: 2, color: 0xd4af37 });
+      backBg.roundRect(2, 2, buttonWidth - 4, buttonHeight - 4, 6)
+        .stroke({ width: 1, color: 0xffd700, alpha: 0.6 });
+      backButton.scale.set(1.0);
+    });
+    
     backButton.on('pointertap', () => {
       navigation.showScreen(HomeScene);
     });
 
-    resultContainer.addChild(overlay, resultBg, resultText, backButton);
+    resultContainer.addChild(overlay, resultBg, iconText, resultText, subtitleText, backButton);
     this.addChild(resultContainer);
+  }
+
+  private drawResultCorners(graphics: Graphics, x: number, y: number, width: number, height: number, color: number): void {
+    const cornerSize = 15;
+    
+    // Top-left
+    graphics.moveTo(x, y + cornerSize)
+      .lineTo(x, y)
+      .lineTo(x + cornerSize, y)
+      .stroke({ width: 3, color: color, alpha: 0.9 });
+    graphics.circle(x + 5, y + 5, 3).fill({ color: color, alpha: 1 });
+    
+    // Top-right
+    graphics.moveTo(x + width - cornerSize, y)
+      .lineTo(x + width, y)
+      .lineTo(x + width, y + cornerSize)
+      .stroke({ width: 3, color: color, alpha: 0.9 });
+    graphics.circle(x + width - 5, y + 5, 3).fill({ color: color, alpha: 1 });
+    
+    // Bottom-left
+    graphics.moveTo(x, y + height - cornerSize)
+      .lineTo(x, y + height)
+      .lineTo(x + cornerSize, y + height)
+      .stroke({ width: 3, color: color, alpha: 0.9 });
+    graphics.circle(x + 5, y + height - 5, 3).fill({ color: color, alpha: 1 });
+    
+    // Bottom-right
+    graphics.moveTo(x + width - cornerSize, y + height)
+      .lineTo(x + width, y + height)
+      .lineTo(x + width, y + height - cornerSize)
+      .stroke({ width: 3, color: color, alpha: 0.9 });
+    graphics.circle(x + width - 5, y + height - 5, 3).fill({ color: color, alpha: 1 });
   }
 
   private endTurn(): void {
