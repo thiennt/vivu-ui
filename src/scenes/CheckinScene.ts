@@ -13,6 +13,8 @@ export class CheckinScene extends BaseScene {
   private characters: any[] = [];
   private loadingManager: LoadingStateManager;
   private checkinReward: any = null;
+  private hasCheckedInToday: boolean = false;
+  private isCheckingIn: boolean = false;
   
   // UI containers
   public container: Container;
@@ -21,6 +23,7 @@ export class CheckinScene extends BaseScene {
   private rewardContainer: Container;
   private gridContainer: Container;
   private buttonContainer: Container;
+  private checkinButtonContainer: Container;
 
   constructor() {
     super();
@@ -32,6 +35,7 @@ export class CheckinScene extends BaseScene {
     this.rewardContainer = new Container();
     this.gridContainer = new Container();
     this.buttonContainer = new Container();
+    this.checkinButtonContainer = new Container();
     
     this.addChild(this.container);
     this.container.addChild(
@@ -39,17 +43,45 @@ export class CheckinScene extends BaseScene {
       this.headerContainer,
       this.rewardContainer,
       this.gridContainer,
+      this.checkinButtonContainer,
       this.buttonContainer
     );
     
     // Initialize loading manager
     this.loadingManager = new LoadingStateManager(this.container, this.gameWidth, this.gameHeight);
     
-    // Call checkin API and load data
-    this.performCheckin();
+    // Check if user has already checked in today
+    this.checkTodayCheckinStatus();
+    
+    // Initialize UI without performing checkin
+    this.initializeUI();
   }
   
+  private checkTodayCheckinStatus(): void {
+    const lastCheckinDate = localStorage.getItem('lastCheckinDate');
+    const today = new Date().toDateString();
+    
+    if (lastCheckinDate === today) {
+      this.hasCheckedInToday = true;
+      // Load cached data from localStorage if available
+      const cachedCharacters = localStorage.getItem('checkinCharacters');
+      const cachedReward = localStorage.getItem('checkinReward');
+      
+      if (cachedCharacters) {
+        this.characters = JSON.parse(cachedCharacters);
+      }
+      if (cachedReward) {
+        this.checkinReward = JSON.parse(cachedReward);
+      }
+    }
+  }
+
   private async performCheckin(): Promise<void> {
+    if (this.hasCheckedInToday || this.isCheckingIn) {
+      return;
+    }
+    
+    this.isCheckingIn = true;
     this.loadingManager.showLoading();
     
     try {
@@ -58,24 +90,34 @@ export class CheckinScene extends BaseScene {
       if (response.data) {
         this.characters = response.data.characters || [];
         this.checkinReward = response.data.checkin_reward || null;
+        
+        // Mark as checked in today
+        this.hasCheckedInToday = true;
+        const today = new Date().toDateString();
+        localStorage.setItem('lastCheckinDate', today);
+        localStorage.setItem('checkinCharacters', JSON.stringify(this.characters));
+        localStorage.setItem('checkinReward', JSON.stringify(this.checkinReward));
       }
     } catch (error) {
       console.error('Checkin failed:', error);
     }
     
     this.loadingManager.hideLoading();
+    this.isCheckingIn = false;
     
     // Show mock data indicator if we're likely using mock data
     if (isLikelyUsingMockData()) {
       this.loadingManager.showMockDataIndicator();
     }
     
-    this.initializeUI();
+    // Refresh UI to show the results and disable button
+    this.updateLayout();
   }
   
   private initializeUI(): void {
     this.createBackground();
     this.createHeader();
+    this.createCheckinButton();
     if (this.checkinReward) {
       this.createRewardDisplay();
     }
@@ -105,11 +147,13 @@ export class CheckinScene extends BaseScene {
     this.headerContainer.removeChildren();
     this.rewardContainer.removeChildren();
     this.gridContainer.removeChildren();
+    this.checkinButtonContainer.removeChildren();
     this.buttonContainer.removeChildren();
     
     // Recreate layout with current dimensions
     this.createBackground();
     this.createHeader();
+    this.createCheckinButton();
     if (this.checkinReward) {
       this.createRewardDisplay();
     }
@@ -235,12 +279,17 @@ export class CheckinScene extends BaseScene {
     title.x = this.gameWidth / 2;
     title.y = bannerY + bannerHeight / 2;
 
+    // Update subtitle based on check-in status
+    const subtitleText = this.hasCheckedInToday 
+      ? '✨ Already checked in today! ✨'
+      : '✨ Click button below to check in ✨';
+    
     const subtitle = new Text({
-      text: '✨ Check-in successful! ✨',
+      text: subtitleText,
       style: {
         fontFamily: 'Kalam',
         fontSize: 14,
-        fill: 0xd4af37,
+        fill: this.hasCheckedInToday ? 0x90ee90 : 0xd4af37,
         align: 'center'
       }
     });
@@ -313,11 +362,34 @@ export class CheckinScene extends BaseScene {
 
     rewardBox.addChild(rewardText);
     
-    // Center horizontally
+    // Center horizontally - position after check-in button
     rewardBox.x = (this.gameWidth - boxWidth) / 2;
-    rewardBox.y = 95;
+    rewardBox.y = 155;
 
     this.rewardContainer.addChild(rewardBox);
+  }
+
+  private createCheckinButton(): void {
+    const buttonWidth = Math.min(220, this.gameWidth - 2 * this.STANDARD_PADDING);
+    const buttonHeight = 50;
+    
+    const buttonText = this.hasCheckedInToday ? '✓ Checked In Today' : '🎁 Check In Now';
+    
+    const checkinButton = this.createFantasyButton(
+      buttonText,
+      (this.gameWidth - buttonWidth) / 2,
+      90,
+      buttonWidth,
+      buttonHeight,
+      () => {
+        if (!this.hasCheckedInToday && !this.isCheckingIn) {
+          this.performCheckin();
+        }
+      },
+      this.hasCheckedInToday // disabled state
+    );
+
+    this.checkinButtonContainer.addChild(checkinButton);
   }
 
   private drawRewardCorners(graphics: Graphics, x: number, y: number, width: number, height: number, color: number): void {
@@ -361,7 +433,7 @@ export class CheckinScene extends BaseScene {
   }
 
   private createCharacterGrid(): void {
-    const gridTop = this.checkinReward ? 195 : 110;
+    const gridTop = this.checkinReward ? 255 : 160;
     const backButtonHeight = 45;
     const backButtonMargin = 20;
     const gridHeight = this.gameHeight - gridTop - backButtonHeight - backButtonMargin - this.STANDARD_PADDING;
@@ -449,18 +521,26 @@ export class CheckinScene extends BaseScene {
     y: number,
     width: number,
     height: number,
-    onClick: () => void
+    onClick: () => void,
+    disabled: boolean = false
   ): Container {
     const button = new Container();
     
     const bg = new Graphics();
+    
+    // Determine colors based on disabled state
+    const mainColor = disabled ? 0x666666 : 0x8b4513;
+    const strokeColor = disabled ? 0x888888 : 0xd4af37;
+    const highlightColor = disabled ? 0x999999 : 0xffd700;
+    const textColor = disabled ? 0xaaaaaa : 0xffffff;
+    
     bg.roundRect(2, 2, width, height, 8)
       .fill({ color: 0x000000, alpha: 0.4 });
     bg.roundRect(0, 0, width, height, 8)
-      .fill({ color: 0x8b4513, alpha: 0.95 })
-      .stroke({ width: 2, color: 0xd4af37 });
+      .fill({ color: mainColor, alpha: 0.95 })
+      .stroke({ width: 2, color: strokeColor });
     bg.roundRect(2, 2, width - 4, height - 4, 6)
-      .stroke({ width: 1, color: 0xffd700, alpha: 0.6 });
+      .stroke({ width: 1, color: highlightColor, alpha: 0.6 });
 
     const buttonText = new Text({
       text: text,
@@ -468,7 +548,7 @@ export class CheckinScene extends BaseScene {
         fontFamily: 'Kalam',
         fontSize: 16,
         fontWeight: 'bold',
-        fill: 0xffffff,
+        fill: textColor,
         stroke: { color: 0x2a1810, width: 2 }
       }
     });
@@ -479,34 +559,37 @@ export class CheckinScene extends BaseScene {
     button.addChild(bg, buttonText);
     button.x = x;
     button.y = y;
-    button.interactive = true;
-    button.cursor = 'pointer';
     
-    button.on('pointerover', () => {
-      bg.clear();
-      bg.roundRect(2, 2, width, height, 8)
-        .fill({ color: 0x000000, alpha: 0.4 });
-      bg.roundRect(0, 0, width, height, 8)
-        .fill({ color: 0xa0632a, alpha: 0.95 })
-        .stroke({ width: 2, color: 0xffd700 });
-      bg.roundRect(2, 2, width - 4, height - 4, 6)
-        .stroke({ width: 1, color: 0xffd700, alpha: 0.9 });
-      button.scale.set(1.02);
-    });
-    
-    button.on('pointerout', () => {
-      bg.clear();
-      bg.roundRect(2, 2, width, height, 8)
-        .fill({ color: 0x000000, alpha: 0.4 });
-      bg.roundRect(0, 0, width, height, 8)
-        .fill({ color: 0x8b4513, alpha: 0.95 })
-        .stroke({ width: 2, color: 0xd4af37 });
-      bg.roundRect(2, 2, width - 4, height - 4, 6)
-        .stroke({ width: 1, color: 0xffd700, alpha: 0.6 });
-      button.scale.set(1.0);
-    });
-    
-    button.on('pointerdown', onClick);
+    if (!disabled) {
+      button.interactive = true;
+      button.cursor = 'pointer';
+      
+      button.on('pointerover', () => {
+        bg.clear();
+        bg.roundRect(2, 2, width, height, 8)
+          .fill({ color: 0x000000, alpha: 0.4 });
+        bg.roundRect(0, 0, width, height, 8)
+          .fill({ color: 0xa0632a, alpha: 0.95 })
+          .stroke({ width: 2, color: 0xffd700 });
+        bg.roundRect(2, 2, width - 4, height - 4, 6)
+          .stroke({ width: 1, color: 0xffd700, alpha: 0.9 });
+        button.scale.set(1.02);
+      });
+      
+      button.on('pointerout', () => {
+        bg.clear();
+        bg.roundRect(2, 2, width, height, 8)
+          .fill({ color: 0x000000, alpha: 0.4 });
+        bg.roundRect(0, 0, width, height, 8)
+          .fill({ color: 0x8b4513, alpha: 0.95 })
+          .stroke({ width: 2, color: 0xd4af37 });
+        bg.roundRect(2, 2, width - 4, height - 4, 6)
+          .stroke({ width: 1, color: 0xffd700, alpha: 0.6 });
+        button.scale.set(1.0);
+      });
+      
+      button.on('pointerdown', onClick);
+    }
     
     return button;
   }
