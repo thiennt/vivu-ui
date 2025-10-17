@@ -177,20 +177,21 @@ export class DeckCard extends Container {
         groupIcon = '⚔️';
         iconColor = 0xe74c3c;  // Red
         break;
-      case CardType.HEAL:
-        groupIcon = '✨';
-        iconColor = 0x26de81;  // Green
-        break;
-      case CardType.DEBUFF:
-        groupIcon = '🌀';
-        iconColor = 0xa55eea;  // Purple
-        break;
-      case CardType.BUFF:
-        groupIcon = '🔼';
-        iconColor = 0x4a90e2;  // Blue
-        break;
+      // case CardType.HEAL:
+      //   groupIcon = '✨';
+      //   iconColor = 0x26de81;  // Green
+      //   break;
+      // case CardType.DEBUFF:
+      //   groupIcon = '🌀';
+      //   iconColor = 0xa55eea;  // Purple
+      //   break;
+      // case CardType.BUFF:
+      //   groupIcon = '🔼';
+      //   iconColor = 0x4a90e2;  // Blue
+      //   break;
       default:
-        groupIcon = '⭐';
+        groupIcon = '✨';
+        iconColor = 0x26de81;
     }
     
     const groupIconRadius = 10;
@@ -225,7 +226,7 @@ export class DeckCard extends Container {
 
     // Avatar/Icon in center of frame with magical glow
     const avatarIcon = new Text({
-      text: groupIcon,
+      text: card.icon_url || groupIcon,  // Fallback to group icon if no avatar
       style: {
         fontFamily: 'Kalam',
         fontSize: Math.max(28, Math.round(36 * fontScale)),

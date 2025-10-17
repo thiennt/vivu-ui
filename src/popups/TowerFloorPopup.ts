@@ -221,7 +221,6 @@ export class TowerFloorPopup extends Container {
       rewardPanel,
       rewardTitle,
       treasureChest,
-      chestText,
       challengeButton,
       closeButton
     );

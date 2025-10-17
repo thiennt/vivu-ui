@@ -413,7 +413,7 @@ export class CardDetailPopup extends Container {
 
     // Large avatar icon in frame with dramatic glow
     const avatarIcon = new Text({
-      text: groupIcon,
+      text: this.card.icon_url || groupIcon,
       style: {
         fontFamily: 'Kalam',
         fontSize: 130,
@@ -817,19 +817,13 @@ export class CardDetailPopup extends Container {
   private getGroupIcon(group: string): string {
     const groupLower = group.toLowerCase();
     if (groupLower.includes('attack') || groupLower.includes('damage')) return '⚔️';
-    if (groupLower.includes('heal')) return '✨';
-    if (groupLower.includes('debuff') || groupLower.includes('control')) return '🌀';
-    if (groupLower.includes('buff') || groupLower.includes('enhancement')) return '🔼';
-    return '⭐';
+    return '✨';
   }
 
   private getGroupColor(group: string): number {
     const groupLower = group.toLowerCase();
-    if (groupLower.includes('attack')) return 0xe74c3c;
-    if (groupLower.includes('heal')) return 0x26de81;
-    if (groupLower.includes('debuff')) return 0xa55eea;
-    if (groupLower.includes('buff')) return 0x4a90e2;
-    return 0xffffff;
+    if (groupLower.includes('attack') || groupLower.includes('damage')) return 0xe74c3c;
+    return 0x26de81;
   }
 
   private getRarityColor(rarity?: string): number {
