@@ -354,6 +354,9 @@ export class EquipmentChangePopup extends Container {
     this.gameHeight = height;
     this.removeChildren();
     // Use cached equipment data instead of reloading from API
-    this.createDialog();
+    // Only recreate dialog if equipment data has been loaded
+    if (this.availableEquipment.length > 0) {
+      this.createDialog();
+    }
   }
 }
