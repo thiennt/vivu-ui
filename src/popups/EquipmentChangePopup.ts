@@ -353,6 +353,6 @@ export class EquipmentChangePopup extends Container {
     this.gameWidth = width;
     this.gameHeight = height;
     this.removeChildren();
-    this.createDialog();
+    this.loadEquipmentAndCreateDialog();
   }
 }
