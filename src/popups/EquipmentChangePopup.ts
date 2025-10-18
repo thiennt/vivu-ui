@@ -1,10 +1,13 @@
 import { Container, Graphics, Text } from 'pixi.js';
 import { navigation } from '@/utils/navigation';
 import { Colors } from '@/utils/colors';
+import { equipmentApi } from '@/services/api';
 
 interface Equipment {
+  id?: string;
   name: string;
   description: string;
+  slot?: string;
 }
 
 export class EquipmentChangePopup extends Container {
@@ -13,24 +16,55 @@ export class EquipmentChangePopup extends Container {
   private equipmentType: string;
   private slotName: string;
   private currentItem: string;
+  private characterId: string;
   private onEquipmentSelected: (equipmentType: string, slotName: string, equipment: Equipment) => void;
   private gameWidth: number;
   private gameHeight: number;
+  private availableEquipment: Equipment[] = [];
 
   constructor(params: { 
     equipmentType: string;
     slotName: string;
     currentItem: string;
+    characterId: string;
     onEquipmentSelected: (equipmentType: string, slotName: string, equipment: Equipment) => void 
   }) {
     super();
     this.equipmentType = params.equipmentType;
     this.slotName = params.slotName;
     this.currentItem = params.currentItem;
+    this.characterId = params.characterId;
     this.onEquipmentSelected = params.onEquipmentSelected;
     this.gameWidth = navigation.width;
     this.gameHeight = navigation.height;
-    this.createDialog();
+    this.loadEquipmentAndCreateDialog();
+  }
+
+  private async loadEquipmentAndCreateDialog(): Promise<void> {
+    try {
+      // Fetch player inventory
+      const inventory = await equipmentApi.getPlayerInventory();
+      
+      // Filter equipment by slot type
+      this.availableEquipment = (inventory.equipment || []).filter(
+        (eq: Equipment) => eq.slot === this.equipmentType
+      );
+      
+      // Add empty option for unequipping
+      if (this.currentItem !== '(empty)') {
+        this.availableEquipment.push({
+          id: undefined,
+          name: '(empty)',
+          description: 'Unequip current item.',
+          slot: this.equipmentType
+        });
+      }
+      
+      this.createDialog();
+    } catch (error) {
+      console.error('Failed to load equipment:', error);
+      this.createDialog(); // Create dialog even if API fails
+    }
   }
 
   private createDialog(): void {
@@ -114,12 +148,11 @@ export class EquipmentChangePopup extends Container {
     currentText.y = dialogY + 75;
 
     // Available equipment options
-    const availableEquipment = this.getAvailableEquipment(this.equipmentType);
     let optionY = dialogY + 105;
 
     const equipmentOptions: Container[] = [];
 
-    availableEquipment.forEach((equipment) => {
+    this.availableEquipment.forEach((equipment) => {
       const optionContainer = new Container();
       
       const isCurrentItem = equipment.name === this.currentItem;
@@ -316,39 +349,14 @@ export class EquipmentChangePopup extends Container {
     return button;
   }
 
-  private getAvailableEquipment(equipmentType: string): Array<{name: string, description: string}> {
-    const equipmentData: Record<string, Array<{name: string, description: string}>> = {
-      weapon: [
-        { name: 'Sword', description: '+10 Attack. Balanced weapon for versatile combat.' },
-        { name: 'Axe', description: '+15 Attack, -2 Speed. Heavy weapon with high damage.' },
-        { name: 'Bow', description: '+8 Attack, +3 Speed. Ranged weapon for quick strikes.' },
-        { name: 'Staff', description: '+5 Attack, +10 Magic. Magical weapon for spellcasters.' },
-        { name: 'Dagger', description: '+6 Attack, +5 Speed. Fast weapon for critical hits.' }
-      ],
-      armor: [
-        { name: 'Plate', description: '+15 Defense, -3 Speed. Heavy armor with maximum protection.' },
-        { name: 'Chain Mail', description: '+10 Defense, -1 Speed. Balanced armor for most situations.' },
-        { name: 'Leather', description: '+5 Defense, +2 Speed. Light armor for mobility.' },
-        { name: 'Robe', description: '+3 Defense, +5 Magic. Magical robes for spellcasters.' },
-        { name: 'Scale Mail', description: '+12 Defense, -2 Speed. Durable armor with good protection.' }
-      ],
-      accessory: [
-        { name: 'Power Ring', description: '+5 Attack. Increases physical damage output.' },
-        { name: 'Shield Ring', description: '+5 Defense. Reduces incoming damage.' },
-        { name: 'Speed Boots', description: '+5 Speed. Increases movement and attack speed.' },
-        { name: 'Magic Amulet', description: '+8 Magic. Enhances magical abilities.' },
-        { name: 'Health Pendant', description: '+20 HP. Increases maximum health points.' },
-        { name: '(empty)', description: 'No accessory equipped.' }
-      ]
-    };
-    
-    return equipmentData[equipmentType] || [];
-  }
-
   resize(width: number, height: number): void {
     this.gameWidth = width;
     this.gameHeight = height;
     this.removeChildren();
-    this.createDialog();
+    // Use cached equipment data instead of reloading from API
+    // Only recreate dialog if equipment data has been loaded
+    if (this.availableEquipment.length > 0) {
+      this.createDialog();
+    }
   }
 }

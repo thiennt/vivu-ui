@@ -3,7 +3,7 @@ import { navigation } from '@/utils/navigation';
 import { HomeScene } from './HomeScene';
 import { BaseScene } from '@/ui/BaseScene';
 import { CharactersScene } from './CharactersScene';
-import { charactersApi, isLikelyUsingMockData } from '@/services/api';
+import { charactersApi, equipmentApi, isLikelyUsingMockData } from '@/services/api';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
 import { Colors } from '@/utils/colors';
 import { LearnSkillPopup } from '@/popups/LearnSkillPopup';
@@ -16,6 +16,7 @@ export class CharacterDetailScene extends BaseScene {
   public static assetBundles = [];
   private character: any = null;
   private characterSkills: any[] = [];
+  private characterEquipment: any = null;
   private loadingManager: LoadingStateManager;
   
   // UI containers
@@ -69,9 +70,10 @@ export class CharacterDetailScene extends BaseScene {
 
     this.loadingManager.showLoading();
     
-    // Load character skills
+    // Load character skills and equipment
     this.character = await charactersApi.getCharacter(this.character.id);
     this.characterSkills = this.character.character_skills || [];
+    this.characterEquipment = await equipmentApi.getCharacterEquipment(this.character.id);
 
     this.loadingManager.hideLoading();
     
@@ -703,9 +705,24 @@ export class CharacterDetailScene extends BaseScene {
     this.equipmentContainer.addChild(equipmentPanel, title);
 
     const equipmentSlots = [
-      { name: 'Weapon', item: 'Sword', type: 'weapon' },
-      { name: 'Armor', item: 'Plate', type: 'armor' },
-      { name: 'Accessory', item: '(empty)', type: 'accessory' }
+      { 
+        name: 'Weapon', 
+        item: this.characterEquipment?.weapon?.name || '(empty)', 
+        type: 'weapon',
+        equipment: this.characterEquipment?.weapon
+      },
+      { 
+        name: 'Armor', 
+        item: this.characterEquipment?.armor?.name || '(empty)', 
+        type: 'armor',
+        equipment: this.characterEquipment?.armor
+      },
+      { 
+        name: 'Accessory', 
+        item: this.characterEquipment?.accessory?.name || '(empty)', 
+        type: 'accessory',
+        equipment: this.characterEquipment?.accessory
+      }
     ];
 
     const slotWidth = (panelWidth - 30) / 3;
@@ -782,19 +799,40 @@ export class CharacterDetailScene extends BaseScene {
           equipmentType,
           slotName,
           currentItem,
-          onEquipmentSelected: (equipmentType: string, slotName: string, equipment: { name: string; description: string }) => {
-            self.equipItem(equipmentType, equipment);
+          characterId: self.character.id,
+          onEquipmentSelected: async (equipmentType: string, slotName: string, equipment: any) => {
+            await self.equipItem(equipmentType, equipment);
           }
         });
       }
     });
   }
 
-  private equipItem(equipmentType: string, equipment: {name: string, description: string}): void {
+  private async equipItem(equipmentType: string, equipment: any): Promise<void> {
     console.log(`Equipped ${equipment.name} in ${equipmentType} slot`);
     
-    this.equipmentContainer.removeChildren();
-    this.createEquipmentDisplay();
+    this.loadingManager.showLoading();
+    
+    try {
+      // Call API to equip item
+      if (equipment && equipment.id) {
+        await equipmentApi.equipItem(this.character.id, equipment.id, equipmentType);
+      } else {
+        // Unequip if equipment is null or empty
+        await equipmentApi.unequipItem(this.character.id, equipmentType);
+      }
+      
+      // Reload equipment data
+      this.characterEquipment = await equipmentApi.getCharacterEquipment(this.character.id);
+      
+      // Refresh equipment display
+      this.equipmentContainer.removeChildren();
+      this.createEquipmentDisplay();
+    } catch (error) {
+      console.error('Failed to equip item:', error);
+    } finally {
+      this.loadingManager.hideLoading();
+    }
   }
 
   private getRarityColor(rarity: string): string {
