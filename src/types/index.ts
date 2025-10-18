@@ -454,3 +454,44 @@ export interface AIAction {
   actions_performed: BattleLogEntry[];
   battle_logs?: BattleLogEntry[]; // Legacy support for backward compatibility
 }
+
+// Equipment types
+export interface Equipment {
+  id: string;
+  name: string;
+  description: string;
+  slot: EquipmentSlot;
+  rarity?: string;
+  stats?: EquipmentStats;
+  icon_url?: string;
+}
+
+export interface EquipmentStats {
+  hp?: number;
+  atk?: number;
+  def?: number;
+  agi?: number;
+  crit_rate?: number;
+  crit_dmg?: number;
+  res?: number;
+  damage?: number;
+  mitigation?: number;
+  hit_rate?: number;
+  dodge?: number;
+}
+
+export enum EquipmentSlot {
+  WEAPON = 'weapon',
+  ARMOR = 'armor',
+  ACCESSORY = 'accessory'
+}
+
+export interface CharacterEquipment {
+  weapon?: Equipment | null;
+  armor?: Equipment | null;
+  accessory?: Equipment | null;
+}
+
+export interface PlayerInventory {
+  equipment: Equipment[];
+}

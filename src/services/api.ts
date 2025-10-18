@@ -9,7 +9,8 @@ import {
   mockPlayer, mockSkills, mockDungeons, mockStages, mockCardBattleState,
   mockBattleStage, mockPlayer1Characters, mockActionResult, mockDrawCardResult,
   mockPlayCardResult, mockEndTurnResult,
-  mockAiTurnResult, mockCheckinResponse
+  mockAiTurnResult, mockCheckinResponse, mockAllEquipment, mockPlayerInventory,
+  mockCharacterEquipment
 } from '@/utils/mockData';
 import {
   TurnAction,
@@ -307,6 +308,66 @@ export const authApi = {
 // Export the ApiError class and LoadingState interface for use in components
 export { ApiError };
 export type { LoadingState };
+
+// Equipment API methods
+export const equipmentApi = {
+  /**
+   * List all available equipment
+   * GET /players/equipment
+   */
+  async getAllEquipment(): Promise<any[]> {
+    return apiRequest('/players/equipment', {}, mockAllEquipment);
+  },
+
+  /**
+   * Get player's inventory
+   * GET /players/:playerId/equipment
+   */
+  async getPlayerInventory(playerId?: string): Promise<any> {
+    const pid = playerId || sessionStorage.getItem('playerId') || 'player_fc_001';
+    return apiRequest(`/players/${pid}/equipment`, {}, mockPlayerInventory);
+  },
+
+  /**
+   * Get character's equipped items
+   * GET /players/:playerId/characters/:characterId/equipment
+   */
+  async getCharacterEquipment(characterId: string, playerId?: string): Promise<any> {
+    const pid = playerId || sessionStorage.getItem('playerId') || 'player_fc_001';
+    return apiRequest(`/players/${pid}/characters/${characterId}/equipment`, {}, mockCharacterEquipment);
+  },
+
+  /**
+   * Equip item to character
+   * POST /players/:playerId/characters/:characterId/equipment
+   */
+  async equipItem(characterId: string, equipmentId: string, slot: string, playerId?: string): Promise<any> {
+    const pid = playerId || sessionStorage.getItem('playerId') || 'player_fc_001';
+    return apiRequest(`/players/${pid}/characters/${characterId}/equipment`, {
+      method: 'POST',
+      body: JSON.stringify({ equipment_id: equipmentId, slot })
+    }, {
+      success: true,
+      message: 'Item equipped successfully',
+      equipment: mockCharacterEquipment
+    });
+  },
+
+  /**
+   * Unequip item from character
+   * DELETE /players/:playerId/characters/:characterId/equipment/:slot
+   */
+  async unequipItem(characterId: string, slot: string, playerId?: string): Promise<any> {
+    const pid = playerId || sessionStorage.getItem('playerId') || 'player_fc_001';
+    return apiRequest(`/players/${pid}/characters/${characterId}/equipment/${slot}`, {
+      method: 'DELETE'
+    }, {
+      success: true,
+      message: 'Item unequipped successfully',
+      equipment: { ...mockCharacterEquipment, [slot]: null }
+    });
+  }
+};
 
 // Utility function to check if we're using mock data (now based on configuration)
 export function isLikelyUsingMockData(): boolean {

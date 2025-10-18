@@ -5181,3 +5181,154 @@ export const mockCheckinResponse = {
     timestamp: new Date().toISOString()
   }
 };
+
+// ---- Equipment Data ----
+export const mockAllEquipment = [
+  // Weapons
+  {
+    id: 'weapon_sword_001',
+    name: 'Sword',
+    description: '+10 Attack. Balanced weapon for versatile combat.',
+    slot: 'weapon',
+    rarity: 'common',
+    stats: { atk: 10 }
+  },
+  {
+    id: 'weapon_axe_001',
+    name: 'Axe',
+    description: '+15 Attack, -2 Speed. Heavy weapon with high damage.',
+    slot: 'weapon',
+    rarity: 'uncommon',
+    stats: { atk: 15, agi: -2 }
+  },
+  {
+    id: 'weapon_bow_001',
+    name: 'Bow',
+    description: '+8 Attack, +3 Speed. Ranged weapon for quick strikes.',
+    slot: 'weapon',
+    rarity: 'common',
+    stats: { atk: 8, agi: 3 }
+  },
+  {
+    id: 'weapon_staff_001',
+    name: 'Staff',
+    description: '+5 Attack, +10 Magic. Magical weapon for spellcasters.',
+    slot: 'weapon',
+    rarity: 'rare',
+    stats: { atk: 5, crit_dmg: 10 }
+  },
+  {
+    id: 'weapon_dagger_001',
+    name: 'Dagger',
+    description: '+6 Attack, +5 Speed. Fast weapon for critical hits.',
+    slot: 'weapon',
+    rarity: 'uncommon',
+    stats: { atk: 6, agi: 5 }
+  },
+  // Armor
+  {
+    id: 'armor_plate_001',
+    name: 'Plate',
+    description: '+15 Defense, -3 Speed. Heavy armor with maximum protection.',
+    slot: 'armor',
+    rarity: 'rare',
+    stats: { def: 15, agi: -3 }
+  },
+  {
+    id: 'armor_chain_001',
+    name: 'Chain Mail',
+    description: '+10 Defense, -1 Speed. Balanced armor for most situations.',
+    slot: 'armor',
+    rarity: 'uncommon',
+    stats: { def: 10, agi: -1 }
+  },
+  {
+    id: 'armor_leather_001',
+    name: 'Leather',
+    description: '+5 Defense, +2 Speed. Light armor for mobility.',
+    slot: 'armor',
+    rarity: 'common',
+    stats: { def: 5, agi: 2 }
+  },
+  {
+    id: 'armor_robe_001',
+    name: 'Robe',
+    description: '+3 Defense, +5 Magic. Magical robes for spellcasters.',
+    slot: 'armor',
+    rarity: 'uncommon',
+    stats: { def: 3, crit_dmg: 5 }
+  },
+  {
+    id: 'armor_scale_001',
+    name: 'Scale Mail',
+    description: '+12 Defense, -2 Speed. Durable armor with good protection.',
+    slot: 'armor',
+    rarity: 'uncommon',
+    stats: { def: 12, agi: -2 }
+  },
+  // Accessories
+  {
+    id: 'accessory_power_ring_001',
+    name: 'Power Ring',
+    description: '+5 Attack. Increases physical damage output.',
+    slot: 'accessory',
+    rarity: 'uncommon',
+    stats: { atk: 5 }
+  },
+  {
+    id: 'accessory_shield_ring_001',
+    name: 'Shield Ring',
+    description: '+5 Defense. Reduces incoming damage.',
+    slot: 'accessory',
+    rarity: 'uncommon',
+    stats: { def: 5 }
+  },
+  {
+    id: 'accessory_speed_boots_001',
+    name: 'Speed Boots',
+    description: '+5 Speed. Increases movement and attack speed.',
+    slot: 'accessory',
+    rarity: 'uncommon',
+    stats: { agi: 5 }
+  },
+  {
+    id: 'accessory_magic_amulet_001',
+    name: 'Magic Amulet',
+    description: '+8 Magic. Enhances magical abilities.',
+    slot: 'accessory',
+    rarity: 'rare',
+    stats: { crit_dmg: 8 }
+  },
+  {
+    id: 'accessory_health_pendant_001',
+    name: 'Health Pendant',
+    description: '+20 HP. Increases maximum health points.',
+    slot: 'accessory',
+    rarity: 'rare',
+    stats: { hp: 20 }
+  }
+];
+
+export const mockPlayerInventory = {
+  equipment: mockAllEquipment
+};
+
+export const mockCharacterEquipment = {
+  weapon: {
+    id: 'weapon_sword_001',
+    name: 'Sword',
+    description: '+10 Attack. Balanced weapon for versatile combat.',
+    slot: 'weapon',
+    rarity: 'common',
+    stats: { atk: 10 }
+  },
+  armor: {
+    id: 'armor_plate_001',
+    name: 'Plate',
+    description: '+15 Defense, -3 Speed. Heavy armor with maximum protection.',
+    slot: 'armor',
+    rarity: 'rare',
+    stats: { def: 15, agi: -3 }
+  },
+  accessory: null
+};
