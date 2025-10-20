@@ -150,6 +150,67 @@ export const skillsApi = {
     const skill = mockSkills.find(s => (s as any).id === skillId);
     return apiRequest(`/skills/${skillId}`, {}, skill);
   },
+
+  /**
+   * Get available skills by type for a character
+   * GET /skills?skill_type={skillType}
+   */
+  async getAvailableSkills(skillType?: string): Promise<any[]> {
+    const endpoint = skillType ? `/skills?skill_type=${skillType}` : '/skills';
+    return apiRequest(endpoint, {}, mockSkills.filter(s => !skillType || s.skill_type === skillType));
+  },
+
+  /**
+   * Learn/equip a skill to a character
+   * POST /players/:playerId/characters/:characterId/skills
+   */
+  async learnSkill(characterId: string, skillId: string, playerId?: string): Promise<any> {
+    const pid = playerId || sessionStorage.getItem('playerId') || 'player_fc_001';
+    return apiRequest(`/players/${pid}/characters/${characterId}/skills`, {
+      method: 'POST',
+      body: JSON.stringify({ skill_id: skillId })
+    }, {
+      success: true,
+      message: 'Skill learned successfully',
+      character_skill: {
+        skill_id: skillId,
+        learned_at: new Date().toISOString()
+      }
+    });
+  },
+
+  /**
+   * Change an equipped skill on a character
+   * PUT /players/:playerId/characters/:characterId/skills/:oldSkillId
+   */
+  async changeSkill(characterId: string, oldSkillId: string, newSkillId: string, playerId?: string): Promise<any> {
+    const pid = playerId || sessionStorage.getItem('playerId') || 'player_fc_001';
+    return apiRequest(`/players/${pid}/characters/${characterId}/skills/${oldSkillId}`, {
+      method: 'PUT',
+      body: JSON.stringify({ new_skill_id: newSkillId })
+    }, {
+      success: true,
+      message: 'Skill changed successfully',
+      character_skill: {
+        skill_id: newSkillId,
+        updated_at: new Date().toISOString()
+      }
+    });
+  },
+
+  /**
+   * Remove a skill from a character
+   * DELETE /players/:playerId/characters/:characterId/skills/:skillId
+   */
+  async removeSkill(characterId: string, skillId: string, playerId?: string): Promise<any> {
+    const pid = playerId || sessionStorage.getItem('playerId') || 'player_fc_001';
+    return apiRequest(`/players/${pid}/characters/${characterId}/skills/${skillId}`, {
+      method: 'DELETE'
+    }, {
+      success: true,
+      message: 'Skill removed successfully'
+    });
+  }
 };
 
 // Battle API methods
