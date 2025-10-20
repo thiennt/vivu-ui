@@ -1,10 +1,13 @@
 import { Container, Graphics, Text } from 'pixi.js';
 import { navigation } from '@/utils/navigation';
 import { Colors } from '@/utils/colors';
+import { skillsApi } from '@/services/api';
 
 interface Skill {
+  id?: string;
   name: string;
   description: string;
+  skill_type?: string;
 }
 
 export class LearnSkillPopup extends Container {
@@ -14,6 +17,8 @@ export class LearnSkillPopup extends Container {
   private onSkillSelected: (skillType: string, skill: Skill) => void;
   private gameWidth: number;
   private gameHeight: number;
+  private availableSkills: Skill[] = [];
+  private isLoading: boolean = true;
 
   constructor(params: { skillType: string; onSkillSelected: (skillType: string, skill: Skill) => void }) {
     super();
@@ -21,7 +26,65 @@ export class LearnSkillPopup extends Container {
     this.onSkillSelected = params.onSkillSelected;
     this.gameWidth = navigation.width;
     this.gameHeight = navigation.height;
-    this.createDialog();
+    this.loadSkillsAndCreateDialog();
+  }
+
+  private async loadSkillsAndCreateDialog(): Promise<void> {
+    // Show loading state
+    this.createLoadingDialog();
+
+    try {
+      // Fetch available skills from API
+      const skills = await skillsApi.getAvailableSkills(this.skillType);
+      this.availableSkills = skills;
+      this.isLoading = false;
+
+      // Recreate dialog with loaded skills
+      this.removeChildren();
+      this.createDialog();
+    } catch (error) {
+      console.error('Failed to load skills:', error);
+      this.isLoading = false;
+      this.availableSkills = this.getFallbackSkills(this.skillType);
+      
+      // Show dialog with fallback data
+      this.removeChildren();
+      this.createDialog();
+    }
+  }
+
+  private createLoadingDialog(): void {
+    // Dark overlay
+    this.dialogBg = new Graphics();
+    this.dialogBg.rect(0, 0, this.gameWidth, this.gameHeight)
+      .fill({ color: 0x000000, alpha: 0.85 });
+    
+    const dialogWidth = Math.min(500, this.gameWidth - 40);
+    const dialogHeight = 200;
+    const dialogX = (this.gameWidth - dialogWidth) / 2;
+    const dialogY = (this.gameHeight - dialogHeight) / 2;
+    
+    // Fantasy parchment panel
+    this.dialogPanel = new Graphics();
+    this.dialogPanel.roundRect(dialogX, dialogY, dialogWidth, dialogHeight, 12)
+      .fill({ color: 0xf5e6d3, alpha: 0.98 })
+      .stroke({ width: 3, color: 0xd4af37 });
+    
+    const loadingText = new Text({
+      text: 'Loading skills...',
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 18,
+        fontWeight: 'bold',
+        fill: 0x8b4513,
+        align: 'center'
+      }
+    });
+    loadingText.anchor.set(0.5);
+    loadingText.x = this.gameWidth / 2;
+    loadingText.y = this.gameHeight / 2;
+
+    this.addChild(this.dialogBg, this.dialogPanel, loadingText);
   }
 
   private createDialog(): void {
@@ -104,13 +167,12 @@ export class LearnSkillPopup extends Container {
     instructionText.x = this.gameWidth / 2;
     instructionText.y = dialogY + 75;
 
-    // Available skills
-    const availableSkills = this.getAvailableSkills(this.skillType);
+    // Use loaded skills from API
     let optionY = dialogY + 105;
 
     const skillOptions: Container[] = [];
 
-    availableSkills.forEach((skill) => {
+    this.availableSkills.forEach((skill) => {
       const optionContainer = new Container();
       
       // Skill card with scroll design
@@ -311,8 +373,9 @@ export class LearnSkillPopup extends Container {
     return button;
   }
 
-  private getAvailableSkills(skillType: string): Array<{name: string, description: string}> {
-    const skillsData: Record<string, Array<{name: string, description: string}>> = {
+  private getFallbackSkills(skillType: string): Skill[] {
+    // Fallback skills data in case API fails
+    const skillsData: Record<string, Skill[]> = {
       active_skill: [
         { name: 'Fireball', description: 'Deals fire damage to target enemy. Moderate damage with burn effect.' },
         { name: 'Heal', description: 'Restores HP to target ally. Can be used multiple times per battle.' },
@@ -337,6 +400,10 @@ export class LearnSkillPopup extends Container {
     this.gameWidth = width;
     this.gameHeight = height;
     this.removeChildren();
-    this.createDialog();
+    if (this.isLoading) {
+      this.createLoadingDialog();
+    } else {
+      this.createDialog();
+    }
   }
 }

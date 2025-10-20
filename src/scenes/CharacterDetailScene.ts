@@ -3,7 +3,7 @@ import { navigation } from '@/utils/navigation';
 import { HomeScene } from './HomeScene';
 import { BaseScene } from '@/ui/BaseScene';
 import { CharactersScene } from './CharactersScene';
-import { charactersApi, equipmentApi, isLikelyUsingMockData } from '@/services/api';
+import { charactersApi, equipmentApi, skillsApi, isLikelyUsingMockData } from '@/services/api';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
 import { Colors } from '@/utils/colors';
 import { LearnSkillPopup } from '@/popups/LearnSkillPopup';
@@ -1028,23 +1028,48 @@ export class CharacterDetailScene extends BaseScene {
       constructor() {
         super({
           skillType,
-          onSkillSelected: (skillType: string, skill: { name: string; description: string }) => {
-            self.learnSkill(skillType, skill);
+          onSkillSelected: async (skillType: string, skill: { id?: string; name: string; description: string }) => {
+            await self.learnSkill(skillType, skill);
           }
         });
       }
     });
   }
 
-  private learnSkill(skillType: string, skill: { name: string, description: string }): void {
-    console.log(`Learned ${skillType}: ${skill.name}`);
+  private async learnSkill(skillType: string, skill: { id?: string; name: string, description: string }): Promise<void> {
+    console.log(`Learning ${skillType}: ${skill.name}`);
 
-    this.skillsContainer.removeChildren();
-    this.createSkillsDisplay();
+    // Show loading indicator
+    this.loadingManager.showLoading();
 
-    // Refresh the scroll content
-    if (this.activeTab === 'skills') {
-      this.refreshTabContent();
+    try {
+      // Call API to learn skill
+      if (skill.id) {
+        await skillsApi.learnSkill(this.character.id, skill.id);
+      }
+
+      // Reload character data to get updated skills
+      this.character = await charactersApi.getCharacter(this.character.id);
+      this.characterSkills = this.character.character_skills || [];
+
+      // Refresh skills display
+      this.skillsContainer.removeChildren();
+      this.createSkillsDisplay();
+
+      // Refresh the scroll content
+      if (this.activeTab === 'skills') {
+        this.refreshTabContent();
+      }
+    } catch (error) {
+      console.error('Failed to learn skill:', error);
+      // Still refresh UI to show any partial changes
+      this.skillsContainer.removeChildren();
+      this.createSkillsDisplay();
+      if (this.activeTab === 'skills') {
+        this.refreshTabContent();
+      }
+    } finally {
+      this.loadingManager.hideLoading();
     }
   }
 
@@ -1055,23 +1080,48 @@ export class CharacterDetailScene extends BaseScene {
         super({
           skillType,
           currentSkill,
-          onSkillSelected: (skillType: string, skill: { name: string; description: string }) => {
-            self.changeSkill(skillType, skill);
+          onSkillSelected: async (skillType: string, skill: { id?: string; name: string; description: string }) => {
+            await self.changeSkill(skillType, currentSkill, skill);
           }
         });
       }
     });
   }
 
-  private changeSkill(skillType: string, skill: { name: string, description: string }): void {
-    console.log(`Changed ${skillType} to ${skill.name}`);
+  private async changeSkill(skillType: string, currentSkill: any, newSkill: { id?: string; name: string, description: string }): Promise<void> {
+    console.log(`Changing ${skillType} from ${currentSkill.name} to ${newSkill.name}`);
 
-    this.skillsContainer.removeChildren();
-    this.createSkillsDisplay();
+    // Show loading indicator
+    this.loadingManager.showLoading();
 
-    // Refresh the scroll content
-    if (this.activeTab === 'skills') {
-      this.refreshTabContent();
+    try {
+      // Call API to change skill
+      if (currentSkill.id && newSkill.id) {
+        await skillsApi.changeSkill(this.character.id, currentSkill.id, newSkill.id);
+      }
+
+      // Reload character data to get updated skills
+      this.character = await charactersApi.getCharacter(this.character.id);
+      this.characterSkills = this.character.character_skills || [];
+
+      // Refresh skills display
+      this.skillsContainer.removeChildren();
+      this.createSkillsDisplay();
+
+      // Refresh the scroll content
+      if (this.activeTab === 'skills') {
+        this.refreshTabContent();
+      }
+    } catch (error) {
+      console.error('Failed to change skill:', error);
+      // Still refresh UI to show any partial changes
+      this.skillsContainer.removeChildren();
+      this.createSkillsDisplay();
+      if (this.activeTab === 'skills') {
+        this.refreshTabContent();
+      }
+    } finally {
+      this.loadingManager.hideLoading();
     }
   }
 
