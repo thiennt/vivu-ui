@@ -10,6 +10,9 @@ import { LearnSkillPopup } from '@/popups/LearnSkillPopup';
 import { SkillChangePopup } from '@/popups/SkillChangePopup';
 import { EquipmentChangePopup } from '@/popups/EquipmentChangePopup';
 import { SkillDetailPopup } from '@/popups/SkillDetailPopup';
+import { ScrollBox } from '@pixi/ui';
+
+type TabType = 'stats' | 'skills' | 'equipment';
 
 export class CharacterDetailScene extends BaseScene {
   /** Assets bundles required by this screen */
@@ -19,11 +22,17 @@ export class CharacterDetailScene extends BaseScene {
   private characterEquipment: any = null;
   private loadingManager: LoadingStateManager;
   
+  // Tab state
+  private activeTab: TabType = 'stats';
+  
   // UI containers
   public container: Container;
   private backgroundContainer: Container;
   private headerContainer: Container;
   private infoContainer: Container;
+  private tabsContainer: Container;
+  private contentContainer: Container;
+  private scrollBox: ScrollBox | null = null;
   private statsContainer: Container;
   private skillsContainer: Container;
   private equipmentContainer: Container;
@@ -39,6 +48,8 @@ export class CharacterDetailScene extends BaseScene {
     this.backgroundContainer = new Container();
     this.headerContainer = new Container();
     this.infoContainer = new Container();
+    this.tabsContainer = new Container();
+    this.contentContainer = new Container();
     this.statsContainer = new Container();
     this.skillsContainer = new Container();
     this.equipmentContainer = new Container();
@@ -49,9 +60,8 @@ export class CharacterDetailScene extends BaseScene {
       this.backgroundContainer,
       this.headerContainer,
       this.infoContainer,
-      this.statsContainer,
-      this.skillsContainer,
-      this.equipmentContainer,
+      this.tabsContainer,
+      this.contentContainer,
       this.buttonContainer
     );
     
@@ -94,9 +104,8 @@ export class CharacterDetailScene extends BaseScene {
     this.createBackground();
     this.createHeader();
     this.createCharacterInfo();
-    this.createStatsDisplay();
-    this.createSkillsDisplay();
-    this.createEquipmentDisplay();
+    this.createTabs();
+    this.createTabContent();
     this.createBackButton();
   }
 
@@ -121,18 +130,22 @@ export class CharacterDetailScene extends BaseScene {
     this.backgroundContainer.removeChildren();
     this.headerContainer.removeChildren();
     this.infoContainer.removeChildren();
+    this.tabsContainer.removeChildren();
+    this.contentContainer.removeChildren();
     this.statsContainer.removeChildren();
     this.skillsContainer.removeChildren();
     this.equipmentContainer.removeChildren();
     this.buttonContainer.removeChildren();
     
+    // Reset scroll box
+    this.scrollBox = null;
+    
     // Recreate layout with current dimensions
     this.createBackground();
     this.createHeader();
     this.createCharacterInfo();
-    this.createStatsDisplay();
-    this.createSkillsDisplay();
-    this.createEquipmentDisplay();
+    this.createTabs();
+    this.createTabContent();
     this.createBackButton();
   }
 
@@ -337,6 +350,179 @@ export class CharacterDetailScene extends BaseScene {
     this.infoContainer.addChild(headerPanelContainer);
   }
 
+  private createTabs(): void {
+    const padding = 12;
+    const panelWidth = this.gameWidth - 2 * padding;
+    const tabsY = 225;
+    
+    const tabs: { type: TabType; label: string; icon: string }[] = [
+      { type: 'stats', label: 'Stats', icon: '📊' },
+      { type: 'skills', label: 'Skills', icon: '📜' },
+      { type: 'equipment', label: 'Equipment', icon: '⚔️' }
+    ];
+    
+    const tabWidth = (panelWidth - 10) / 3;
+    const tabHeight = 36;
+    
+    tabs.forEach((tab, index) => {
+      const x = padding + (index * (tabWidth + 5));
+      const isActive = this.activeTab === tab.type;
+      
+      const tabButton = this.createTabButton(
+        tab.label,
+        tab.icon,
+        x,
+        tabsY,
+        tabWidth,
+        tabHeight,
+        isActive,
+        () => this.switchTab(tab.type)
+      );
+      
+      this.tabsContainer.addChild(tabButton);
+    });
+  }
+
+  private createTabButton(
+    label: string,
+    icon: string,
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    isActive: boolean,
+    onClick: () => void
+  ): Container {
+    const button = new Container();
+    
+    const bg = new Graphics();
+    
+    if (isActive) {
+      // Active tab styling
+      bg.roundRect(0, 0, width, height, 8)
+        .fill({ color: 0x4a2f5f, alpha: 0.95 })
+        .stroke({ width: 2, color: 0x8b9dc3 });
+      bg.roundRect(2, 2, width - 4, height - 4, 6)
+        .stroke({ width: 1, color: 0x6b8cae, alpha: 0.8 });
+    } else {
+      // Inactive tab styling
+      bg.roundRect(0, 0, width, height, 8)
+        .fill({ color: 0x2a2a2a, alpha: 0.8 })
+        .stroke({ width: 1.5, color: 0x4a5f7f });
+    }
+    
+    const iconText = new Text({
+      text: icon,
+      style: {
+        fontFamily: 'Arial',
+        fontSize: 16,
+        fill: isActive ? 0xffffff : 0x8b9dc3
+      }
+    });
+    iconText.anchor.set(0.5);
+    iconText.x = width / 2 - 20;
+    iconText.y = height / 2;
+    
+    const labelText = new Text({
+      text: label,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 13,
+        fontWeight: isActive ? 'bold' : 'normal',
+        fill: isActive ? 0xffffff : 0x8b9dc3
+      }
+    });
+    labelText.anchor.set(0.5);
+    labelText.x = width / 2 + 10;
+    labelText.y = height / 2;
+    
+    button.addChild(bg, iconText, labelText);
+    button.x = x;
+    button.y = y;
+    button.interactive = true;
+    button.cursor = 'pointer';
+    
+    if (!isActive) {
+      button.on('pointerover', () => {
+        bg.clear();
+        bg.roundRect(0, 0, width, height, 8)
+          .fill({ color: 0x3a3a3a, alpha: 0.9 })
+          .stroke({ width: 1.5, color: 0x6b8cae });
+      });
+      
+      button.on('pointerout', () => {
+        bg.clear();
+        bg.roundRect(0, 0, width, height, 8)
+          .fill({ color: 0x2a2a2a, alpha: 0.8 })
+          .stroke({ width: 1.5, color: 0x4a5f7f });
+      });
+    }
+    
+    button.on('pointerdown', onClick);
+    
+    return button;
+  }
+
+  private switchTab(tabType: TabType): void {
+    if (this.activeTab === tabType) return;
+    
+    this.activeTab = tabType;
+    
+    // Clear and recreate tabs and content
+    this.tabsContainer.removeChildren();
+    this.contentContainer.removeChildren();
+    this.statsContainer.removeChildren();
+    this.skillsContainer.removeChildren();
+    this.equipmentContainer.removeChildren();
+    this.scrollBox = null;
+    
+    this.createTabs();
+    this.createTabContent();
+  }
+
+  private createTabContent(): void {
+    const padding = 12;
+    const contentY = 270;
+    const contentHeight = this.gameHeight - contentY - 60; // Reserve space for back button
+    const contentWidth = this.gameWidth - 2 * padding;
+    
+    // Create scroll content container
+    const scrollContent = new Container();
+    
+    // Add appropriate content based on active tab
+    switch (this.activeTab) {
+      case 'stats':
+        this.createStatsDisplay();
+        scrollContent.addChild(this.statsContainer);
+        this.statsContainer.x = 0;
+        this.statsContainer.y = 0;
+        break;
+      case 'skills':
+        this.createSkillsDisplay();
+        scrollContent.addChild(this.skillsContainer);
+        this.skillsContainer.x = 0;
+        this.skillsContainer.y = 0;
+        break;
+      case 'equipment':
+        this.createEquipmentDisplay();
+        scrollContent.addChild(this.equipmentContainer);
+        this.equipmentContainer.x = 0;
+        this.equipmentContainer.y = 0;
+        break;
+    }
+    
+    // Create ScrollBox
+    this.scrollBox = new ScrollBox({
+      width: contentWidth,
+      height: contentHeight,
+    });
+    this.scrollBox.x = padding;
+    this.scrollBox.y = contentY;
+    this.scrollBox.addItem(scrollContent);
+    
+    this.contentContainer.addChild(this.scrollBox);
+  }
+
   private createStatsDisplay(): void {
     const padding = 12;
     const panelWidth = this.gameWidth - 2 * padding;
@@ -364,7 +550,7 @@ export class CharacterDetailScene extends BaseScene {
 
     // Title
     const title = new Text({
-      text: '📊 Detailed Stats',
+      text: '⚔️ Combat Stats',
       style: {
         fontFamily: 'Kalam',
         fontSize: 14,
@@ -410,9 +596,102 @@ export class CharacterDetailScene extends BaseScene {
       otherStatsContainer.addChild(statText);
     });
 
-    this.statsContainer.x = padding;
-    this.statsContainer.y = 225;
     this.statsContainer.addChild(otherStatsContainer);
+    
+    // Add Point Distribution Panel
+    this.createPointDistributionPanel(panelWidth, otherStatsHeight + 20);
+  }
+
+  private createPointDistributionPanel(panelWidth: number, yOffset: number): void {
+    const panelHeight = 95;
+    
+    const distributionContainer = new Container();
+    distributionContainer.y = yOffset;
+    
+    // Fantasy panel
+    const panel = new Graphics();
+    
+    panel.roundRect(2, 2, panelWidth, panelHeight, 10)
+      .fill({ color: 0x000000, alpha: 0.5 });
+    
+    panel.roundRect(0, 0, panelWidth, panelHeight, 10)
+      .fill({ color: 0x1a1a2e, alpha: 0.98 })
+      .stroke({ width: 2, color: 0x4a5f7f });
+    
+    panel.roundRect(3, 3, panelWidth - 6, panelHeight - 6, 8)
+      .fill({ color: 0x16213e, alpha: 0.7 });
+    
+    panel.roundRect(5, 5, panelWidth - 10, panelHeight - 10, 7)
+      .stroke({ width: 1, color: 0x6b8cae, alpha: 0.4 });
+    
+    distributionContainer.addChild(panel);
+
+    // Title
+    const title = new Text({
+      text: '📈 Point Distribution',
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 14,
+        fontWeight: 'bold',
+        fill: 0x8b9dc3
+      }
+    });
+    title.x = 10;
+    title.y = 10;
+    distributionContainer.addChild(title);
+
+    // Point bars
+    const stats = [
+      { name: 'HP', value: this.character!.hp, max: 1000, color: Colors.STAT_HP },
+      { name: 'ATK', value: this.character!.atk, max: 500, color: Colors.STAT_ATK },
+      { name: 'DEF', value: this.character!.def, max: 500, color: Colors.STAT_DEF },
+      { name: 'AGI', value: this.character!.agi, max: 200, color: Colors.STAT_AGI }
+    ];
+
+    stats.forEach((stat, index) => {
+      const y = 35 + (index * 13);
+      const barWidth = panelWidth - 120;
+      const fillWidth = (stat.value / stat.max) * barWidth;
+      
+      // Stat name
+      const nameText = new Text({
+        text: stat.name,
+        style: {
+          fontFamily: 'Kalam',
+          fontSize: 10,
+          fill: 0x8b9dc3
+        }
+      });
+      nameText.x = 10;
+      nameText.y = y;
+      
+      // Bar background
+      const barBg = new Graphics();
+      barBg.roundRect(50, y, barWidth, 10, 2)
+        .fill({ color: 0x2a2a2a, alpha: 0.8 })
+        .stroke({ width: 1, color: 0x4a5f7f });
+      
+      // Bar fill
+      const barFill = new Graphics();
+      barFill.roundRect(50, y, fillWidth, 10, 2)
+        .fill({ color: stat.color, alpha: 0.9 });
+      
+      // Value text
+      const valueText = new Text({
+        text: stat.value.toString(),
+        style: {
+          fontFamily: 'Kalam',
+          fontSize: 10,
+          fill: 0xffffff
+        }
+      });
+      valueText.x = 55 + barWidth;
+      valueText.y = y;
+      
+      distributionContainer.addChild(nameText, barBg, barFill, valueText);
+    });
+
+    this.statsContainer.addChild(distributionContainer);
   }
 
   private createSkillsDisplay(): void {
@@ -438,7 +717,7 @@ export class CharacterDetailScene extends BaseScene {
 
     // Title
     const title = new Text({
-      text: '📜 Skills',
+      text: '🎯 Active Skills',
       style: {
         fontFamily: 'Kalam',
         fontSize: 14,
@@ -488,7 +767,7 @@ export class CharacterDetailScene extends BaseScene {
         
         const skillContainer = new Container();
         
-        // Skill name
+        // Skill name (clickable to view details)
         const skillName = new Text({
           text: skill.name,
           style: {
@@ -530,7 +809,7 @@ export class CharacterDetailScene extends BaseScene {
         skillContainer.addChild(skillName);
         this.skillsContainer.addChild(badge, badgeText, skillContainer);
       } else {
-        // Empty skill slot
+        // Empty skill slot indicator
         const emptyText = new Text({
           text: '(Empty)',
           style: {
@@ -557,9 +836,6 @@ export class CharacterDetailScene extends BaseScene {
 
       y += 38;
     });
-
-    this.skillsContainer.x = padding;
-    this.skillsContainer.y = 355;
   }
 
   private createSmallButton(
@@ -644,6 +920,11 @@ export class CharacterDetailScene extends BaseScene {
     
     this.skillsContainer.removeChildren();
     this.createSkillsDisplay();
+    
+    // Refresh the scroll content
+    if (this.activeTab === 'skills') {
+      this.refreshTabContent();
+    }
   }
 
   private showSkillChangeDialog(skillType: string, currentSkill: any): void {
@@ -666,6 +947,17 @@ export class CharacterDetailScene extends BaseScene {
     
     this.skillsContainer.removeChildren();
     this.createSkillsDisplay();
+    
+    // Refresh the scroll content
+    if (this.activeTab === 'skills') {
+      this.refreshTabContent();
+    }
+  }
+
+  private refreshTabContent(): void {
+    this.contentContainer.removeChildren();
+    this.scrollBox = null;
+    this.createTabContent();
   }
 
   private createEquipmentDisplay(): void {
@@ -691,7 +983,7 @@ export class CharacterDetailScene extends BaseScene {
 
     // Title
     const title = new Text({
-      text: '⚔️ Equipment',
+      text: '🛡️ Equipment Slots',
       style: {
         fontFamily: 'Kalam',
         fontSize: 14,
@@ -733,7 +1025,7 @@ export class CharacterDetailScene extends BaseScene {
       
       const slotContainer = new Container();
       
-      // Equipment slot
+      // Equipment slot with interactive hover
       const slotBg = new Graphics();
       slotBg.roundRect(0, 0, slotWidth, 42, 6)
         .fill({ color: slot.item === '(empty)' ? 0x2a2a2a : 0x0f0f1e, alpha: 0.95 })
@@ -786,9 +1078,135 @@ export class CharacterDetailScene extends BaseScene {
       
       this.equipmentContainer.addChild(slotContainer);
     });
+    
+    // Add Equipment Bonuses Panel
+    this.createEquipmentBonusesPanel(panelWidth, panelHeight + 20);
+  }
 
-    this.equipmentContainer.x = padding;
-    this.equipmentContainer.y = 540;
+  private createEquipmentBonusesPanel(panelWidth: number, yOffset: number): void {
+    const panelHeight = 125;
+    
+    const bonusContainer = new Container();
+    bonusContainer.y = yOffset;
+    
+    // Fantasy panel
+    const panel = new Graphics();
+    
+    panel.roundRect(2, 2, panelWidth, panelHeight, 10)
+      .fill({ color: 0x000000, alpha: 0.5 });
+    
+    panel.roundRect(0, 0, panelWidth, panelHeight, 10)
+      .fill({ color: 0x1a1a2e, alpha: 0.98 })
+      .stroke({ width: 2, color: 0x4a5f7f });
+    
+    panel.roundRect(3, 3, panelWidth - 6, panelHeight - 6, 8)
+      .fill({ color: 0x16213e, alpha: 0.7 });
+    
+    panel.roundRect(5, 5, panelWidth - 10, panelHeight - 10, 7)
+      .stroke({ width: 1, color: 0x6b8cae, alpha: 0.4 });
+    
+    bonusContainer.addChild(panel);
+
+    // Title
+    const title = new Text({
+      text: '✨ Equipment Bonuses',
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 14,
+        fontWeight: 'bold',
+        fill: 0x8b9dc3
+      }
+    });
+    title.x = 10;
+    title.y = 10;
+    bonusContainer.addChild(title);
+
+    // Calculate total bonuses from equipment
+    const bonuses = this.calculateEquipmentBonuses();
+    
+    // Display bonuses in grid
+    const bonusStats = [
+      { name: 'HP', value: bonuses.hp, color: Colors.STAT_HP },
+      { name: 'ATK', value: bonuses.atk, color: Colors.STAT_ATK },
+      { name: 'DEF', value: bonuses.def, color: Colors.STAT_DEF },
+      { name: 'AGI', value: bonuses.agi, color: Colors.STAT_AGI },
+      { name: 'Crit Rate', value: bonuses.crit_rate ? bonuses.crit_rate + '%' : 0, color: Colors.STAT_CRIT_RATE },
+      { name: 'Crit Dmg', value: bonuses.crit_dmg ? bonuses.crit_dmg + '%' : 0, color: Colors.STAT_CRIT_DMG }
+    ];
+
+    const colWidth = (panelWidth - 24) / 3;
+    const rowHeight = 28;
+    
+    bonusStats.forEach((stat, index) => {
+      const col = index % 3;
+      const row = Math.floor(index / 3);
+      const x = 12 + (col * colWidth);
+      const y = 35 + (row * rowHeight);
+      
+      const statContainer = new Container();
+      
+      // Stat icon
+      const icon = new Text({
+        text: '+',
+        style: {
+          fontFamily: 'Arial',
+          fontSize: 12,
+          fill: stat.color
+        }
+      });
+      icon.x = x;
+      icon.y = y;
+      
+      // Stat text
+      const statText = new Text({
+        text: `${stat.name}: ${stat.value}`,
+        style: {
+          fontFamily: 'Kalam',
+          fontSize: 12,
+          fontWeight: stat.value > 0 ? 'bold' : 'normal',
+          fill: stat.value > 0 ? 0xffffff : 0x6b8cae
+        }
+      });
+      statText.x = x + 12;
+      statText.y = y;
+      
+      bonusContainer.addChild(icon, statText);
+    });
+
+    this.equipmentContainer.addChild(bonusContainer);
+  }
+
+  private calculateEquipmentBonuses(): any {
+    const bonuses = {
+      hp: 0,
+      atk: 0,
+      def: 0,
+      agi: 0,
+      crit_rate: 0,
+      crit_dmg: 0
+    };
+    
+    if (!this.characterEquipment) return bonuses;
+    
+    // Sum bonuses from all equipped items
+    const items = [
+      this.characterEquipment.weapon,
+      this.characterEquipment.armor,
+      this.characterEquipment.accessory
+    ];
+    
+    items.forEach(item => {
+      if (item && item.bonuses) {
+        bonuses.hp += item.bonuses.hp || 0;
+        bonuses.atk += item.bonuses.atk || 0;
+        bonuses.def += item.bonuses.def || 0;
+        bonuses.agi += item.bonuses.agi || 0;
+        bonuses.crit_rate += item.bonuses.crit_rate || 0;
+        bonuses.crit_dmg += item.bonuses.crit_dmg || 0;
+      }
+    });
+    
+    return bonuses;
   }
 
   private showEquipmentChangeDialog(equipmentType: string, slotName: string, currentItem: string): void {
@@ -828,6 +1246,11 @@ export class CharacterDetailScene extends BaseScene {
       // Refresh equipment display
       this.equipmentContainer.removeChildren();
       this.createEquipmentDisplay();
+      
+      // Refresh the scroll content if we're on the equipment tab
+      if (this.activeTab === 'equipment') {
+        this.refreshTabContent();
+      }
     } catch (error) {
       console.error('Failed to equip item:', error);
     } finally {
