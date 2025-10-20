@@ -33,7 +33,6 @@ The CharacterDetailScene has been updated with a tabbed interface to organize ch
 
 ### Stats Tab
 - **Combat Stats Panel**: Displays detailed combat statistics (Crit Rate, Crit Dmg, Resist, Damage, Mitigation, Hit, Dodge)
-- **Point Distribution Panel**: Visual bars showing HP, ATK, DEF, AGI allocation with max values
 
 ### Skills Tab
 - **Active Skill Slots**: Shows Normal, Active, and Passive skill slots
@@ -65,7 +64,6 @@ The CharacterDetailScene has been updated with a tabbed interface to organize ch
 - `createTabButton()`: Builds individual tab button with styling
 - `switchTab()`: Handles tab switching and content refresh
 - `createTabContent()`: Creates the appropriate content based on active tab
-- `createPointDistributionPanel()`: Adds visual stat bars (Stats tab)
 - `createEquipmentBonusesPanel()`: Shows equipment stat bonuses (Equipment tab)
 - `calculateEquipmentBonuses()`: Sums bonuses from all equipped items
 - `refreshTabContent()`: Refreshes scroll content after data changes
