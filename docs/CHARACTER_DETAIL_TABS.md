@@ -44,10 +44,11 @@ The CharacterDetailScene has been updated with a tabbed interface to organize ch
 
 ### Equipment Tab
 - **Equipment Slots**: Weapon, Armor, Accessory with interactive click-to-change functionality
-- **Equipment Bonuses Panel**: Shows total stat bonuses from all equipped items
+- **Equipment Bonuses Panel**: Shows total stat bonuses aggregated from all equipped items (weapon + armor + accessory)
   - HP, ATK, DEF, AGI bonuses
   - Crit Rate, Crit Dmg bonuses
   - Color-coded stat indicators
+  - Calculated dynamically from equipment data
 - **Interactive Hover**: Equipment slots highlight on hover
 
 ## Technical Implementation
@@ -80,9 +81,9 @@ The CharacterDetailScene has been updated with a tabbed interface to organize ch
 ## Styling
 
 ### Tab Buttons
-- **Active**: Purple background (#4a2f5f), bold white text, blue border
+- **Active**: Purple background (#4a2f5f), bold white text, steel blue border (#8b9dc3)
 - **Inactive**: Dark gray background (#2a2a2a), normal gray text
-- **Hover** (inactive): Lighter gray background (#3a3a3a), blue border
+- **Hover** (inactive): Lighter gray background (#3a3a3a), steel blue border (#6b8cae)
 
 ### Panels
 All panels maintain the fantasy theme with:
