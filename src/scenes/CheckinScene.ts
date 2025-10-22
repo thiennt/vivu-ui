@@ -210,6 +210,7 @@ export class CheckinScene extends BaseScene {
 
   private createBackground(): void {
     const bg = new Graphics();
+    this.backgroundContainer.addChild(bg);
     
     // Dark fantasy background
     bg.rect(0, 0, this.gameWidth, this.gameHeight)
@@ -225,10 +226,8 @@ export class CheckinScene extends BaseScene {
       const size = 1 + Math.random() * 2;
       particle.circle(Math.random() * this.gameWidth, Math.random() * this.gameHeight, size)
         .fill({ color: 0xffd700, alpha: 0.3 + Math.random() * 0.3 });
-      bg.addChild(particle);
+      this.backgroundContainer.addChild(particle);
     }
-    
-    this.backgroundContainer.addChild(bg);
   }
 
   private createHeader(): void {
