@@ -156,11 +156,11 @@ export class CharactersScene extends BaseScene {
     
     // Dark fantasy background
     bg.rect(0, 0, this.gameWidth, this.gameHeight)
-      .fill({ color: 0x1a0f0a, alpha: 1.0 });
+      .fill({ color: Colors.BROWN_DARKEST, alpha: 1.0 });
     
     // Subtle brown texture
     bg.rect(0, 0, this.gameWidth, this.gameHeight)
-      .fill({ color: 0x2a1810, alpha: 0.3 });
+      .fill({ color: Colors.BROWN_DARK, alpha: 0.3 });
     
     this.backgroundContainer.addChild(bg);
   }
@@ -181,8 +181,8 @@ export class CharactersScene extends BaseScene {
       .lineTo(bannerX + bannerWidth, bannerY + bannerHeight / 2)
       .lineTo(bannerX + bannerWidth - 12, bannerY)
       .lineTo(bannerX + 12, bannerY)
-      .fill({ color: 0x8b4513, alpha: 0.95 })
-      .stroke({ width: 2.5, color: 0xd4af37 });
+      .fill({ color: Colors.BROWN, alpha: 0.95 })
+      .stroke({ width: 2.5, color: Colors.GOLD });
     
     // Inner highlight
     banner.moveTo(bannerX + 15, bannerY + 3)
@@ -192,7 +192,7 @@ export class CharactersScene extends BaseScene {
       .lineTo(bannerX + 15, bannerY + bannerHeight - 3)
       .lineTo(bannerX + 4, bannerY + bannerHeight / 2)
       .lineTo(bannerX + 15, bannerY + 3)
-      .stroke({ width: 1, color: 0xffd700, alpha: 0.6 });
+      .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.6 });
 
     const title = new Text({
       text: '🎭 Character Gallery 🎭',
@@ -200,10 +200,10 @@ export class CharactersScene extends BaseScene {
         fontFamily: 'Kalam',
         fontSize: 24,
         fontWeight: 'bold',
-        fill: 0xffffff,
-        stroke: { color: 0x2a1810, width: 2 },
+        fill: Colors.WHITE,
+        stroke: { color: Colors.BROWN_DARK, width: 2 },
         dropShadow: {
-          color: 0xffd700,
+          color: Colors.GOLD_BRIGHT,
           blur: 3,
           angle: Math.PI / 4,
           distance: 2,
@@ -220,7 +220,7 @@ export class CharactersScene extends BaseScene {
       style: {
         fontFamily: 'Kalam',
         fontSize: 14,
-        fill: 0xd4af37,
+        fill: Colors.GOLD,
         align: 'center'
       }
     });
@@ -335,12 +335,12 @@ export class CharactersScene extends BaseScene {
     
     const bg = new Graphics();
     bg.roundRect(2, 2, width, height, 8)
-      .fill({ color: 0x000000, alpha: 0.4 });
+      .fill({ color: Colors.BLACK, alpha: 0.4 });
     bg.roundRect(0, 0, width, height, 8)
-      .fill({ color: 0x8b4513, alpha: 0.95 })
-      .stroke({ width: 2, color: 0xd4af37 });
+      .fill({ color: Colors.BROWN, alpha: 0.95 })
+      .stroke({ width: 2, color: Colors.GOLD });
     bg.roundRect(2, 2, width - 4, height - 4, 6)
-      .stroke({ width: 1, color: 0xffd700, alpha: 0.6 });
+      .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.6 });
     
     const buttonText = new Text({
       text: text,
@@ -348,8 +348,8 @@ export class CharactersScene extends BaseScene {
         fontFamily: 'Kalam',
         fontSize: 14,
         fontWeight: 'bold',
-        fill: 0xffffff,
-        stroke: { color: 0x2a1810, width: 2 }
+        fill: Colors.WHITE,
+        stroke: { color: Colors.BROWN_DARK, width: 2 }
       }
     });
     buttonText.anchor.set(0.5);
@@ -365,24 +365,24 @@ export class CharactersScene extends BaseScene {
     button.on('pointerover', () => {
       bg.clear();
       bg.roundRect(2, 2, width, height, 8)
-        .fill({ color: 0x000000, alpha: 0.4 });
+        .fill({ color: Colors.BLACK, alpha: 0.4 });
       bg.roundRect(0, 0, width, height, 8)
-        .fill({ color: 0xa0632a, alpha: 0.95 })
-        .stroke({ width: 2, color: 0xffd700 });
+        .fill({ color: Colors.BROWN_LIGHT, alpha: 0.95 })
+        .stroke({ width: 2, color: Colors.GOLD_BRIGHT });
       bg.roundRect(2, 2, width - 4, height - 4, 6)
-        .stroke({ width: 1, color: 0xffd700, alpha: 0.9 });
+        .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.9 });
       button.scale.set(1.02);
     });
     
     button.on('pointerout', () => {
       bg.clear();
       bg.roundRect(2, 2, width, height, 8)
-        .fill({ color: 0x000000, alpha: 0.4 });
+        .fill({ color: Colors.BLACK, alpha: 0.4 });
       bg.roundRect(0, 0, width, height, 8)
-        .fill({ color: 0x8b4513, alpha: 0.95 })
-        .stroke({ width: 2, color: 0xd4af37 });
+        .fill({ color: Colors.BROWN, alpha: 0.95 })
+        .stroke({ width: 2, color: Colors.GOLD });
       bg.roundRect(2, 2, width - 4, height - 4, 6)
-        .stroke({ width: 1, color: 0xffd700, alpha: 0.6 });
+        .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.6 });
       button.scale.set(1.0);
     });
     

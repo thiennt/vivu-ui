@@ -37,24 +37,24 @@ export class CardDetailPopup extends Container {
     // Deep shadow layers for depth (Slay the Spire style)
     const shadowPanel = new Graphics();
     shadowPanel.roundRect(4, 4, tooltipWidth, tooltipHeight, 8)
-      .fill({ color: 0x000000, alpha: 0.5 });
+      .fill({ color: Colors.BLACK, alpha: 0.5 });
     shadowPanel.roundRect(2, 2, tooltipWidth, tooltipHeight, 8)
-      .fill({ color: 0x000000, alpha: 0.3 });
+      .fill({ color: Colors.BLACK, alpha: 0.3 });
     this.addChild(shadowPanel);
 
     // Main background - aged parchment color
     this.dialogPanel = new Graphics();
     this.dialogPanel.roundRect(0, 0, tooltipWidth, tooltipHeight, 8)
-      .fill({ color: 0xf5e6d3, alpha: 0.98 })
-      .stroke({ width: 3, color: 0xd4af37 }); // Golden border
+      .fill({ color: Colors.PARCHMENT_LIGHT, alpha: 0.98 })
+      .stroke({ width: 3, color: Colors.GOLD }); // Golden border
 
     // Inner darker parchment layer for depth
     this.dialogPanel.roundRect(4, 4, tooltipWidth - 8, tooltipHeight - 8, 6)
-      .fill({ color: 0xe8d4b8, alpha: 0.6 });
+      .fill({ color: Colors.PARCHMENT, alpha: 0.6 });
 
     // Inner golden highlight
     this.dialogPanel.roundRect(6, 6, tooltipWidth - 12, tooltipHeight - 12, 5)
-      .stroke({ width: 1, color: 0xffd700, alpha: 0.5 });
+      .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.5 });
 
     this.addChild(this.dialogPanel);
 
@@ -71,7 +71,7 @@ export class CardDetailPopup extends Container {
       .lineTo(tooltipWidth - 8, 12)
       .lineTo(8, 12)
       .fill({ color: rarityColor, alpha: 0.8 })
-      .stroke({ width: 1, color: 0x8b4513 });
+      .stroke({ width: 1, color: Colors.BROWN });
 
     this.addChild(bannerGraphics);
 
@@ -88,8 +88,8 @@ export class CardDetailPopup extends Container {
     // Ornate circle with golden border
     const groupIconBg = new Graphics()
       .circle(tooltipWidth - 20, 40, 16)
-      .fill({ color: 0x2a1810, alpha: 0.95 })
-      .stroke({ width: 2, color: 0xd4af37, alpha: 0.9 });
+      .fill({ color: Colors.BROWN_DARK, alpha: 0.95 })
+      .stroke({ width: 2, color: Colors.GOLD, alpha: 0.9 });
     
     // Inner glow
     groupIconBg.circle(tooltipWidth - 20, 40, 14)
@@ -100,9 +100,9 @@ export class CardDetailPopup extends Container {
       style: {
         fontFamily: 'Kalam',
         fontSize: 18,
-        fill: 0xffffff,
+        fill: Colors.WHITE,
         dropShadow: {
-          color: 0x000000,
+          color: Colors.BLACK,
           blur: 2,
           angle: Math.PI / 4,
           distance: 1,
@@ -122,16 +122,16 @@ export class CardDetailPopup extends Container {
         fontFamily: 'Kalam',
         fontSize: 18,
         fontWeight: 'bold',
-        fill: 0x2a1810, // Dark brown text on parchment
+        fill: Colors.BROWN_DARK, // Dark brown text on parchment
         align: 'left',
         wordWrap: true,
         wordWrapWidth: 200,
         stroke: {
-          color: 0xffd700,
+          color: Colors.GOLD_BRIGHT,
           width: 1
         },
         dropShadow: {
-          color: 0xd4af37,
+          color: Colors.GOLD,
           blur: 2,
           angle: Math.PI / 4,
           distance: 1,
@@ -151,17 +151,17 @@ export class CardDetailPopup extends Container {
     // Dark background with golden border
     const avatarFrame = new Graphics()
       .roundRect(avatarFrameX, avatarFrameY, avatarFrameSize, avatarFrameSize, 4)
-      .fill({ color: 0x2a1810, alpha: 0.95 })
-      .stroke({ width: 2, color: 0xd4af37, alpha: 0.9 });
+      .fill({ color: Colors.BROWN_DARK, alpha: 0.95 })
+      .stroke({ width: 2, color: Colors.GOLD, alpha: 0.9 });
     
     // Inner bevel effect
     avatarFrame.roundRect(avatarFrameX + 2, avatarFrameY + 2, avatarFrameSize - 4, avatarFrameSize - 4, 3)
-      .stroke({ width: 1, color: 0x8b4513, alpha: 0.5 });
+      .stroke({ width: 1, color: Colors.BROWN, alpha: 0.5 });
     
     this.addChild(avatarFrame);
 
     // Draw ornate corners on avatar frame
-    this.drawFantasyCorners(avatarFrameX, avatarFrameY, avatarFrameSize, avatarFrameSize, 0xffd700);
+    this.drawFantasyCorners(avatarFrameX, avatarFrameY, avatarFrameSize, avatarFrameSize, Colors.GOLD_BRIGHT);
 
     // Avatar icon with glow
     const avatarIcon = new Text({
@@ -169,7 +169,7 @@ export class CardDetailPopup extends Container {
       style: {
         fontFamily: 'Kalam',
         fontSize: 48,
-        fill: 0xffffff
+        fill: Colors.WHITE
       }
     });
     avatarIcon.anchor.set(0.5);
@@ -194,7 +194,7 @@ export class CardDetailPopup extends Container {
         (this.card.card_type || this.card.group).toString().toUpperCase(),
         badgeX,
         badgeY,
-        0x8b4513,
+        Colors.BROWN,
         true
       );
       this.addChild(typeBadge);
@@ -214,11 +214,11 @@ export class CardDetailPopup extends Container {
     const divider = new Graphics();
     divider.moveTo(12, 150)
       .lineTo(tooltipWidth - 12, 150)
-      .stroke({ width: 1, color: 0x8b4513, alpha: 0.5 });
+      .stroke({ width: 1, color: Colors.BROWN, alpha: 0.5 });
     
     // Decorative dots
     divider.circle(tooltipWidth / 2, 150, 2)
-      .fill({ color: 0xd4af37 });
+      .fill({ color: Colors.GOLD });
     
     this.addChild(divider);
 
@@ -228,7 +228,7 @@ export class CardDetailPopup extends Container {
       style: {
         fontFamily: 'Kalam',
         fontSize: 11,
-        fill: 0x3d2817, // Darker brown for readability
+        fill: Colors.BROWN_DARKER, // Darker brown for readability
         align: 'left',
         wordWrap: true,
         wordWrapWidth: tooltipWidth - 24,
@@ -251,12 +251,12 @@ export class CardDetailPopup extends Container {
         style: {
           fontFamily: 'Kalam',
           fontSize: 10,
-          fill: 0xcc6600,
+          fill: Colors.ORANGE_RUST_DARK,
           align: 'left',
           wordWrap: true,
           wordWrapWidth: tooltipWidth - 24,
           stroke: {
-            color: 0xffd700,
+            color: Colors.GOLD_BRIGHT,
             width: 0.5
           }
         }
@@ -271,7 +271,7 @@ export class CardDetailPopup extends Container {
     // Create semi-transparent background with vignette
     this.dialogBg = new Graphics();
     this.dialogBg.rect(0, 0, this.gameWidth, this.gameHeight)
-      .fill({ color: 0x1a0f0a, alpha: 0.85 });
+      .fill({ color: Colors.BROWN_DARKEST, alpha: 0.85 });
 
     const cardWidth = Math.min(400, this.gameWidth - 40);
     const cardHeight = Math.min(680, this.gameHeight - 60);
@@ -283,26 +283,26 @@ export class CardDetailPopup extends Container {
 
     // Multiple shadow layers for dramatic depth
     this.dialogPanel.roundRect(cardX + 8, cardY + 8, cardWidth, cardHeight, 16)
-      .fill({ color: 0x000000, alpha: 0.6 });
+      .fill({ color: Colors.BLACK, alpha: 0.6 });
 
     this.dialogPanel.roundRect(cardX + 5, cardY + 5, cardWidth, cardHeight, 16)
-      .fill({ color: 0x000000, alpha: 0.4 });
+      .fill({ color: Colors.BLACK, alpha: 0.4 });
 
     this.dialogPanel.roundRect(cardX + 2, cardY + 2, cardWidth, cardHeight, 16)
-      .fill({ color: 0x000000, alpha: 0.2 });
+      .fill({ color: Colors.BLACK, alpha: 0.2 });
 
     // Main card background - aged parchment
     this.dialogPanel.roundRect(cardX, cardY, cardWidth, cardHeight, 16)
-      .fill({ color: 0xf5e6d3, alpha: 0.98 })
-      .stroke({ width: 4, color: 0xd4af37 }); // Golden border
+      .fill({ color: Colors.PARCHMENT_LIGHT, alpha: 0.98 })
+      .stroke({ width: 4, color: Colors.GOLD }); // Golden border
 
     // Inner darker parchment layer
     this.dialogPanel.roundRect(cardX + 6, cardY + 6, cardWidth - 12, cardHeight - 12, 12)
-      .fill({ color: 0xe8d4b8, alpha: 0.7 });
+      .fill({ color: Colors.PARCHMENT, alpha: 0.7 });
 
     // Inner golden highlight/trim
     this.dialogPanel.roundRect(cardX + 8, cardY + 8, cardWidth - 16, cardHeight - 16, 10)
-      .stroke({ width: 2, color: 0xffd700, alpha: 0.6 });
+      .stroke({ width: 2, color: Colors.GOLD_BRIGHT, alpha: 0.6 });
 
     // Ornate decorative corners on main card
     this.drawOrnateCorners(cardX, cardY, cardWidth, cardHeight);
@@ -320,7 +320,7 @@ export class CardDetailPopup extends Container {
       .lineTo(cardX + cardWidth - 20, cardY + 20)
       .lineTo(cardX + 20, cardY + 20)
       .fill({ color: rarityColor, alpha: 0.85 })
-      .stroke({ width: 2, color: 0x8b4513 });
+      .stroke({ width: 2, color: Colors.BROWN });
 
     // Avatar/Art frame with ornate decorative border
     const frameMargin = 25;
@@ -330,15 +330,15 @@ export class CardDetailPopup extends Container {
 
     // Dark inner frame with golden border
     this.dialogPanel.roundRect(cardX + frameMargin, frameY, frameWidth, frameHeight, 12)
-      .fill({ color: 0x2a1810, alpha: 0.95 })
-      .stroke({ width: 3, color: 0xd4af37, alpha: 0.95 });
+      .fill({ color: Colors.BROWN_DARK, alpha: 0.95 })
+      .stroke({ width: 3, color: Colors.GOLD, alpha: 0.95 });
 
     // Inner bevel/emboss effect
     this.dialogPanel.roundRect(cardX + frameMargin + 3, frameY + 3, frameWidth - 6, frameHeight - 6, 10)
-      .stroke({ width: 2, color: 0x8b4513, alpha: 0.6 });
+      .stroke({ width: 2, color: Colors.BROWN, alpha: 0.6 });
 
     // Decorative fantasy corners on art frame
-    this.drawFantasyCorners(cardX + frameMargin, frameY, frameWidth, frameHeight, 0xffd700);
+    this.drawFantasyCorners(cardX + frameMargin, frameY, frameWidth, frameHeight, Colors.GOLD_BRIGHT);
 
     this.addChild(this.dialogBg, this.dialogPanel);
 
@@ -352,8 +352,8 @@ export class CardDetailPopup extends Container {
     
     const groupIconBg = new Graphics()
       .circle(cardX + cardWidth - 40, cardY + 97, 25)
-      .fill({ color: 0x2a1810, alpha: 0.95 })
-      .stroke({ width: 3, color: 0xd4af37, alpha: 0.95 });
+      .fill({ color: Colors.BROWN_DARK, alpha: 0.95 })
+      .stroke({ width: 3, color: Colors.GOLD, alpha: 0.95 });
     
     // Inner magical glow
     groupIconBg.circle(cardX + cardWidth - 40, cardY + 97, 22)
@@ -364,7 +364,7 @@ export class CardDetailPopup extends Container {
       style: {
         fontFamily: 'Kalam',
         fontSize: 32,
-        fill: 0xffffff
+        fill: Colors.WHITE
       }
     });
     groupIconText.anchor.set(0.5);
@@ -389,16 +389,16 @@ export class CardDetailPopup extends Container {
         fontFamily: 'Kalam',
         fontSize: 28,
         fontWeight: 'bold',
-        fill: 0x2a1810, // Dark brown on parchment
+        fill: Colors.BROWN_DARK, // Dark brown on parchment
         align: 'center',
         wordWrap: true,
         wordWrapWidth: cardWidth - 160,
         stroke: {
-          color: 0xffd700,
+          color: Colors.GOLD_BRIGHT,
           width: 2
         },
         dropShadow: {
-          color: 0xd4af37,
+          color: Colors.GOLD,
           blur: 3,
           angle: Math.PI / 4,
           distance: 2,
@@ -417,7 +417,7 @@ export class CardDetailPopup extends Container {
       style: {
         fontFamily: 'Kalam',
         fontSize: 130,
-        fill: 0xffffff
+        fill: Colors.WHITE
       }
     });
     avatarIcon.anchor.set(0.5);
@@ -439,7 +439,7 @@ export class CardDetailPopup extends Container {
       (this.card.card_type || this.card.group).toString().toUpperCase(),
       cardX + cardWidth / 2 - 130,
       badgeY,
-      0x8b4513,
+      Colors.BROWN,
       false
     );
 
@@ -457,11 +457,11 @@ export class CardDetailPopup extends Container {
     const divider = new Graphics();
     divider.moveTo(cardX + 40, badgeY + 50)
       .lineTo(cardX + cardWidth - 40, badgeY + 50)
-      .stroke({ width: 2, color: 0x8b4513, alpha: 0.5 });
+      .stroke({ width: 2, color: Colors.BROWN, alpha: 0.5 });
     
     // Center ornament
     divider.circle(cardX + cardWidth / 2, badgeY + 50, 3)
-      .fill({ color: 0xd4af37 });
+      .fill({ color: Colors.GOLD });
     
     this.addChild(divider);
 
@@ -472,7 +472,7 @@ export class CardDetailPopup extends Container {
       style: {
         fontFamily: 'Kalam',
         fontSize: 15,
-        fill: 0x3d2817, // Dark brown for readability
+        fill: Colors.BROWN_DARKER, // Dark brown for readability
         align: 'center',
         wordWrap: true,
         wordWrapWidth: cardWidth - 60,
@@ -493,10 +493,10 @@ export class CardDetailPopup extends Container {
           fontFamily: 'Kalam',
           fontSize: 18,
           fontWeight: 'bold',
-          fill: 0xcc6600,
+          fill: Colors.ORANGE_RUST_DARK,
           align: 'center',
           stroke: {
-            color: 0xffd700,
+            color: Colors.GOLD_BRIGHT,
             width: 1
           }
         }
@@ -540,21 +540,21 @@ export class CardDetailPopup extends Container {
     
     // Dark background
     gemBg.roundRect(0, 0, width, height, height / 4)
-      .fill({ color: 0x2a1810, alpha: 0.95 })
-      .stroke({ width: 2, color: 0xd4af37, alpha: 0.95 });
+      .fill({ color: Colors.BROWN_DARK, alpha: 0.95 })
+      .stroke({ width: 2, color: Colors.GOLD, alpha: 0.95 });
     
     // Inner shine/highlight
     gemBg.roundRect(2, 2, width - 4, height - 4, height / 4 - 1)
-      .stroke({ width: 1, color: 0xffd700, alpha: 0.6 });
+      .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.6 });
 
     const energyIcon = new Text({
       text: '⚡',
       style: {
         fontFamily: 'Kalam',
         fontSize: height * 0.45,
-        fill: 0xf39c12,
+        fill: Colors.ORANGE,
         dropShadow: {
-          color: 0xffd700,
+          color: Colors.GOLD_BRIGHT,
           blur: 4,
           angle: 0,
           distance: 0,
@@ -572,8 +572,8 @@ export class CardDetailPopup extends Container {
         fontFamily: 'Kalam',
         fontSize: height * 0.55,
         fontWeight: 'bold',
-        fill: 0xffffff,
-        stroke: { color: 0x2a1810, width: 3 }
+        fill: Colors.WHITE,
+        stroke: { color: Colors.BROWN_DARK, width: 3 }
       }
     });
     energyText.anchor.set(0.5);
@@ -587,7 +587,7 @@ export class CardDetailPopup extends Container {
     return gem;
   }
 
-  private createFantasyBadge(text: string, x: number, y: number, color: number, isSmall: boolean): Container {
+  private createFantasyBadge(text: string, x: number, y: number, color: string, isSmall: boolean): Container {
     const badge = new Container();
     const badgeWidth = isSmall ? 100 : 120;
     const badgeHeight = isSmall ? 24 : 36;
@@ -596,12 +596,12 @@ export class CardDetailPopup extends Container {
     // Badge background - parchment style with colored border
     const bg = new Graphics()
       .roundRect(0, 0, badgeWidth, badgeHeight, 6)
-      .fill({ color: 0xf5e6d3, alpha: 0.95 })
+      .fill({ color: Colors.PARCHMENT_LIGHT, alpha: 0.95 })
       .stroke({ width: 2, color: color, alpha: 0.95 });
     
     // Inner accent
     bg.roundRect(2, 2, badgeWidth - 4, badgeHeight - 4, 4)
-      .stroke({ width: 1, color: 0xd4af37, alpha: 0.4 });
+      .stroke({ width: 1, color: Colors.GOLD, alpha: 0.4 });
 
     const badgeText = new Text({
       text,
@@ -609,10 +609,10 @@ export class CardDetailPopup extends Container {
         fontFamily: 'Kalam',
         fontSize: fontSize,
         fontWeight: 'bold',
-        fill: 0x2a1810,
+        fill: Colors.BROWN_DARK,
         align: 'center',
         stroke: {
-          color: 0xffd700,
+          color: Colors.GOLD_BRIGHT,
           width: 0.5
         }
       }
@@ -636,19 +636,19 @@ export class CardDetailPopup extends Container {
     // Parchment background with ornate border
     const bg = new Graphics()
       .roundRect(0, 0, badgeWidth, badgeHeight, 6)
-      .fill({ color: 0xf5e6d3, alpha: 0.95 })
-      .stroke({ width: 2, color: 0xcc6600, alpha: 0.8 });
+      .fill({ color: Colors.PARCHMENT_LIGHT, alpha: 0.95 })
+      .stroke({ width: 2, color: Colors.ORANGE_RUST_DARK, alpha: 0.8 });
     
     // Inner golden accent
     bg.roundRect(2, 2, badgeWidth - 4, badgeHeight - 4, 4)
-      .stroke({ width: 1, color: 0xffd700, alpha: 0.4 });
+      .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.4 });
 
     const effectText = new Text({
       text: `${effect.type}: ${effect.value}`,
       style: {
         fontFamily: 'Kalam',
         fontSize: 14,
-        fill: 0x3d2817,
+        fill: Colors.BROWN_DARKER,
         align: 'left',
         fontWeight: 'bold'
       }
@@ -672,12 +672,12 @@ export class CardDetailPopup extends Container {
     // Ornate button with parchment and golden trim
     const bg = new Graphics()
       .roundRect(0, 0, buttonWidth, buttonHeight, 10)
-      .fill({ color: 0x8b4513 })
-      .stroke({ width: 3, color: 0xd4af37 });
+      .fill({ color: Colors.BROWN })
+      .stroke({ width: 3, color: Colors.GOLD });
     
     // Inner highlight
     bg.roundRect(3, 3, buttonWidth - 6, buttonHeight - 6, 8)
-      .stroke({ width: 1, color: 0xffd700, alpha: 0.6 });
+      .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.6 });
 
     const buttonText = new Text({
       text: 'CLOSE',
@@ -685,9 +685,9 @@ export class CardDetailPopup extends Container {
         fontFamily: 'Kalam',
         fontSize: 18,
         fontWeight: 'bold',
-        fill: 0xffffff,
+        fill: Colors.WHITE,
         stroke: {
-          color: 0x2a1810,
+          color: Colors.BROWN_DARK,
           width: 2
         }
       }
@@ -709,19 +709,19 @@ export class CardDetailPopup extends Container {
     button.on('pointerover', () => {
       bg.clear();
       bg.roundRect(0, 0, buttonWidth, buttonHeight, 10)
-        .fill({ color: 0xa0632a })
-        .stroke({ width: 3, color: 0xffd700 });
+        .fill({ color: Colors.BROWN_LIGHT })
+        .stroke({ width: 3, color: Colors.GOLD_BRIGHT });
       bg.roundRect(3, 3, buttonWidth - 6, buttonHeight - 6, 8)
-        .stroke({ width: 1, color: 0xffd700, alpha: 0.8 });
+        .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.8 });
     });
     
     button.on('pointerout', () => {
       bg.clear();
       bg.roundRect(0, 0, buttonWidth, buttonHeight, 10)
-        .fill({ color: 0x8b4513 })
-        .stroke({ width: 3, color: 0xd4af37 });
+        .fill({ color: Colors.BROWN })
+        .stroke({ width: 3, color: Colors.GOLD });
       bg.roundRect(3, 3, buttonWidth - 6, buttonHeight - 6, 8)
-        .stroke({ width: 1, color: 0xffd700, alpha: 0.6 });
+        .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.6 });
     });
 
     return button;
@@ -729,7 +729,7 @@ export class CardDetailPopup extends Container {
 
   private drawOrnateCorners(x: number, y: number, width: number, height: number): void {
     const cornerSize = 20;
-    const cornerColor = 0xffd700;
+    const cornerColor = Colors.GOLD_BRIGHT;
 
     // Top-left ornate corner
     this.dialogPanel.moveTo(x, y + cornerSize)
@@ -769,7 +769,7 @@ export class CardDetailPopup extends Container {
       .fill({ color: cornerColor });
   }
 
-  private drawFantasyCorners(x: number, y: number, width: number, height: number, color: number): void {
+  private drawFantasyCorners(x: number, y: number, width: number, height: number, color: string): void {
     const cornerSize = 12;
 
     // More elaborate corner decorations
@@ -820,19 +820,19 @@ export class CardDetailPopup extends Container {
     return '✨';
   }
 
-  private getGroupColor(group: string): number {
+  private getGroupColor(group: string): string {
     const groupLower = group.toLowerCase();
-    if (groupLower.includes('attack') || groupLower.includes('damage')) return 0xe74c3c;
-    return 0x26de81;
+    if (groupLower.includes('attack') || groupLower.includes('damage')) return Colors.RED;
+    return Colors.GREEN_BRIGHT;
   }
 
-  private getRarityColor(rarity?: string): number {
-    const rarityColors: { [key: string]: number } = {
-      common: 0x95a5a6,    // Grey
-      uncommon: 0x26de81,  // Green
-      rare: 0x4a90e2,      // Blue
-      epic: 0xa55eea,      // Purple
-      legendary: 0xf39c12  // Gold/Orange
+  private getRarityColor(rarity?: string): string {
+    const rarityColors: { [key: string]: string } = {
+      common: Colors.GRAY_SILVER,    // Grey
+      uncommon: Colors.GREEN_BRIGHT,  // Green
+      rare: Colors.BLUE_SKY,      // Blue
+      epic: Colors.PURPLE_BRIGHT,      // Purple
+      legendary: Colors.ORANGE  // Gold/Orange
     };
     return rarityColors[rarity?.toLowerCase() || 'common'] || rarityColors.common;
   }

@@ -161,7 +161,7 @@ export class CardBattleEffects extends Container {
    */
   private async animateColorFlash(
     container: Container,
-    color: number,
+    color: string,
     duration: number = 0.3,
     maxAlpha: number = 0.5
   ): Promise<void> {

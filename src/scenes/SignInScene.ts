@@ -54,7 +54,7 @@ export class SignInScene extends BaseScene {
 
     // Add decorative gradient overlay
     const overlay = new Graphics();
-    overlay.fill({ color: 0x000000, alpha: 0.1 })
+    overlay.fill({ color: Colors.BLACK, alpha: 0.1 })
       .rect(0, 0, this.gameWidth, this.gameHeight);
     this.container.addChild(overlay);
   }

@@ -168,11 +168,11 @@ export class PlayerDetailScene extends BaseScene {
     
     // Dark fantasy background
     bg.rect(0, 0, this.gameWidth, this.gameHeight)
-      .fill({ color: 0x1a0f0a, alpha: 1.0 });
+      .fill({ color: Colors.BROWN_DARKEST, alpha: 1.0 });
     
     // Brown texture overlay
     bg.rect(0, 0, this.gameWidth, this.gameHeight)
-      .fill({ color: 0x2a1810, alpha: 0.3 });
+      .fill({ color: Colors.BROWN_DARK, alpha: 0.3 });
     
     this.backgroundContainer.addChild(bg);
   }
@@ -192,8 +192,8 @@ export class PlayerDetailScene extends BaseScene {
       .lineTo(bannerX + bannerWidth, bannerY + bannerHeight / 2)
       .lineTo(bannerX + bannerWidth - 12, bannerY)
       .lineTo(bannerX + 12, bannerY)
-      .fill({ color: 0x8b4513, alpha: 0.95 })
-      .stroke({ width: 2.5, color: 0xd4af37 });
+      .fill({ color: Colors.BROWN, alpha: 0.95 })
+      .stroke({ width: 2.5, color: Colors.GOLD });
     
     banner.moveTo(bannerX + 15, bannerY + 3)
       .lineTo(bannerX + bannerWidth - 15, bannerY + 3)
@@ -202,7 +202,7 @@ export class PlayerDetailScene extends BaseScene {
       .lineTo(bannerX + 15, bannerY + bannerHeight - 3)
       .lineTo(bannerX + 4, bannerY + bannerHeight / 2)
       .lineTo(bannerX + 15, bannerY + 3)
-      .stroke({ width: 1, color: 0xffd700, alpha: 0.6 });
+      .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.6 });
 
     const title = new Text({
       text: '👤 Player Profile 👤',
@@ -210,10 +210,10 @@ export class PlayerDetailScene extends BaseScene {
         fontFamily: 'Kalam',
         fontSize: 22,
         fontWeight: 'bold',
-        fill: 0xffffff,
-        stroke: { color: 0x2a1810, width: 2 },
+        fill: Colors.WHITE,
+        stroke: { color: Colors.BROWN_DARK, width: 2 },
         dropShadow: {
-          color: 0xffd700,
+          color: Colors.GOLD_BRIGHT,
           blur: 3,
           angle: Math.PI / 4,
           distance: 2,
@@ -282,17 +282,17 @@ export class PlayerDetailScene extends BaseScene {
     const bg = new Graphics();
     
     bg.roundRect(3, 3, width, height, 10)
-      .fill({ color: 0x000000, alpha: 0.4 });
+      .fill({ color: Colors.BLACK, alpha: 0.4 });
     
     bg.roundRect(0, 0, width, height, 10)
-      .fill({ color: 0xf5e6d3, alpha: 0.98 })
-      .stroke({ width: 2, color: 0xd4af37 });
+      .fill({ color: Colors.PARCHMENT_LIGHT, alpha: 0.98 })
+      .stroke({ width: 2, color: Colors.GOLD });
     
     bg.roundRect(3, 3, width - 6, height - 6, 8)
-      .fill({ color: 0xe8d4b8, alpha: 0.6 });
+      .fill({ color: Colors.PARCHMENT, alpha: 0.6 });
     
     bg.roundRect(5, 5, width - 10, height - 10, 7)
-      .stroke({ width: 1, color: 0xffd700, alpha: 0.5 });
+      .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.5 });
     
     panel.addChild(bg);
     
@@ -301,7 +301,7 @@ export class PlayerDetailScene extends BaseScene {
     const divider = new Graphics();
     divider.moveTo(dividerX, 15)
       .lineTo(dividerX, height - 15)
-      .stroke({ width: 2, color: 0xd4af37, alpha: 0.5 });
+      .stroke({ width: 2, color: Colors.GOLD, alpha: 0.5 });
     panel.addChild(divider);
     
     // Left section - Player Info
@@ -311,8 +311,8 @@ export class PlayerDetailScene extends BaseScene {
         fontFamily: 'Kalam',
         fontSize: 16,
         fontWeight: 'bold',
-        fill: 0x2a1810,
-        stroke: { color: 0xffd700, width: 0.5 }
+        fill: Colors.BROWN_DARK,
+        stroke: { color: Colors.GOLD_BRIGHT, width: 0.5 }
       }
     });
     leftTitle.x = 12;
@@ -325,7 +325,7 @@ export class PlayerDetailScene extends BaseScene {
         style: {
           fontFamily: 'Kalam',
           fontSize: 13,
-          fill: 0x3d2817
+          fill: Colors.BROWN_DARKER
         }
       });
       statText.x = 12;
@@ -340,8 +340,8 @@ export class PlayerDetailScene extends BaseScene {
         fontFamily: 'Kalam',
         fontSize: 16,
         fontWeight: 'bold',
-        fill: 0x2a1810,
-        stroke: { color: 0xffd700, width: 0.5 }
+        fill: Colors.BROWN_DARK,
+        stroke: { color: Colors.GOLD_BRIGHT, width: 0.5 }
       }
     });
     rightTitle.x = dividerX + 12;
@@ -354,7 +354,7 @@ export class PlayerDetailScene extends BaseScene {
         style: {
           fontFamily: 'Kalam',
           fontSize: 13,
-          fill: 0x3d2817
+          fill: Colors.BROWN_DARKER
         }
       });
       statText.x = dividerX + 12;
@@ -383,17 +383,17 @@ export class PlayerDetailScene extends BaseScene {
     const bg = new Graphics();
     
     bg.roundRect(3, 3, panelWidth, panelHeight, 10)
-      .fill({ color: 0x000000, alpha: 0.4 });
+      .fill({ color: Colors.BLACK, alpha: 0.4 });
     
     bg.roundRect(0, 0, panelWidth, panelHeight, 10)
-      .fill({ color: 0xf5e6d3, alpha: 0.98 })
-      .stroke({ width: 2, color: 0xd4af37 });
+      .fill({ color: Colors.PARCHMENT_LIGHT, alpha: 0.98 })
+      .stroke({ width: 2, color: Colors.GOLD });
     
     bg.roundRect(3, 3, panelWidth - 6, panelHeight - 6, 8)
-      .fill({ color: 0xe8d4b8, alpha: 0.6 });
+      .fill({ color: Colors.PARCHMENT, alpha: 0.6 });
     
     bg.roundRect(5, 5, panelWidth - 10, panelHeight - 10, 7)
-      .stroke({ width: 1, color: 0xffd700, alpha: 0.5 });
+      .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.5 });
     
     // Title
     const titleText = new Text({
@@ -402,8 +402,8 @@ export class PlayerDetailScene extends BaseScene {
         fontFamily: 'Kalam',
         fontSize: 16,
         fontWeight: 'bold',
-        fill: 0x2a1810,
-        stroke: { color: 0xffd700, width: 0.5 }
+        fill: Colors.BROWN_DARK,
+        stroke: { color: Colors.GOLD_BRIGHT, width: 0.5 }
       }
     });
     titleText.x = 12;
@@ -417,7 +417,7 @@ export class PlayerDetailScene extends BaseScene {
         style: {
           fontFamily: 'Kalam',
           fontSize: 14,
-          fill: 0x8b4513,
+          fill: Colors.BROWN,
           fontStyle: 'italic'
         }
       });
@@ -438,8 +438,8 @@ export class PlayerDetailScene extends BaseScene {
         fontFamily: 'Kalam',
         fontSize: 14,
         fontWeight: 'bold',
-        fill: 0x2a1810,
-        stroke: { color: 0xffd700, width: 0.5 }
+        fill: Colors.BROWN_DARK,
+        stroke: { color: Colors.GOLD_BRIGHT, width: 0.5 }
       }
     });
     remainingText.anchor.set(1, 0);
@@ -465,7 +465,7 @@ export class PlayerDetailScene extends BaseScene {
           fontFamily: 'Kalam',
           fontSize: 14,
           fontWeight: 'bold',
-          fill: 0x2a1810
+          fill: Colors.BROWN_DARK
         }
       });
       nameText.x = 12;
@@ -479,7 +479,7 @@ export class PlayerDetailScene extends BaseScene {
           fontFamily: 'Kalam',
           fontSize: 16,
           fontWeight: 'bold',
-          fill: 0x2a1810
+          fill: Colors.BROWN_DARK
         }
       });
       valueText.x = 140;
@@ -566,11 +566,11 @@ export class PlayerDetailScene extends BaseScene {
     
     const bg = new Graphics();
     bg.roundRect(0, 0, width, height, 6)
-      .fill({ color: 0x8b4513, alpha: 0.95 })
-      .stroke({ width: 2, color: 0xd4af37 });
+      .fill({ color: Colors.BROWN, alpha: 0.95 })
+      .stroke({ width: 2, color: Colors.GOLD });
     
     bg.roundRect(2, 2, width - 4, height - 4, 4)
-      .stroke({ width: 1, color: 0xffd700, alpha: 0.5 });
+      .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.5 });
 
     const buttonText = new Text({
       text: text,
@@ -578,8 +578,8 @@ export class PlayerDetailScene extends BaseScene {
         fontFamily: 'Kalam',
         fontSize: 16,
         fontWeight: 'bold',
-        fill: 0xffffff,
-        stroke: { color: 0x2a1810, width: 1.5 }
+        fill: Colors.WHITE,
+        stroke: { color: Colors.BROWN_DARK, width: 1.5 }
       }
     });
     buttonText.anchor.set(0.5);
@@ -595,19 +595,19 @@ export class PlayerDetailScene extends BaseScene {
     button.on('pointerover', () => {
       bg.clear();
       bg.roundRect(0, 0, width, height, 6)
-        .fill({ color: 0xa0632a, alpha: 0.95 })
-        .stroke({ width: 2, color: 0xffd700 });
+        .fill({ color: Colors.BROWN_LIGHT, alpha: 0.95 })
+        .stroke({ width: 2, color: Colors.GOLD_BRIGHT });
       bg.roundRect(2, 2, width - 4, height - 4, 4)
-        .stroke({ width: 1, color: 0xffd700, alpha: 0.8 });
+        .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.8 });
     });
     
     button.on('pointerout', () => {
       bg.clear();
       bg.roundRect(0, 0, width, height, 6)
-        .fill({ color: 0x8b4513, alpha: 0.95 })
-        .stroke({ width: 2, color: 0xd4af37 });
+        .fill({ color: Colors.BROWN, alpha: 0.95 })
+        .stroke({ width: 2, color: Colors.GOLD });
       bg.roundRect(2, 2, width - 4, height - 4, 4)
-        .stroke({ width: 1, color: 0xffd700, alpha: 0.5 });
+        .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.5 });
     });
     
     button.on('pointerdown', onClick);
@@ -627,11 +627,11 @@ export class PlayerDetailScene extends BaseScene {
     
     const bg = new Graphics();
     bg.roundRect(0, 0, width, height, 8)
-      .fill({ color: 0x8b4513, alpha: 0.95 })
-      .stroke({ width: 2, color: 0xd4af37 });
+      .fill({ color: Colors.BROWN, alpha: 0.95 })
+      .stroke({ width: 2, color: Colors.GOLD });
     
     bg.roundRect(2, 2, width - 4, height - 4, 6)
-      .stroke({ width: 1, color: 0xffd700, alpha: 0.6 });
+      .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.6 });
 
     const buttonText = new Text({
       text: text,
@@ -639,8 +639,8 @@ export class PlayerDetailScene extends BaseScene {
         fontFamily: 'Kalam',
         fontSize: 13,
         fontWeight: 'bold',
-        fill: 0xffffff,
-        stroke: { color: 0x2a1810, width: 2 }
+        fill: Colors.WHITE,
+        stroke: { color: Colors.BROWN_DARK, width: 2 }
       }
     });
     buttonText.anchor.set(0.5);
@@ -656,20 +656,20 @@ export class PlayerDetailScene extends BaseScene {
     button.on('pointerover', () => {
       bg.clear();
       bg.roundRect(0, 0, width, height, 8)
-        .fill({ color: 0xa0632a, alpha: 0.95 })
-        .stroke({ width: 2, color: 0xffd700 });
+        .fill({ color: Colors.BROWN_LIGHT, alpha: 0.95 })
+        .stroke({ width: 2, color: Colors.GOLD_BRIGHT });
       bg.roundRect(2, 2, width - 4, height - 4, 6)
-        .stroke({ width: 1, color: 0xffd700, alpha: 0.9 });
+        .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.9 });
       button.scale.set(1.02);
     });
     
     button.on('pointerout', () => {
       bg.clear();
       bg.roundRect(0, 0, width, height, 8)
-        .fill({ color: 0x8b4513, alpha: 0.95 })
-        .stroke({ width: 2, color: 0xd4af37 });
+        .fill({ color: Colors.BROWN, alpha: 0.95 })
+        .stroke({ width: 2, color: Colors.GOLD });
       bg.roundRect(2, 2, width - 4, height - 4, 6)
-        .stroke({ width: 1, color: 0xffd700, alpha: 0.6 });
+        .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.6 });
       button.scale.set(1.0);
     });
     
@@ -708,10 +708,10 @@ export class PlayerDetailScene extends BaseScene {
         fontFamily: 'Kalam',
         fontSize: 20,
         fontWeight: 'bold',
-        fill: 0xffffff,
-        stroke: { color: 0x2a1810, width: 2 },
+        fill: Colors.WHITE,
+        stroke: { color: Colors.BROWN_DARK, width: 2 },
         dropShadow: {
-          color: 0xffd700,
+          color: Colors.GOLD_BRIGHT,
           blur: 3,
           angle: Math.PI / 4,
           distance: 2,

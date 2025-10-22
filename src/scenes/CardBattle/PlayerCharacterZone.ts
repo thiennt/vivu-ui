@@ -1,4 +1,4 @@
-import { Colors } from "@/utils/colors";
+import { Colors } from '@/utils/colors';
 import { Container, Graphics, Text } from "pixi.js";
 import { CardBattlePlayerState } from "@/types";
 import { BaseScene } from "@/ui/BaseScene";
@@ -69,11 +69,11 @@ export class PlayerCharacterZone extends Container {
     
     // Dark wooden frame background
     this.zoneBg.roundRect(0, 0, width, height, 8)
-      .fill({ color: 0x2a1810, alpha: 0.4 });
+      .fill({ color: Colors.BROWN_DARK, alpha: 0.4 });
     
     // Inner wooden texture
     this.zoneBg.roundRect(2, 2, width - 4, height - 4, 6)
-      .stroke({ width: 1, color: 0x8b4513, alpha: 0.3 });
+      .stroke({ width: 1, color: Colors.BROWN, alpha: 0.3 });
     
     // Team-colored border
     this.zoneBg.roundRect(0, 0, width, height, 8)
@@ -95,12 +95,12 @@ export class PlayerCharacterZone extends Container {
       fontFamily: 'Kalam',
       fontSize: 14,
       fontWeight: 'bold',
-      fill: 0xffffff,
-      stroke: { color: 0x000000, width: 2.5 },
+      fill: Colors.WHITE,
+      stroke: { color: Colors.BLACK, width: 2.5 },
       align: 'center',
       lineHeight: 16,
       dropShadow: {
-        color: 0x000000,
+        color: Colors.BLACK,
         blur: 4,
         angle: Math.PI / 4,
         distance: 2,
@@ -117,11 +117,11 @@ export class PlayerCharacterZone extends Container {
       fontFamily: 'Kalam',
       fontSize: 20,
       fontWeight: 'bold',
-      fill: 0xffd700,
+      fill: Colors.GOLD_BRIGHT,
       align: 'center',
-      stroke: { color: 0x000000, width: 3 },
+      stroke: { color: Colors.BLACK, width: 3 },
       dropShadow: {
-        color: 0xffd700,
+        color: Colors.GOLD_BRIGHT,
         blur: 8,
         angle: 0,
         distance: 0,
@@ -138,11 +138,11 @@ export class PlayerCharacterZone extends Container {
       fontFamily: 'Kalam',
       fontSize: 16,
       fontWeight: 'bold',
-      fill: 0xffffff,
+      fill: Colors.WHITE,
       align: 'center',
-      stroke: { color: 0x000000, width: 2.5 },
+      stroke: { color: Colors.BLACK, width: 2.5 },
       dropShadow: {
-        color: 0x000000,
+        color: Colors.BLACK,
         blur: 3,
         angle: Math.PI / 4,
         distance: 1,
@@ -173,37 +173,37 @@ export class PlayerCharacterZone extends Container {
     if (highlight) {
       // Glowing discard area - red glow
       this.playerInfoGlow.roundRect(-5, -5, this.infoWidth + 10, this.infoHeight + 10, 10)
-        .fill({ color: 0xff6b6b, alpha: 0.3 });
+        .fill({ color: Colors.RED_BRIGHT, alpha: 0.3 });
       
       // Dark background with red discard border
       this.playerInfoBg.roundRect(0, 0, this.infoWidth, this.infoHeight, 6)
-        .fill({ color: 0x3d2817, alpha: 0.95 })
-        .stroke({ width: 3, color: 0xff6b6b, alpha: 0.95 });
+        .fill({ color: Colors.BROWN_DARKER, alpha: 0.95 })
+        .stroke({ width: 3, color: Colors.RED_BRIGHT, alpha: 0.95 });
       
       // Inner darker layer
       this.playerInfoBg.roundRect(2, 2, this.infoWidth - 4, this.infoHeight - 4, 4)
-        .fill({ color: 0x2a1810, alpha: 0.7 });
+        .fill({ color: Colors.BROWN_DARK, alpha: 0.7 });
       
       // Inner red glow
       this.playerInfoBg.roundRect(2, 2, this.infoWidth - 4, this.infoHeight - 4, 4)
-        .stroke({ width: 2, color: 0xff6b6b, alpha: 0.7 });
+        .stroke({ width: 2, color: Colors.RED_BRIGHT, alpha: 0.7 });
       
       // Animated dashed border effect
       const dashLength = 8;
       const spacing = 4;
       for (let i = 0; i < this.infoWidth; i += dashLength + spacing) {
         this.playerInfoBg.roundRect(i + 2, 2, Math.min(dashLength, this.infoWidth - i - 4), 3, 1)
-          .fill({ color: 0xff6b6b, alpha: 0.9 });
+          .fill({ color: Colors.RED_BRIGHT, alpha: 0.9 });
       }
       for (let i = 0; i < this.infoHeight; i += dashLength + spacing) {
         this.playerInfoBg.roundRect(2, i + 2, 3, Math.min(dashLength, this.infoHeight - i - 4), 1)
-          .fill({ color: 0xff6b6b, alpha: 0.9 });
+          .fill({ color: Colors.RED_BRIGHT, alpha: 0.9 });
         this.playerInfoBg.roundRect(this.infoWidth - 5, i + 2, 3, Math.min(dashLength, this.infoHeight - i - 4), 1)
-          .fill({ color: 0xff6b6b, alpha: 0.9 });
+          .fill({ color: Colors.RED_BRIGHT, alpha: 0.9 });
       }
       for (let i = 0; i < this.infoWidth; i += dashLength + spacing) {
         this.playerInfoBg.roundRect(i + 2, this.infoHeight - 5, Math.min(dashLength, this.infoWidth - i - 4), 3, 1)
-          .fill({ color: 0xff6b6b, alpha: 0.9 });
+          .fill({ color: Colors.RED_BRIGHT, alpha: 0.9 });
       }
 
       // Show tooltip - white text on dark
@@ -214,12 +214,12 @@ export class PlayerCharacterZone extends Container {
             fontFamily: 'Kalam',
             fontSize: 11,
             fontWeight: 'bold',
-            fill: 0xffffff,
+            fill: Colors.WHITE,
             align: 'center',
             lineHeight: 14,
-            stroke: { color: 0x000000, width: 2.5 },
+            stroke: { color: Colors.BLACK, width: 2.5 },
             dropShadow: {
-              color: 0xff6b6b,
+              color: Colors.RED_BRIGHT,
               blur: 4,
               distance: 0,
               alpha: 0.8
@@ -241,12 +241,12 @@ export class PlayerCharacterZone extends Container {
       
       // Dark brown background
       this.playerInfoBg.roundRect(0, 0, this.infoWidth, this.infoHeight, 6)
-        .fill({ color: 0x3d2817, alpha: 0.95 })
-        .stroke({ width: 2, color: 0xd4af37, alpha: 0.7 });
+        .fill({ color: Colors.BROWN_DARKER, alpha: 0.95 })
+        .stroke({ width: 2, color: Colors.GOLD, alpha: 0.7 });
       
       // Inner darker texture
       this.playerInfoBg.roundRect(2, 2, this.infoWidth - 4, this.infoHeight - 4, 4)
-        .fill({ color: 0x2a1810, alpha: 0.6 });
+        .fill({ color: Colors.BROWN_DARK, alpha: 0.6 });
       
       // Team-colored inner border (subtle)
       this.playerInfoBg.roundRect(3, 3, this.infoWidth - 6, this.infoHeight - 6, 3)

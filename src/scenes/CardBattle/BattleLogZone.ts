@@ -1,4 +1,4 @@
-import { Colors } from "@/utils/colors";
+import { Colors } from '@/utils/colors';
 import { Container, Graphics, Text, Ticker } from "pixi.js";
 import { BattlePhaseName } from "@/types";
 import { gsap } from "gsap";
@@ -64,11 +64,11 @@ export class BattleLogZone extends Container {
       fontFamily: 'Kalam',
       fontSize: 18,
       fontWeight: 'bold',
-      fill: 0xffd700,
-      stroke: { color: 0x000000, width: 3 },
+      fill: Colors.GOLD_BRIGHT,
+      stroke: { color: Colors.BLACK, width: 3 },
       align: 'center',
       dropShadow: {
-        color: 0x000000,
+        color: Colors.BLACK,
         blur: 4,
         angle: Math.PI / 4,
         distance: 2,
@@ -84,11 +84,11 @@ export class BattleLogZone extends Container {
       fontFamily: 'Kalam',
       fontSize: 16,
       fontWeight: 'bold',
-      fill: 0xffffff,
-      stroke: { color: 0x000000, width: 2.5 },
+      fill: Colors.WHITE,
+      stroke: { color: Colors.BLACK, width: 2.5 },
       align: 'center',
       dropShadow: {
-        color: 0x000000,
+        color: Colors.BLACK,
         blur: 3,
         angle: Math.PI / 4,
         distance: 2,
@@ -104,11 +104,11 @@ export class BattleLogZone extends Container {
       fontFamily: 'Kalam',
       fontSize: 13,
       fontWeight: 'bold',
-      fill: 0xffffff,
-      stroke: { color: 0x000000, width: 2 },
+      fill: Colors.WHITE,
+      stroke: { color: Colors.BLACK, width: 2 },
       align: 'center',
       dropShadow: {
-        color: 0x000000,
+        color: Colors.BLACK,
         blur: 2,
         angle: Math.PI / 4,
         distance: 1,
@@ -124,11 +124,11 @@ export class BattleLogZone extends Container {
       fontFamily: 'Kalam',
       fontSize: 14,
       fontWeight: 'bold',
-      fill: 0xffffff,
-      stroke: { color: 0x000000, width: 3 },
+      fill: Colors.WHITE,
+      stroke: { color: Colors.BLACK, width: 3 },
       align: 'center',
       dropShadow: {
-        color: 0x000000,
+        color: Colors.BLACK,
         blur: 4,
         angle: 0,
         distance: 0,
@@ -160,42 +160,42 @@ export class BattleLogZone extends Container {
 
     // Dark brown/wooden background - much better contrast
     this.logBg.roundRect(0, 0, width, height, 8)
-      .fill({ color: 0x3d2817, alpha: 0.95 });
+      .fill({ color: Colors.BROWN_DARKER, alpha: 0.95 });
 
     // Darker inner layer
     this.logBg.roundRect(2, 2, width - 4, height - 4, 6)
-      .fill({ color: 0x2a1810, alpha: 0.7 });
+      .fill({ color: Colors.BROWN_DARK, alpha: 0.7 });
 
     // Very subtle gradient
     const segmentHeight = height / 8;
     for (let i = 0; i < 8; i++) {
       const alpha = 0.05 - (i * 0.006);
       this.logBg.rect(4, 4 + i * segmentHeight, width - 8, segmentHeight)
-        .fill({ color: 0x000000, alpha });
+        .fill({ color: Colors.BLACK, alpha });
     }
 
     // Golden border (main)
     this.logBg.roundRect(0, 0, width, height, 8)
-      .stroke({ width: 3, color: 0xd4af37, alpha: 0.8 });
+      .stroke({ width: 3, color: Colors.GOLD, alpha: 0.8 });
 
     // Team-colored inner border (subtle)
     this.logBg.roundRect(3, 3, width - 6, height - 6, 5)
       .stroke({ width: 2, color: playerColor, alpha: 0.5 });
 
     // Decorative golden corner accents
-    this.drawParchmentCorners(this.logBg, 0, 0, width, height, 0xffd700);
+    this.drawParchmentCorners(this.logBg, 0, 0, width, height, Colors.GOLD_BRIGHT);
 
     // Top and bottom golden accent bars
     this.logBg.roundRect(12, 8, width - 24, 3, 1.5)
-      .fill({ color: 0xffd700, alpha: 0.6 })
-      .stroke({ width: 1, color: 0xd4af37, alpha: 0.4 });
+      .fill({ color: Colors.GOLD_BRIGHT, alpha: 0.6 })
+      .stroke({ width: 1, color: Colors.GOLD, alpha: 0.4 });
 
     this.logBg.roundRect(12, height - 11, width - 24, 3, 1.5)
-      .fill({ color: 0xffd700, alpha: 0.6 })
-      .stroke({ width: 1, color: 0xd4af37, alpha: 0.4 });
+      .fill({ color: Colors.GOLD_BRIGHT, alpha: 0.6 })
+      .stroke({ width: 1, color: Colors.GOLD, alpha: 0.4 });
   }
 
-  private drawParchmentCorners(graphics: Graphics, x: number, y: number, width: number, height: number, color: number): void {
+  private drawParchmentCorners(graphics: Graphics, x: number, y: number, width: number, height: number, color: string): void {
     const cornerSize = 10;
     
     // Top-left corner
@@ -281,12 +281,12 @@ export class BattleLogZone extends Container {
 
     // Dark badge background for better contrast
     this.notificationBg.roundRect(-bgWidth / 2, -bgHeight / 2, bgWidth, bgHeight, 6)
-      .fill({ color: 0x2a1810, alpha: 0.95 })
+      .fill({ color: Colors.BROWN_DARK, alpha: 0.95 })
       .stroke({ width: 2, color: notificationColor, alpha: 0.9 });
 
     // Inner darker texture
     this.notificationBg.roundRect(-bgWidth / 2 + 2, -bgHeight / 2 + 2, bgWidth - 4, bgHeight - 4, 4)
-      .fill({ color: 0x1a0f0a, alpha: 0.6 });
+      .fill({ color: Colors.BROWN_DARKEST, alpha: 0.6 });
 
     // Inner highlight border
     this.notificationBg.roundRect(-bgWidth / 2 + 2, -bgHeight / 2 + 2, bgWidth - 4, bgHeight - 4, 4)
