@@ -1,4 +1,5 @@
 import { Container, Graphics, Ticker } from 'pixi.js';
+import { Colors, hexToPixi } from '@/utils/colors';
 
 /**
  * BattleField - Dynamic animated background for card battles
@@ -69,9 +70,9 @@ export class BattleField extends Container {
     this.backgroundGradient.clear();
 
     // Create gradient from top (player 2 side) to bottom (player 1 side)
-    const topColor = 0x1a1a3e; // Dark purple (enemy territory)
-    const middleColor = 0x2d2d5f; // Mid purple-blue (battlefield)
-    const bottomColor = 0x1a3e3e; // Dark teal (player territory)
+    const topColor = hexToPixi(Colors.BLUE_NAVY_ALT); // Dark purple (enemy territory)
+    const middleColor = hexToPixi(Colors.TEAL_DARKER); // Mid purple-blue (battlefield)
+    const bottomColor = hexToPixi(Colors.TEAL_DARKEST); // Dark teal (player territory)
 
     // Draw gradient rectangles
     const segmentHeight = this.fieldHeight / 20;
@@ -113,12 +114,12 @@ export class BattleField extends Container {
       currentX += dashLength + gapLength;
     }
     
-    this.battlefieldLine.stroke({ width: 2, color: 0x4a90e2, alpha: 0.3 });
+    this.battlefieldLine.stroke({ width: 2, color: hexToPixi(Colors.BLUE_SKY), alpha: 0.3 });
 
     // Add subtle glow to center line
     this.battlefieldLine.moveTo(0, centerY);
     this.battlefieldLine.lineTo(this.fieldWidth, centerY);
-    this.battlefieldLine.stroke({ width: 6, color: 0x4a90e2, alpha: 0.1 });
+    this.battlefieldLine.stroke({ width: 6, color: hexToPixi(Colors.BLUE_SKY), alpha: 0.1 });
   }
 
   private updateBattlefieldLine(): void {
@@ -138,7 +139,7 @@ export class BattleField extends Container {
     for (let r = radius; r > 0; r -= 20) {
       const alpha = (1 - r / radius) * 0.4;
       this.vignette.circle(centerX, centerY, r)
-        .fill({ color: 0x000000, alpha });
+        .fill({ color: hexToPixi(Colors.BLACK), alpha });
     }
   }
 
@@ -184,7 +185,7 @@ export class BattleField extends Container {
         break;
     }
 
-    decoration.stroke({ width: thickness, color: 0x6a4c93, alpha: 0.5 });
+    decoration.stroke({ width: thickness, color: hexToPixi(Colors.TEAL_PURPLE), alpha: 0.5 });
     this.addChild(decoration);
     this.cornerDecorations.push(decoration);
   }
@@ -195,7 +196,7 @@ export class BattleField extends Container {
       const graphics = new Graphics();
       const size = Math.random() * 2 + 1;
       graphics.circle(0, 0, size)
-        .fill({ color: 0xffffff, alpha: Math.random() * 0.3 + 0.2 });
+        .fill({ color: hexToPixi(Colors.WHITE), alpha: Math.random() * 0.3 + 0.2 });
       
       this.addChild(graphics);
       

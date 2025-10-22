@@ -1,7 +1,7 @@
 import { Container, Graphics, Text } from 'pixi.js';
 import { BaseScene } from '@/ui/BaseScene';
 import { Button } from '@/ui/Button';
-import { Colors } from '@/utils/colors';
+import { Colors, hexToPixi } from '@/utils/colors';
 import { authApi } from '@/services/api';
 import { navigation } from '@/utils/navigation';
 import { HomeScene } from './HomeScene';
@@ -54,7 +54,7 @@ export class SignInScene extends BaseScene {
 
     // Add decorative gradient overlay
     const overlay = new Graphics();
-    overlay.fill({ color: 0x000000, alpha: 0.1 })
+    overlay.fill({ color: hexToPixi(Colors.BLACK), alpha: 0.1 })
       .rect(0, 0, this.gameWidth, this.gameHeight);
     this.container.addChild(overlay);
   }

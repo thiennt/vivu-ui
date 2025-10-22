@@ -5,7 +5,7 @@ import { BaseScene } from '@/ui/BaseScene';
 import { CharactersScene } from './CharactersScene';
 import { charactersApi, equipmentApi, skillsApi, isLikelyUsingMockData } from '@/services/api';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
-import { Colors } from '@/utils/colors';
+import { Colors, hexToPixi } from '@/utils/colors';
 import { LearnSkillPopup } from '@/popups/LearnSkillPopup';
 import { SkillChangePopup } from '@/popups/SkillChangePopup';
 import { EquipmentChangePopup } from '@/popups/EquipmentChangePopup';
@@ -154,11 +154,11 @@ export class CharacterDetailScene extends BaseScene {
 
     // Dark hero portrait background
     bg.rect(0, 0, this.gameWidth, this.gameHeight)
-      .fill({ color: 0x1a1a2e, alpha: 1.0 });
+      .fill({ color: hexToPixi(Colors.BLUE_NAVY_DARK), alpha: 1.0 });
 
     // Darker overlay for portrait feel
     bg.rect(0, 0, this.gameWidth, this.gameHeight)
-      .fill({ color: 0x16213e, alpha: 0.5 });
+      .fill({ color: hexToPixi(Colors.BLUE_NAVY), alpha: 0.5 });
 
     this.backgroundContainer.addChild(bg);
   }
@@ -178,8 +178,8 @@ export class CharacterDetailScene extends BaseScene {
       .lineTo(bannerX + bannerWidth, bannerY + bannerHeight / 2)
       .lineTo(bannerX + bannerWidth - 12, bannerY)
       .lineTo(bannerX + 12, bannerY)
-      .fill({ color: 0x4a2f5f, alpha: 0.95 })
-      .stroke({ width: 2.5, color: 0x8b9dc3 });
+      .fill({ color: hexToPixi(Colors.PURPLE_DARKER), alpha: 0.95 })
+      .stroke({ width: 2.5, color: hexToPixi(Colors.BLUE_STEEL_LIGHT) });
 
     banner.moveTo(bannerX + 15, bannerY + 3)
       .lineTo(bannerX + bannerWidth - 15, bannerY + 3)
@@ -188,7 +188,7 @@ export class CharacterDetailScene extends BaseScene {
       .lineTo(bannerX + 15, bannerY + bannerHeight - 3)
       .lineTo(bannerX + 4, bannerY + bannerHeight / 2)
       .lineTo(bannerX + 15, bannerY + 3)
-      .stroke({ width: 1, color: 0x6b8cae, alpha: 0.6 });
+      .stroke({ width: 1, color: hexToPixi(Colors.BLUE_STEEL), alpha: 0.6 });
 
     const title = new Text({
       text: this.character!.name,
@@ -196,10 +196,10 @@ export class CharacterDetailScene extends BaseScene {
         fontFamily: 'Kalam',
         fontSize: 26,
         fontWeight: 'bold',
-        fill: 0xffffff,
-        stroke: { color: 0x1a1a2e, width: 2 },
+        fill: hexToPixi(Colors.WHITE),
+        stroke: { color: hexToPixi(Colors.BLUE_NAVY_DARK), width: 2 },
         dropShadow: {
-          color: 0x6b8cae,
+          color: hexToPixi(Colors.BLUE_STEEL),
           blur: 4,
           angle: Math.PI / 4,
           distance: 2,
@@ -225,20 +225,20 @@ export class CharacterDetailScene extends BaseScene {
 
     // Shadow
     headerPanel.roundRect(3, 3, panelWidth, 125, 10)
-      .fill({ color: 0x000000, alpha: 0.5 });
+      .fill({ color: hexToPixi(Colors.BLACK), alpha: 0.5 });
 
     // Main portrait panel
     headerPanel.roundRect(0, 0, panelWidth, 125, 10)
-      .fill({ color: 0x1a1a2e, alpha: 0.98 })
-      .stroke({ width: 2, color: 0x4a5f7f });
+      .fill({ color: hexToPixi(Colors.BLUE_NAVY_DARK), alpha: 0.98 })
+      .stroke({ width: 2, color: hexToPixi(Colors.BLUE_STEEL_DARK) });
 
     // Inner layer
     headerPanel.roundRect(3, 3, panelWidth - 6, 119, 8)
-      .fill({ color: 0x16213e, alpha: 0.7 });
+      .fill({ color: hexToPixi(Colors.BLUE_NAVY), alpha: 0.7 });
 
     // Steel highlight
     headerPanel.roundRect(5, 5, panelWidth - 10, 115, 7)
-      .stroke({ width: 1, color: 0x6b8cae, alpha: 0.4 });
+      .stroke({ width: 1, color: hexToPixi(Colors.BLUE_STEEL), alpha: 0.4 });
 
     // Avatar with ornate frame
     const avatarSize = 90;
@@ -246,16 +246,16 @@ export class CharacterDetailScene extends BaseScene {
 
     // Avatar frame shadow
     avatar.roundRect(padding + 2, 17 + 2, avatarSize, avatarSize, 8)
-      .fill({ color: 0x000000, alpha: 0.5 });
+      .fill({ color: hexToPixi(Colors.BLACK), alpha: 0.5 });
 
     // Avatar frame
     avatar.roundRect(padding, 17, avatarSize, avatarSize, 8)
-      .fill({ color: 0x0f0f1e, alpha: 0.95 })
-      .stroke({ width: 2, color: 0x4a5f7f });
+      .fill({ color: hexToPixi(Colors.BLUE_NAVY_DARKER), alpha: 0.95 })
+      .stroke({ width: 2, color: hexToPixi(Colors.BLUE_STEEL_DARK) });
 
     // Inner avatar frame
     avatar.roundRect(padding + 2, 19, avatarSize - 4, avatarSize - 4, 6)
-      .stroke({ width: 1, color: 0x6b8cae, alpha: 0.5 });
+      .stroke({ width: 1, color: hexToPixi(Colors.BLUE_STEEL), alpha: 0.5 });
 
     // Avatar sprite
     const avatarTexture = await Assets.load(this.character!.avatar_url || 'https://pixijs.com/assets/bunny.png');
@@ -269,7 +269,7 @@ export class CharacterDetailScene extends BaseScene {
     // Rarity indicator gem
     const rarityBadge = new Graphics();
     rarityBadge.circle(padding + avatarSize - 12, 27, 10)
-      .fill({ color: 0x1a1a2e, alpha: 0.95 })
+      .fill({ color: hexToPixi(Colors.BLUE_NAVY_DARK), alpha: 0.95 })
       .stroke({ width: 2, color: this.getRarityColor(this.character!.rarity) });
 
     headerPanelContainer.addChild(
@@ -299,8 +299,8 @@ export class CharacterDetailScene extends BaseScene {
       // Stat badge
       const statBadge = new Graphics();
       statBadge.roundRect(x, y, statWidth - 8, 40, 6)
-        .fill({ color: 0x0f0f1e, alpha: 0.95 })
-        .stroke({ width: 1.5, color: 0x4a5f7f });
+        .fill({ color: hexToPixi(Colors.BLUE_NAVY_DARKER), alpha: 0.95 })
+        .stroke({ width: 1.5, color: hexToPixi(Colors.BLUE_STEEL_DARK) });
 
       statBadge.roundRect(x + 2, y + 2, statWidth - 12, 36, 4)
         .stroke({ width: 1, color: stat.color, alpha: 0.6 });
@@ -323,7 +323,7 @@ export class CharacterDetailScene extends BaseScene {
         style: {
           fontFamily: 'Kalam',
           fontSize: 10,
-          fill: 0x8b9dc3
+          fill: hexToPixi(Colors.BLUE_STEEL_LIGHT)
         }
       });
       labelText.x = x + 30;
@@ -336,7 +336,7 @@ export class CharacterDetailScene extends BaseScene {
           fontFamily: 'Kalam',
           fontSize: 16,
           fontWeight: 'bold',
-          fill: 0xffffff
+          fill: hexToPixi(Colors.WHITE)
         }
       });
       valueText.x = x + 30;
@@ -400,15 +400,15 @@ export class CharacterDetailScene extends BaseScene {
     if (isActive) {
       // Active tab styling
       bg.roundRect(0, 0, width, height, 8)
-        .fill({ color: 0x4a2f5f, alpha: 0.95 })
-        .stroke({ width: 2, color: 0x8b9dc3 });
+        .fill({ color: hexToPixi(Colors.PURPLE_DARKER), alpha: 0.95 })
+        .stroke({ width: 2, color: hexToPixi(Colors.BLUE_STEEL_LIGHT) });
       bg.roundRect(2, 2, width - 4, height - 4, 6)
-        .stroke({ width: 1, color: 0x6b8cae, alpha: 0.8 });
+        .stroke({ width: 1, color: hexToPixi(Colors.BLUE_STEEL), alpha: 0.8 });
     } else {
       // Inactive tab styling
       bg.roundRect(0, 0, width, height, 8)
-        .fill({ color: 0x2a2a2a, alpha: 0.8 })
-        .stroke({ width: 1.5, color: 0x4a5f7f });
+        .fill({ color: hexToPixi(Colors.GRAY_DARKER), alpha: 0.8 })
+        .stroke({ width: 1.5, color: hexToPixi(Colors.BLUE_STEEL_DARK) });
     }
 
     const iconText = new Text({
@@ -416,7 +416,7 @@ export class CharacterDetailScene extends BaseScene {
       style: {
         fontFamily: 'Arial',
         fontSize: 16,
-        fill: isActive ? 0xffffff : 0x8b9dc3
+        fill: isActive ? hexToPixi(Colors.WHITE) : hexToPixi(Colors.BLUE_STEEL_LIGHT)
       }
     });
     iconText.anchor.set(0.5);
@@ -429,7 +429,7 @@ export class CharacterDetailScene extends BaseScene {
         fontFamily: 'Kalam',
         fontSize: 13,
         fontWeight: isActive ? 'bold' : 'normal',
-        fill: isActive ? 0xffffff : 0x8b9dc3
+        fill: isActive ? hexToPixi(Colors.WHITE) : hexToPixi(Colors.BLUE_STEEL_LIGHT)
       }
     });
     labelText.anchor.set(0.5);
@@ -446,15 +446,15 @@ export class CharacterDetailScene extends BaseScene {
       button.on('pointerover', () => {
         bg.clear();
         bg.roundRect(0, 0, width, height, 8)
-          .fill({ color: 0x3a3a3a, alpha: 0.9 })
-          .stroke({ width: 1.5, color: 0x6b8cae });
+          .fill({ color: hexToPixi(Colors.GRAY_DARK), alpha: 0.9 })
+          .stroke({ width: 1.5, color: hexToPixi(Colors.BLUE_STEEL) });
       });
 
       button.on('pointerout', () => {
         bg.clear();
         bg.roundRect(0, 0, width, height, 8)
-          .fill({ color: 0x2a2a2a, alpha: 0.8 })
-          .stroke({ width: 1.5, color: 0x4a5f7f });
+          .fill({ color: hexToPixi(Colors.GRAY_DARKER), alpha: 0.8 })
+          .stroke({ width: 1.5, color: hexToPixi(Colors.BLUE_STEEL_DARK) });
       });
     }
 
@@ -541,17 +541,17 @@ export class CharacterDetailScene extends BaseScene {
     const otherStatsPanel = new Graphics();
 
     otherStatsPanel.roundRect(2, 2, panelWidth, otherStatsHeight, 10)
-      .fill({ color: 0x000000, alpha: 0.5 });
+      .fill({ color: hexToPixi(Colors.BLACK), alpha: 0.5 });
 
     otherStatsPanel.roundRect(0, 0, panelWidth, otherStatsHeight, 10)
-      .fill({ color: 0x1a1a2e, alpha: 0.98 })
-      .stroke({ width: 2, color: 0x4a5f7f });
+      .fill({ color: hexToPixi(Colors.BLUE_NAVY_DARK), alpha: 0.98 })
+      .stroke({ width: 2, color: hexToPixi(Colors.BLUE_STEEL_DARK) });
 
     otherStatsPanel.roundRect(3, 3, panelWidth - 6, otherStatsHeight - 6, 8)
-      .fill({ color: 0x16213e, alpha: 0.7 });
+      .fill({ color: hexToPixi(Colors.BLUE_NAVY), alpha: 0.7 });
 
     otherStatsPanel.roundRect(5, 5, panelWidth - 10, otherStatsHeight - 10, 7)
-      .stroke({ width: 1, color: 0x6b8cae, alpha: 0.4 });
+      .stroke({ width: 1, color: hexToPixi(Colors.BLUE_STEEL), alpha: 0.4 });
 
     otherStatsContainer.addChild(otherStatsPanel);
 
@@ -562,7 +562,7 @@ export class CharacterDetailScene extends BaseScene {
         fontFamily: 'Kalam',
         fontSize: 14,
         fontWeight: 'bold',
-        fill: 0x8b9dc3
+        fill: hexToPixi(Colors.BLUE_STEEL_LIGHT)
       }
     });
     title.x = 10;
@@ -589,7 +589,7 @@ export class CharacterDetailScene extends BaseScene {
       // Stat background bar
       const statBg = new Graphics();
       statBg.roundRect(10, y, panelWidth - 20, 28, 6)
-        .fill({ color: 0x0f0f1e, alpha: 0.7 })
+        .fill({ color: hexToPixi(Colors.BLUE_NAVY_DARKER), alpha: 0.7 })
         .stroke({ width: 1, color: stat.color, alpha: 0.4 });
 
       // Icon
@@ -611,7 +611,7 @@ export class CharacterDetailScene extends BaseScene {
           fontFamily: 'Kalam',
           fontSize: 13,
           fontWeight: 'bold',
-          fill: 0xffffff
+          fill: hexToPixi(Colors.WHITE)
         }
       });
       nameText.x = 45;
@@ -654,17 +654,17 @@ export class CharacterDetailScene extends BaseScene {
     const skillsPanel = new Graphics();
 
     skillsPanel.roundRect(2, 2, panelWidth, panelHeight, 10)
-      .fill({ color: 0x000000, alpha: 0.5 });
+      .fill({ color: hexToPixi(Colors.BLACK), alpha: 0.5 });
 
     skillsPanel.roundRect(0, 0, panelWidth, panelHeight, 10)
-      .fill({ color: 0x1a1a2e, alpha: 0.98 })
-      .stroke({ width: 2, color: 0x4a5f7f });
+      .fill({ color: hexToPixi(Colors.BLUE_NAVY_DARK), alpha: 0.98 })
+      .stroke({ width: 2, color: hexToPixi(Colors.BLUE_STEEL_DARK) });
 
     skillsPanel.roundRect(3, 3, panelWidth - 6, panelHeight - 6, 8)
-      .fill({ color: 0x16213e, alpha: 0.7 });
+      .fill({ color: hexToPixi(Colors.BLUE_NAVY), alpha: 0.7 });
 
     skillsPanel.roundRect(5, 5, panelWidth - 10, panelHeight - 10, 7)
-      .stroke({ width: 1, color: 0x6b8cae, alpha: 0.4 });
+      .stroke({ width: 1, color: hexToPixi(Colors.BLUE_STEEL), alpha: 0.4 });
 
     this.skillsContainer.addChild(skillsPanel);
 
@@ -675,8 +675,8 @@ export class CharacterDetailScene extends BaseScene {
         fontFamily: 'Kalam',
         fontSize: 16,
         fontWeight: 'bold',
-        fill: 0x8b9dc3,
-        stroke: { color: 0x1a1a2e, width: 1 }
+        fill: hexToPixi(Colors.BLUE_STEEL_LIGHT),
+        stroke: { color: hexToPixi(Colors.BLUE_NAVY_DARK), width: 1 }
       }
     });
     title.x = 10;
@@ -689,10 +689,10 @@ export class CharacterDetailScene extends BaseScene {
       const iconBg = new Graphics();
       iconBg.roundRect(15, 50, iconSize, iconSize, 12)
         .fill({ color: this.getSkillTypeColor(skill.skill_type), alpha: 0.9 })
-        .stroke({ width: 3, color: 0x8b9dc3 });
+        .stroke({ width: 3, color: hexToPixi(Colors.BLUE_STEEL_LIGHT) });
 
       iconBg.roundRect(18, 53, iconSize - 6, iconSize - 6, 10)
-        .stroke({ width: 1, color: 0xffffff, alpha: 0.3 });
+        .stroke({ width: 1, color: hexToPixi(Colors.WHITE), alpha: 0.3 });
 
       const skillIcon = new Text({
         text: this.getSkillTypeIcon(skill.skill_type),
@@ -711,8 +711,8 @@ export class CharacterDetailScene extends BaseScene {
       // Skill type badge
       const typeBadge = new Graphics();
       typeBadge.roundRect(15, 138, 80, 22, 11)
-        .fill({ color: 0x4a2f5f, alpha: 0.95 })
-        .stroke({ width: 2, color: 0x8b9dc3 });
+        .fill({ color: hexToPixi(Colors.PURPLE_DARKER), alpha: 0.95 })
+        .stroke({ width: 2, color: hexToPixi(Colors.BLUE_STEEL_LIGHT) });
 
       const typeBadgeText = new Text({
         text: this.getSkillTypeName(skill.skill_type),
@@ -720,7 +720,7 @@ export class CharacterDetailScene extends BaseScene {
           fontFamily: 'Kalam',
           fontSize: 11,
           fontWeight: 'bold',
-          fill: 0xffffff
+          fill: hexToPixi(Colors.WHITE)
         }
       });
       typeBadgeText.anchor.set(0.5);
@@ -736,10 +736,10 @@ export class CharacterDetailScene extends BaseScene {
           fontFamily: 'Kalam',
           fontSize: 18,
           fontWeight: 'bold',
-          fill: 0xffffff,
-          stroke: { color: 0x1a1a2e, width: 2 },
+          fill: hexToPixi(Colors.WHITE),
+          stroke: { color: hexToPixi(Colors.BLUE_NAVY_DARK), width: 2 },
           dropShadow: {
-            color: 0x6b8cae,
+            color: hexToPixi(Colors.BLUE_STEEL),
             blur: 2,
             angle: Math.PI / 4,
             distance: 1,
@@ -757,10 +757,10 @@ export class CharacterDetailScene extends BaseScene {
         this.showSkillDetailPopup(skill);
       });
       skillName.on('pointerover', () => {
-        skillName.style.fill = 0x6b8cae;
+        skillName.style.fill = hexToPixi(Colors.BLUE_STEEL);
       });
       skillName.on('pointerout', () => {
-        skillName.style.fill = 0xffffff;
+        skillName.style.fill = hexToPixi(Colors.WHITE);
       });
 
       this.skillsContainer.addChild(skillName);
@@ -771,7 +771,7 @@ export class CharacterDetailScene extends BaseScene {
         style: {
           fontFamily: 'Kalam',
           fontSize: 13,
-          fill: 0xaaaaaa,
+          fill: hexToPixi(Colors.GRAY_LIGHTER),
           wordWrap: true,
           wordWrapWidth: panelWidth - 130,
           lineHeight: 20
@@ -790,8 +790,8 @@ export class CharacterDetailScene extends BaseScene {
         // Stats background
         const statsBg = new Graphics();
         statsBg.roundRect(110, statsY, panelWidth - 125, 60, 8)
-          .fill({ color: 0x0f0f1e, alpha: 0.8 })
-          .stroke({ width: 1.5, color: 0x4a5f7f });
+          .fill({ color: hexToPixi(Colors.BLUE_NAVY_DARKER), alpha: 0.8 })
+          .stroke({ width: 1.5, color: hexToPixi(Colors.BLUE_STEEL_DARK) });
 
         this.skillsContainer.addChild(statsBg);
 
@@ -811,7 +811,7 @@ export class CharacterDetailScene extends BaseScene {
             style: {
               fontFamily: 'Kalam',
               fontSize: 12,
-              fill: 0xffffff
+              fill: hexToPixi(Colors.WHITE)
             }
           });
           dmgText.x = statX + 20;
@@ -835,7 +835,7 @@ export class CharacterDetailScene extends BaseScene {
             style: {
               fontFamily: 'Kalam',
               fontSize: 12,
-              fill: 0xffffff
+              fill: hexToPixi(Colors.WHITE)
             }
           });
           cdText.x = statX + 20;
@@ -858,7 +858,7 @@ export class CharacterDetailScene extends BaseScene {
             style: {
               fontFamily: 'Kalam',
               fontSize: 12,
-              fill: 0xffffff
+              fill: hexToPixi(Colors.WHITE)
             }
           });
           costText.x = 140;
@@ -885,7 +885,7 @@ export class CharacterDetailScene extends BaseScene {
         text: '❓',
         style: {
           fontSize: 64,
-          fill: 0x4a5f7f
+          fill: hexToPixi(Colors.BLUE_STEEL_DARK)
         }
       });
       emptyIcon.anchor.set(0.5);
@@ -898,8 +898,8 @@ export class CharacterDetailScene extends BaseScene {
           fontFamily: 'Kalam',
           fontSize: 16,
           fontStyle: 'italic',
-          fill: 0x6b8cae,
-          stroke: { color: 0x1a1a2e, width: 1 }
+          fill: hexToPixi(Colors.BLUE_STEEL),
+          stroke: { color: hexToPixi(Colors.BLUE_NAVY_DARK), width: 1 }
         }
       });
       emptyText.anchor.set(0.5);
@@ -961,11 +961,11 @@ export class CharacterDetailScene extends BaseScene {
 
     const bg = new Graphics();
     bg.roundRect(0, 0, width, height, 8)
-      .fill({ color: 0x4a2f5f, alpha: 0.95 })
-      .stroke({ width: 2, color: 0x8b9dc3 });
+      .fill({ color: hexToPixi(Colors.PURPLE_DARKER), alpha: 0.95 })
+      .stroke({ width: 2, color: hexToPixi(Colors.BLUE_STEEL_LIGHT) });
 
     bg.roundRect(2, 2, width - 4, height - 4, 6)
-      .stroke({ width: 1, color: 0x6b8cae, alpha: 0.6 });
+      .stroke({ width: 1, color: hexToPixi(Colors.BLUE_STEEL), alpha: 0.6 });
 
     const buttonText = new Text({
       text: text,
@@ -973,8 +973,8 @@ export class CharacterDetailScene extends BaseScene {
         fontFamily: 'Kalam',
         fontSize: 13,
         fontWeight: 'bold',
-        fill: 0xffffff,
-        stroke: { color: 0x1a1a2e, width: 1.5 }
+        fill: hexToPixi(Colors.WHITE),
+        stroke: { color: hexToPixi(Colors.BLUE_NAVY_DARK), width: 1.5 }
       }
     });
     buttonText.anchor.set(0.5);
@@ -990,20 +990,20 @@ export class CharacterDetailScene extends BaseScene {
     button.on('pointerover', () => {
       bg.clear();
       bg.roundRect(0, 0, width, height, 8)
-        .fill({ color: 0x6b4a7f, alpha: 0.95 })
-        .stroke({ width: 2, color: 0x8b9dc3 });
+        .fill({ color: hexToPixi(Colors.PURPLE_DARK_ALT), alpha: 0.95 })
+        .stroke({ width: 2, color: hexToPixi(Colors.BLUE_STEEL_LIGHT) });
       bg.roundRect(2, 2, width - 4, height - 4, 6)
-        .stroke({ width: 1, color: 0x6b8cae, alpha: 0.9 });
+        .stroke({ width: 1, color: hexToPixi(Colors.BLUE_STEEL), alpha: 0.9 });
       button.scale.set(1.03);
     });
 
     button.on('pointerout', () => {
       bg.clear();
       bg.roundRect(0, 0, width, height, 8)
-        .fill({ color: 0x4a2f5f, alpha: 0.95 })
-        .stroke({ width: 2, color: 0x8b9dc3 });
+        .fill({ color: hexToPixi(Colors.PURPLE_DARKER), alpha: 0.95 })
+        .stroke({ width: 2, color: hexToPixi(Colors.BLUE_STEEL_LIGHT) });
       bg.roundRect(2, 2, width - 4, height - 4, 6)
-        .stroke({ width: 1, color: 0x6b8cae, alpha: 0.6 });
+        .stroke({ width: 1, color: hexToPixi(Colors.BLUE_STEEL), alpha: 0.6 });
       button.scale.set(1.0);
     });
 
@@ -1144,8 +1144,8 @@ export class CharacterDetailScene extends BaseScene {
         fontFamily: 'Kalam',
         fontSize: 16,
         fontWeight: 'bold',
-        fill: 0x8b9dc3,
-        stroke: { color: 0x1a1a2e, width: 1 }
+        fill: hexToPixi(Colors.BLUE_STEEL_LIGHT),
+        stroke: { color: hexToPixi(Colors.BLUE_NAVY_DARK), width: 1 }
       }
     });
     title.x = 10;
@@ -1159,7 +1159,7 @@ export class CharacterDetailScene extends BaseScene {
         item: this.characterEquipment?.weapon?.name || '(empty)',
         type: 'weapon',
         equipment: this.characterEquipment?.weapon,
-        color: 0xffd700
+        color: hexToPixi(Colors.GOLD_BRIGHT)
       },
       {
         name: 'Armor',
@@ -1167,7 +1167,7 @@ export class CharacterDetailScene extends BaseScene {
         item: this.characterEquipment?.armor?.name || '(empty)',
         type: 'armor',
         equipment: this.characterEquipment?.armor,
-        color: 0x3b82f6
+        color: hexToPixi(Colors.BLUE_BRIGHT)
       },
       {
         name: 'Accessory',
@@ -1175,7 +1175,7 @@ export class CharacterDetailScene extends BaseScene {
         item: this.characterEquipment?.accessory?.name || '(empty)',
         type: 'accessory',
         equipment: this.characterEquipment?.accessory,
-        color: 0xa855f7
+        color: hexToPixi(Colors.PURPLE_BRIGHTER)
       }
     ];
 
@@ -1197,8 +1197,8 @@ export class CharacterDetailScene extends BaseScene {
         fontFamily: 'Kalam',
         fontSize: 16,
         fontWeight: 'bold',
-        fill: 0x8b9dc3,
-        stroke: { color: 0x1a1a2e, width: 1 }
+        fill: hexToPixi(Colors.BLUE_STEEL_LIGHT),
+        stroke: { color: hexToPixi(Colors.BLUE_NAVY_DARK), width: 1 }
       }
     });
     bonusTitle.x = 10;
@@ -1219,14 +1219,14 @@ export class CharacterDetailScene extends BaseScene {
     // Card background
     const bg = new Graphics();
     bg.roundRect(0, 0, width, height, 10)
-      .fill({ color: 0x1a1a2e, alpha: 0.98 })
-      .stroke({ width: 2, color: isEmpty ? 0x4a5f7f : slot.color, alpha: isEmpty ? 0.5 : 0.8 });
+      .fill({ color: hexToPixi(Colors.BLUE_NAVY_DARK), alpha: 0.98 })
+      .stroke({ width: 2, color: isEmpty ? hexToPixi(Colors.BLUE_STEEL_DARK) : slot.color, alpha: isEmpty ? 0.5 : 0.8 });
 
     bg.roundRect(3, 3, width - 6, height - 6, 8)
-      .fill({ color: 0x16213e, alpha: 0.7 });
+      .fill({ color: hexToPixi(Colors.BLUE_NAVY), alpha: 0.7 });
 
     bg.roundRect(5, 5, width - 10, height - 10, 7)
-      .stroke({ width: 1, color: isEmpty ? 0x4a5f7f : slot.color, alpha: 0.4 });
+      .stroke({ width: 1, color: isEmpty ? hexToPixi(Colors.BLUE_STEEL_DARK) : slot.color, alpha: 0.4 });
 
     card.addChild(bg);
 
@@ -1234,14 +1234,14 @@ export class CharacterDetailScene extends BaseScene {
     const iconSize = 60;
     const iconBg = new Graphics();
     iconBg.roundRect(15, 15, iconSize, iconSize, 10)
-      .fill({ color: isEmpty ? 0x2a2a2a : slot.color, alpha: isEmpty ? 0.3 : 0.2 })
-      .stroke({ width: 2.5, color: isEmpty ? 0x4a5f7f : slot.color, alpha: isEmpty ? 0.5 : 0.8 });
+      .fill({ color: isEmpty ? hexToPixi(Colors.GRAY_DARKER) : slot.color, alpha: isEmpty ? 0.3 : 0.2 })
+      .stroke({ width: 2.5, color: isEmpty ? hexToPixi(Colors.BLUE_STEEL_DARK) : slot.color, alpha: isEmpty ? 0.5 : 0.8 });
 
     const iconText = new Text({
       text: slot.icon,
       style: {
         fontSize: 32,
-        fill: isEmpty ? 0x6b8cae : slot.color
+        fill: isEmpty ? hexToPixi(Colors.BLUE_STEEL) : slot.color
       }
     });
     iconText.anchor.set(0.5);
@@ -1254,8 +1254,8 @@ export class CharacterDetailScene extends BaseScene {
     const badgeWidth = 80;
     const badge = new Graphics();
     badge.roundRect(90, 15, badgeWidth, 22, 11)
-      .fill({ color: isEmpty ? 0x3a3a3a : slot.color, alpha: isEmpty ? 0.5 : 0.3 })
-      .stroke({ width: 1.5, color: isEmpty ? 0x4a5f7f : slot.color });
+      .fill({ color: isEmpty ? hexToPixi(Colors.GRAY_DARK) : slot.color, alpha: isEmpty ? 0.5 : 0.3 })
+      .stroke({ width: 1.5, color: isEmpty ? hexToPixi(Colors.BLUE_STEEL_DARK) : slot.color });
 
     const badgeText = new Text({
       text: slot.name.toUpperCase(),
@@ -1263,7 +1263,7 @@ export class CharacterDetailScene extends BaseScene {
         fontFamily: 'Kalam',
         fontSize: 10,
         fontWeight: 'bold',
-        fill: isEmpty ? 0x8b9dc3 : 0xffffff
+        fill: isEmpty ? hexToPixi(Colors.BLUE_STEEL_LIGHT) : hexToPixi(Colors.WHITE)
       }
     });
     badgeText.anchor.set(0.5);
@@ -1279,9 +1279,9 @@ export class CharacterDetailScene extends BaseScene {
         fontFamily: 'Kalam',
         fontSize: 15,
         fontWeight: isEmpty ? 'normal' : 'bold',
-        fill: isEmpty ? 0x6b8cae : 0xffffff,
+        fill: isEmpty ? hexToPixi(Colors.BLUE_STEEL) : hexToPixi(Colors.WHITE),
         fontStyle: isEmpty ? 'italic' : 'normal',
-        stroke: { color: 0x1a1a2e, width: isEmpty ? 0 : 1.5 }
+        stroke: { color: hexToPixi(Colors.BLUE_NAVY_DARK), width: isEmpty ? 0 : 1.5 }
       }
     });
     itemText.x = 90;
@@ -1295,7 +1295,7 @@ export class CharacterDetailScene extends BaseScene {
         style: {
           fontFamily: 'Kalam',
           fontSize: 12,
-          fill: 0x4ecca3,
+          fill: hexToPixi(Colors.GREEN_MINT),
           wordWrap: true,
           wordWrapWidth: width - 190
         }
@@ -1309,7 +1309,7 @@ export class CharacterDetailScene extends BaseScene {
         style: {
           fontFamily: 'Kalam',
           fontSize: 11,
-          fill: 0x6b8cae,
+          fill: hexToPixi(Colors.BLUE_STEEL),
           fontStyle: 'italic'
         }
       });
@@ -1335,7 +1335,7 @@ export class CharacterDetailScene extends BaseScene {
     if (!isEmpty) {
       const equippedBadge = new Graphics();
       equippedBadge.roundRect(width - 95, 15, 70, 18, 9)
-        .fill({ color: 0x4ecca3, alpha: 0.95 });
+        .fill({ color: hexToPixi(Colors.GREEN_MINT), alpha: 0.95 });
 
       const equippedText = new Text({
         text: 'EQUIPPED',
@@ -1343,7 +1343,7 @@ export class CharacterDetailScene extends BaseScene {
           fontFamily: 'Kalam',
           fontSize: 9,
           fontWeight: 'bold',
-          fill: 0x0f3460
+          fill: hexToPixi(Colors.BLUE_MIDNIGHT)
         }
       });
       equippedText.anchor.set(0.5);
@@ -1359,23 +1359,23 @@ export class CharacterDetailScene extends BaseScene {
     card.on('pointerover', () => {
       bg.clear();
       bg.roundRect(0, 0, width, height, 10)
-        .fill({ color: 0x1a1a2e, alpha: 0.98 })
-        .stroke({ width: 3, color: isEmpty ? 0x6b8cae : slot.color });
+        .fill({ color: hexToPixi(Colors.BLUE_NAVY_DARK), alpha: 0.98 })
+        .stroke({ width: 3, color: isEmpty ? hexToPixi(Colors.BLUE_STEEL) : slot.color });
       bg.roundRect(3, 3, width - 6, height - 6, 8)
-        .fill({ color: 0x16213e, alpha: 0.7 });
+        .fill({ color: hexToPixi(Colors.BLUE_NAVY), alpha: 0.7 });
       bg.roundRect(5, 5, width - 10, height - 10, 7)
-        .stroke({ width: 1, color: isEmpty ? 0x6b8cae : slot.color, alpha: 0.6 });
+        .stroke({ width: 1, color: isEmpty ? hexToPixi(Colors.BLUE_STEEL) : slot.color, alpha: 0.6 });
     });
 
     card.on('pointerout', () => {
       bg.clear();
       bg.roundRect(0, 0, width, height, 10)
-        .fill({ color: 0x1a1a2e, alpha: 0.98 })
-        .stroke({ width: 2, color: isEmpty ? 0x4a5f7f : slot.color, alpha: isEmpty ? 0.5 : 0.8 });
+        .fill({ color: hexToPixi(Colors.BLUE_NAVY_DARK), alpha: 0.98 })
+        .stroke({ width: 2, color: isEmpty ? hexToPixi(Colors.BLUE_STEEL_DARK) : slot.color, alpha: isEmpty ? 0.5 : 0.8 });
       bg.roundRect(3, 3, width - 6, height - 6, 8)
-        .fill({ color: 0x16213e, alpha: 0.7 });
+        .fill({ color: hexToPixi(Colors.BLUE_NAVY), alpha: 0.7 });
       bg.roundRect(5, 5, width - 10, height - 10, 7)
-        .stroke({ width: 1, color: isEmpty ? 0x4a5f7f : slot.color, alpha: 0.4 });
+        .stroke({ width: 1, color: isEmpty ? hexToPixi(Colors.BLUE_STEEL_DARK) : slot.color, alpha: 0.4 });
     });
 
     card.on('pointerdown', () => {
@@ -1397,11 +1397,11 @@ export class CharacterDetailScene extends BaseScene {
 
     const bg = new Graphics();
     bg.roundRect(0, 0, width, height, 7)
-      .fill({ color: 0x4a2f5f, alpha: 0.95 })
-      .stroke({ width: 2, color: 0x8b9dc3 });
+      .fill({ color: hexToPixi(Colors.PURPLE_DARKER), alpha: 0.95 })
+      .stroke({ width: 2, color: hexToPixi(Colors.BLUE_STEEL_LIGHT) });
 
     bg.roundRect(2, 2, width - 4, height - 4, 5)
-      .stroke({ width: 1, color: 0x6b8cae, alpha: 0.6 });
+      .stroke({ width: 1, color: hexToPixi(Colors.BLUE_STEEL), alpha: 0.6 });
 
     const buttonText = new Text({
       text: text,
@@ -1409,8 +1409,8 @@ export class CharacterDetailScene extends BaseScene {
         fontFamily: 'Kalam',
         fontSize: 12,
         fontWeight: 'bold',
-        fill: 0xffffff,
-        stroke: { color: 0x1a1a2e, width: 1.5 }
+        fill: hexToPixi(Colors.WHITE),
+        stroke: { color: hexToPixi(Colors.BLUE_NAVY_DARK), width: 1.5 }
       }
     });
     buttonText.anchor.set(0.5);
@@ -1426,20 +1426,20 @@ export class CharacterDetailScene extends BaseScene {
     button.on('pointerover', () => {
       bg.clear();
       bg.roundRect(0, 0, width, height, 7)
-        .fill({ color: 0x6b4a7f, alpha: 0.95 })
-        .stroke({ width: 2, color: 0x8b9dc3 });
+        .fill({ color: hexToPixi(Colors.PURPLE_DARK_ALT), alpha: 0.95 })
+        .stroke({ width: 2, color: hexToPixi(Colors.BLUE_STEEL_LIGHT) });
       bg.roundRect(2, 2, width - 4, height - 4, 5)
-        .stroke({ width: 1, color: 0x6b8cae, alpha: 0.9 });
+        .stroke({ width: 1, color: hexToPixi(Colors.BLUE_STEEL), alpha: 0.9 });
       button.scale.set(1.05);
     });
 
     button.on('pointerout', () => {
       bg.clear();
       bg.roundRect(0, 0, width, height, 7)
-        .fill({ color: 0x4a2f5f, alpha: 0.95 })
-        .stroke({ width: 2, color: 0x8b9dc3 });
+        .fill({ color: hexToPixi(Colors.PURPLE_DARKER), alpha: 0.95 })
+        .stroke({ width: 2, color: hexToPixi(Colors.BLUE_STEEL_LIGHT) });
       bg.roundRect(2, 2, width - 4, height - 4, 5)
-        .stroke({ width: 1, color: 0x6b8cae, alpha: 0.6 });
+        .stroke({ width: 1, color: hexToPixi(Colors.BLUE_STEEL), alpha: 0.6 });
       button.scale.set(1.0);
     });
 
@@ -1467,14 +1467,14 @@ export class CharacterDetailScene extends BaseScene {
 
     const bg = new Graphics();
     bg.roundRect(0, 0, width, height, 10)
-      .fill({ color: 0x1a1a2e, alpha: 0.98 })
-      .stroke({ width: 2, color: 0x4a5f7f });
+      .fill({ color: hexToPixi(Colors.BLUE_NAVY_DARK), alpha: 0.98 })
+      .stroke({ width: 2, color: hexToPixi(Colors.BLUE_STEEL_DARK) });
 
     bg.roundRect(3, 3, width - 6, height - 6, 8)
-      .fill({ color: 0x16213e, alpha: 0.7 });
+      .fill({ color: hexToPixi(Colors.BLUE_NAVY), alpha: 0.7 });
 
     bg.roundRect(5, 5, width - 10, height - 10, 7)
-      .stroke({ width: 1, color: 0x6b8cae, alpha: 0.4 });
+      .stroke({ width: 1, color: hexToPixi(Colors.BLUE_STEEL), alpha: 0.4 });
 
     panel.addChild(bg);
 
@@ -1499,7 +1499,7 @@ export class CharacterDetailScene extends BaseScene {
       // Bonus stat row
       const statBg = new Graphics();
       statBg.roundRect(x, y, (width / 2) - 20, 32, 6)
-        .fill({ color: 0x0f0f1e, alpha: 0.8 })
+        .fill({ color: hexToPixi(Colors.BLUE_NAVY_DARKER), alpha: 0.8 })
         .stroke({ width: 1, color: stat.color, alpha: 0.5 });
 
       // Icon
@@ -1516,7 +1516,7 @@ export class CharacterDetailScene extends BaseScene {
         style: {
           fontFamily: 'Kalam',
           fontSize: 11,
-          fill: 0x8b9dc3
+          fill: hexToPixi(Colors.BLUE_STEEL_LIGHT)
         }
       });
       labelText.x = x + 32;
@@ -1532,7 +1532,7 @@ export class CharacterDetailScene extends BaseScene {
           fontFamily: 'Kalam',
           fontSize: 14,
           fontWeight: 'bold',
-          fill: hasBonus ? stat.color : 0x4a5f7f
+          fill: hasBonus ? stat.color : hexToPixi(Colors.BLUE_STEEL_DARK)
         }
       });
       valueText.x = x + 32;
@@ -1663,12 +1663,12 @@ export class CharacterDetailScene extends BaseScene {
 
     const bg = new Graphics();
     bg.roundRect(2, 2, width, height, 8)
-      .fill({ color: 0x000000, alpha: 0.5 });
+      .fill({ color: hexToPixi(Colors.BLACK), alpha: 0.5 });
     bg.roundRect(0, 0, width, height, 8)
-      .fill({ color: 0x4a2f5f, alpha: 0.95 })
-      .stroke({ width: 2, color: 0x8b9dc3 });
+      .fill({ color: hexToPixi(Colors.PURPLE_DARKER), alpha: 0.95 })
+      .stroke({ width: 2, color: hexToPixi(Colors.BLUE_STEEL_LIGHT) });
     bg.roundRect(2, 2, width - 4, height - 4, 6)
-      .stroke({ width: 1, color: 0x6b8cae, alpha: 0.6 });
+      .stroke({ width: 1, color: hexToPixi(Colors.BLUE_STEEL), alpha: 0.6 });
 
     const buttonText = new Text({
       text: text,
@@ -1676,8 +1676,8 @@ export class CharacterDetailScene extends BaseScene {
         fontFamily: 'Kalam',
         fontSize: 14,
         fontWeight: 'bold',
-        fill: 0xffffff,
-        stroke: { color: 0x1a1a2e, width: 2 }
+        fill: hexToPixi(Colors.WHITE),
+        stroke: { color: hexToPixi(Colors.BLUE_NAVY_DARK), width: 2 }
       }
     });
     buttonText.anchor.set(0.5);
@@ -1693,24 +1693,24 @@ export class CharacterDetailScene extends BaseScene {
     button.on('pointerover', () => {
       bg.clear();
       bg.roundRect(2, 2, width, height, 8)
-        .fill({ color: 0x000000, alpha: 0.5 });
+        .fill({ color: hexToPixi(Colors.BLACK), alpha: 0.5 });
       bg.roundRect(0, 0, width, height, 8)
-        .fill({ color: 0x6b4a7f, alpha: 0.95 })
-        .stroke({ width: 2, color: 0x8b9dc3 });
+        .fill({ color: hexToPixi(Colors.PURPLE_DARK_ALT), alpha: 0.95 })
+        .stroke({ width: 2, color: hexToPixi(Colors.BLUE_STEEL_LIGHT) });
       bg.roundRect(2, 2, width - 4, height - 4, 6)
-        .stroke({ width: 1, color: 0x6b8cae, alpha: 0.9 });
+        .stroke({ width: 1, color: hexToPixi(Colors.BLUE_STEEL), alpha: 0.9 });
       button.scale.set(1.02);
     });
 
     button.on('pointerout', () => {
       bg.clear();
       bg.roundRect(2, 2, width, height, 8)
-        .fill({ color: 0x000000, alpha: 0.5 });
+        .fill({ color: hexToPixi(Colors.BLACK), alpha: 0.5 });
       bg.roundRect(0, 0, width, height, 8)
-        .fill({ color: 0x4a2f5f, alpha: 0.95 })
-        .stroke({ width: 2, color: 0x8b9dc3 });
+        .fill({ color: hexToPixi(Colors.PURPLE_DARKER), alpha: 0.95 })
+        .stroke({ width: 2, color: hexToPixi(Colors.BLUE_STEEL_LIGHT) });
       bg.roundRect(2, 2, width - 4, height - 4, 6)
-        .stroke({ width: 1, color: 0x6b8cae, alpha: 0.6 });
+        .stroke({ width: 1, color: hexToPixi(Colors.BLUE_STEEL), alpha: 0.6 });
       button.scale.set(1.0);
     });
 

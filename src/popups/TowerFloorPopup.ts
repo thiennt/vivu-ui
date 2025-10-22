@@ -1,6 +1,6 @@
 import { Assets, Container, Graphics, Sprite, Text } from 'pixi.js';
 import { navigation } from '@/utils/navigation';
-import { Colors } from '@/utils/colors';
+import { Colors, hexToPixi } from '@/utils/colors';
 import { Stage, Character } from '@/types';
 import { CardBattleScene } from '@/scenes/CardBattleScene';
 import { PrepareScene } from '@/scenes/PrepareScene';
@@ -24,7 +24,7 @@ export class TowerFloorPopup extends Container {
     // Create semi-transparent dark overlay
     this.dialogBg = new Graphics();
     this.dialogBg.rect(0, 0, this.gameWidth, this.gameHeight)
-      .fill({ color: 0x000000, alpha: 0.85 });
+      .fill({ color: hexToPixi(Colors.BLACK), alpha: 0.85 });
     
     const dialogWidth = Math.min(500, this.gameWidth - 40);
     const dialogHeight = Math.min(600, this.gameHeight - 40);
@@ -36,23 +36,23 @@ export class TowerFloorPopup extends Container {
     
     // Shadow
     this.dialogPanel.roundRect(dialogX + 4, dialogY + 4, dialogWidth, dialogHeight, 12)
-      .fill({ color: 0x000000, alpha: 0.6 });
+      .fill({ color: hexToPixi(Colors.BLACK), alpha: 0.6 });
     
     // Main parchment panel
     this.dialogPanel.roundRect(dialogX, dialogY, dialogWidth, dialogHeight, 12)
-      .fill({ color: 0xf5e6d3, alpha: 0.98 })
-      .stroke({ width: 3, color: 0xd4af37 });
+      .fill({ color: hexToPixi(Colors.PARCHMENT_LIGHT), alpha: 0.98 })
+      .stroke({ width: 3, color: hexToPixi(Colors.GOLD) });
     
     // Inner layer
     this.dialogPanel.roundRect(dialogX + 4, dialogY + 4, dialogWidth - 8, dialogHeight - 8, 10)
-      .fill({ color: 0xe8d4b8, alpha: 0.6 });
+      .fill({ color: hexToPixi(Colors.PARCHMENT), alpha: 0.6 });
     
     // Golden highlight
     this.dialogPanel.roundRect(dialogX + 6, dialogY + 6, dialogWidth - 12, dialogHeight - 12, 9)
-      .stroke({ width: 1, color: 0xffd700, alpha: 0.5 });
+      .stroke({ width: 1, color: hexToPixi(Colors.GOLD_BRIGHT), alpha: 0.5 });
     
     // Decorative corners
-    this.drawPanelCorners(this.dialogPanel, dialogX, dialogY, dialogWidth, dialogHeight, 0xffd700);
+    this.drawPanelCorners(this.dialogPanel, dialogX, dialogY, dialogWidth, dialogHeight, hexToPixi(Colors.GOLD_BRIGHT));
 
     // Dialog title banner
     const bannerWidth = dialogWidth - 80;
@@ -68,8 +68,8 @@ export class TowerFloorPopup extends Container {
       .lineTo(bannerX + bannerWidth, bannerY + bannerHeight / 2)
       .lineTo(bannerX + bannerWidth - 10, bannerY)
       .lineTo(bannerX + 10, bannerY)
-      .fill({ color: 0x8b4513, alpha: 0.95 })
-      .stroke({ width: 2, color: 0xd4af37 });
+      .fill({ color: hexToPixi(Colors.BROWN), alpha: 0.95 })
+      .stroke({ width: 2, color: hexToPixi(Colors.GOLD) });
     
     titleBanner.moveTo(bannerX + 12, bannerY + 2)
       .lineTo(bannerX + bannerWidth - 12, bannerY + 2)
@@ -78,7 +78,7 @@ export class TowerFloorPopup extends Container {
       .lineTo(bannerX + 12, bannerY + bannerHeight - 2)
       .lineTo(bannerX + 3, bannerY + bannerHeight / 2)
       .lineTo(bannerX + 12, bannerY + 2)
-      .stroke({ width: 1, color: 0xffd700, alpha: 0.6 });
+      .stroke({ width: 1, color: hexToPixi(Colors.GOLD_BRIGHT), alpha: 0.6 });
 
     const dialogTitle = new Text({
       text: `🗼 ${this.stage.name}`,
@@ -86,8 +86,8 @@ export class TowerFloorPopup extends Container {
         fontFamily: 'Kalam',
         fontSize: 22,
         fontWeight: 'bold',
-        fill: 0xffffff,
-        stroke: { color: 0x2a1810, width: 2 },
+        fill: hexToPixi(Colors.WHITE),
+        stroke: { color: hexToPixi(Colors.BROWN_DARK), width: 2 },
         align: 'center'
       }
     });
@@ -106,8 +106,8 @@ export class TowerFloorPopup extends Container {
     
     const enemyPanel = new Graphics();
     enemyPanel.roundRect(dialogX + 15, enemySectionY, dialogWidth - 30, enemySectionHeight, 8)
-      .fill({ color: 0xe8d4b8, alpha: 0.5 })
-      .stroke({ width: 2, color: 0xd4af37, alpha: 0.7 });
+      .fill({ color: hexToPixi(Colors.PARCHMENT), alpha: 0.5 })
+      .stroke({ width: 2, color: hexToPixi(Colors.GOLD), alpha: 0.7 });
 
     const enemyTitle = new Text({
       text: `⚔️ Enemy Lineup ⚡${lineup_power}`,
@@ -115,8 +115,8 @@ export class TowerFloorPopup extends Container {
         fontFamily: 'Kalam',
         fontSize: 16,
         fontWeight: 'bold',
-        fill: 0x2a1810,
-        stroke: { color: 0xffd700, width: 0.5 }
+        fill: hexToPixi(Colors.BROWN_DARK),
+        stroke: { color: hexToPixi(Colors.GOLD_BRIGHT), width: 0.5 }
       }
     });
     enemyTitle.x = dialogX + 25;
@@ -137,14 +137,14 @@ export class TowerFloorPopup extends Container {
     
     // Golden treasure panel
     rewardPanel.roundRect(dialogX + 15 + 2, rewardSectionY + 2, dialogWidth - 30, rewardSectionHeight, 8)
-      .fill({ color: 0x000000, alpha: 0.3 });
+      .fill({ color: hexToPixi(Colors.BLACK), alpha: 0.3 });
     
     rewardPanel.roundRect(dialogX + 15, rewardSectionY, dialogWidth - 30, rewardSectionHeight, 8)
-      .fill({ color: 0xffd700, alpha: 0.25 })
-      .stroke({ width: 2, color: 0xd4af37 });
+      .fill({ color: hexToPixi(Colors.GOLD_BRIGHT), alpha: 0.25 })
+      .stroke({ width: 2, color: hexToPixi(Colors.GOLD) });
     
     rewardPanel.roundRect(dialogX + 17, rewardSectionY + 2, dialogWidth - 34, rewardSectionHeight - 4, 7)
-      .stroke({ width: 1, color: 0xffd700, alpha: 0.8 });
+      .stroke({ width: 1, color: hexToPixi(Colors.GOLD_BRIGHT), alpha: 0.8 });
 
     const rewardTitle = new Text({
       text: '🏆 Battle Rewards',
@@ -152,8 +152,8 @@ export class TowerFloorPopup extends Container {
         fontFamily: 'Kalam',
         fontSize: 16,
         fontWeight: 'bold',
-        fill: 0x2a1810,
-        stroke: { color: 0xffd700, width: 0.5 }
+        fill: hexToPixi(Colors.BROWN_DARK),
+        stroke: { color: hexToPixi(Colors.GOLD_BRIGHT), width: 0.5 }
       }
     });
     rewardTitle.x = dialogX + 25;
@@ -165,7 +165,7 @@ export class TowerFloorPopup extends Container {
       style: {
         fontFamily: 'Kalam',
         fontSize: 28,
-        fill: 0x2a1810
+        fill: hexToPixi(Colors.BROWN_DARK)
       }
     });
     treasureChest.x = dialogX + 30;
@@ -177,7 +177,7 @@ export class TowerFloorPopup extends Container {
         fontFamily: 'Kalam',
         fontSize: 14,
         fontWeight: 'bold',
-        fill: 0x2a1810,
+        fill: hexToPixi(Colors.BROWN_DARK),
         align: 'left',
         wordWrap: true,
         wordWrapWidth: dialogWidth - 140
@@ -268,7 +268,7 @@ export class TowerFloorPopup extends Container {
           fontFamily: 'Kalam',
           fontSize: 16,
           fontStyle: 'italic',
-          fill: 0x8b4513
+          fill: hexToPixi(Colors.BROWN)
         }
       });
       container.addChild(placeholderText);
@@ -302,14 +302,14 @@ export class TowerFloorPopup extends Container {
     const bg = new Graphics();
     
     bg.roundRect(2, 2, width, height, 8)
-      .fill({ color: 0x000000, alpha: 0.4 });
+      .fill({ color: hexToPixi(Colors.BLACK), alpha: 0.4 });
     
     bg.roundRect(0, 0, width, height, 8)
-      .fill({ color: 0x2a1810, alpha: 0.95 })
-      .stroke({ width: 2, color: 0xc23616 });
+      .fill({ color: hexToPixi(Colors.BROWN_DARK), alpha: 0.95 })
+      .stroke({ width: 2, color: hexToPixi(Colors.RED_DARK) });
     
     bg.roundRect(2, 2, width - 4, height - 4, 6)
-      .stroke({ width: 1, color: 0xe74c3c, alpha: 0.5 });
+      .stroke({ width: 1, color: hexToPixi(Colors.RED), alpha: 0.5 });
     
     card.addChild(bg);
 
@@ -329,7 +329,7 @@ export class TowerFloorPopup extends Container {
           style: {
             fontFamily: 'Kalam',
             fontSize: 24,
-            fill: 0xe74c3c
+            fill: hexToPixi(Colors.RED)
           }
         });
         enemyIcon.anchor.set(0.5);
@@ -345,7 +345,7 @@ export class TowerFloorPopup extends Container {
           fontFamily: 'Kalam',
           fontSize: 11,
           fontWeight: 'bold',
-          fill: 0xffffff,
+          fill: hexToPixi(Colors.WHITE),
           align: 'center',
           wordWrap: true,
           wordWrapWidth: width - 10
@@ -361,7 +361,7 @@ export class TowerFloorPopup extends Container {
         style: {
           fontFamily: 'Kalam',
           fontSize: 10,
-          fill: 0xe8d4b8,
+          fill: hexToPixi(Colors.PARCHMENT),
           align: 'center'
         }
       });
@@ -387,12 +387,12 @@ export class TowerFloorPopup extends Container {
     
     const bg = new Graphics();
     bg.roundRect(2, 2, width, height, 8)
-      .fill({ color: 0x000000, alpha: 0.5 });
+      .fill({ color: hexToPixi(Colors.BLACK), alpha: 0.5 });
     bg.roundRect(0, 0, width, height, 8)
-      .fill({ color: 0xc23616, alpha: 0.95 })
-      .stroke({ width: 2, color: 0xffd700 });
+      .fill({ color: hexToPixi(Colors.RED_DARK), alpha: 0.95 })
+      .stroke({ width: 2, color: hexToPixi(Colors.GOLD_BRIGHT) });
     bg.roundRect(2, 2, width - 4, height - 4, 6)
-      .stroke({ width: 1, color: 0xffd700, alpha: 0.8 });
+      .stroke({ width: 1, color: hexToPixi(Colors.GOLD_BRIGHT), alpha: 0.8 });
     
     const buttonText = new Text({
       text,
@@ -400,8 +400,8 @@ export class TowerFloorPopup extends Container {
         fontFamily: 'Kalam',
         fontSize: 18,
         fontWeight: 'bold',
-        fill: 0xffffff,
-        stroke: { color: 0x2a1810, width: 2 }
+        fill: hexToPixi(Colors.WHITE),
+        stroke: { color: hexToPixi(Colors.BROWN_DARK), width: 2 }
       }
     });
     buttonText.anchor.set(0.5);
@@ -419,24 +419,24 @@ export class TowerFloorPopup extends Container {
     button.on('pointerover', () => {
       bg.clear();
       bg.roundRect(2, 2, width, height, 8)
-        .fill({ color: 0x000000, alpha: 0.5 });
+        .fill({ color: hexToPixi(Colors.BLACK), alpha: 0.5 });
       bg.roundRect(0, 0, width, height, 8)
-        .fill({ color: 0xe74c3c, alpha: 0.95 })
-        .stroke({ width: 2, color: 0xffd700 });
+        .fill({ color: hexToPixi(Colors.RED), alpha: 0.95 })
+        .stroke({ width: 2, color: hexToPixi(Colors.GOLD_BRIGHT) });
       bg.roundRect(2, 2, width - 4, height - 4, 6)
-        .stroke({ width: 1, color: 0xffd700, alpha: 1 });
+        .stroke({ width: 1, color: hexToPixi(Colors.GOLD_BRIGHT), alpha: 1 });
       button.scale.set(1.03);
     });
     
     button.on('pointerout', () => {
       bg.clear();
       bg.roundRect(2, 2, width, height, 8)
-        .fill({ color: 0x000000, alpha: 0.5 });
+        .fill({ color: hexToPixi(Colors.BLACK), alpha: 0.5 });
       bg.roundRect(0, 0, width, height, 8)
-        .fill({ color: 0xc23616, alpha: 0.95 })
-        .stroke({ width: 2, color: 0xffd700 });
+        .fill({ color: hexToPixi(Colors.RED_DARK), alpha: 0.95 })
+        .stroke({ width: 2, color: hexToPixi(Colors.GOLD_BRIGHT) });
       bg.roundRect(2, 2, width - 4, height - 4, 6)
-        .stroke({ width: 1, color: 0xffd700, alpha: 0.8 });
+        .stroke({ width: 1, color: hexToPixi(Colors.GOLD_BRIGHT), alpha: 0.8 });
       button.scale.set(1.0);
     });
     
@@ -454,8 +454,8 @@ export class TowerFloorPopup extends Container {
     
     const bg = new Graphics();
     bg.circle(width / 2, height / 2, width / 2)
-      .fill({ color: 0x8b4513, alpha: 0.95 })
-      .stroke({ width: 2, color: 0xd4af37 });
+      .fill({ color: hexToPixi(Colors.BROWN), alpha: 0.95 })
+      .stroke({ width: 2, color: hexToPixi(Colors.GOLD) });
     
     const buttonText = new Text({
       text: '✕',
@@ -463,7 +463,7 @@ export class TowerFloorPopup extends Container {
         fontFamily: 'Kalam',
         fontSize: 18,
         fontWeight: 'bold',
-        fill: 0xffffff
+        fill: hexToPixi(Colors.WHITE)
       }
     });
     buttonText.anchor.set(0.5);
@@ -479,12 +479,12 @@ export class TowerFloorPopup extends Container {
     button.on('pointerdown', onClick);
     
     button.on('pointerover', () => {
-      bg.tint = 0xcccccc;
+      bg.tint = hexToPixi(Colors.GRAY_LIGHTEST);
       button.scale.set(1.1);
     });
     
     button.on('pointerout', () => {
-      bg.tint = 0xffffff;
+      bg.tint = hexToPixi(Colors.WHITE);
       button.scale.set(1.0);
     });
     
