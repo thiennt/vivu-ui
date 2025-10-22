@@ -2,7 +2,7 @@ import { Container, Graphics, Text } from 'pixi.js';
 import { navigation } from '@/utils/navigation';
 import { HomeScene } from './HomeScene';
 import { BaseScene } from '@/ui/BaseScene';
-import { Colors, hexToPixi } from '@/utils/colors';
+import { Colors } from '@/utils/colors';
 import { authApi, isLikelyUsingMockData } from '@/services/api';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
 
@@ -214,18 +214,18 @@ export class CheckinScene extends BaseScene {
     
     // Dark fantasy background
     bg.rect(0, 0, this.gameWidth, this.gameHeight)
-      .fill({ color: hexToPixi(Colors.BROWN_DARKEST), alpha: 1.0 });
+      .fill({ color: Colors.BROWN_DARKEST, alpha: 1.0 });
     
     // Brown texture overlay
     bg.rect(0, 0, this.gameWidth, this.gameHeight)
-      .fill({ color: hexToPixi(Colors.BROWN_DARK), alpha: 0.3 });
+      .fill({ color: Colors.BROWN_DARK, alpha: 0.3 });
     
     // Add mystical golden particles
     for (let i = 0; i < 20; i++) {
       const particle = new Graphics();
       const size = 1 + Math.random() * 2;
       particle.circle(Math.random() * this.gameWidth, Math.random() * this.gameHeight, size)
-        .fill({ color: hexToPixi(Colors.GOLD_BRIGHT), alpha: 0.3 + Math.random() * 0.3 });
+        .fill({ color: Colors.GOLD_BRIGHT, alpha: 0.3 + Math.random() * 0.3 });
       this.backgroundContainer.addChild(particle);
     }
   }
@@ -245,8 +245,8 @@ export class CheckinScene extends BaseScene {
       .lineTo(bannerX + bannerWidth, bannerY + bannerHeight / 2)
       .lineTo(bannerX + bannerWidth - 12, bannerY)
       .lineTo(bannerX + 12, bannerY)
-      .fill({ color: hexToPixi(Colors.BROWN), alpha: 0.95 })
-      .stroke({ width: 2.5, color: hexToPixi(Colors.GOLD) });
+      .fill({ color: Colors.BROWN, alpha: 0.95 })
+      .stroke({ width: 2.5, color: Colors.GOLD });
     
     banner.moveTo(bannerX + 15, bannerY + 3)
       .lineTo(bannerX + bannerWidth - 15, bannerY + 3)
@@ -255,7 +255,7 @@ export class CheckinScene extends BaseScene {
       .lineTo(bannerX + 15, bannerY + bannerHeight - 3)
       .lineTo(bannerX + 4, bannerY + bannerHeight / 2)
       .lineTo(bannerX + 15, bannerY + 3)
-      .stroke({ width: 1, color: hexToPixi(Colors.GOLD_BRIGHT), alpha: 0.6 });
+      .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.6 });
 
     const title = new Text({
       text: '📅 Daily Check-In 📅',
@@ -263,10 +263,10 @@ export class CheckinScene extends BaseScene {
         fontFamily: 'Kalam',
         fontSize: 24,
         fontWeight: 'bold',
-        fill: hexToPixi(Colors.WHITE),
-        stroke: { color: hexToPixi(Colors.BROWN_DARK), width: 2 },
+        fill: Colors.WHITE,
+        stroke: { color: Colors.BROWN_DARK, width: 2 },
         dropShadow: {
-          color: hexToPixi(Colors.GOLD_BRIGHT),
+          color: Colors.GOLD_BRIGHT,
           blur: 4,
           angle: Math.PI / 4,
           distance: 2,
@@ -288,7 +288,7 @@ export class CheckinScene extends BaseScene {
       style: {
         fontFamily: 'Kalam',
         fontSize: 14,
-        fill: this.hasCheckedInToday ? hexToPixi(Colors.GREEN_LIGHT) : hexToPixi(Colors.GOLD),
+        fill: this.hasCheckedInToday ? Colors.GREEN_LIGHT : Colors.GOLD,
         align: 'center'
       }
     });
@@ -313,19 +313,19 @@ export class CheckinScene extends BaseScene {
     
     // Shadow
     rewardBg.roundRect(3, 3, boxWidth, boxHeight, 10)
-      .fill({ color: hexToPixi(Colors.BLACK), alpha: 0.5 });
+      .fill({ color: Colors.BLACK, alpha: 0.5 });
     
     // Main chest background - golden
     rewardBg.roundRect(0, 0, boxWidth, boxHeight, 10)
-      .fill({ color: hexToPixi(Colors.GOLD_BRIGHT), alpha: 0.3 })
-      .stroke({ width: 3, color: hexToPixi(Colors.GOLD) });
+      .fill({ color: Colors.GOLD_BRIGHT, alpha: 0.3 })
+      .stroke({ width: 3, color: Colors.GOLD });
     
     // Inner glow
     rewardBg.roundRect(3, 3, boxWidth - 6, boxHeight - 6, 8)
-      .stroke({ width: 2, color: hexToPixi(Colors.GOLD_BRIGHT), alpha: 0.8 });
+      .stroke({ width: 2, color: Colors.GOLD_BRIGHT, alpha: 0.8 });
     
     // Ornate corners
-    this.drawRewardCorners(rewardBg, 0, 0, boxWidth, boxHeight, hexToPixi(Colors.GOLD_BRIGHT));
+    this.drawRewardCorners(rewardBg, 0, 0, boxWidth, boxHeight, Colors.GOLD_BRIGHT);
     
     rewardBox.addChild(rewardBg);
 
@@ -336,8 +336,8 @@ export class CheckinScene extends BaseScene {
         fontFamily: 'Kalam',
         fontSize: 14,
         fontWeight: 'bold',
-        fill: hexToPixi(Colors.BROWN_DARK),
-        stroke: { color: hexToPixi(Colors.GOLD_BRIGHT), width: 0.5 }
+        fill: Colors.BROWN_DARK,
+        stroke: { color: Colors.GOLD_BRIGHT, width: 0.5 }
       }
     });
     rewardTitle.anchor.set(0.5, 0);
@@ -351,7 +351,7 @@ export class CheckinScene extends BaseScene {
         fontFamily: 'Kalam',
         fontSize: 18,
         fontWeight: 'bold',
-        fill: hexToPixi(Colors.BROWN_DARK),
+        fill: Colors.BROWN_DARK,
         align: 'center'
       }
     });
@@ -391,7 +391,7 @@ export class CheckinScene extends BaseScene {
     this.checkinButtonContainer.addChild(checkinButton);
   }
 
-  private drawRewardCorners(graphics: Graphics, x: number, y: number, width: number, height: number, color: number): void {
+  private drawRewardCorners(graphics: Graphics, x: number, y: number, width: number, height: number, color: string): void {
     const cornerSize = 12;
     
     // Top-left
@@ -459,10 +459,10 @@ export class CheckinScene extends BaseScene {
         fontFamily: 'Kalam',
         fontSize: 18,
         fontWeight: 'bold',
-        fill: hexToPixi(Colors.WHITE),
-        stroke: { color: hexToPixi(Colors.BROWN_DARK), width: 2 },
+        fill: Colors.WHITE,
+        stroke: { color: Colors.BROWN_DARK, width: 2 },
         dropShadow: {
-          color: hexToPixi(Colors.GOLD_BRIGHT),
+          color: Colors.GOLD_BRIGHT,
           blur: 3,
           angle: Math.PI / 4,
           distance: 2,
@@ -528,13 +528,13 @@ export class CheckinScene extends BaseScene {
     const bg = new Graphics();
     
     // Determine colors based on disabled state
-    const mainColor = disabled ? hexToPixi(Colors.GRAY) : hexToPixi(Colors.BROWN);
-    const strokeColor = disabled ? hexToPixi(Colors.GRAY_MID) : hexToPixi(Colors.GOLD);
-    const highlightColor = disabled ? hexToPixi(Colors.GRAY_LIGHT) : hexToPixi(Colors.GOLD_BRIGHT);
-    const textColor = disabled ? hexToPixi(Colors.GRAY_LIGHTER) : hexToPixi(Colors.WHITE);
+    const mainColor = disabled ? Colors.GRAY : Colors.BROWN;
+    const strokeColor = disabled ? Colors.GRAY_MID : Colors.GOLD;
+    const highlightColor = disabled ? Colors.GRAY_LIGHT : Colors.GOLD_BRIGHT;
+    const textColor = disabled ? Colors.GRAY_LIGHTER : Colors.WHITE;
     
     bg.roundRect(2, 2, width, height, 8)
-      .fill({ color: hexToPixi(Colors.BLACK), alpha: 0.4 });
+      .fill({ color: Colors.BLACK, alpha: 0.4 });
     bg.roundRect(0, 0, width, height, 8)
       .fill({ color: mainColor, alpha: 0.95 })
       .stroke({ width: 2, color: strokeColor });
@@ -548,7 +548,7 @@ export class CheckinScene extends BaseScene {
         fontSize: 16,
         fontWeight: 'bold',
         fill: textColor,
-        stroke: { color: hexToPixi(Colors.BROWN_DARK), width: 2 }
+        stroke: { color: Colors.BROWN_DARK, width: 2 }
       }
     });
     buttonText.anchor.set(0.5);
@@ -566,24 +566,24 @@ export class CheckinScene extends BaseScene {
       button.on('pointerover', () => {
         bg.clear();
         bg.roundRect(2, 2, width, height, 8)
-          .fill({ color: hexToPixi(Colors.BLACK), alpha: 0.4 });
+          .fill({ color: Colors.BLACK, alpha: 0.4 });
         bg.roundRect(0, 0, width, height, 8)
-          .fill({ color: hexToPixi(Colors.BROWN_LIGHT), alpha: 0.95 })
-          .stroke({ width: 2, color: hexToPixi(Colors.GOLD_BRIGHT) });
+          .fill({ color: Colors.BROWN_LIGHT, alpha: 0.95 })
+          .stroke({ width: 2, color: Colors.GOLD_BRIGHT });
         bg.roundRect(2, 2, width - 4, height - 4, 6)
-          .stroke({ width: 1, color: hexToPixi(Colors.GOLD_BRIGHT), alpha: 0.9 });
+          .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.9 });
         button.scale.set(1.02);
       });
       
       button.on('pointerout', () => {
         bg.clear();
         bg.roundRect(2, 2, width, height, 8)
-          .fill({ color: hexToPixi(Colors.BLACK), alpha: 0.4 });
+          .fill({ color: Colors.BLACK, alpha: 0.4 });
         bg.roundRect(0, 0, width, height, 8)
-          .fill({ color: hexToPixi(Colors.BROWN), alpha: 0.95 })
-          .stroke({ width: 2, color: hexToPixi(Colors.GOLD) });
+          .fill({ color: Colors.BROWN, alpha: 0.95 })
+          .stroke({ width: 2, color: Colors.GOLD });
         bg.roundRect(2, 2, width - 4, height - 4, 6)
-          .stroke({ width: 1, color: hexToPixi(Colors.GOLD_BRIGHT), alpha: 0.6 });
+          .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.6 });
         button.scale.set(1.0);
       });
       

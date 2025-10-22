@@ -7,7 +7,7 @@ import { BattleScene } from './BattleScene';
 import { CardBattleScene } from './CardBattleScene';
 import { TowerScene } from './TowerScene';
 import { CheckinScene } from './CheckinScene';
-import { Colors, hexToPixi } from '@/utils/colors';
+import { Colors } from '@/utils/colors';
 import { playerApi, isLikelyUsingMockData } from '@/services/api';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
 
@@ -154,11 +154,11 @@ export class HomeScene extends BaseScene {
     // Fantasy dark background with texture
     const bg = new Graphics();
     bg.rect(0, 0, this.gameWidth, availableHeight)
-      .fill({ color: hexToPixi(Colors.BROWN_DARKEST), alpha: 1.0 });
+      .fill({ color: Colors.BROWN_DARKEST, alpha: 1.0 });
     
     // Add subtle brown texture overlay
     bg.rect(0, 0, this.gameWidth, availableHeight)
-      .fill({ color: hexToPixi(Colors.BROWN_DARK), alpha: 0.3 });
+      .fill({ color: Colors.BROWN_DARK, alpha: 0.3 });
     
     bgContainer.addChild(bg);
     
@@ -167,7 +167,7 @@ export class HomeScene extends BaseScene {
       const particle = new Graphics();
       const size = 1 + Math.random() * 2;
       particle.circle(0, 0, size)
-        .fill({ color: hexToPixi(Colors.GOLD_BRIGHT), alpha: 0.2 + Math.random() * 0.3 });
+        .fill({ color: Colors.GOLD_BRIGHT, alpha: 0.2 + Math.random() * 0.3 });
       particle.x = Math.random() * this.gameWidth;
       particle.y = Math.random() * availableHeight;
       bgContainer.addChild(particle);
@@ -192,8 +192,8 @@ export class HomeScene extends BaseScene {
       .lineTo(bannerX + bannerWidth, bannerY + bannerHeight / 2)
       .lineTo(bannerX + bannerWidth - 15, bannerY)
       .lineTo(bannerX + 15, bannerY)
-      .fill({ color: hexToPixi(Colors.BROWN), alpha: 0.95 })
-      .stroke({ width: 3, color: hexToPixi(Colors.GOLD) });
+      .fill({ color: Colors.BROWN, alpha: 0.95 })
+      .stroke({ width: 3, color: Colors.GOLD });
     
     // Inner golden highlight
     banner.moveTo(bannerX + 18, bannerY + 4)
@@ -203,7 +203,7 @@ export class HomeScene extends BaseScene {
       .lineTo(bannerX + 18, bannerY + bannerHeight - 4)
       .lineTo(bannerX + 5, bannerY + bannerHeight / 2)
       .lineTo(bannerX + 18, bannerY + 4)
-      .stroke({ width: 1, color: hexToPixi(Colors.GOLD_BRIGHT), alpha: 0.6 });
+      .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.6 });
     
     const title = new Text({
       text: '⚔️ VIVU ⚔️',
@@ -211,10 +211,10 @@ export class HomeScene extends BaseScene {
         fontFamily: 'Kalam',
         fontSize: 38,
         fontWeight: 'bold',
-        fill: hexToPixi(Colors.WHITE),
-        stroke: { color: hexToPixi(Colors.BROWN_DARK), width: 2 },
+        fill: Colors.WHITE,
+        stroke: { color: Colors.BROWN_DARK, width: 2 },
         dropShadow: {
-          color: hexToPixi(Colors.GOLD_BRIGHT),
+          color: Colors.GOLD_BRIGHT,
           blur: 4,
           angle: Math.PI / 4,
           distance: 2,
@@ -232,7 +232,7 @@ export class HomeScene extends BaseScene {
         fontFamily: 'Kalam',
         fontSize: 14,
         fontStyle: 'italic',
-        fill: hexToPixi(Colors.GOLD),
+        fill: Colors.GOLD,
         align: 'center'
       }
     });
@@ -254,23 +254,23 @@ export class HomeScene extends BaseScene {
     
     // Shadow
     bg.roundRect(3, 3, panelWidth, panelHeight, 10)
-      .fill({ color: hexToPixi(Colors.BLACK), alpha: 0.4 });
+      .fill({ color: Colors.BLACK, alpha: 0.4 });
     
     // Main parchment
     bg.roundRect(0, 0, panelWidth, panelHeight, 10)
-      .fill({ color: hexToPixi(Colors.PARCHMENT_LIGHT), alpha: 0.98 })
-      .stroke({ width: 2, color: hexToPixi(Colors.GOLD) });
+      .fill({ color: Colors.PARCHMENT_LIGHT, alpha: 0.98 })
+      .stroke({ width: 2, color: Colors.GOLD });
     
     // Inner layer
     bg.roundRect(3, 3, panelWidth - 6, panelHeight - 6, 8)
-      .fill({ color: hexToPixi(Colors.PARCHMENT), alpha: 0.6 });
+      .fill({ color: Colors.PARCHMENT, alpha: 0.6 });
     
     // Golden highlight
     bg.roundRect(5, 5, panelWidth - 10, panelHeight - 10, 7)
-      .stroke({ width: 1, color: hexToPixi(Colors.GOLD_BRIGHT), alpha: 0.5 });
+      .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.5 });
     
     // Decorative corners
-    this.drawPanelCorners(bg, 0, 0, panelWidth, panelHeight, hexToPixi(Colors.GOLD_BRIGHT));
+    this.drawPanelCorners(bg, 0, 0, panelWidth, panelHeight, Colors.GOLD_BRIGHT);
     
     // Player info text
     const playerName = new Text({
@@ -279,8 +279,8 @@ export class HomeScene extends BaseScene {
         fontFamily: 'Kalam',
         fontSize: 16,
         fontWeight: 'bold',
-        fill: hexToPixi(Colors.BROWN_DARK),
-        stroke: { color: hexToPixi(Colors.GOLD_BRIGHT), width: 0.5 }
+        fill: Colors.BROWN_DARK,
+        stroke: { color: Colors.GOLD_BRIGHT, width: 0.5 }
       }
     });
     playerName.x = 12;
@@ -291,7 +291,7 @@ export class HomeScene extends BaseScene {
       style: {
         fontFamily: 'Kalam',
         fontSize: 14,
-        fill: hexToPixi(Colors.BROWN_DARKER)
+        fill: Colors.BROWN_DARKER
       }
     });
     playerLevel.x = 12;
@@ -302,7 +302,7 @@ export class HomeScene extends BaseScene {
       style: {
         fontFamily: 'Kalam',
         fontSize: 14,
-        fill: hexToPixi(Colors.BROWN_DARKER)
+        fill: Colors.BROWN_DARKER
       }
     });
     playerExp.x = 12;
@@ -315,7 +315,7 @@ export class HomeScene extends BaseScene {
     this.container.addChild(playerPanel);
   }
 
-  private drawPanelCorners(graphics: Graphics, x: number, y: number, width: number, height: number, color: number): void {
+  private drawPanelCorners(graphics: Graphics, x: number, y: number, width: number, height: number, color: string): void {
     const cornerSize = 10;
     
     // Top-left
@@ -397,16 +397,16 @@ export class HomeScene extends BaseScene {
     
     // Shadow
     bg.roundRect(3, 3, width, height, 8)
-      .fill({ color: hexToPixi(Colors.BLACK), alpha: 0.4 });
+      .fill({ color: Colors.BLACK, alpha: 0.4 });
     
     // Main button - wooden style
     bg.roundRect(0, 0, width, height, 8)
-      .fill({ color: hexToPixi(Colors.BROWN), alpha: 0.95 })
-      .stroke({ width: 2, color: hexToPixi(Colors.GOLD) });
+      .fill({ color: Colors.BROWN, alpha: 0.95 })
+      .stroke({ width: 2, color: Colors.GOLD });
     
     // Inner highlight
     bg.roundRect(2, 2, width - 4, height - 4, 6)
-      .stroke({ width: 1, color: hexToPixi(Colors.GOLD_BRIGHT), alpha: 0.6 });
+      .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.6 });
     
     const buttonText = new Text({
       text: text,
@@ -414,8 +414,8 @@ export class HomeScene extends BaseScene {
         fontFamily: 'Kalam',
         fontSize: 16,
         fontWeight: 'bold',
-        fill: hexToPixi(Colors.WHITE),
-        stroke: { color: hexToPixi(Colors.BROWN_DARK), width: 2 }
+        fill: Colors.WHITE,
+        stroke: { color: Colors.BROWN_DARK, width: 2 }
       }
     });
     buttonText.anchor.set(0.5);
@@ -431,24 +431,24 @@ export class HomeScene extends BaseScene {
     button.on('pointerover', () => {
       bg.clear();
       bg.roundRect(3, 3, width, height, 8)
-        .fill({ color: hexToPixi(Colors.BLACK), alpha: 0.4 });
+        .fill({ color: Colors.BLACK, alpha: 0.4 });
       bg.roundRect(0, 0, width, height, 8)
-        .fill({ color: hexToPixi(Colors.BROWN_LIGHT), alpha: 0.95 })
-        .stroke({ width: 2, color: hexToPixi(Colors.GOLD_BRIGHT) });
+        .fill({ color: Colors.BROWN_LIGHT, alpha: 0.95 })
+        .stroke({ width: 2, color: Colors.GOLD_BRIGHT });
       bg.roundRect(2, 2, width - 4, height - 4, 6)
-        .stroke({ width: 1, color: hexToPixi(Colors.GOLD_BRIGHT), alpha: 0.9 });
+        .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.9 });
       button.scale.set(1.02);
     });
     
     button.on('pointerout', () => {
       bg.clear();
       bg.roundRect(3, 3, width, height, 8)
-        .fill({ color: hexToPixi(Colors.BLACK), alpha: 0.4 });
+        .fill({ color: Colors.BLACK, alpha: 0.4 });
       bg.roundRect(0, 0, width, height, 8)
-        .fill({ color: hexToPixi(Colors.BROWN), alpha: 0.95 })
-        .stroke({ width: 2, color: hexToPixi(Colors.GOLD) });
+        .fill({ color: Colors.BROWN, alpha: 0.95 })
+        .stroke({ width: 2, color: Colors.GOLD });
       bg.roundRect(2, 2, width - 4, height - 4, 6)
-        .stroke({ width: 1, color: hexToPixi(Colors.GOLD_BRIGHT), alpha: 0.6 });
+        .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.6 });
       button.scale.set(1.0);
     });
     
@@ -463,7 +463,7 @@ export class HomeScene extends BaseScene {
       const decoration = new Graphics();
       const size = 2 + Math.random() * 3;
       decoration.circle(0, 0, size)
-        .fill({ color: hexToPixi(Colors.GOLD_BRIGHT), alpha: 0.4 + Math.random() * 0.3 });
+        .fill({ color: Colors.GOLD_BRIGHT, alpha: 0.4 + Math.random() * 0.3 });
       
       decoration.x = Math.random() * this.gameWidth;
       decoration.y = Math.random() * this.gameHeight;

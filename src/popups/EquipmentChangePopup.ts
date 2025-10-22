@@ -1,6 +1,6 @@
 import { Container, Graphics, Text } from 'pixi.js';
 import { navigation } from '@/utils/navigation';
-import { Colors, hexToPixi } from '@/utils/colors';
+import { Colors } from '@/utils/colors';
 import { equipmentApi } from '@/services/api';
 
 interface Equipment {
@@ -71,7 +71,7 @@ export class EquipmentChangePopup extends Container {
     // Dark overlay
     this.dialogBg = new Graphics();
     this.dialogBg.rect(0, 0, this.gameWidth, this.gameHeight)
-      .fill({ color: hexToPixi(Colors.BLACK), alpha: 0.85 });
+      .fill({ color: Colors.BLACK, alpha: 0.85 });
     
     const dialogWidth = Math.min(500, this.gameWidth - 40);
     const dialogHeight = 500;
@@ -83,23 +83,23 @@ export class EquipmentChangePopup extends Container {
     
     // Shadow
     this.dialogPanel.roundRect(dialogX + 4, dialogY + 4, dialogWidth, dialogHeight, 12)
-      .fill({ color: hexToPixi(Colors.BLACK), alpha: 0.6 });
+      .fill({ color: Colors.BLACK, alpha: 0.6 });
     
     // Main parchment
     this.dialogPanel.roundRect(dialogX, dialogY, dialogWidth, dialogHeight, 12)
-      .fill({ color: hexToPixi(Colors.PARCHMENT_LIGHT), alpha: 0.98 })
-      .stroke({ width: 3, color: hexToPixi(Colors.GOLD) });
+      .fill({ color: Colors.PARCHMENT_LIGHT, alpha: 0.98 })
+      .stroke({ width: 3, color: Colors.GOLD });
     
     // Inner layer
     this.dialogPanel.roundRect(dialogX + 4, dialogY + 4, dialogWidth - 8, dialogHeight - 8, 10)
-      .fill({ color: hexToPixi(Colors.PARCHMENT), alpha: 0.6 });
+      .fill({ color: Colors.PARCHMENT, alpha: 0.6 });
     
     // Golden highlight
     this.dialogPanel.roundRect(dialogX + 6, dialogY + 6, dialogWidth - 12, dialogHeight - 12, 9)
-      .stroke({ width: 1, color: hexToPixi(Colors.GOLD_BRIGHT), alpha: 0.5 });
+      .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.5 });
     
     // Decorative corners
-    this.drawPanelCorners(this.dialogPanel, dialogX, dialogY, dialogWidth, dialogHeight, hexToPixi(Colors.GOLD_BRIGHT));
+    this.drawPanelCorners(this.dialogPanel, dialogX, dialogY, dialogWidth, dialogHeight, Colors.GOLD_BRIGHT);
 
     // Title banner
     const bannerWidth = dialogWidth - 80;
@@ -115,8 +115,8 @@ export class EquipmentChangePopup extends Container {
       .lineTo(bannerX + bannerWidth, bannerY + bannerHeight / 2)
       .lineTo(bannerX + bannerWidth - 10, bannerY)
       .lineTo(bannerX + 10, bannerY)
-      .fill({ color: hexToPixi(Colors.BROWN), alpha: 0.95 })
-      .stroke({ width: 2, color: hexToPixi(Colors.GOLD) });
+      .fill({ color: Colors.BROWN, alpha: 0.95 })
+      .stroke({ width: 2, color: Colors.GOLD });
 
     const dialogTitle = new Text({
       text: `⚔️ Change ${this.slotName}`,
@@ -124,8 +124,8 @@ export class EquipmentChangePopup extends Container {
         fontFamily: 'Kalam',
         fontSize: 18,
         fontWeight: 'bold',
-        fill: hexToPixi(Colors.WHITE),
-        stroke: { color: hexToPixi(Colors.BROWN_DARK), width: 2 },
+        fill: Colors.WHITE,
+        stroke: { color: Colors.BROWN_DARK, width: 2 },
         align: 'center'
       }
     });
@@ -139,7 +139,7 @@ export class EquipmentChangePopup extends Container {
       style: {
         fontFamily: 'Kalam',
         fontSize: 14,
-        fill: hexToPixi(Colors.BROWN),
+        fill: Colors.BROWN,
         align: 'center'
       }
     });
@@ -163,16 +163,16 @@ export class EquipmentChangePopup extends Container {
       if (isCurrentItem) {
         // Highlight current item
         optionBg.roundRect(0, 0, dialogWidth - 40, 55, 6)
-          .fill({ color: hexToPixi(Colors.GOLD_BRIGHT), alpha: 0.3 })
-          .stroke({ width: 2, color: hexToPixi(Colors.GOLD) });
+          .fill({ color: Colors.GOLD_BRIGHT, alpha: 0.3 })
+          .stroke({ width: 2, color: Colors.GOLD });
         
         optionBg.roundRect(2, 2, dialogWidth - 44, 51, 5)
-          .stroke({ width: 1, color: hexToPixi(Colors.GOLD_BRIGHT), alpha: 0.6 });
+          .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.6 });
       } else {
         // Regular equipment card
         optionBg.roundRect(0, 0, dialogWidth - 40, 55, 6)
-          .fill({ color: hexToPixi(Colors.PARCHMENT), alpha: 0.5 })
-          .stroke({ width: 2, color: hexToPixi(Colors.GOLD), alpha: 0.5 });
+          .fill({ color: Colors.PARCHMENT, alpha: 0.5 })
+          .stroke({ width: 2, color: Colors.GOLD, alpha: 0.5 });
       }
       
       const equipmentName = new Text({
@@ -181,8 +181,8 @@ export class EquipmentChangePopup extends Container {
           fontFamily: 'Kalam',
           fontSize: 14,
           fontWeight: 'bold',
-          fill: isCurrentItem ? hexToPixi(Colors.BROWN_DARK) : hexToPixi(Colors.BROWN_DARKER),
-          stroke: isCurrentItem ? { color: hexToPixi(Colors.GOLD_BRIGHT), width: 0.5 } : undefined
+          fill: isCurrentItem ? Colors.BROWN_DARK : Colors.BROWN_DARKER,
+          stroke: isCurrentItem ? { color: Colors.GOLD_BRIGHT, width: 0.5 } : undefined
         }
       });
       equipmentName.x = 10;
@@ -193,7 +193,7 @@ export class EquipmentChangePopup extends Container {
         style: {
           fontFamily: 'Kalam',
           fontSize: 11,
-          fill: hexToPixi(Colors.BROWN_WOOD),
+          fill: Colors.BROWN_WOOD,
           wordWrap: true,
           wordWrapWidth: dialogWidth - 60
         }
@@ -217,17 +217,17 @@ export class EquipmentChangePopup extends Container {
         optionContainer.on('pointerover', () => {
           optionBg.clear();
           optionBg.roundRect(0, 0, dialogWidth - 40, 55, 6)
-            .fill({ color: hexToPixi(Colors.GOLD_BRIGHT), alpha: 0.4 })
-            .stroke({ width: 2, color: hexToPixi(Colors.GOLD) });
+            .fill({ color: Colors.GOLD_BRIGHT, alpha: 0.4 })
+            .stroke({ width: 2, color: Colors.GOLD });
           optionBg.roundRect(2, 2, dialogWidth - 44, 51, 5)
-            .stroke({ width: 1, color: hexToPixi(Colors.GOLD_BRIGHT), alpha: 0.8 });
+            .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.8 });
         });
         
         optionContainer.on('pointerout', () => {
           optionBg.clear();
           optionBg.roundRect(0, 0, dialogWidth - 40, 55, 6)
-            .fill({ color: hexToPixi(Colors.PARCHMENT), alpha: 0.5 })
-            .stroke({ width: 2, color: hexToPixi(Colors.GOLD), alpha: 0.5 });
+            .fill({ color: Colors.PARCHMENT, alpha: 0.5 })
+            .stroke({ width: 2, color: Colors.GOLD, alpha: 0.5 });
         });
       }
       
@@ -253,7 +253,7 @@ export class EquipmentChangePopup extends Container {
     this.addChild(this.dialogBg, this.dialogPanel, titleBanner, dialogTitle, currentText, ...equipmentOptions, closeButton);
   }
 
-  private drawPanelCorners(graphics: Graphics, x: number, y: number, width: number, height: number, color: number): void {
+  private drawPanelCorners(graphics: Graphics, x: number, y: number, width: number, height: number, color: string): void {
     const cornerSize = 12;
     
     graphics.moveTo(x, y + cornerSize)
@@ -293,12 +293,12 @@ export class EquipmentChangePopup extends Container {
     
     const bg = new Graphics();
     bg.roundRect(2, 2, width, height, 8)
-      .fill({ color: hexToPixi(Colors.BLACK), alpha: 0.4 });
+      .fill({ color: Colors.BLACK, alpha: 0.4 });
     bg.roundRect(0, 0, width, height, 8)
-      .fill({ color: hexToPixi(Colors.BROWN), alpha: 0.95 })
-      .stroke({ width: 2, color: hexToPixi(Colors.GOLD) });
+      .fill({ color: Colors.BROWN, alpha: 0.95 })
+      .stroke({ width: 2, color: Colors.GOLD });
     bg.roundRect(2, 2, width - 4, height - 4, 6)
-      .stroke({ width: 1, color: hexToPixi(Colors.GOLD_BRIGHT), alpha: 0.6 });
+      .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.6 });
     
     const buttonText = new Text({
       text,
@@ -306,8 +306,8 @@ export class EquipmentChangePopup extends Container {
         fontFamily: 'Kalam',
         fontSize: 14,
         fontWeight: 'bold',
-        fill: hexToPixi(Colors.WHITE),
-        stroke: { color: hexToPixi(Colors.BROWN_DARK), width: 2 }
+        fill: Colors.WHITE,
+        stroke: { color: Colors.BROWN_DARK, width: 2 }
       }
     });
     buttonText.anchor.set(0.5);
@@ -325,24 +325,24 @@ export class EquipmentChangePopup extends Container {
     button.on('pointerover', () => {
       bg.clear();
       bg.roundRect(2, 2, width, height, 8)
-        .fill({ color: hexToPixi(Colors.BLACK), alpha: 0.4 });
+        .fill({ color: Colors.BLACK, alpha: 0.4 });
       bg.roundRect(0, 0, width, height, 8)
-        .fill({ color: hexToPixi(Colors.BROWN_LIGHT), alpha: 0.95 })
-        .stroke({ width: 2, color: hexToPixi(Colors.GOLD_BRIGHT) });
+        .fill({ color: Colors.BROWN_LIGHT, alpha: 0.95 })
+        .stroke({ width: 2, color: Colors.GOLD_BRIGHT });
       bg.roundRect(2, 2, width - 4, height - 4, 6)
-        .stroke({ width: 1, color: hexToPixi(Colors.GOLD_BRIGHT), alpha: 0.9 });
+        .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.9 });
       button.scale.set(1.02);
     });
     
     button.on('pointerout', () => {
       bg.clear();
       bg.roundRect(2, 2, width, height, 8)
-        .fill({ color: hexToPixi(Colors.BLACK), alpha: 0.4 });
+        .fill({ color: Colors.BLACK, alpha: 0.4 });
       bg.roundRect(0, 0, width, height, 8)
-        .fill({ color: hexToPixi(Colors.BROWN), alpha: 0.95 })
-        .stroke({ width: 2, color: hexToPixi(Colors.GOLD) });
+        .fill({ color: Colors.BROWN, alpha: 0.95 })
+        .stroke({ width: 2, color: Colors.GOLD });
       bg.roundRect(2, 2, width - 4, height - 4, 6)
-        .stroke({ width: 1, color: hexToPixi(Colors.GOLD_BRIGHT), alpha: 0.6 });
+        .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.6 });
       button.scale.set(1.0);
     });
     

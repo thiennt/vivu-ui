@@ -2,7 +2,7 @@ import { Container, Graphics, Text, Ticker } from 'pixi.js';
 import { navigation } from '@/utils/navigation';
 import { BaseScene } from '@/ui/BaseScene';
 import { HomeScene } from './HomeScene';
-import { Colors, hexToPixi } from '@/utils/colors';
+import { Colors } from '@/utils/colors';
 import { battleApi, isLikelyUsingMockData } from '@/services/api';
 import { Dungeon, Stage } from '@/types';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
@@ -113,11 +113,11 @@ export class TowerScene extends BaseScene {
     // Dark tower background
     const bg = new Graphics();
     bg.rect(0, 0, this.gameWidth, availableHeight)
-      .fill({ color: hexToPixi(Colors.BLUE_NAVY_DARKEST), alpha: 1.0 });
+      .fill({ color: Colors.BLUE_NAVY_DARKEST, alpha: 1.0 });
     
     // Purple mystical overlay
     bg.rect(0, 0, this.gameWidth, availableHeight)
-      .fill({ color: hexToPixi(Colors.PURPLE_DARKEST), alpha: 0.4 });
+      .fill({ color: Colors.PURPLE_DARKEST, alpha: 0.4 });
     
     bgContainer.addChild(bg);
     
@@ -126,7 +126,7 @@ export class TowerScene extends BaseScene {
       const particle = new Graphics();
       const size = 1 + Math.random() * 2;
       particle.circle(0, 0, size)
-        .fill({ color: hexToPixi(Colors.PURPLE), alpha: 0.3 + Math.random() * 0.4 });
+        .fill({ color: Colors.PURPLE, alpha: 0.3 + Math.random() * 0.4 });
       particle.x = Math.random() * this.gameWidth;
       particle.y = Math.random() * availableHeight;
       bgContainer.addChild(particle);
@@ -150,8 +150,8 @@ export class TowerScene extends BaseScene {
       .lineTo(bannerX + bannerWidth, bannerY + bannerHeight / 2)
       .lineTo(bannerX + bannerWidth - 12, bannerY)
       .lineTo(bannerX + 12, bannerY)
-      .fill({ color: hexToPixi(Colors.PURPLE_DARKER), alpha: 0.95 })
-      .stroke({ width: 2.5, color: hexToPixi(Colors.PURPLE) });
+      .fill({ color: Colors.PURPLE_DARKER, alpha: 0.95 })
+      .stroke({ width: 2.5, color: Colors.PURPLE });
     
     banner.moveTo(bannerX + 15, bannerY + 3)
       .lineTo(bannerX + bannerWidth - 15, bannerY + 3)
@@ -160,7 +160,7 @@ export class TowerScene extends BaseScene {
       .lineTo(bannerX + 15, bannerY + bannerHeight - 3)
       .lineTo(bannerX + 4, bannerY + bannerHeight / 2)
       .lineTo(bannerX + 15, bannerY + 3)
-      .stroke({ width: 1, color: hexToPixi(Colors.PURPLE_VIVID), alpha: 0.6 });
+      .stroke({ width: 1, color: Colors.PURPLE_VIVID, alpha: 0.6 });
     
     const title = new Text({
       text: '🗼 Battle Tower 🗼',
@@ -168,10 +168,10 @@ export class TowerScene extends BaseScene {
         fontFamily: 'Kalam',
         fontSize: 26,
         fontWeight: 'bold',
-        fill: hexToPixi(Colors.WHITE),
-        stroke: { color: hexToPixi(Colors.PURPLE_DARKEST), width: 2 },
+        fill: Colors.WHITE,
+        stroke: { color: Colors.PURPLE_DARKEST, width: 2 },
         dropShadow: {
-          color: hexToPixi(Colors.PURPLE),
+          color: Colors.PURPLE,
           blur: 4,
           angle: Math.PI / 4,
           distance: 2,
@@ -252,21 +252,21 @@ export class TowerScene extends BaseScene {
     const line = new Graphics();
     line.moveTo(0, 0)
         .lineTo(0, 50)
-        .stroke({ width: 6, color: hexToPixi(Colors.PURPLE), alpha: 0.7 });
+        .stroke({ width: 6, color: Colors.PURPLE, alpha: 0.7 });
     
     // Glowing nodes
     const topNode = new Graphics();
     topNode.circle(0, 0, 5)
-           .fill({ color: hexToPixi(Colors.PURPLE_VIVID), alpha: 0.95 });
+           .fill({ color: Colors.PURPLE_VIVID, alpha: 0.95 });
     
     const bottomNode = new Graphics();
     bottomNode.circle(0, 50, 5)
-              .fill({ color: hexToPixi(Colors.PURPLE_VIVID), alpha: 0.95 });
+              .fill({ color: Colors.PURPLE_VIVID, alpha: 0.95 });
     
     // Energy pulse effect
     const energy = new Graphics();
     energy.circle(0, 25, 8)
-          .fill({ color: hexToPixi(Colors.PURPLE), alpha: 0.4 });
+          .fill({ color: Colors.PURPLE, alpha: 0.4 });
     
     connection.addChild(line, topNode, bottomNode, energy);
     return connection;
@@ -285,31 +285,31 @@ export class TowerScene extends BaseScene {
     
     // Shadow
     bg.roundRect(3, 3, cardWidth, cardHeight, 10)
-      .fill({ color: hexToPixi(Colors.BLACK), alpha: 0.5 });
+      .fill({ color: Colors.BLACK, alpha: 0.5 });
     
     if (isAccessible) {
       // Accessible floor - mystical purple parchment
       bg.roundRect(0, 0, cardWidth, cardHeight, 10)
-        .fill({ color: hexToPixi(Colors.LAVENDER_LIGHT), alpha: 0.98 })
-        .stroke({ width: 3, color: hexToPixi(Colors.PURPLE) });
+        .fill({ color: Colors.LAVENDER_LIGHT, alpha: 0.98 })
+        .stroke({ width: 3, color: Colors.PURPLE });
       
       bg.roundRect(3, 3, cardWidth - 6, cardHeight - 6, 8)
-        .fill({ color: hexToPixi(Colors.LAVENDER), alpha: 0.6 });
+        .fill({ color: Colors.LAVENDER, alpha: 0.6 });
       
       bg.roundRect(5, 5, cardWidth - 10, cardHeight - 10, 7)
-        .stroke({ width: 1, color: hexToPixi(Colors.PURPLE_VIVID), alpha: 0.5 });
+        .stroke({ width: 1, color: Colors.PURPLE_VIVID, alpha: 0.5 });
     } else {
       // Locked floor - dark stone
       bg.roundRect(0, 0, cardWidth, cardHeight, 10)
-        .fill({ color: hexToPixi(Colors.GRAY_DARKER), alpha: 0.95 })
-        .stroke({ width: 3, color: hexToPixi(Colors.GRAY_DARK) });
+        .fill({ color: Colors.GRAY_DARKER, alpha: 0.95 })
+        .stroke({ width: 3, color: Colors.GRAY_DARK });
       
       bg.roundRect(3, 3, cardWidth - 6, cardHeight - 6, 8)
-        .fill({ color: hexToPixi(Colors.GRAY_DARKEST), alpha: 0.8 });
+        .fill({ color: Colors.GRAY_DARKEST, alpha: 0.8 });
     }
     
     // Decorative corners
-    this.drawFloorCorners(bg, 0, 0, cardWidth, cardHeight, isAccessible ? hexToPixi(Colors.PURPLE_VIVID) : hexToPixi(Colors.GRAY));
+    this.drawFloorCorners(bg, 0, 0, cardWidth, cardHeight, isAccessible ? Colors.PURPLE_VIVID : Colors.GRAY);
     
     // Floor number
     const floorNumber = new Text({
@@ -318,9 +318,9 @@ export class TowerScene extends BaseScene {
         fontFamily: 'Kalam',
         fontSize: 16,
         fontWeight: 'bold',
-        fill: isAccessible ? hexToPixi(Colors.PURPLE_DARKER) : hexToPixi(Colors.GRAY),
+        fill: isAccessible ? Colors.PURPLE_DARKER : Colors.GRAY,
         align: 'center',
-        stroke: isAccessible ? { color: hexToPixi(Colors.PURPLE_VIVID), width: 0.5 } : undefined
+        stroke: isAccessible ? { color: Colors.PURPLE_VIVID, width: 0.5 } : undefined
       }
     });
     floorNumber.anchor.set(0.5, 0);
@@ -335,7 +335,7 @@ export class TowerScene extends BaseScene {
         style: {
           fontFamily: 'Kalam',
           fontSize: 48,
-          fill: hexToPixi(Colors.GRAY)
+          fill: Colors.GRAY
         }
       });
     } else if (stage.is_completed) {
@@ -344,8 +344,8 @@ export class TowerScene extends BaseScene {
         style: {
           fontFamily: 'Kalam',
           fontSize: 48,
-          fill: hexToPixi(Colors.GREEN_BRIGHT),
-          stroke: { color: hexToPixi(Colors.GREEN_FOREST_DARK), width: 2 }
+          fill: Colors.GREEN_BRIGHT,
+          stroke: { color: Colors.GREEN_FOREST_DARK, width: 2 }
         }
       });
     } else {
@@ -354,7 +354,7 @@ export class TowerScene extends BaseScene {
         style: {
           fontFamily: 'Kalam',
           fontSize: 48,
-          fill: hexToPixi(Colors.PURPLE)
+          fill: Colors.PURPLE
         }
       });
     }
@@ -371,30 +371,30 @@ export class TowerScene extends BaseScene {
       card.on('pointerover', () => {
         bg.clear();
         bg.roundRect(3, 3, cardWidth, cardHeight, 10)
-          .fill({ color: hexToPixi(Colors.BLACK), alpha: 0.5 });
+          .fill({ color: Colors.BLACK, alpha: 0.5 });
         bg.roundRect(0, 0, cardWidth, cardHeight, 10)
-          .fill({ color: hexToPixi(Colors.LAVENDER_LIGHT), alpha: 1.0 })
-          .stroke({ width: 3, color: hexToPixi(Colors.PURPLE_VIVID) });
+          .fill({ color: Colors.LAVENDER_LIGHT, alpha: 1.0 })
+          .stroke({ width: 3, color: Colors.PURPLE_VIVID });
         bg.roundRect(3, 3, cardWidth - 6, cardHeight - 6, 8)
-          .fill({ color: hexToPixi(Colors.LAVENDER), alpha: 0.8 });
+          .fill({ color: Colors.LAVENDER, alpha: 0.8 });
         bg.roundRect(5, 5, cardWidth - 10, cardHeight - 10, 7)
-          .stroke({ width: 1, color: hexToPixi(Colors.PURPLE_VIVID), alpha: 0.8 });
-        this.drawFloorCorners(bg, 0, 0, cardWidth, cardHeight, hexToPixi(Colors.PURPLE_VIVID));
+          .stroke({ width: 1, color: Colors.PURPLE_VIVID, alpha: 0.8 });
+        this.drawFloorCorners(bg, 0, 0, cardWidth, cardHeight, Colors.PURPLE_VIVID);
         towerIcon.scale.set(1.1);
       });
       
       card.on('pointerout', () => {
         bg.clear();
         bg.roundRect(3, 3, cardWidth, cardHeight, 10)
-          .fill({ color: hexToPixi(Colors.BLACK), alpha: 0.5 });
+          .fill({ color: Colors.BLACK, alpha: 0.5 });
         bg.roundRect(0, 0, cardWidth, cardHeight, 10)
-          .fill({ color: hexToPixi(Colors.LAVENDER_LIGHT), alpha: 0.98 })
-          .stroke({ width: 3, color: hexToPixi(Colors.PURPLE) });
+          .fill({ color: Colors.LAVENDER_LIGHT, alpha: 0.98 })
+          .stroke({ width: 3, color: Colors.PURPLE });
         bg.roundRect(3, 3, cardWidth - 6, cardHeight - 6, 8)
-          .fill({ color: hexToPixi(Colors.LAVENDER), alpha: 0.6 });
+          .fill({ color: Colors.LAVENDER, alpha: 0.6 });
         bg.roundRect(5, 5, cardWidth - 10, cardHeight - 10, 7)
-          .stroke({ width: 1, color: hexToPixi(Colors.PURPLE_VIVID), alpha: 0.5 });
-        this.drawFloorCorners(bg, 0, 0, cardWidth, cardHeight, hexToPixi(Colors.PURPLE_VIVID));
+          .stroke({ width: 1, color: Colors.PURPLE_VIVID, alpha: 0.5 });
+        this.drawFloorCorners(bg, 0, 0, cardWidth, cardHeight, Colors.PURPLE_VIVID);
         towerIcon.scale.set(1.0);
       });
       
@@ -406,7 +406,7 @@ export class TowerScene extends BaseScene {
     return card;
   }
 
-  private drawFloorCorners(graphics: Graphics, x: number, y: number, width: number, height: number, color: number): void {
+  private drawFloorCorners(graphics: Graphics, x: number, y: number, width: number, height: number, color: string): void {
     const cornerSize = 10;
     
     graphics.moveTo(x, y + cornerSize)
@@ -457,12 +457,12 @@ export class TowerScene extends BaseScene {
     
     const bg = new Graphics();
     bg.roundRect(2, 2, width, height, 8)
-      .fill({ color: hexToPixi(Colors.BLACK), alpha: 0.5 });
+      .fill({ color: Colors.BLACK, alpha: 0.5 });
     bg.roundRect(0, 0, width, height, 8)
-      .fill({ color: hexToPixi(Colors.PURPLE_DARKER), alpha: 0.95 })
-      .stroke({ width: 2, color: hexToPixi(Colors.PURPLE) });
+      .fill({ color: Colors.PURPLE_DARKER, alpha: 0.95 })
+      .stroke({ width: 2, color: Colors.PURPLE });
     bg.roundRect(2, 2, width - 4, height - 4, 6)
-      .stroke({ width: 1, color: hexToPixi(Colors.PURPLE_VIVID), alpha: 0.6 });
+      .stroke({ width: 1, color: Colors.PURPLE_VIVID, alpha: 0.6 });
     
     const buttonText = new Text({
       text: text,
@@ -470,8 +470,8 @@ export class TowerScene extends BaseScene {
         fontFamily: 'Kalam',
         fontSize: 14,
         fontWeight: 'bold',
-        fill: hexToPixi(Colors.WHITE),
-        stroke: { color: hexToPixi(Colors.PURPLE_DARKEST), width: 2 }
+        fill: Colors.WHITE,
+        stroke: { color: Colors.PURPLE_DARKEST, width: 2 }
       }
     });
     buttonText.anchor.set(0.5);
@@ -487,24 +487,24 @@ export class TowerScene extends BaseScene {
     button.on('pointerover', () => {
       bg.clear();
       bg.roundRect(2, 2, width, height, 8)
-        .fill({ color: hexToPixi(Colors.BLACK), alpha: 0.5 });
+        .fill({ color: Colors.BLACK, alpha: 0.5 });
       bg.roundRect(0, 0, width, height, 8)
-        .fill({ color: hexToPixi(Colors.PURPLE_DARK_ALT), alpha: 0.95 })
-        .stroke({ width: 2, color: hexToPixi(Colors.PURPLE_VIVID) });
+        .fill({ color: Colors.PURPLE_DARK_ALT, alpha: 0.95 })
+        .stroke({ width: 2, color: Colors.PURPLE_VIVID });
       bg.roundRect(2, 2, width - 4, height - 4, 6)
-        .stroke({ width: 1, color: hexToPixi(Colors.PURPLE_VIVID), alpha: 0.9 });
+        .stroke({ width: 1, color: Colors.PURPLE_VIVID, alpha: 0.9 });
       button.scale.set(1.02);
     });
     
     button.on('pointerout', () => {
       bg.clear();
       bg.roundRect(2, 2, width, height, 8)
-        .fill({ color: hexToPixi(Colors.BLACK), alpha: 0.5 });
+        .fill({ color: Colors.BLACK, alpha: 0.5 });
       bg.roundRect(0, 0, width, height, 8)
-        .fill({ color: hexToPixi(Colors.PURPLE_DARKER), alpha: 0.95 })
-        .stroke({ width: 2, color: hexToPixi(Colors.PURPLE) });
+        .fill({ color: Colors.PURPLE_DARKER, alpha: 0.95 })
+        .stroke({ width: 2, color: Colors.PURPLE });
       bg.roundRect(2, 2, width - 4, height - 4, 6)
-        .stroke({ width: 1, color: hexToPixi(Colors.PURPLE_VIVID), alpha: 0.6 });
+        .stroke({ width: 1, color: Colors.PURPLE_VIVID, alpha: 0.6 });
       button.scale.set(1.0);
     });
     

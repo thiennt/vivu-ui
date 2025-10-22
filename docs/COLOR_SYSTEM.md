@@ -37,23 +37,23 @@ Examples:
 
 ### In TypeScript/PixiJS Files
 
-When using colors in PixiJS (which requires numeric color values), use the `hexToPixi()` helper function:
+PixiJS can directly accept hex color strings, so you can use Colors constants directly:
 
 ```typescript
-import { Colors, hexToPixi } from '@/utils/colors';
+import { Colors } from '@/utils/colors';
 
 // Create a graphics object with a colored fill
 const graphics = new Graphics();
 graphics
   .roundRect(0, 0, 100, 100, 5)
-  .fill({ color: hexToPixi(Colors.PARCHMENT_LIGHT), alpha: 0.95 })
-  .stroke({ width: 2, color: hexToPixi(Colors.GOLD) });
+  .fill({ color: Colors.PARCHMENT_LIGHT, alpha: 0.95 })
+  .stroke({ width: 2, color: Colors.GOLD });
 
 // Set text color
 const text = new Text({
   text: 'Hello World',
   style: {
-    fill: hexToPixi(Colors.TEXT_PRIMARY)
+    fill: Colors.TEXT_PRIMARY
   }
 });
 ```
@@ -147,30 +147,27 @@ import { Colors, hexToPixi } from '@/utils/colors';
 waterGraphics.fill({ color: hexToPixi(Colors.WATER_EFFECT) });
 ```
 
-## Helper Functions
+## Color Format
 
-### hexToPixi(hexColor: string): number
-
-Converts a hex color string (`#RRGGBB`) to a PixiJS number format (`0xRRGGBB`).
-
-**Note**: For colors with alpha/transparency (e.g., `rgba()`), this function returns `0x000000` (black) since PixiJS handles alpha separately in most APIs.
+Colors are defined as hex strings (`#RRGGBB`) which work directly in both CSS and PixiJS v8+. PixiJS can accept string colors natively, so no conversion is needed.
 
 ```typescript
-// Good
-.fill({ color: hexToPixi(Colors.GOLD), alpha: 0.8 })
+// Good - Direct usage
+.fill({ color: Colors.GOLD, alpha: 0.8 })
 
-// Avoid
+// Avoid - Hardcoded colors
 .fill({ color: 0xD4AF37, alpha: 0.8 })  // Hardcoded color
+.fill({ color: '#D4AF37', alpha: 0.8 })  // Hardcoded color
 ```
 
 ## Migration Guide
 
 If you're updating old code with hardcoded colors:
 
-1. Find the hardcoded color value (e.g., `0xD4AF37`)
+1. Find the hardcoded color value (e.g., `0xD4AF37` or `#D4AF37`)
 2. Look up the corresponding Colors constant in `colors.ts`
-3. Import `Colors` and `hexToPixi` if not already imported
-4. Replace with `hexToPixi(Colors.CONSTANT_NAME)`
+3. Import `Colors` if not already imported
+4. Replace with `Colors.CONSTANT_NAME`
 
 Example:
 ```typescript
@@ -178,7 +175,7 @@ Example:
 .fill({ color: 0xD4AF37, alpha: 0.95 })
 
 // After
-.fill({ color: hexToPixi(Colors.GOLD), alpha: 0.95 })
+.fill({ color: Colors.GOLD, alpha: 0.95 })
 ```
 
 ## Theme Information

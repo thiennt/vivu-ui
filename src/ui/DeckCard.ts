@@ -1,5 +1,5 @@
 import { Container, Graphics, Text } from 'pixi.js';
-import { Colors, hexToPixi } from '@/utils/colors';
+import { Colors } from '@/utils/colors';
 import { Card, CardType } from '@/types';
 import { gsap } from 'gsap';
 import { DropShadowFilter } from 'pixi-filters';
@@ -38,23 +38,23 @@ export class DeckCard extends Container {
     
     // Multi-layer shadow for depth (Slay the Spire style)
     this.bg.roundRect(2.5, 2.5, width, height, 5)
-      .fill({ color: hexToPixi(Colors.BLACK), alpha: 0.4 });
+      .fill({ color: Colors.BLACK, alpha: 0.4 });
     
     this.bg.roundRect(1.5, 1.5, width, height, 5)
-      .fill({ color: hexToPixi(Colors.BLACK), alpha: 0.2 });
+      .fill({ color: Colors.BLACK, alpha: 0.2 });
     
     // Main card background - aged parchment
     this.bg.roundRect(0, 0, width, height, 5)
-      .fill({ color: hexToPixi(Colors.PARCHMENT_LIGHT), alpha: 0.98 })  // Parchment color
-      .stroke({ width: 2, color: hexToPixi(Colors.GOLD) });   // Golden border
+      .fill({ color: Colors.PARCHMENT_LIGHT, alpha: 0.98 })  // Parchment color
+      .stroke({ width: 2, color: Colors.GOLD });   // Golden border
     
     // Inner darker parchment layer for depth
     this.bg.roundRect(2, 2, width - 4, height - 4, 4)
-      .fill({ color: hexToPixi(Colors.PARCHMENT), alpha: 0.6 });
+      .fill({ color: Colors.PARCHMENT, alpha: 0.6 });
     
     // Inner golden highlight
     this.bg.roundRect(3, 3, width - 6, height - 6, 3)
-      .stroke({ width: 0.8, color: hexToPixi(Colors.GOLD_BRIGHT), alpha: 0.5 });
+      .stroke({ width: 0.8, color: Colors.GOLD_BRIGHT, alpha: 0.5 });
 
     // Avatar/Art frame in center with ornate border
     const frameMargin = 6;
@@ -64,16 +64,16 @@ export class DeckCard extends Container {
     
     // Dark inner frame for avatar/art with golden border
     this.bg.roundRect(frameMargin, frameY, frameWidth, frameHeight, 3)
-      .fill({ color: hexToPixi(Colors.BROWN_DARK), alpha: 0.95 })
-      .stroke({ width: 1.5, color: hexToPixi(Colors.GOLD), alpha: 0.9 });
+      .fill({ color: Colors.BROWN_DARK, alpha: 0.95 })
+      .stroke({ width: 1.5, color: Colors.GOLD, alpha: 0.9 });
     
     // Inner bevel effect
     this.bg.roundRect(frameMargin + 1, frameY + 1, frameWidth - 2, frameHeight - 2, 2)
-      .stroke({ width: 0.8, color: hexToPixi(Colors.BROWN), alpha: 0.5 });
+      .stroke({ width: 0.8, color: Colors.BROWN, alpha: 0.5 });
     
     // Fantasy corner decorations with golden accents
     const cornerSize = 4;
-    const cornerColor = hexToPixi(Colors.GOLD_BRIGHT);
+    const cornerColor = Colors.GOLD_BRIGHT;
     
     // Top-left corner
     this.bg.moveTo(frameMargin, frameY + cornerSize)
@@ -117,7 +117,7 @@ export class DeckCard extends Container {
     // Hover overlay (initially hidden) - subtle golden tint
     this.hoverOverlay = new Graphics();
     this.hoverOverlay.roundRect(0, 0, width, height, 5)
-      .fill({ color: hexToPixi(Colors.GOLD_BRIGHT), alpha: 0 });
+      .fill({ color: Colors.GOLD_BRIGHT, alpha: 0 });
     this.addChild(this.hoverOverlay);
 
     // Energy cost gem - TOP LEFT - fantasy crystal style
@@ -128,21 +128,21 @@ export class DeckCard extends Container {
     
     const energyCostBg = new Graphics()
       .roundRect(energyX, energyY, energyBgWidth, energyBgHeight, 4)
-      .fill({ color: hexToPixi(Colors.BROWN_DARK), alpha: 0.95 })
-      .stroke({ width: 1.5, color: hexToPixi(Colors.GOLD), alpha: 0.95 });  // Golden border
+      .fill({ color: Colors.BROWN_DARK, alpha: 0.95 })
+      .stroke({ width: 1.5, color: Colors.GOLD, alpha: 0.95 });  // Golden border
     
     // Inner highlight for gem effect
     energyCostBg.roundRect(energyX + 1, energyY + 1, energyBgWidth - 2, energyBgHeight - 2, 3)
-      .stroke({ width: 0.6, color: hexToPixi(Colors.GOLD_BRIGHT), alpha: 0.6 });
+      .stroke({ width: 0.6, color: Colors.GOLD_BRIGHT, alpha: 0.6 });
     
     const energyIcon = new Text({
       text: '⚡',
       style: {
         fontFamily: 'Kalam',
         fontSize: Math.max(8, Math.round(14 * fontScale)),
-        fill: hexToPixi(Colors.ORANGE),
+        fill: Colors.ORANGE,
         dropShadow: {
-          color: hexToPixi(Colors.GOLD_BRIGHT),
+          color: Colors.GOLD_BRIGHT,
           blur: 2,
           angle: 0,
           distance: 0,
@@ -160,8 +160,8 @@ export class DeckCard extends Container {
         fontFamily: 'Kalam',
         fontSize: Math.max(12, Math.round(14 * fontScale)),
         fontWeight: 'bold',
-        fill: hexToPixi(Colors.WHITE),
-        stroke: { color: hexToPixi(Colors.BROWN_DARK), width: 1.5 }
+        fill: Colors.WHITE,
+        stroke: { color: Colors.BROWN_DARK, width: 1.5 }
       }
     });
     energyText.anchor.set(0.5);
@@ -170,35 +170,35 @@ export class DeckCard extends Container {
 
     // Group icon - TOP RIGHT with ornate frame
     let groupIcon = '';
-    let iconColor = hexToPixi(Colors.WHITE);
+    let iconColor = Colors.WHITE;
     
     switch (card.group) {
       case CardType.ATTACK:
         groupIcon = '⚔️';
-        iconColor = hexToPixi(Colors.RED);  // Red
+        iconColor = Colors.RED;  // Red
         break;
       // case CardType.HEAL:
       //   groupIcon = '✨';
-      //   iconColor = hexToPixi(Colors.GREEN_BRIGHT);  // Green
+      //   iconColor = Colors.GREEN_BRIGHT;  // Green
       //   break;
       // case CardType.DEBUFF:
       //   groupIcon = '🌀';
-      //   iconColor = hexToPixi(Colors.PURPLE_BRIGHT);  // Purple
+      //   iconColor = Colors.PURPLE_BRIGHT;  // Purple
       //   break;
       // case CardType.BUFF:
       //   groupIcon = '🔼';
-      //   iconColor = hexToPixi(Colors.BLUE_SKY);  // Blue
+      //   iconColor = Colors.BLUE_SKY;  // Blue
       //   break;
       default:
         groupIcon = '✨';
-        iconColor = hexToPixi(Colors.GREEN_BRIGHT);
+        iconColor = Colors.GREEN_BRIGHT;
     }
     
     const groupIconRadius = 10;
     const groupIconBg = new Graphics()
       .circle(width - 12, 16, groupIconRadius)
-      .fill({ color: hexToPixi(Colors.BROWN_DARK), alpha: 0.95 })
-      .stroke({ width: 1.5, color: hexToPixi(Colors.GOLD), alpha: 0.9 });
+      .fill({ color: Colors.BROWN_DARK, alpha: 0.95 })
+      .stroke({ width: 1.5, color: Colors.GOLD, alpha: 0.9 });
     
     // Inner magical glow ring
     groupIconBg.circle(width - 12, 16, groupIconRadius - 1.5)
@@ -210,9 +210,9 @@ export class DeckCard extends Container {
         fontFamily: 'Kalam',
         fontSize: Math.max(10, Math.round(12 * fontScale)),
         align: 'center',
-        fill: hexToPixi(Colors.WHITE),
+        fill: Colors.WHITE,
         dropShadow: {
-          color: hexToPixi(Colors.BLACK),
+          color: Colors.BLACK,
           blur: 1,
           angle: Math.PI / 4,
           distance: 1,
@@ -231,7 +231,7 @@ export class DeckCard extends Container {
         fontFamily: 'Kalam',
         fontSize: Math.max(28, Math.round(36 * fontScale)),
         align: 'center',
-        fill: hexToPixi(Colors.WHITE)
+        fill: Colors.WHITE
       }
     });
     avatarIcon.anchor.set(0.5);

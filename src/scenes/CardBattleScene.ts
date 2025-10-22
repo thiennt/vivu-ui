@@ -13,7 +13,7 @@ import {
 } from '@/types';
 import { battleApi, ApiError } from '@/services/api';
 import { gsap } from 'gsap';
-import { Colors, hexToPixi } from '@/utils/colors';
+import { Colors } from '@/utils/colors';
 import { navigation } from '@/utils/navigation';
 import { HomeScene } from './HomeScene';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
@@ -780,7 +780,7 @@ export class CardBattleScene extends BaseScene {
     // Dark fantasy overlay
     const overlay = new Graphics();
     overlay.rect(0, 0, this.gameWidth, this.gameHeight)
-      .fill({ color: hexToPixi(Colors.BLACK), alpha: 0.9 });
+      .fill({ color: Colors.BLACK, alpha: 0.9 });
 
     // Victory/Defeat banner dimensions
     const bannerWidth = Math.min(400, this.gameWidth - 60);
@@ -793,19 +793,19 @@ export class CardBattleScene extends BaseScene {
     
     // Shadow
     resultBg.roundRect(bannerX + 5, bannerY + 5, bannerWidth, bannerHeight, 15)
-      .fill({ color: hexToPixi(Colors.BLACK), alpha: 0.7 });
+      .fill({ color: Colors.BLACK, alpha: 0.7 });
     
     const isVictory = this.battleState.winner_team === 1;
     
     // Main panel with victory/defeat colors
-    const panelColor = isVictory ? hexToPixi(Colors.GOLD_BRIGHT) : hexToPixi(Colors.BROWN);
+    const panelColor = isVictory ? Colors.GOLD_BRIGHT : Colors.BROWN;
     resultBg.roundRect(bannerX, bannerY, bannerWidth, bannerHeight, 15)
-      .fill({ color: hexToPixi(Colors.PARCHMENT_LIGHT), alpha: 0.98 })
+      .fill({ color: Colors.PARCHMENT_LIGHT, alpha: 0.98 })
       .stroke({ width: 4, color: panelColor });
     
     // Inner layer
     resultBg.roundRect(bannerX + 5, bannerY + 5, bannerWidth - 10, bannerHeight - 10, 12)
-      .fill({ color: hexToPixi(Colors.PARCHMENT), alpha: 0.6 });
+      .fill({ color: Colors.PARCHMENT, alpha: 0.6 });
     
     // Golden/brown highlight
     resultBg.roundRect(bannerX + 8, bannerY + 8, bannerWidth - 16, bannerHeight - 16, 10)
@@ -820,7 +820,7 @@ export class CardBattleScene extends BaseScene {
       style: {
         fontFamily: 'Kalam',
         fontSize: 64,
-        fill: hexToPixi(Colors.WHITE)
+        fill: Colors.WHITE
       }
     });
     iconText.anchor.set(0.5);
@@ -834,10 +834,10 @@ export class CardBattleScene extends BaseScene {
         fontFamily: 'Kalam',
         fontSize: 42,
         fontWeight: 'bold',
-        fill: isVictory ? hexToPixi(Colors.GREEN_DARK) : hexToPixi(Colors.RED_DARKEST),
-        stroke: { color: isVictory ? hexToPixi(Colors.GOLD_BRIGHT) : hexToPixi(Colors.BROWN_DARK), width: 3 },
+        fill: isVictory ? Colors.GREEN_DARK : Colors.RED_DARKEST,
+        stroke: { color: isVictory ? Colors.GOLD_BRIGHT : Colors.BROWN_DARK, width: 3 },
         dropShadow: {
-          color: isVictory ? hexToPixi(Colors.GOLD_BRIGHT) : hexToPixi(Colors.BLACK),
+          color: isVictory ? Colors.GOLD_BRIGHT : Colors.BLACK,
           blur: 5,
           angle: Math.PI / 4,
           distance: 3,
@@ -856,7 +856,7 @@ export class CardBattleScene extends BaseScene {
       style: {
         fontFamily: 'Kalam',
         fontSize: 16,
-        fill: hexToPixi(Colors.BROWN_WOOD),
+        fill: Colors.BROWN_WOOD,
         align: 'center'
       }
     });
@@ -871,12 +871,12 @@ export class CardBattleScene extends BaseScene {
     
     const backBg = new Graphics();
     backBg.roundRect(2, 2, buttonWidth, buttonHeight, 8)
-      .fill({ color: hexToPixi(Colors.BLACK), alpha: 0.4 });
+      .fill({ color: Colors.BLACK, alpha: 0.4 });
     backBg.roundRect(0, 0, buttonWidth, buttonHeight, 8)
-      .fill({ color: hexToPixi(Colors.BROWN), alpha: 0.95 })
-      .stroke({ width: 2, color: hexToPixi(Colors.GOLD) });
+      .fill({ color: Colors.BROWN, alpha: 0.95 })
+      .stroke({ width: 2, color: Colors.GOLD });
     backBg.roundRect(2, 2, buttonWidth - 4, buttonHeight - 4, 6)
-      .stroke({ width: 1, color: hexToPixi(Colors.GOLD_BRIGHT), alpha: 0.6 });
+      .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.6 });
 
     const backText = new Text({
       text: '← Back Home',
@@ -884,8 +884,8 @@ export class CardBattleScene extends BaseScene {
         fontFamily: 'Kalam',
         fontSize: 16,
         fontWeight: 'bold',
-        fill: hexToPixi(Colors.WHITE),
-        stroke: { color: hexToPixi(Colors.BROWN_DARK), width: 2 },
+        fill: Colors.WHITE,
+        stroke: { color: Colors.BROWN_DARK, width: 2 },
         align: 'center'
       }
     });
@@ -903,24 +903,24 @@ export class CardBattleScene extends BaseScene {
     backButton.on('pointerover', () => {
       backBg.clear();
       backBg.roundRect(2, 2, buttonWidth, buttonHeight, 8)
-        .fill({ color: hexToPixi(Colors.BLACK), alpha: 0.4 });
+        .fill({ color: Colors.BLACK, alpha: 0.4 });
       backBg.roundRect(0, 0, buttonWidth, buttonHeight, 8)
-        .fill({ color: hexToPixi(Colors.BROWN_LIGHT), alpha: 0.95 })
-        .stroke({ width: 2, color: hexToPixi(Colors.GOLD_BRIGHT) });
+        .fill({ color: Colors.BROWN_LIGHT, alpha: 0.95 })
+        .stroke({ width: 2, color: Colors.GOLD_BRIGHT });
       backBg.roundRect(2, 2, buttonWidth - 4, buttonHeight - 4, 6)
-        .stroke({ width: 1, color: hexToPixi(Colors.GOLD_BRIGHT), alpha: 0.9 });
+        .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.9 });
       backButton.scale.set(1.03);
     });
     
     backButton.on('pointerout', () => {
       backBg.clear();
       backBg.roundRect(2, 2, buttonWidth, buttonHeight, 8)
-        .fill({ color: hexToPixi(Colors.BLACK), alpha: 0.4 });
+        .fill({ color: Colors.BLACK, alpha: 0.4 });
       backBg.roundRect(0, 0, buttonWidth, buttonHeight, 8)
-        .fill({ color: hexToPixi(Colors.BROWN), alpha: 0.95 })
-        .stroke({ width: 2, color: hexToPixi(Colors.GOLD) });
+        .fill({ color: Colors.BROWN, alpha: 0.95 })
+        .stroke({ width: 2, color: Colors.GOLD });
       backBg.roundRect(2, 2, buttonWidth - 4, buttonHeight - 4, 6)
-        .stroke({ width: 1, color: hexToPixi(Colors.GOLD_BRIGHT), alpha: 0.6 });
+        .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.6 });
       backButton.scale.set(1.0);
     });
     
@@ -932,7 +932,7 @@ export class CardBattleScene extends BaseScene {
     this.addChild(resultContainer);
   }
 
-  private drawResultCorners(graphics: Graphics, x: number, y: number, width: number, height: number, color: number): void {
+  private drawResultCorners(graphics: Graphics, x: number, y: number, width: number, height: number, color: string): void {
     const cornerSize = 15;
     
     // Top-left

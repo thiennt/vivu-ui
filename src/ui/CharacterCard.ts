@@ -1,5 +1,5 @@
 import { Container, Graphics, Text, Sprite, Assets, Rectangle } from 'pixi.js';
-import { Colors, hexToPixi } from '@/utils/colors';
+import { Colors } from '@/utils/colors';
 import { gsap } from 'gsap';
 import { DropShadowFilter } from 'pixi-filters';
 
@@ -69,18 +69,18 @@ export class CharacterCard extends Container {
     // Shadow
     const shadow = new Graphics();
     shadow.roundRect(4, 4, width, height, 10)
-      .fill({ color: hexToPixi(Colors.BLACK), alpha: 0.4 });
+      .fill({ color: Colors.BLACK, alpha: 0.4 });
     this.cardContainer.addChild(shadow);
 
     // Main background
     const bg = new Graphics();
     bg.roundRect(0, 0, width, height, 10)
-      .fill({ color: hexToPixi(Colors.BLUE_NAVY_DARK), alpha: 0.98 })
-      .stroke({ width: 2.5, color: hexToPixi(Colors.BLUE_STEEL_DARK) });
+      .fill({ color: Colors.BLUE_NAVY_DARK, alpha: 0.98 })
+      .stroke({ width: 2.5, color: Colors.BLUE_STEEL_DARK });
     
     // Inner layer
     bg.roundRect(3, 3, width - 6, height - 6, 8)
-      .fill({ color: hexToPixi(Colors.BLUE_NAVY), alpha: 0.6 });
+      .fill({ color: Colors.BLUE_NAVY, alpha: 0.6 });
     
     this.cardContainer.addChild(bg);
 
@@ -88,22 +88,22 @@ export class CharacterCard extends Container {
     this.stateOverlay = new Graphics();
     if (this.isDead) {
       this.stateOverlay.roundRect(0, 0, width, height, 10)
-        .fill({ color: hexToPixi(Colors.BLACK), alpha: 0.7 });
+        .fill({ color: Colors.BLACK, alpha: 0.7 });
     } else if (this.hasActed) {
       this.stateOverlay.roundRect(0, 0, width, height, 10)
-        .fill({ color: hexToPixi(Colors.BLACK), alpha: 0.4 });
+        .fill({ color: Colors.BLACK, alpha: 0.4 });
     }
     this.cardContainer.addChild(this.stateOverlay);
 
     // Hover effects
     this.glowEffect = new Graphics();
     this.glowEffect.roundRect(0, 0, width, height, 10)
-      .stroke({ width: 3, color: hexToPixi(Colors.BLUE_STEEL), alpha: 0 });
+      .stroke({ width: 3, color: Colors.BLUE_STEEL, alpha: 0 });
     this.cardContainer.addChild(this.glowEffect);
 
     this.hoverOverlay = new Graphics();
     this.hoverOverlay.roundRect(0, 0, width, height, 10)
-      .fill({ color: hexToPixi(Colors.WHITE), alpha: 0 });
+      .fill({ color: Colors.WHITE, alpha: 0 });
     this.cardContainer.addChild(this.hoverOverlay);
   }
 
@@ -142,19 +142,19 @@ export class CharacterCard extends Container {
     const container = new Container();
 
     const effectType = effect.type || 'buff';
-    let borderColor = hexToPixi(Colors.GREEN_BRIGHT);
+    let borderColor = Colors.GREEN_BRIGHT;
     
     if (effectType.includes('debuff') || effectType.includes('damage')) {
-      borderColor = hexToPixi(Colors.RED);
+      borderColor = Colors.RED;
     } else if (effectType.includes('heal') || effectType.includes('shield')) {
-      borderColor = hexToPixi(Colors.BLUE_SKY);
+      borderColor = Colors.BLUE_SKY;
     }
 
     // Background
     const bg = new Graphics();
     bg.circle(size / 2, size / 2, size / 2)
-      .fill({ color: hexToPixi(Colors.BLUE_NAVY_DARK), alpha: 0.95 })
-      .stroke({ width: 1.5, color: hexToPixi(Colors.BLUE_STEEL_DARK) });
+      .fill({ color: Colors.BLUE_NAVY_DARK, alpha: 0.95 })
+      .stroke({ width: 1.5, color: Colors.BLUE_STEEL_DARK });
     
     bg.circle(size / 2, size / 2, size / 2 - 1.5)
       .stroke({ width: 1, color: borderColor, alpha: 0.8 });
@@ -167,7 +167,7 @@ export class CharacterCard extends Container {
       text: iconText,
       style: {
         fontSize: size * 0.6,
-        fill: hexToPixi(Colors.WHITE)
+        fill: Colors.WHITE
       }
     });
     icon.anchor.set(0.5);
@@ -179,7 +179,7 @@ export class CharacterCard extends Container {
     if (effect.duration || effect.stacks) {
       const countBg = new Graphics();
       countBg.circle(size - 3, size - 3, 4.5)
-        .fill({ color: hexToPixi(Colors.BLUE_NAVY_DARK), alpha: 0.95 })
+        .fill({ color: Colors.BLUE_NAVY_DARK, alpha: 0.95 })
         .stroke({ width: 1, color: borderColor });
 
       const countText = new Text({
@@ -188,7 +188,7 @@ export class CharacterCard extends Container {
           fontFamily: 'Kalam',
           fontSize: 7,
           fontWeight: 'bold',
-          fill: hexToPixi(Colors.WHITE)
+          fill: Colors.WHITE
         }
       });
       countText.anchor.set(0.5);
@@ -239,12 +239,12 @@ export class CharacterCard extends Container {
     // Portrait frame
     const frame = new Graphics();
     frame.roundRect(frameInset, frameTop, frameWidth, frameHeight, 8)
-      .fill({ color: hexToPixi(Colors.BLUE_NAVY_DARKER), alpha: 0.95 })
-      .stroke({ width: 2, color: hexToPixi(Colors.BLUE_STEEL_DARK) });
+      .fill({ color: Colors.BLUE_NAVY_DARKER, alpha: 0.95 })
+      .stroke({ width: 2, color: Colors.BLUE_STEEL_DARK });
     
     // Inner highlight
     frame.roundRect(frameInset + 2, frameTop + 2, frameWidth - 4, frameHeight - 4, 6)
-      .stroke({ width: 1, color: hexToPixi(Colors.BLUE_STEEL), alpha: 0.4 });
+      .stroke({ width: 1, color: Colors.BLUE_STEEL, alpha: 0.4 });
     
     this.cardContainer.addChild(frame);
 
@@ -277,8 +277,8 @@ export class CharacterCard extends Container {
         fontFamily: 'Kalam',
         fontSize: 13,
         fontWeight: 'bold',
-        fill: hexToPixi(Colors.WHITE),
-        stroke: { color: hexToPixi(Colors.BLUE_NAVY_DARKER), width: 2.5 },
+        fill: Colors.WHITE,
+        stroke: { color: Colors.BLUE_NAVY_DARKER, width: 2.5 },
         align: 'center'
       }
     });
@@ -297,29 +297,29 @@ export class CharacterCard extends Container {
     const { cardWidth: width } = this;
     
     if (this.isDead) {
-      const badge = this.createStatusBadge('💀', hexToPixi(Colors.RED));
+      const badge = this.createStatusBadge('💀', Colors.RED);
       badge.x = width / 2;
       badge.y = 40; // Center of avatar (10 + 90/2)
       this.cardContainer.addChild(badge);
     } else if (this.hasActed) {
-      const badge = this.createStatusBadge('✓', hexToPixi(Colors.ORANGE));
+      const badge = this.createStatusBadge('✓', Colors.ORANGE);
       badge.x = width / 2;
       badge.y = 40; // Center of avatar
       this.cardContainer.addChild(badge);
     }
   }
 
-  private createStatusBadge(icon: string, color: number): Container {
+  private createStatusBadge(icon: string, color: string): Container {
     const badge = new Container();
     const size = 36;
 
     const bg = new Graphics();
     bg.circle(0, 0, size / 2)
-      .fill({ color: hexToPixi(Colors.BLUE_NAVY_DARK), alpha: 0.95 })
+      .fill({ color: Colors.BLUE_NAVY_DARK, alpha: 0.95 })
       .stroke({ width: 2.5, color: color });
     
     bg.circle(0, 0, size / 2 - 2)
-      .stroke({ width: 1, color: hexToPixi(Colors.BLUE_STEEL_LIGHT), alpha: 0.4 });
+      .stroke({ width: 1, color: Colors.BLUE_STEEL_LIGHT, alpha: 0.4 });
     
     badge.addChild(bg);
 
@@ -329,7 +329,7 @@ export class CharacterCard extends Container {
         fontFamily: 'Kalam',
         fontSize: 22,
         fontWeight: 'bold',
-        fill: hexToPixi(Colors.WHITE)
+        fill: Colors.WHITE
       }
     });
     iconText.anchor.set(0.5);
@@ -349,19 +349,19 @@ export class CharacterCard extends Container {
     
     const hpBarBg = new Graphics();
     hpBarBg.roundRect(barX, hpBarY, barWidth, hpBarHeight, 6)
-      .fill({ color: hexToPixi(Colors.BLUE_NAVY_DARKER), alpha: 0.95 })
-      .stroke({ width: 1.5, color: hexToPixi(Colors.BLUE_STEEL_DARK) });
+      .fill({ color: Colors.BLUE_NAVY_DARKER, alpha: 0.95 })
+      .stroke({ width: 1.5, color: Colors.BLUE_STEEL_DARK });
     
     hpBarBg.roundRect(barX + 1, hpBarY + 1, barWidth - 2, hpBarHeight - 2, 5)
-      .stroke({ width: 0.8, color: hexToPixi(Colors.BLUE_STEEL), alpha: 0.4 });
+      .stroke({ width: 0.8, color: Colors.BLUE_STEEL, alpha: 0.4 });
     
     this.cardContainer.addChild(hpBarBg);
 
     // HP Fill
     const hpPercent = Math.max(0, Math.min(1, this.character.hp / this.character.max_hp));
-    let hpColor = hexToPixi(Colors.GREEN_BRIGHT);
-    if (hpPercent <= 0.25) hpColor = hexToPixi(Colors.RED);
-    else if (hpPercent <= 0.5) hpColor = hexToPixi(Colors.ORANGE);
+    let hpColor = Colors.GREEN_BRIGHT;
+    if (hpPercent <= 0.25) hpColor = Colors.RED;
+    else if (hpPercent <= 0.5) hpColor = Colors.ORANGE;
 
     if (hpPercent > 0) {
       const hpFill = new Graphics();
@@ -377,8 +377,8 @@ export class CharacterCard extends Container {
         fontFamily: 'Kalam',
         fontSize: 10,
         fontWeight: 'bold',
-        fill: this.isDead ? hexToPixi(Colors.RED) : hexToPixi(Colors.WHITE),
-        stroke: { color: hexToPixi(Colors.BLUE_NAVY_DARKER), width: 2 }
+        fill: this.isDead ? Colors.RED : Colors.WHITE,
+        stroke: { color: Colors.BLUE_NAVY_DARKER, width: 2 }
       }
     });
     hpText.anchor.set(0.5);
@@ -392,11 +392,11 @@ export class CharacterCard extends Container {
 
     const energyBarBg = new Graphics();
     energyBarBg.roundRect(barX, energyBarY, barWidth, energyBarHeight, 4)
-      .fill({ color: hexToPixi(Colors.BLUE_NAVY_DARKER), alpha: 0.95 })
-      .stroke({ width: 1.5, color: hexToPixi(Colors.BLUE_STEEL_DARK) });
+      .fill({ color: Colors.BLUE_NAVY_DARKER, alpha: 0.95 })
+      .stroke({ width: 1.5, color: Colors.BLUE_STEEL_DARK });
     
     energyBarBg.roundRect(barX + 1, energyBarY + 1, barWidth - 2, energyBarHeight - 2, 3)
-      .stroke({ width: 0.8, color: hexToPixi(Colors.BLUE_STEEL), alpha: 0.4 });
+      .stroke({ width: 0.8, color: Colors.BLUE_STEEL, alpha: 0.4 });
     
     this.cardContainer.addChild(energyBarBg);
 
@@ -407,7 +407,7 @@ export class CharacterCard extends Container {
 
     const energyFill = new Graphics();
     energyFill.roundRect(barX + 2, energyBarY + 2, (barWidth - 4) * energyPercent, energyBarHeight - 4, 3)
-      .fill({ color: hexToPixi(Colors.BLUE_STEEL_LIGHTER), alpha: this.isDead ? 0.3 : 0.9 });
+      .fill({ color: Colors.BLUE_STEEL_LIGHTER, alpha: this.isDead ? 0.3 : 0.9 });
     this.cardContainer.addChild(energyFill);
   }
 
@@ -434,7 +434,7 @@ export class CharacterCard extends Container {
         offset: { x: 0, y: 0 },
         blur: 6,
         alpha: 0.6,
-        color: hexToPixi(Colors.BLUE_STEEL)
+        color: Colors.BLUE_STEEL
       });
       avatarSprite.filters = [dropShadow];
 
@@ -467,7 +467,7 @@ export class CharacterCard extends Container {
       text: avatarIcon,
       style: {
         fontSize: 38,
-        fill: hexToPixi(Colors.WHITE)
+        fill: Colors.WHITE
       }
     });
     avatar.anchor.set(0.5);
@@ -478,7 +478,7 @@ export class CharacterCard extends Container {
       offset: { x: 0, y: 0 },
       blur: 6,
       alpha: 0.6,
-      color: hexToPixi(Colors.BLUE_STEEL)
+      color: Colors.BLUE_STEEL
     });
     avatar.filters = [dropShadow];
 

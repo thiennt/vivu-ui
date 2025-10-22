@@ -1,5 +1,5 @@
 import { Container, Graphics, Text } from 'pixi.js';
-import { Colors, hexToPixi } from '@/utils/colors';
+import { Colors } from '@/utils/colors';
 
 export class BottomNavigationMenu extends Container {
   private menuHeight = 60;
@@ -19,16 +19,16 @@ export class BottomNavigationMenu extends Container {
     
     // Shadow at top
     menuBg.rect(0, 0, this.gameWidth, 2)
-      .fill({ color: hexToPixi(Colors.BLACK), alpha: 0.5 });
+      .fill({ color: Colors.BLACK, alpha: 0.5 });
     
     // Main wooden bar
     menuBg.rect(0, 0, this.gameWidth, this.menuHeight)
-      .fill({ color: hexToPixi(Colors.BROWN_DARK_WOOD), alpha: 0.98 })
-      .stroke({ width: 2, color: hexToPixi(Colors.GOLD_BRONZE), alpha: 0.9 });
+      .fill({ color: Colors.BROWN_DARK_WOOD, alpha: 0.98 })
+      .stroke({ width: 2, color: Colors.GOLD_BRONZE, alpha: 0.9 });
     
     // Top golden border
     menuBg.rect(0, 0, this.gameWidth, 3)
-      .fill({ color: hexToPixi(Colors.GOLD), alpha: 0.7 });
+      .fill({ color: Colors.GOLD, alpha: 0.7 });
 
     this.addChild(menuBg);
 
@@ -108,7 +108,7 @@ export class BottomNavigationMenu extends Container {
     // Item background (for hover effect)
     const itemBg = new Graphics();
     itemBg.rect(0, 0, width, height)
-      .fill({ color: hexToPixi(Colors.BLACK), alpha: 0 });
+      .fill({ color: Colors.BLACK, alpha: 0 });
 
     // Icon with glow
     const iconText = new Text({
@@ -118,7 +118,7 @@ export class BottomNavigationMenu extends Container {
         fontSize: 26,
         align: 'center',
         dropShadow: {
-          color: hexToPixi(Colors.GOLD_BRIGHT),
+          color: Colors.GOLD_BRIGHT,
           blur: 3,
           angle: 0,
           distance: 0,
@@ -136,9 +136,9 @@ export class BottomNavigationMenu extends Container {
       style: {
         fontFamily: 'Kalam',
         fontSize: 10,
-        fill: hexToPixi(Colors.PARCHMENT_LIGHTEST),
+        fill: Colors.PARCHMENT_LIGHTEST,
         align: 'center',
-        stroke: { color: hexToPixi(Colors.BROWN_DARK), width: 1 }
+        stroke: { color: Colors.BROWN_DARK, width: 1 }
       }
     });
     labelText.anchor.set(0.5);
@@ -155,14 +155,14 @@ export class BottomNavigationMenu extends Container {
     item.on('pointerover', () => {
       itemBg.clear();
       itemBg.rect(0, 0, width, height)
-        .fill({ color: hexToPixi(Colors.GOLD_BRIGHT), alpha: 0.2 });
+        .fill({ color: Colors.GOLD_BRIGHT, alpha: 0.2 });
       iconText.scale.set(1.1);
     });
 
     item.on('pointerout', () => {
       itemBg.clear();
       itemBg.rect(0, 0, width, height)
-        .fill({ color: hexToPixi(Colors.BLACK), alpha: 0 });
+        .fill({ color: Colors.BLACK, alpha: 0 });
       iconText.scale.set(1.0);
     });
 

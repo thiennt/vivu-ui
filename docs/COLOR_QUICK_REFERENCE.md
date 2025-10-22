@@ -104,17 +104,17 @@ Colors.ELEMENT_DARK            // #2F4F4F - Dark forest
 
 ### Basic Usage
 ```typescript
-import { Colors, hexToPixi } from '@/utils/colors';
+import { Colors } from '@/utils/colors';
 
 // Graphics
-graphics.fill({ color: hexToPixi(Colors.PARCHMENT_LIGHT), alpha: 0.95 });
-graphics.stroke({ width: 2, color: hexToPixi(Colors.GOLD) });
+graphics.fill({ color: Colors.PARCHMENT_LIGHT), alpha: 0.95 });
+graphics.stroke({ width: 2, color: Colors.GOLD) });
 
 // Text
 const text = new Text({
   text: 'Hello',
   style: {
-    fill: hexToPixi(Colors.TEXT_PRIMARY),
+    fill: Colors.TEXT_PRIMARY),
     fontSize: 16
   }
 });
@@ -146,7 +146,7 @@ function getRarityColor(rarity: string) {
 
 cardFrame.stroke({ 
   width: 2, 
-  color: hexToPixi(getRarityColor(card.rarity)) 
+  color: getRarityColor(card.rarity)) 
 });
 ```
 

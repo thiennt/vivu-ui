@@ -1,4 +1,4 @@
-import { Colors, hexToPixi } from '@/utils/colors';
+import { Colors } from '@/utils/colors';
 import { Container, Graphics, FederatedPointerEvent, Text } from "pixi.js";
 import { CardBattlePlayerState, Card } from "@/types";
 import { BaseScene } from "@/ui/BaseScene";
@@ -69,15 +69,15 @@ export class HandZone extends Container {
     
     // Dark wooden background with texture
     handBgGraphics.roundRect(0, handBgY, width, handBgHeight, 8)
-      .fill({ color: hexToPixi(Colors.BROWN_DARK), alpha: 0.5 });
+      .fill({ color: Colors.BROWN_DARK, alpha: 0.5 });
     
     // Inner wood grain texture
     handBgGraphics.roundRect(2, handBgY + 2, width - 4, handBgHeight - 4, 6)
-      .stroke({ width: 1, color: hexToPixi(Colors.BROWN), alpha: 0.4 });
+      .stroke({ width: 1, color: Colors.BROWN, alpha: 0.4 });
     
     // Subtle border
     handBgGraphics.roundRect(0, handBgY, width, handBgHeight, 8)
-      .stroke({ width: 2, color: hexToPixi(Colors.BROWN_COPPER), alpha: 0.6 });
+      .stroke({ width: 2, color: Colors.BROWN_COPPER, alpha: 0.6 });
     
     this.updateButton(width, height);
 
@@ -206,20 +206,20 @@ export class HandZone extends Container {
     
     // Shadow
     bg.roundRect(2, 2, width, height, 8)
-      .fill({ color: hexToPixi(Colors.BLACK), alpha: 0.5 });
+      .fill({ color: Colors.BLACK, alpha: 0.5 });
     
     // Main wooden button
     bg.roundRect(0, 0, width, height, 8)
-      .fill({ color: hexToPixi(Colors.BROWN), alpha: 0.98 })
-      .stroke({ width: 2, color: hexToPixi(Colors.GOLD) });
+      .fill({ color: Colors.BROWN, alpha: 0.98 })
+      .stroke({ width: 2, color: Colors.GOLD });
     
     // Inner wooden texture
     bg.roundRect(2, 2, width - 4, height - 4, 6)
-      .fill({ color: hexToPixi(Colors.BROWN_LIGHT), alpha: 0.3 });
+      .fill({ color: Colors.BROWN_LIGHT, alpha: 0.3 });
     
     // Golden highlight
     bg.roundRect(3, 3, width - 6, height - 6, 5)
-      .stroke({ width: 1, color: hexToPixi(Colors.GOLD_BRIGHT), alpha: 0.6 });
+      .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.6 });
     
     const buttonText = new Text({
       text,
@@ -227,8 +227,8 @@ export class HandZone extends Container {
         fontFamily: 'Kalam',
         fontSize: text.includes('END TURN') ? 16 : 14,
         fontWeight: 'bold',
-        fill: hexToPixi(Colors.WHITE),
-        stroke: { color: hexToPixi(Colors.BROWN_DARK), width: 2 },
+        fill: Colors.WHITE,
+        stroke: { color: Colors.BROWN_DARK, width: 2 },
         align: 'center'
       }
     });
@@ -247,28 +247,28 @@ export class HandZone extends Container {
     button.on('pointerover', () => {
       bg.clear();
       bg.roundRect(2, 2, width, height, 8)
-        .fill({ color: hexToPixi(Colors.BLACK), alpha: 0.5 });
+        .fill({ color: Colors.BLACK, alpha: 0.5 });
       bg.roundRect(0, 0, width, height, 8)
-        .fill({ color: hexToPixi(Colors.BROWN_LIGHT), alpha: 0.98 })
-        .stroke({ width: 2, color: hexToPixi(Colors.GOLD_BRIGHT) });
+        .fill({ color: Colors.BROWN_LIGHT, alpha: 0.98 })
+        .stroke({ width: 2, color: Colors.GOLD_BRIGHT });
       bg.roundRect(2, 2, width - 4, height - 4, 6)
-        .fill({ color: hexToPixi(Colors.BROWN_LIGHTEST), alpha: 0.4 });
+        .fill({ color: Colors.BROWN_LIGHTEST, alpha: 0.4 });
       bg.roundRect(3, 3, width - 6, height - 6, 5)
-        .stroke({ width: 1, color: hexToPixi(Colors.GOLD_BRIGHT), alpha: 0.9 });
+        .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.9 });
       button.scale.set(1.03);
     });
     
     button.on('pointerout', () => {
       bg.clear();
       bg.roundRect(2, 2, width, height, 8)
-        .fill({ color: hexToPixi(Colors.BLACK), alpha: 0.5 });
+        .fill({ color: Colors.BLACK, alpha: 0.5 });
       bg.roundRect(0, 0, width, height, 8)
-        .fill({ color: hexToPixi(Colors.BROWN), alpha: 0.98 })
-        .stroke({ width: 2, color: hexToPixi(Colors.GOLD) });
+        .fill({ color: Colors.BROWN, alpha: 0.98 })
+        .stroke({ width: 2, color: Colors.GOLD });
       bg.roundRect(2, 2, width - 4, height - 4, 6)
-        .fill({ color: hexToPixi(Colors.BROWN_LIGHT), alpha: 0.3 });
+        .fill({ color: Colors.BROWN_LIGHT, alpha: 0.3 });
       bg.roundRect(3, 3, width - 6, height - 6, 5)
-        .stroke({ width: 1, color: hexToPixi(Colors.GOLD_BRIGHT), alpha: 0.6 });
+        .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.6 });
       button.scale.set(1.0);
     });
     

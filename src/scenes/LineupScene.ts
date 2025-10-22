@@ -3,7 +3,7 @@ import { ScrollBox } from '@pixi/ui';
 import { BaseScene } from '@/ui/BaseScene';
 import { navigation } from '@/utils/navigation';
 import { HomeScene } from './HomeScene';
-import { Colors, hexToPixi } from '@/utils/colors';
+import { Colors } from '@/utils/colors';
 import { app } from '../app';
 import { playerApi } from '@/services/api';
 
@@ -109,16 +109,16 @@ export class LineupScene extends BaseScene {
     
     // Dark fantasy battlefield background
     bg.rect(0, 0, this.gameWidth, this.gameHeight)
-      .fill({ color: hexToPixi(Colors.BROWN_DARKEST), alpha: 1.0 });
+      .fill({ color: Colors.BROWN_DARKEST, alpha: 1.0 });
     
     // Battle texture overlay
     bg.rect(0, 0, this.gameWidth, this.gameHeight)
-      .fill({ color: hexToPixi(Colors.BROWN_DARK), alpha: 0.3 });
+      .fill({ color: Colors.BROWN_DARK, alpha: 0.3 });
 
     // Tactical grid with golden lines
     const gridSpacing = 40;
     const grid = new Graphics();
-    grid.stroke({ width: 1, color: hexToPixi(Colors.GOLD), alpha: 0.15 });
+    grid.stroke({ width: 1, color: Colors.GOLD, alpha: 0.15 });
 
     for (let x = 0; x <= this.gameWidth; x += gridSpacing) {
       grid.moveTo(x, 0);
@@ -147,8 +147,8 @@ export class LineupScene extends BaseScene {
       .lineTo(bannerX + bannerWidth, bannerY + bannerHeight / 2)
       .lineTo(bannerX + bannerWidth - 12, bannerY)
       .lineTo(bannerX + 12, bannerY)
-      .fill({ color: hexToPixi(Colors.BROWN), alpha: 0.95 })
-      .stroke({ width: 2.5, color: hexToPixi(Colors.GOLD) });
+      .fill({ color: Colors.BROWN, alpha: 0.95 })
+      .stroke({ width: 2.5, color: Colors.GOLD });
     
     banner.moveTo(bannerX + 15, bannerY + 3)
       .lineTo(bannerX + bannerWidth - 15, bannerY + 3)
@@ -157,7 +157,7 @@ export class LineupScene extends BaseScene {
       .lineTo(bannerX + 15, bannerY + bannerHeight - 3)
       .lineTo(bannerX + 4, bannerY + bannerHeight / 2)
       .lineTo(bannerX + 15, bannerY + 3)
-      .stroke({ width: 1, color: hexToPixi(Colors.GOLD_BRIGHT), alpha: 0.6 });
+      .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.6 });
 
     const title = new Text({
       text: '⚔️ Battle Lineup ⚔️',
@@ -165,10 +165,10 @@ export class LineupScene extends BaseScene {
         fontFamily: 'Kalam',
         fontSize: 24,
         fontWeight: 'bold',
-        fill: hexToPixi(Colors.WHITE),
-        stroke: { color: hexToPixi(Colors.BROWN_DARK), width: 2 },
+        fill: Colors.WHITE,
+        stroke: { color: Colors.BROWN_DARK, width: 2 },
         dropShadow: {
-          color: hexToPixi(Colors.GOLD_BRIGHT),
+          color: Colors.GOLD_BRIGHT,
           blur: 3,
           angle: Math.PI / 4,
           distance: 2,
@@ -185,7 +185,7 @@ export class LineupScene extends BaseScene {
       style: {
         fontFamily: 'Kalam',
         fontSize: 12,
-        fill: hexToPixi(Colors.GOLD),
+        fill: Colors.GOLD,
         align: 'center'
       }
     });
@@ -244,16 +244,16 @@ export class LineupScene extends BaseScene {
     
     // Shadow
     bg.roundRect(2, 2, width, height, 8)
-      .fill({ color: hexToPixi(Colors.BLACK), alpha: 0.4 });
+      .fill({ color: Colors.BLACK, alpha: 0.4 });
     
     // Main slot - parchment
     bg.roundRect(0, 0, width, height, 8)
-      .fill({ color: hexToPixi(Colors.PARCHMENT_LIGHT), alpha: 0.5 })
-      .stroke({ width: 2, color: hexToPixi(Colors.GOLD), alpha: 0.8 });
+      .fill({ color: Colors.PARCHMENT_LIGHT, alpha: 0.5 })
+      .stroke({ width: 2, color: Colors.GOLD, alpha: 0.8 });
     
     // Inner layer
     bg.roundRect(2, 2, width - 4, height - 4, 6)
-      .stroke({ width: 1, color: hexToPixi(Colors.GOLD_BRIGHT), alpha: 0.4 });
+      .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.4 });
 
     const positionText = new Text({
       text: `${positionIndex + 1}`,
@@ -261,8 +261,8 @@ export class LineupScene extends BaseScene {
         fontFamily: 'Kalam',
         fontSize: 28,
         fontWeight: 'bold',
-        fill: hexToPixi(Colors.BROWN),
-        stroke: { color: hexToPixi(Colors.GOLD_BRIGHT), width: 1 }
+        fill: Colors.BROWN,
+        stroke: { color: Colors.GOLD_BRIGHT, width: 1 }
       }
     });
     positionText.anchor.set(0.5);
@@ -314,20 +314,20 @@ export class LineupScene extends BaseScene {
     
     // Shadow
     poolBg.roundRect(3, 3, poolWidth, poolHeight, 12)
-      .fill({ color: hexToPixi(Colors.BLACK), alpha: 0.4 });
+      .fill({ color: Colors.BLACK, alpha: 0.4 });
     
     // Main parchment panel
     poolBg.roundRect(0, 0, poolWidth, poolHeight, 12)
-      .fill({ color: hexToPixi(Colors.PARCHMENT_LIGHT), alpha: 0.95 })
-      .stroke({ width: 2, color: hexToPixi(Colors.GOLD) });
+      .fill({ color: Colors.PARCHMENT_LIGHT, alpha: 0.95 })
+      .stroke({ width: 2, color: Colors.GOLD });
     
     // Inner layer
     poolBg.roundRect(3, 3, poolWidth - 6, poolHeight - 6, 10)
-      .fill({ color: hexToPixi(Colors.PARCHMENT), alpha: 0.6 });
+      .fill({ color: Colors.PARCHMENT, alpha: 0.6 });
     
     // Golden highlight
     poolBg.roundRect(5, 5, poolWidth - 10, poolHeight - 10, 9)
-      .stroke({ width: 1, color: hexToPixi(Colors.GOLD_BRIGHT), alpha: 0.5 });
+      .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.5 });
 
     // Title
     const poolTitle = new Text({
@@ -336,8 +336,8 @@ export class LineupScene extends BaseScene {
         fontFamily: 'Kalam',
         fontSize: 18,
         fontWeight: 'bold',
-        fill: hexToPixi(Colors.BROWN_DARK),
-        stroke: { color: hexToPixi(Colors.GOLD_BRIGHT), width: 0.5 }
+        fill: Colors.BROWN_DARK,
+        stroke: { color: Colors.GOLD_BRIGHT, width: 0.5 }
       }
     });
     poolTitle.x = padding + 5;
@@ -577,12 +577,12 @@ export class LineupScene extends BaseScene {
     
     const bg = new Graphics();
     bg.roundRect(2, 2, width, height, 8)
-      .fill({ color: hexToPixi(Colors.BLACK), alpha: 0.4 });
+      .fill({ color: Colors.BLACK, alpha: 0.4 });
     bg.roundRect(0, 0, width, height, 8)
-      .fill({ color: hexToPixi(Colors.BROWN), alpha: 0.95 })
-      .stroke({ width: 2, color: hexToPixi(Colors.GOLD) });
+      .fill({ color: Colors.BROWN, alpha: 0.95 })
+      .stroke({ width: 2, color: Colors.GOLD });
     bg.roundRect(2, 2, width - 4, height - 4, 6)
-      .stroke({ width: 1, color: hexToPixi(Colors.GOLD_BRIGHT), alpha: 0.6 });
+      .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.6 });
     
     const buttonText = new Text({
       text: text,
@@ -590,8 +590,8 @@ export class LineupScene extends BaseScene {
         fontFamily: 'Kalam',
         fontSize: 13,
         fontWeight: 'bold',
-        fill: hexToPixi(Colors.WHITE),
-        stroke: { color: hexToPixi(Colors.BROWN_DARK), width: 2 }
+        fill: Colors.WHITE,
+        stroke: { color: Colors.BROWN_DARK, width: 2 }
       }
     });
     buttonText.anchor.set(0.5);
@@ -607,24 +607,24 @@ export class LineupScene extends BaseScene {
     button.on('pointerover', () => {
       bg.clear();
       bg.roundRect(2, 2, width, height, 8)
-        .fill({ color: hexToPixi(Colors.BLACK), alpha: 0.4 });
+        .fill({ color: Colors.BLACK, alpha: 0.4 });
       bg.roundRect(0, 0, width, height, 8)
-        .fill({ color: hexToPixi(Colors.BROWN_LIGHT), alpha: 0.95 })
-        .stroke({ width: 2, color: hexToPixi(Colors.GOLD_BRIGHT) });
+        .fill({ color: Colors.BROWN_LIGHT, alpha: 0.95 })
+        .stroke({ width: 2, color: Colors.GOLD_BRIGHT });
       bg.roundRect(2, 2, width - 4, height - 4, 6)
-        .stroke({ width: 1, color: hexToPixi(Colors.GOLD_BRIGHT), alpha: 0.9 });
+        .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.9 });
       button.scale.set(1.02);
     });
     
     button.on('pointerout', () => {
       bg.clear();
       bg.roundRect(2, 2, width, height, 8)
-        .fill({ color: hexToPixi(Colors.BLACK), alpha: 0.4 });
+        .fill({ color: Colors.BLACK, alpha: 0.4 });
       bg.roundRect(0, 0, width, height, 8)
-        .fill({ color: hexToPixi(Colors.BROWN), alpha: 0.95 })
-        .stroke({ width: 2, color: hexToPixi(Colors.GOLD) });
+        .fill({ color: Colors.BROWN, alpha: 0.95 })
+        .stroke({ width: 2, color: Colors.GOLD });
       bg.roundRect(2, 2, width - 4, height - 4, 6)
-        .stroke({ width: 1, color: hexToPixi(Colors.GOLD_BRIGHT), alpha: 0.6 });
+        .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.6 });
       button.scale.set(1.0);
     });
     

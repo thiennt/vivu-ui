@@ -6,7 +6,7 @@
  * 1. BASE_COLORS: Core palette colors (single source of truth)
  * 2. Semantic aliases: Descriptive names that reference base colors
  * 
- * Note: Use hex format (#RRGGBB) for CSS, convert to 0xRRGGBB for PixiJS
+ * Note: Colors are defined in hex format (#RRGGBB) which works in both CSS and PixiJS
  */
 
 export const Colors = {
@@ -327,19 +327,3 @@ export const Colors = {
 
 // Type-safe color access
 export type ColorKey = keyof typeof Colors;
-
-/**
- * Convert hex color string (#RRGGBB) to PixiJS number format (0xRRGGBB)
- * @param hexColor - Hex color string (e.g., '#FF0000')
- * @returns PixiJS color number (e.g., 0xFF0000)
- */
-export function hexToPixi(hexColor: string): number {
-  // Handle rgba colors - extract just the hex part
-  if (hexColor.startsWith('rgba(')) {
-    return 0x000000; // Return black for rgba, as alpha needs separate handling
-  }
-  
-  // Remove the '#' if present and convert to number
-  const hex = hexColor.replace('#', '');
-  return parseInt(hex, 16);
-}
