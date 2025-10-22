@@ -362,12 +362,11 @@ export class LineupScene extends BaseScene {
 
       const characterCard = this.createPoolCharacterCard(character, x, y, cardWidth, cardHeight);
       content.addChild(characterCard);
+      scrollBox.addItem(content);
     });
 
     const totalRows = Math.ceil(this.availableCharacters.length / cardsPerRow);
     content.height = totalRows * (cardHeight + spacing);
-
-    scrollBox.addItem(content);
 
     this.poolContainer.addChild(poolBg, poolTitle, scrollBox);
 
@@ -558,6 +557,9 @@ export class LineupScene extends BaseScene {
           return available.shift() || null;
         });
         
+        // Remove any characters now in lineup from availableCharacters
+        const lineupIds = this.lineupPositions.filter(c => c).map(c => c.id);
+        this.availableCharacters = this.availableCharacters.filter(c => !lineupIds.includes(c.id));
         this.refreshLineup();
       }
     );
