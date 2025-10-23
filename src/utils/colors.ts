@@ -139,8 +139,8 @@ export const Colors = {
   // ============================================================================
 
   // Background colors - Ancient Forest theme
-  BACKGROUND_PRIMARY: '#1C3A33',     // = FOREST_DARK
-  BACKGROUND_SECONDARY: '#2A4C44',   // = FOREST_EMERALD
+  BACKGROUND_PRIMARY: '#1A0F0A',     // = FOREST_DARK
+  BACKGROUND_SECONDARY: '#2A1810',   // = FOREST_EMERALD
 
   // Text colors
   TEXT_PRIMARY: '#F0F4E8',           // = IVORY_SOFT

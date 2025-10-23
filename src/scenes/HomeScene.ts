@@ -348,7 +348,6 @@ export class HomeScene extends BaseScene {
     
     const buttons = [
       { text: '📅 Daily Check-In', screen: CheckinScene },
-      { text: '🗼 Tower (Card Battle)', screen: TowerScene },
       { text: '👥 Characters', screen: CharactersScene },
       { text: '🃏 Card Battle', screen: CardBattleScene },
       { text: '🧑‍🤝‍🧑 Lineup', screen: LineupScene },

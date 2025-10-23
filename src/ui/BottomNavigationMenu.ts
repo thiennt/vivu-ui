@@ -78,16 +78,16 @@ export class BottomNavigationMenu extends Container {
         });
         break;
       case 'dungeon':
-        import('@/scenes/DungeonScene').then(({ DungeonScene }) => {
+        import('@/scenes/TowerScene').then(({ TowerScene }) => {
           import('@/utils/navigation').then(({ navigation }) => {
-            navigation.showScreen(DungeonScene);
+            navigation.showScreen(TowerScene);
           });
         });
         break;
       case 'store':
-        import('@/scenes/CharactersScene').then(({ CharactersScene }) => {
+        import('@/scenes/HomeScene').then(({ HomeScene }) => {
           import('@/utils/navigation').then(({ navigation }) => {
-            navigation.showScreen(CharactersScene);
+            navigation.showScreen(HomeScene);
           });
         });
         break;
