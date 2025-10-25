@@ -7,6 +7,7 @@ import { BattleScene } from './BattleScene';
 import { CardBattleScene } from './CardBattleScene';
 import { TowerScene } from './TowerScene';
 import { CheckinScene } from './CheckinScene';
+import { RewardSpinScene } from './RewardSpinScene';
 import { Colors } from '@/utils/colors';
 import { playerApi, isLikelyUsingMockData } from '@/services/api';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
@@ -348,6 +349,7 @@ export class HomeScene extends BaseScene {
     
     const buttons = [
       { text: '📅 Daily Check-In', screen: CheckinScene },
+      { text: '🎡 Reward Spin', screen: RewardSpinScene },
       { text: '👥 Characters', screen: CharactersScene },
       { text: '🃏 Card Battle', screen: CardBattleScene },
       { text: '🧑‍🤝‍🧑 Lineup', screen: LineupScene },
