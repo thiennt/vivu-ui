@@ -170,7 +170,7 @@ export class DeckCard extends Container {
 
     // Group icon - TOP RIGHT with ornate frame
     let groupIcon = '';
-    let iconColor = Colors.WHITE;
+    let iconColor: string = Colors.WHITE;
     
     switch (card.group) {
       case CardType.ATTACK:
