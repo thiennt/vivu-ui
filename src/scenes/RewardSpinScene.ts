@@ -338,11 +338,20 @@ export class RewardSpinScene extends BaseScene {
       this.spinButton.alpha = 0.6;
     }
     
+    // Constants for spinning behavior
+    const MIN_ROTATIONS = 5;
+    const ROTATION_VARIANCE = 3;
+    
     // Random final rotation (multiple full rotations + random position)
-    const fullRotations = 5 + Math.random() * 3; // 5-8 full rotations
+    const fullRotations = MIN_ROTATIONS + Math.random() * ROTATION_VARIANCE; // 5-8 full rotations
     const randomSegment = Math.floor(Math.random() * this.segments.length);
     const segmentAngle = (Math.PI * 2) / this.segments.length;
-    const finalRotation = this.currentRotation + (fullRotations * Math.PI * 2) + (randomSegment * segmentAngle);
+    
+    // Calculate the target rotation so that the pointer (at top, -PI/2) lands on the chosen segment
+    // Segments are drawn starting at -PI/2 (top) going clockwise
+    // We want the randomSegment to be at the top (-PI/2) position after spinning
+    const targetSegmentAngle = randomSegment * segmentAngle;
+    const finalRotation = this.currentRotation + (fullRotations * Math.PI * 2) + targetSegmentAngle;
     
     // Animate wheel spinning with easing
     gsap.to(this.wheel, {
@@ -356,10 +365,9 @@ export class RewardSpinScene extends BaseScene {
         this.isSpinning = false;
         
         // Calculate which segment won (pointer is at top)
-        const normalizedRotation = (this.currentRotation % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2);
-        // Add PI/2 because wheel starts at -PI/2 and pointer is at top
-        const pointerAngle = (Math.PI / 2);
-        const winningIndex = Math.floor(((pointerAngle - normalizedRotation + Math.PI * 2) % (Math.PI * 2)) / segmentAngle) % this.segments.length;
+        // The wheel rotation determines which segment is at the top
+        const normalizedRotation = ((this.currentRotation % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+        const winningIndex = Math.floor(normalizedRotation / segmentAngle) % this.segments.length;
         const winningSegment = this.segments[winningIndex];
         
         // Show result
