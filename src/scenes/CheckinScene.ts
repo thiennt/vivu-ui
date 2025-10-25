@@ -14,7 +14,6 @@ export class CheckinScene extends BaseScene {
   private loadingManager: LoadingStateManager;
   private checkinReward: any = null;
   private hasCheckedInToday: boolean = false;
-  private isCheckingIn: boolean = false;
   
   // UI containers
   public container: Container;
@@ -53,57 +52,48 @@ export class CheckinScene extends BaseScene {
     // Check if user has already checked in today
     this.checkTodayCheckinStatus();
     
-    // Initialize UI without performing checkin
-    this.initializeUI();
+    this.checkTodayCheckinStatus().then(() => {
+      // Initialize UI without performing checkin
+      this.initializeUI();
+    });
   }
   
-  private checkTodayCheckinStatus(): void {
-    const lastCheckinDate = localStorage.getItem('lastCheckinDate');
-    const today = new Date().toDateString();
-    
-    if (lastCheckinDate === today) {
-      this.hasCheckedInToday = true;
-      // Load cached data from localStorage if available
-      const cachedCharacters = localStorage.getItem('checkinCharacters');
-      const cachedReward = localStorage.getItem('checkinReward');
-      
-      if (cachedCharacters) {
-        this.characters = JSON.parse(cachedCharacters);
+  private async checkTodayCheckinStatus(): Promise<void> {
+    try {
+      const response = await authApi.getCheckinStatus();
+      if (response) {
+        this.hasCheckedInToday = response.isCheckedInToday || false;
+        this.characters = response.characters || [];
+        console.log('Check-in status response:', this.hasCheckedInToday, this.characters);
       }
-      if (cachedReward) {
-        this.checkinReward = JSON.parse(cachedReward);
-      }
+    } catch (error) {
+      console.error('Error checking check-in status:', error);
     }
   }
 
   private async performCheckin(): Promise<void> {
-    if (this.hasCheckedInToday || this.isCheckingIn) {
+    if (this.hasCheckedInToday) {
       return;
     }
     
-    this.isCheckingIn = true;
     this.loadingManager.showLoading();
     
     try {
       const response = await authApi.checkin();
       
-      if (response.data) {
-        this.characters = response.data.characters || [];
-        this.checkinReward = response.data.checkin_reward || null;
-        
+      console.log('Check-in response:', response);
+      if (response) {
+        this.characters = response.characters || [];
+        this.checkinReward = response.checkin_reward || null;
+
         // Mark as checked in today
         this.hasCheckedInToday = true;
-        const today = new Date().toDateString();
-        localStorage.setItem('lastCheckinDate', today);
-        localStorage.setItem('checkinCharacters', JSON.stringify(this.characters));
-        localStorage.setItem('checkinReward', JSON.stringify(this.checkinReward));
       }
     } catch (error) {
       console.error('Checkin failed:', error);
     }
     
     this.loadingManager.hideLoading();
-    this.isCheckingIn = false;
     
     // Show mock data indicator if we're likely using mock data
     if (isLikelyUsingMockData()) {
@@ -115,6 +105,7 @@ export class CheckinScene extends BaseScene {
   }
   
   private initializeUI(): void {
+    console.log('Initializing Check-in UI. Has checked in today:', this.hasCheckedInToday);
     this.createBackground();
     this.createHeader();
     this.createCheckinButton();
@@ -165,42 +156,9 @@ export class CheckinScene extends BaseScene {
 
   /** Show the screen with animation */
   async show(): Promise<void> {
-    const tween = { alpha: 0 };
-    
-    return new Promise((resolve) => {
-      const animate = () => {
-        tween.alpha += 0.05;
-        this.alpha = tween.alpha;
-        
-        if (tween.alpha >= 1) {
-          this.alpha = 1;
-          resolve();
-        } else {
-          requestAnimationFrame(animate);
-        }
-      };
-      animate();
-    });
   }
 
-  /** Hide the screen with animation */
   async hide(): Promise<void> {
-    const tween = { alpha: 1 };
-    
-    return new Promise((resolve) => {
-      const animate = () => {
-        tween.alpha -= 0.1;
-        this.alpha = tween.alpha;
-        
-        if (tween.alpha <= 0) {
-          this.alpha = 0;
-          resolve();
-        } else {
-          requestAnimationFrame(animate);
-        }
-      };
-      animate();
-    });
   }
 
   /** Reset screen after hidden */
@@ -346,7 +304,7 @@ export class CheckinScene extends BaseScene {
     rewardBox.addChild(rewardTitle);
 
     const rewardText = new Text({
-      text: `🪙 ${this.checkinReward.gold || 0} Gold  •  ✨ ${this.checkinReward.experience || 0} EXP`,
+      text: `x${this.checkinReward.dice || 0} 🎲`,
       style: {
         fontFamily: 'Kalam',
         fontSize: 18,
@@ -371,7 +329,7 @@ export class CheckinScene extends BaseScene {
   private createCheckinButton(): void {
     const buttonWidth = Math.min(220, this.gameWidth - 2 * this.STANDARD_PADDING);
     const buttonHeight = 50;
-    
+        
     const buttonText = this.hasCheckedInToday ? '✓ Checked In Today' : '🎁 Check In Now';
     
     const checkinButton = this.createFantasyButton(
@@ -381,7 +339,7 @@ export class CheckinScene extends BaseScene {
       buttonWidth,
       buttonHeight,
       () => {
-        if (!this.hasCheckedInToday && !this.isCheckingIn) {
+        if (!this.hasCheckedInToday) {
           this.performCheckin();
         }
       },

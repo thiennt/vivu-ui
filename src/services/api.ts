@@ -10,7 +10,8 @@ import {
   mockBattleStage, mockPlayer1Characters, mockActionResult, mockDrawCardResult,
   mockPlayCardResult, mockEndTurnResult,
   mockAiTurnResult, mockCheckinResponse, mockAllEquipment, mockPlayerInventory,
-  mockCharacterEquipment
+  mockCharacterEquipment,
+  mockCheckinStatusResponse
 } from '@/utils/mockData';
 import {
   TurnAction,
@@ -354,6 +355,15 @@ export const authApi = {
         'Authorization': `Bearer ${token}`
       }
     }, mockPlayer);
+  },
+
+  async getCheckinStatus(): Promise<any> {
+    return apiRequest('/auth/checkin/status', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${sessionStorage.getItem('authToken') || ''}`
+      }
+    }, mockCheckinStatusResponse);
   },
 
   async checkin(): Promise<any> {

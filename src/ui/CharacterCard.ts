@@ -142,7 +142,7 @@ export class CharacterCard extends Container {
     const container = new Container();
 
     const effectType = effect.type || 'buff';
-    let borderColor = Colors.GREEN_BRIGHT;
+    let borderColor: string = Colors.GREEN_BRIGHT;
     
     if (effectType.includes('debuff') || effectType.includes('damage')) {
       borderColor = Colors.RED;
@@ -359,7 +359,7 @@ export class CharacterCard extends Container {
 
     // HP Fill
     const hpPercent = Math.max(0, Math.min(1, this.character.hp / this.character.max_hp));
-    let hpColor = Colors.GREEN_BRIGHT;
+    let hpColor: string = Colors.GREEN_BRIGHT;
     if (hpPercent <= 0.25) hpColor = Colors.RED;
     else if (hpPercent <= 0.5) hpColor = Colors.ORANGE;
 
