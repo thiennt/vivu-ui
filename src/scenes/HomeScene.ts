@@ -8,6 +8,8 @@ import { CardBattleScene } from './CardBattleScene';
 import { TowerScene } from './TowerScene';
 import { CheckinScene } from './CheckinScene';
 import { RewardSpinScene } from './RewardSpinScene';
+import { CraftEquipmentScene } from './CraftEquipmentScene';
+import { CraftSkillScene } from './CraftSkillScene';
 import { Colors } from '@/utils/colors';
 import { playerApi, isLikelyUsingMockData } from '@/services/api';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
@@ -353,17 +355,19 @@ export class HomeScene extends BaseScene {
       { text: '👥 Characters', screen: CharactersScene },
       { text: '🃏 Card Battle', screen: CardBattleScene },
       { text: '🧑‍🤝‍🧑 Lineup', screen: LineupScene },
+      { text: '⚒️ Craft Equipment', screen: CraftEquipmentScene },
+      { text: '✨ Craft Skills', screen: CraftSkillScene },
     ];
     
     const buttonWidth = Math.min(this.gameWidth - 2 * this.STANDARD_PADDING, 380);
-    const buttonHeight = 50;
+    const buttonHeight = 45;
     
     const headerHeight = 240;
     const availableHeight = this.gameHeight - headerHeight - this.STANDARD_PADDING;
     const totalButtonHeight = buttons.length * buttonHeight + (buttons.length - 1) * this.STANDARD_SPACING;
     
     const spacing = totalButtonHeight > availableHeight ? 
-      Math.max(6, (availableHeight - (buttons.length * buttonHeight)) / (buttons.length - 1)) : 
+      Math.max(4, (availableHeight - (buttons.length * buttonHeight)) / (buttons.length - 1)) : 
       this.STANDARD_SPACING;
     
     buttons.forEach((buttonData, index) => {
