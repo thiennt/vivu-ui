@@ -293,6 +293,11 @@ export class PlayerCharacterZone extends Container {
       
       (characterCard as Container & { characterId: string }).characterId = character.id;
       
+      // Add energy-full visual and click handler for player 1
+      if (this.playerNo === 1) {
+        this.setupEnergyFullInteraction(characterCard, character);
+      }
+      
       this.charactersZone.addChild(characterCard);
       this.characterCards.push(characterCard);
     });
@@ -306,6 +311,65 @@ export class PlayerCharacterZone extends Container {
     card.width = width;
     card.height = height;
     return card;
+  }
+
+  private setupEnergyFullInteraction(characterCard: Container, character: any): void {
+    const maxEnergy = character.max_energy || 100;
+    const currentEnergy = character.energy || 0;
+    const isEnergyFull = currentEnergy >= maxEnergy;
+    
+    if (isEnergyFull) {
+      // Add visual indicator - glowing effect
+      const glowGraphics = new Graphics();
+      glowGraphics.roundRect(0, 0, characterCard.width, characterCard.height, 10)
+        .stroke({ width: 3, color: Colors.GOLD_BRIGHT, alpha: 0.8 });
+      
+      // Add to card at bottom layer
+      characterCard.addChildAt(glowGraphics, 0);
+      
+      // Add pulsing animation
+      let pulseDirection = 1;
+      let pulseAlpha = 0.8;
+      const pulseInterval = setInterval(() => {
+        if (!characterCard.destroyed) {
+          pulseAlpha += 0.05 * pulseDirection;
+          if (pulseAlpha >= 1) pulseDirection = -1;
+          if (pulseAlpha <= 0.5) pulseDirection = 1;
+          glowGraphics.alpha = pulseAlpha;
+        } else {
+          clearInterval(pulseInterval);
+        }
+      }, 50);
+      
+      // Make card clickable to perform skill
+      characterCard.interactive = true;
+      characterCard.cursor = 'pointer';
+      
+      characterCard.on('pointerdown', () => {
+        this.onCharacterSkillActivate(character);
+      });
+      
+      // Add hover effect
+      characterCard.on('pointerover', () => {
+        glowGraphics.clear();
+        glowGraphics.roundRect(0, 0, characterCard.width, characterCard.height, 10)
+          .stroke({ width: 4, color: Colors.GOLD_BRIGHT, alpha: 1 });
+      });
+      
+      characterCard.on('pointerout', () => {
+        glowGraphics.clear();
+        glowGraphics.roundRect(0, 0, characterCard.width, characterCard.height, 10)
+          .stroke({ width: 3, color: Colors.GOLD_BRIGHT, alpha: 0.8 });
+      });
+    }
+  }
+
+  private onCharacterSkillActivate(character: any): void {
+    // This would trigger the character's skill
+    console.log('Character skill activated:', character);
+    // TODO: Implement skill activation logic
+    // This could emit an event that CardBattleScene listens to
+    this.emit('characterSkillActivated', character);
   }
 
   getCharacterDropTarget(globalX: number, globalY: number): string | null {

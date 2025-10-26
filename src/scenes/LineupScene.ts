@@ -204,7 +204,7 @@ export class LineupScene extends BaseScene {
     const gap = 6;
     const layout = this.calculateThreeCardsLayout(availableWidth, gap);
     const slotWidth = Math.min(layout.itemWidth, 100);
-    const slotHeight = slotWidth * 1.25;
+    const slotHeight = slotWidth * (160 / 120); // Match CardBattleScene default ratio
     const gridWidth = cols * slotWidth + (cols - 1) * gap;
     const startX = (this.gameWidth - gridWidth) / 2;
     const startY = 95;
@@ -292,7 +292,7 @@ export class LineupScene extends BaseScene {
     const gap = 6;
     const layout = this.calculateThreeCardsLayout(availableWidth, gap);
     const slotWidth = Math.min(layout.itemWidth, 100);
-    const slotHeight = slotWidth * 1.25;
+    const slotHeight = slotWidth * (160 / 120); // Match CardBattleScene default ratio
     const poolTop = 150 + slotHeight + 2 * this.STANDARD_SPACING;
     const actionButtonHeight = 50;
     const actionButtonY = this.gameHeight - 80;
@@ -306,7 +306,7 @@ export class LineupScene extends BaseScene {
 
     const poolLayout = this.calculateThreeCardsLayout(poolWidth - 2 * padding, spacing);
     const cardWidth = Math.min(poolLayout.itemWidth, 100);
-    const cardHeight = cardWidth * 1.25;
+    const cardHeight = cardWidth * (160 / 120); // Match CardBattleScene default ratio
     const cardsPerRow = poolLayout.itemsPerRow;
 
     // Fantasy pool panel

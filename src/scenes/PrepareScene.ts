@@ -156,7 +156,7 @@ export class PrepareScene extends BaseScene {
     
     // Calculate card width based on available space and spacing
     const cardWidth = (availableCardWidth - (cardSpacing * (maxPerRow - 1))) / maxPerRow;
-    const cardHeight = cardWidth * 1.25;
+    const cardHeight = cardWidth * (160 / 120); // Match CardBattleScene default ratio
     
     // Calculate panel height based on actual card height
     const titleHeight = 40;

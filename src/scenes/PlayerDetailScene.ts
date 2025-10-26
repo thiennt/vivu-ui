@@ -699,7 +699,7 @@ export class PlayerDetailScene extends BaseScene {
     const cardCount = 3;
     
     const cardWidth = (availableWidth - (gap * (cardCount - 1))) / cardCount;
-    const cardHeight = cardWidth * 1.25;
+    const cardHeight = cardWidth * (160 / 120); // Match CardBattleScene default ratio
 
     // Title
     const collectionTitle = new Text({ 
@@ -766,7 +766,7 @@ export class PlayerDetailScene extends BaseScene {
 
   private createCharacterPreviewCard(character: any, x: number, y: number, customWidth?: number): Container {
     const cardWidth = customWidth || 120;
-    const cardHeight = cardWidth * 1.25;
+    const cardHeight = cardWidth * (160 / 120); // Match CardBattleScene default ratio
     const card = this.createCharacterCard(character, x, y, cardWidth, cardHeight);
     
     card.on('pointerdown', () => {
