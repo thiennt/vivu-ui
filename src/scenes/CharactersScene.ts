@@ -244,7 +244,7 @@ export class CharactersScene extends BaseScene {
     const cardCount = 3;
     
     const cardWidth = (availableWidth - (gap * (cardCount - 1))) / cardCount;
-    const cardHeight = cardWidth * 1.25;
+    const cardHeight = cardWidth * (160 / 120); // Match CardBattleScene default ratio
 
     const layout = {
       itemsPerRow: cardCount,
