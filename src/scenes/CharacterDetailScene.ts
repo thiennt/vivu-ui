@@ -361,7 +361,8 @@ export class CharacterDetailScene extends BaseScene {
       { type: 'equipment', label: 'Equipment', icon: '⚔️' }
     ];
 
-    const tabWidth = (panelWidth - 5) / 2; // Changed from 3 to 2 tabs
+    const spacing = 5;
+    const tabWidth = (panelWidth - spacing) / 2; // Changed from 3 to 2 tabs
     const tabHeight = 36;
 
     tabs.forEach((tab, index) => {
