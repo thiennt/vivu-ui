@@ -23,8 +23,6 @@ export class HandZone extends Container {
   private dragTarget: Container | null = null;
   private dragOffset = { x: 0, y: 0 };
   private onCardDropCallback?: (card: Card, dropTarget: string, cardPosition?: number) => void;
-  private onDragEnterDiscardCallback?: () => void;
-  private onDragLeaveDiscardCallback?: () => void;
   private onCharacterHoverCallback?: (globalX: number, globalY: number, isDragging: boolean) => void;
   private currentDropTarget: string | null = null;
 
@@ -279,14 +277,6 @@ export class HandZone extends Container {
     this.onCardDropCallback = callback;
   }
 
-  setDiscardHighlightCallbacks(
-    onDragEnter: () => void,
-    onDragLeave: () => void
-  ): void {
-    this.onDragEnterDiscardCallback = onDragEnter;
-    this.onDragLeaveDiscardCallback = onDragLeave;
-  }
-
   setCharacterHoverCallback(callback: (globalX: number, globalY: number, isDragging: boolean) => void): void {
     this.onCharacterHoverCallback = callback;
   }
@@ -392,17 +382,7 @@ export class HandZone extends Container {
     const getDropTargetMethod = (this as any).getDropTarget;
     const dropTarget = getDropTargetMethod ? getDropTargetMethod(event.global.x, event.global.y) : null;
 
-    if (dropTarget !== this.currentDropTarget) {
-      if (this.currentDropTarget === 'discard' && this.onDragLeaveDiscardCallback) {
-        this.onDragLeaveDiscardCallback();
-      }
-
-      if (dropTarget === 'discard' && this.onDragEnterDiscardCallback) {
-        this.onDragEnterDiscardCallback();
-      }
-
-      this.currentDropTarget = dropTarget;
-    }
+    this.currentDropTarget = dropTarget;
   };
 
   private onCardDragEnd = (event: FederatedPointerEvent): void => {
@@ -418,9 +398,6 @@ export class HandZone extends Container {
       this.onCharacterHoverCallback(0, 0, false);
     }
 
-    if (this.currentDropTarget === 'discard' && this.onDragLeaveDiscardCallback) {
-      this.onDragLeaveDiscardCallback();
-    }
     this.currentDropTarget = null;
 
     const getDropTargetMethod = (this as any).getDropTarget;

@@ -94,12 +94,6 @@ export class CardBattleScene extends BaseScene {
       this.handleCardDrop(card, dropTarget, cardPosition);
     });
 
-    // Set up discard highlighting callbacks
-    this.p1HandZone.setDiscardHighlightCallbacks(
-      () => this.p1CharacterZone.updateDiscardHighlight(true),
-      () => this.p1CharacterZone.updateDiscardHighlight(false)
-    );
-
     // Set up character hover callback for zoom effects
     this.p1HandZone.setCharacterHoverCallback((globalX: number, globalY: number, isDragging: boolean) => {
       this.p1CharacterZone.updateCharacterHover(globalX, globalY, isDragging);
@@ -128,11 +122,6 @@ export class CardBattleScene extends BaseScene {
       return p1CharacterTarget;
     }
 
-    // Check if dropped on player 1 info zone (now acts as discard)
-    if (this.p1CharacterZone.isPointInPlayerInfo(globalX, globalY)) {
-      return 'discard';
-    }
-
     return null;
   }
 
@@ -147,10 +136,7 @@ export class CardBattleScene extends BaseScene {
     this.disablePlayerUI();
 
     try {
-      if (dropTarget === 'discard') {
-        // Discard card for energy
-        await this.discardCardForEnergy(card, cardPosition);
-      } else if (dropTarget.startsWith('character:')) {
+      if (dropTarget.startsWith('character:')) {
         // Check if player has enough energy to play the card
         const currentPlayer = this.battleState.players.find(p => p.team === this.battleState!.current_player);
         const currentEnergy = currentPlayer?.deck.current_energy || 0;
@@ -175,59 +161,6 @@ export class CardBattleScene extends BaseScene {
     }
 
     this.enablePlayerUI();
-  }
-
-  private async discardCardForEnergy(card: Card, cardPosition?: number): Promise<void> {
-    if (!this.battleState) return;
-
-    // Store previous energy count for animation
-    let currentPlayer = this.battleState.players.find(p => p.team === this.battleState!.current_player);
-    const previousEnergy = currentPlayer?.deck.current_energy || 0;
-
-    const turnAction: TurnAction = {
-      type: 'discard_card',
-      player_team: this.battleState.current_player,
-      card_id: card.id,
-      card_position: cardPosition
-    };
-
-    try {
-      const response = await battleApi.discardCard(this.battleId, turnAction);
-      if (response.success && response.data) {
-        const logs = response.data;
-        console.log('Discard card logs:', logs);
-
-        // Get the card container from hand zone before updating zones
-        const cardContainer = this.p1HandZone.getDragTarget();
-
-        // Animate card to discard zone before updating UI
-        if (cardContainer) {
-          const discardTarget = this.p1CharacterZone.toGlobal({ x: 0, y: 0 });
-          await this.animateCardToDiscard(cardContainer, discardTarget);
-        }
-
-        // Update battle state from after_state if available
-        if (logs.length > 0 && logs[0].after_state) {
-          this.updateBattleStateFromAfterState(logs[0].after_state);
-        }
-
-        this.updateAllZones();
-
-        currentPlayer = this.battleState.players.find(p => p.team === this.battleState!.current_player);
-
-        // Animate energy count increase after updating zones
-        const newEnergy = currentPlayer?.deck.current_energy || 0;
-        if (newEnergy > previousEnergy) {
-          await this.animateEnergyIncrease(1);
-        }
-      }
-    } catch (error) {
-      console.error('Failed to discard card:', error);
-      const errorMessage = error instanceof ApiError
-        ? error.message
-        : 'Failed to discard card. Please try again.';
-      this.battleLogZone.showNotification(errorMessage, Colors.ERROR, 3000);
-    }
   }
 
   private async playCardOnCharacter(card: Card, characterId: string, cardPosition?: number): Promise<void> {
@@ -273,32 +206,6 @@ export class CardBattleScene extends BaseScene {
       });
       this.updateAllZones();
     }
-  }
-
-  private async animateCardToDiscard(cardContainer: Container, discardTarget: { x: number; y: number }): Promise<void> {
-    // Animate card flying to discard zone (player info area)
-    return new Promise((resolve) => {
-      gsap.timeline({
-        onComplete: () => {
-          // Destroy the card after animation
-          cardContainer.destroy();
-          resolve();
-        }
-      })
-        .to(cardContainer, {
-          x: discardTarget.x + 40, // Center of player info zone
-          y: discardTarget.y + 60,
-          duration: 0.5,
-          ease: 'power2.inOut'
-        }, 0)
-        .to(cardContainer, {
-          scale: 0.3,
-          rotation: Math.PI * 2, // Full rotation
-          alpha: 0,
-          duration: 0.5,
-          ease: 'power2.in'
-        }, 0);
-    });
   }
 
   private async animateEnergyIncrease(playerTeam: number): Promise<void> {
@@ -498,6 +405,10 @@ export class CardBattleScene extends BaseScene {
     this.currentPhase = 'draw_phase';
     console.log('Draw Phase');
 
+    // Store previous energy count for animation
+    let currentPlayer = this.battleState.players.find(p => p.team === this.battleState!.current_player);
+    const previousEnergy = currentPlayer?.deck.current_energy || 0;
+
     const turnAction: TurnAction = {
       type: 'draw_card',
       player_team: this.battleState.current_player
@@ -524,6 +435,13 @@ export class CardBattleScene extends BaseScene {
 
         this.updateAllZones();
         await this.p1HandZone.animateCardDraw();
+
+        // Animate energy increase after drawing cards
+        currentPlayer = this.battleState.players.find(p => p.team === this.battleState!.current_player);
+        const newEnergy = currentPlayer?.deck.current_energy || 0;
+        if (newEnergy > previousEnergy) {
+          await this.animateEnergyIncrease(this.battleState.current_player);
+        }
       }
     } catch (error) {
       console.error('Failed to draw cards:', error);
@@ -644,6 +562,10 @@ export class CardBattleScene extends BaseScene {
       const cardCount = log.drawn_cards?.length || 0;
       console.log('AI drew cards:', cardCount);
 
+      // Store previous energy count for animation
+      let aiPlayer = this.battleState?.players.find(p => p.team === 2);
+      const previousEnergy = aiPlayer?.deck.current_energy || 0;
+
       // Show notification
       this.battleLogZone.showNotification(`AI drew ${cardCount} card${cardCount !== 1 ? 's' : ''}`, Colors.EFFECT_DRAW_BLUE);
 
@@ -655,38 +577,8 @@ export class CardBattleScene extends BaseScene {
       this.updateAllZones();
       await this.p2HandZone.animateCardDraw();
 
-      // Brief delay
-      await new Promise(resolve => setTimeout(resolve, 300));
-      return false; // Game hasn't ended
-    } else if (log.action_type === 'discard_card') {
-      // Handle discard card animation for AI
-      console.log('AI discarded a card');
-
-      // Store previous energy count for animation
-      let aiPlayer = this.battleState?.players.find(p => p.team === 2);
-      const previousEnergy = aiPlayer?.deck.current_energy || 0;
-
-      // Show notification
-      this.battleLogZone.showNotification('AI discarded a card', Colors.EFFECT_DISCARD_RED);
-
-      // Animate the last card in AI's hand (or random)
-      const cardToAnimate = this.p2HandZone.getRandomHandCard();
-
-      // Animate card to AI's discard zone before updating zones
-      if (cardToAnimate) {
-        const discardTarget = this.p2CharacterZone.toGlobal({ x: 0, y: 0 });
-        await this.animateCardToDiscard(cardToAnimate, discardTarget);
-      }
-
-      // Update battle state from after_state if available
-      if (log.after_state) {
-        this.updateBattleStateFromAfterState(log.after_state);
-      }
-
-      this.updateAllZones();
-
-      // Animate energy count increase after updating zones
-      aiPlayer = this.battleState?.players.find(p => p.team === 2)
+      // Animate energy increase after drawing cards
+      aiPlayer = this.battleState?.players.find(p => p.team === 2);
       const newEnergy = aiPlayer?.deck.current_energy || 0;
       if (newEnergy > previousEnergy) {
         await this.animateEnergyIncrease(2);
