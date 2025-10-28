@@ -366,7 +366,7 @@ export class CharacterDetailScene extends BaseScene {
     const tabHeight = 36;
 
     tabs.forEach((tab, index) => {
-      const x = padding + (index * (tabWidth + 5));
+      const x = padding + (index * (tabWidth + spacing));
       const isActive = this.activeTab === tab.type;
 
       const tabButton = this.createTabButton(
