@@ -357,11 +357,11 @@ export class CharacterDetailScene extends BaseScene {
 
     const tabs: { type: TabType; label: string; icon: string }[] = [
       { type: 'stats', label: 'Stats', icon: '📊' },
-      { type: 'skills', label: 'Skills', icon: '📜' },
+      // { type: 'skills', label: 'Skills', icon: '📜' }, // Hidden to simplify game
       { type: 'equipment', label: 'Equipment', icon: '⚔️' }
     ];
 
-    const tabWidth = (panelWidth - 10) / 3;
+    const tabWidth = (panelWidth - 5) / 2; // Changed from 3 to 2 tabs
     const tabHeight = 36;
 
     tabs.forEach((tab, index) => {

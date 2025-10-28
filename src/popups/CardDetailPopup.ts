@@ -75,11 +75,13 @@ export class CardDetailPopup extends Container {
 
     this.addChild(bannerGraphics);
 
-    // Energy cost badge - gem/crystal style
+    // Energy cost badge - Hidden to simplify game
+    /*
     const energyX = 12;
     const energyY = 35;
     const energyBadge = this.createEnergyGem(energyX, energyY, 32, 28);
     this.addChild(energyBadge);
+    */
 
     // Group icon (top-right) - ornate frame
     const groupIcon = this.getGroupIcon(this.card.group);
@@ -342,9 +344,11 @@ export class CardDetailPopup extends Container {
 
     this.addChild(this.dialogBg, this.dialogPanel);
 
-    // Energy cost (top left) - crystal gem style
+    // Energy cost - Hidden to simplify game
+    /*
     const energyBadge = this.createEnergyGem(cardX + 25, cardY + 75, 55, 45);
     this.addChild(energyBadge);
+    */
 
     // Group icon (top right) - ornate version
     const groupIcon = this.getGroupIcon(this.card.group);
