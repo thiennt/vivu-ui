@@ -172,26 +172,18 @@ export class DeckCard extends Container {
     let groupIcon = '';
     let iconColor: string = Colors.WHITE;
     
-    switch (card.group) {
-      case CardType.ATTACK:
-        groupIcon = '⚔️';
-        iconColor = Colors.RED;  // Red
-        break;
-      // case CardType.HEAL:
-      //   groupIcon = '✨';
-      //   iconColor = Colors.GREEN_BRIGHT;  // Green
-      //   break;
-      // case CardType.DEBUFF:
-      //   groupIcon = '🌀';
-      //   iconColor = Colors.PURPLE_BRIGHT;  // Purple
-      //   break;
-      // case CardType.BUFF:
-      //   groupIcon = '🔼';
-      //   iconColor = Colors.BLUE_SKY;  // Blue
-      //   break;
-      default:
-        groupIcon = '✨';
-        iconColor = Colors.GREEN_BRIGHT;
+    if (card.group.includes('Damage')) {
+      groupIcon = '⚔️';
+      iconColor = Colors.RED;  // Red
+    } else if (card.group.includes('Healing')) {
+      groupIcon = '❤️';
+      iconColor = Colors.GREEN_BRIGHT;  // Green
+    } else if (card.group.includes('Buff')) {
+      groupIcon = '🔼';
+      iconColor = Colors.BLUE_SKY;  // Blue
+    } else {
+      groupIcon = '✨';
+      iconColor = Colors.PURPLE;  // Purple
     }
     
     const groupIconRadius = 10;

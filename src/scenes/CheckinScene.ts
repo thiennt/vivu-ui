@@ -304,7 +304,7 @@ export class CheckinScene extends BaseScene {
     rewardBox.addChild(rewardTitle);
 
     const rewardText = new Text({
-      text: `x${this.checkinReward.dice || 0} 🎲`,
+      text: `x${this.checkinReward.dice || 0} 🎟️`,
       style: {
         fontFamily: 'Kalam',
         fontSize: 18,
