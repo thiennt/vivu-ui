@@ -356,7 +356,7 @@ export class HomeScene extends BaseScene {
       { text: '🃏 Card Battle', screen: CardBattleScene },
       { text: '🧑‍🤝‍🧑 Lineup', screen: LineupScene },
       { text: '⚒️ Craft Equipment', screen: CraftEquipmentScene },
-      { text: '✨ Craft Skills', screen: CraftSkillScene },
+      // { text: '✨ Craft Skills', screen: CraftSkillScene }, // Hidden to simplify game
     ];
     
     const buttonWidth = Math.min(this.gameWidth - 2 * this.STANDARD_PADDING, 380);

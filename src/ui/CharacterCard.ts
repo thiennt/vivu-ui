@@ -386,7 +386,8 @@ export class CharacterCard extends Container {
     hpText.y = hpBarY + hpBarHeight / 2;
     this.cardContainer.addChild(hpText);
 
-    // Energy Bar
+    // Energy Bar - Hidden to simplify game
+    /*
     const energyBarY = height - 12; // 16px from bottom
     const energyBarHeight = 8;
 
@@ -409,6 +410,7 @@ export class CharacterCard extends Container {
     energyFill.roundRect(barX + 2, energyBarY + 2, (barWidth - 4) * energyPercent, energyBarHeight - 4, 3)
       .fill({ color: Colors.BLUE_STEEL_LIGHTER, alpha: this.isDead ? 0.3 : 0.9 });
     this.cardContainer.addChild(energyFill);
+    */
   }
 
   private async loadAvatar(centerX: number, centerY: number, maxWidth: number, maxHeight: number): Promise<void> {
