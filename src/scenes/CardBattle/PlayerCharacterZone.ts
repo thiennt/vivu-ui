@@ -7,7 +7,6 @@ export class PlayerCharacterZone extends Container {
   private zoneBg: Graphics;
   private playerInfoZone: Container;
   private playerInfoBg: Graphics;
-  private playerInfoGlow: Graphics;
   private playerInfoLabel: Text;
   private energyText: Text;
   private energyCount: number = 0;
@@ -25,8 +24,6 @@ export class PlayerCharacterZone extends Container {
   private charactersWidth: number = 0;
   private charactersHeight: number = 0;
 
-  private discardTooltip: Text | null = null;
-
   constructor(params?: { playerNo: number }) {
     super();
 
@@ -37,9 +34,6 @@ export class PlayerCharacterZone extends Container {
 
     this.playerInfoZone = new Container();
     this.addChild(this.playerInfoZone);
-
-    this.playerInfoGlow = new Graphics();
-    this.playerInfoZone.addChild(this.playerInfoGlow);
 
     this.playerInfoBg = new Graphics();
     this.playerInfoZone.addChild(this.playerInfoBg);
@@ -86,7 +80,7 @@ export class PlayerCharacterZone extends Container {
     this.playerInfoZone.x = 0;
     this.playerInfoZone.y = 0;
 
-    this.drawPlayerInfoBackground(false);
+    this.drawPlayerInfoBackground();
 
     // Player label with better contrast - white text
     const labelIcon = this.playerNo === 1 ? '🛡️' : '⚔️';
@@ -153,9 +147,6 @@ export class PlayerCharacterZone extends Container {
     this.deckText.x = this.infoWidth / 2;
     this.deckText.y = this.infoHeight * 0.78;
 
-    this.playerInfoBg.interactive = true;
-    this.updateDiscardHighlight(false);
-
     this.charactersWidth = width - this.infoWidth;
     this.charactersHeight = height;
     this.charactersZone.x = this.infoWidth;
@@ -164,98 +155,29 @@ export class PlayerCharacterZone extends Container {
     this.updateCharactersDisplay();
   }
 
-  private drawPlayerInfoBackground(highlight: boolean): void {
+  private drawPlayerInfoBackground(): void {
     const accentColor = this.playerNo === 1 ? Colors.TEAM_ALLY : Colors.TEAM_ENEMY;
     
-    this.playerInfoGlow.clear();
     this.playerInfoBg.clear();
 
-    if (highlight) {
-      // Glowing discard area - red glow
-      this.playerInfoGlow.roundRect(-5, -5, this.infoWidth + 10, this.infoHeight + 10, 10)
-        .fill({ color: Colors.RED_BRIGHT, alpha: 0.3 });
-      
-      // Dark background with red discard border
-      this.playerInfoBg.roundRect(0, 0, this.infoWidth, this.infoHeight, 6)
-        .fill({ color: Colors.BROWN_DARKER, alpha: 0.95 })
-        .stroke({ width: 3, color: Colors.RED_BRIGHT, alpha: 0.95 });
-      
-      // Inner darker layer
-      this.playerInfoBg.roundRect(2, 2, this.infoWidth - 4, this.infoHeight - 4, 4)
-        .fill({ color: Colors.BROWN_DARK, alpha: 0.7 });
-      
-      // Inner red glow
-      this.playerInfoBg.roundRect(2, 2, this.infoWidth - 4, this.infoHeight - 4, 4)
-        .stroke({ width: 2, color: Colors.RED_BRIGHT, alpha: 0.7 });
-      
-      // Animated dashed border effect
-      const dashLength = 8;
-      const spacing = 4;
-      for (let i = 0; i < this.infoWidth; i += dashLength + spacing) {
-        this.playerInfoBg.roundRect(i + 2, 2, Math.min(dashLength, this.infoWidth - i - 4), 3, 1)
-          .fill({ color: Colors.RED_BRIGHT, alpha: 0.9 });
-      }
-      for (let i = 0; i < this.infoHeight; i += dashLength + spacing) {
-        this.playerInfoBg.roundRect(2, i + 2, 3, Math.min(dashLength, this.infoHeight - i - 4), 1)
-          .fill({ color: Colors.RED_BRIGHT, alpha: 0.9 });
-        this.playerInfoBg.roundRect(this.infoWidth - 5, i + 2, 3, Math.min(dashLength, this.infoHeight - i - 4), 1)
-          .fill({ color: Colors.RED_BRIGHT, alpha: 0.9 });
-      }
-      for (let i = 0; i < this.infoWidth; i += dashLength + spacing) {
-        this.playerInfoBg.roundRect(i + 2, this.infoHeight - 5, Math.min(dashLength, this.infoWidth - i - 4), 3, 1)
-          .fill({ color: Colors.RED_BRIGHT, alpha: 0.9 });
-      }
-
-      // Show tooltip - white text on dark
-      if (!this.discardTooltip) {
-        this.discardTooltip = new Text({
-          text: '♻️ DISCARD\n+1 ⚡',
-          style: {
-            fontFamily: 'Kalam',
-            fontSize: 11,
-            fontWeight: 'bold',
-            fill: Colors.WHITE,
-            align: 'center',
-            lineHeight: 14,
-            stroke: { color: Colors.BLACK, width: 2.5 },
-            dropShadow: {
-              color: Colors.RED_BRIGHT,
-              blur: 4,
-              distance: 0,
-              alpha: 0.8
-            }
-          }
-        });
-        this.discardTooltip.anchor.set(0.5);
-        this.playerInfoZone.addChild(this.discardTooltip);
-      }
-      
-      this.discardTooltip.visible = true;
-      this.discardTooltip.x = this.infoWidth / 2;
-      this.discardTooltip.y = this.infoHeight - 20;
-      
-    } else {
-      // Normal dark fantasy styling
-      this.playerInfoGlow.roundRect(-3, -3, this.infoWidth + 6, this.infoHeight + 6, 9)
-        .fill({ color: accentColor, alpha: 0.15 });
-      
-      // Dark brown background
-      this.playerInfoBg.roundRect(0, 0, this.infoWidth, this.infoHeight, 6)
-        .fill({ color: Colors.BROWN_DARKER, alpha: 0.95 })
-        .stroke({ width: 2, color: Colors.GOLD, alpha: 0.7 });
-      
-      // Inner darker texture
-      this.playerInfoBg.roundRect(2, 2, this.infoWidth - 4, this.infoHeight - 4, 4)
-        .fill({ color: Colors.BROWN_DARK, alpha: 0.6 });
-      
-      // Team-colored inner border (subtle)
-      this.playerInfoBg.roundRect(3, 3, this.infoWidth - 6, this.infoHeight - 6, 3)
-        .stroke({ width: 1, color: accentColor, alpha: 0.4 });
-        
-      if (this.discardTooltip) {
-        this.discardTooltip.visible = false;
-      }
-    }
+    // Normal dark fantasy styling
+    const glowGraphics = new Graphics();
+    glowGraphics.roundRect(-3, -3, this.infoWidth + 6, this.infoHeight + 6, 9)
+      .fill({ color: accentColor, alpha: 0.15 });
+    this.playerInfoZone.addChildAt(glowGraphics, 0);
+    
+    // Dark brown background
+    this.playerInfoBg.roundRect(0, 0, this.infoWidth, this.infoHeight, 6)
+      .fill({ color: Colors.BROWN_DARKER, alpha: 0.95 })
+      .stroke({ width: 2, color: Colors.GOLD, alpha: 0.7 });
+    
+    // Inner darker texture
+    this.playerInfoBg.roundRect(2, 2, this.infoWidth - 4, this.infoHeight - 4, 4)
+      .fill({ color: Colors.BROWN_DARK, alpha: 0.6 });
+    
+    // Team-colored inner border (subtle)
+    this.playerInfoBg.roundRect(3, 3, this.infoWidth - 6, this.infoHeight - 6, 3)
+      .stroke({ width: 1, color: accentColor, alpha: 0.4 });
   }
 
   updateBattleState(playerState: CardBattlePlayerState): void {
@@ -402,16 +324,6 @@ export class PlayerCharacterZone extends Container {
         characterCard.scale.set(1.0);
       }
     }
-  }
-
-  isPointInPlayerInfo(globalX: number, globalY: number): boolean {
-    const globalPos = this.toGlobal({ x: 0, y: 0 });
-    return globalX >= globalPos.x && globalX <= globalPos.x + this.infoWidth &&
-           globalY >= globalPos.y && globalY <= globalPos.y + this.infoHeight;
-  }
-
-  updateDiscardHighlight(highlight: boolean): void {
-    this.drawPlayerInfoBackground(highlight);
   }
 
   public findCharacterCard(characterId: string): Container | null {
