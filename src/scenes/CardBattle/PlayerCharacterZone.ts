@@ -7,6 +7,7 @@ export class PlayerCharacterZone extends Container {
   private zoneBg: Graphics;
   private playerInfoZone: Container;
   private playerInfoBg: Graphics;
+  private playerInfoGlow: Graphics;
   private playerInfoLabel: Text;
   private energyText: Text;
   private energyCount: number = 0;
@@ -34,6 +35,9 @@ export class PlayerCharacterZone extends Container {
 
     this.playerInfoZone = new Container();
     this.addChild(this.playerInfoZone);
+
+    this.playerInfoGlow = new Graphics();
+    this.playerInfoZone.addChild(this.playerInfoGlow);
 
     this.playerInfoBg = new Graphics();
     this.playerInfoZone.addChild(this.playerInfoBg);
@@ -158,13 +162,12 @@ export class PlayerCharacterZone extends Container {
   private drawPlayerInfoBackground(): void {
     const accentColor = this.playerNo === 1 ? Colors.TEAM_ALLY : Colors.TEAM_ENEMY;
     
+    this.playerInfoGlow.clear();
     this.playerInfoBg.clear();
 
     // Normal dark fantasy styling
-    const glowGraphics = new Graphics();
-    glowGraphics.roundRect(-3, -3, this.infoWidth + 6, this.infoHeight + 6, 9)
+    this.playerInfoGlow.roundRect(-3, -3, this.infoWidth + 6, this.infoHeight + 6, 9)
       .fill({ color: accentColor, alpha: 0.15 });
-    this.playerInfoZone.addChildAt(glowGraphics, 0);
     
     // Dark brown background
     this.playerInfoBg.roundRect(0, 0, this.infoWidth, this.infoHeight, 6)
