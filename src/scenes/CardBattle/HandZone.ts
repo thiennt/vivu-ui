@@ -471,7 +471,7 @@ export class HandZone extends Container {
   private showCardTooltip(card: Card): void {
     this.hideCardTooltip();
 
-    this.cardTooltip = new CardDetailPopup({ card, tooltipMode: true });
+    this.cardTooltip = new CardDetailPopup({ card });
 
     app.stage.addChild(this.cardTooltip);
 
