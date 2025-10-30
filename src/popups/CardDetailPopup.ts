@@ -29,8 +29,13 @@ export class CardDetailPopup extends Container {
     this.dialogBg.rect(0, 0, this.gameWidth, this.gameHeight)
       .fill({ color: Colors.BROWN_DARKEST, alpha: 0.85 });
 
-    const cardWidth = Math.min(400, this.gameWidth - 40);
-    const cardHeight = Math.min(600, this.gameHeight - 60);
+    // Card dimensions maintaining 1:1.5 aspect ratio (same as hand cards: 60×90)
+    const CARD_MAX_WIDTH = 400;
+    const CARD_ASPECT_RATIO = 1.5; // height/width ratio
+    const CARD_MAX_HEIGHT = CARD_MAX_WIDTH * CARD_ASPECT_RATIO;
+    
+    const cardWidth = Math.min(CARD_MAX_WIDTH, this.gameWidth - 40);
+    const cardHeight = Math.min(CARD_MAX_HEIGHT, this.gameHeight - 60);
     const cardX = (this.gameWidth - cardWidth) / 2;
     const cardY = (this.gameHeight - cardHeight) / 2;
 
