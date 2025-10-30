@@ -430,7 +430,7 @@ export class PrepareScene extends BaseScene {
   }
 
   private showCardDetails(card: Card): void {
-    navigation.presentPopup(CardDetailPopup, { card: card });
+    navigation.presentPopup(CardDetailPopup, { card: card, popupMode: true });
   }
 
   /** Resize handler */
