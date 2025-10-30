@@ -8,8 +8,11 @@ export class CardDetailPopup extends Container {
   private dialogPanel!: Graphics;
   private card: Card;
 
-  private readonly CARD_MAX_WIDTH = 300;
-  private readonly CARD_MAX_HEIGHT = 400;
+  public static readonly CARD_WIDTH = 300;
+  public static readonly CARD_HEIGHT = 400;
+
+  private readonly CARD_MAX_WIDTH = CardDetailPopup.CARD_WIDTH;
+  private readonly CARD_MAX_HEIGHT = CardDetailPopup.CARD_HEIGHT;
 
   constructor(params: { card: Card }) {
     super();
