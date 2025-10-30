@@ -30,7 +30,7 @@ export class CardDetailPopup extends Container {
       .fill({ color: Colors.BROWN_DARKEST, alpha: 0.85 });
 
     const cardWidth = Math.min(400, this.gameWidth - 40);
-    const cardHeight = Math.min(680, this.gameHeight - 60);
+    const cardHeight = Math.min(600, this.gameHeight - 60);
     const cardX = (this.gameWidth - cardWidth) / 2;
     const cardY = (this.gameHeight - cardHeight) / 2;
 
@@ -98,11 +98,9 @@ export class CardDetailPopup extends Container {
 
     this.addChild(this.dialogBg, this.dialogPanel);
 
-    // Energy cost - Hidden to simplify game
-    /*
+    // Energy cost
     const energyBadge = this.createEnergyGem(cardX + 25, cardY + 75, 55, 45);
     this.addChild(energyBadge);
-    */
 
     // Group icon (top right) - ornate version
     const groupIcon = this.getGroupIcon(this.card.group);
