@@ -8,116 +8,113 @@ export class CardDetailPopup extends Container {
   private dialogPanel!: Graphics;
   private card: Card;
 
-  public static readonly CARD_WIDTH = 300;
-  public static readonly CARD_HEIGHT = 400;
-
+  public static readonly CARD_WIDTH = 250;
+  public static readonly CARD_HEIGHT = 300;
+  
   private readonly CARD_MAX_WIDTH = CardDetailPopup.CARD_WIDTH;
   private readonly CARD_MAX_HEIGHT = CardDetailPopup.CARD_HEIGHT;
 
-  constructor(params: { card: Card }) {
+  private popupMode: boolean = false;
+
+  constructor(params: { card: Card, popupMode?: boolean }) {
     super();
     this.card = params.card;
+    this.popupMode = params.popupMode || false;
     this.createDialog();
   }
 
   private createDialog(): void {
     this.createCardDisplay();
+    this.positionAtTop(navigation.width, navigation.height);
   }
 
   private createCardDisplay(): void {
-    // Use fixed card size (same as DeckCard visual style but larger)
     const cardWidth = this.CARD_MAX_WIDTH;
     const cardHeight = this.CARD_MAX_HEIGHT;
 
-    // Create card with Slay the Spire style (no background overlay)
     this.dialogPanel = new Graphics();
 
-    // Multiple shadow layers for dramatic depth
-    this.dialogPanel.roundRect(8, 8, cardWidth, cardHeight, 16)
+    // Shadows
+    this.dialogPanel.roundRect(6, 6, cardWidth, cardHeight, 14)
       .fill({ color: Colors.BLACK, alpha: 0.6 });
+    this.dialogPanel.roundRect(3, 3, cardWidth, cardHeight, 14)
+      .fill({ color: Colors.BLACK, alpha: 0.3 });
 
-    this.dialogPanel.roundRect(5, 5, cardWidth, cardHeight, 16)
-      .fill({ color: Colors.BLACK, alpha: 0.4 });
-
-    this.dialogPanel.roundRect(2, 2, cardWidth, cardHeight, 16)
-      .fill({ color: Colors.BLACK, alpha: 0.2 });
-
-    // Main card background - aged parchment
-    this.dialogPanel.roundRect(0, 0, cardWidth, cardHeight, 16)
+    // Main card background
+    this.dialogPanel.roundRect(0, 0, cardWidth, cardHeight, 14)
       .fill({ color: Colors.PARCHMENT_LIGHT, alpha: 0.98 })
-      .stroke({ width: 4, color: Colors.GOLD }); // Golden border
+      .stroke({ width: 3, color: Colors.GOLD });
 
-    // Inner darker parchment layer
-    this.dialogPanel.roundRect(6, 6, cardWidth - 12, cardHeight - 12, 12)
+    // Inner layer
+    this.dialogPanel.roundRect(5, 5, cardWidth - 10, cardHeight - 10, 10)
       .fill({ color: Colors.PARCHMENT, alpha: 0.7 });
 
-    // Inner golden highlight/trim
-    this.dialogPanel.roundRect(8, 8, cardWidth - 16, cardHeight - 16, 10)
-      .stroke({ width: 2, color: Colors.GOLD_BRIGHT, alpha: 0.6 });
+    // Inner trim
+    this.dialogPanel.roundRect(7, 7, cardWidth - 14, cardHeight - 14, 8)
+      .stroke({ width: 1.5, color: Colors.GOLD_BRIGHT, alpha: 0.6 });
 
-    // Ornate decorative corners on main card
     this.drawOrnateCorners(0, 0, cardWidth, cardHeight);
 
     // Top banner
     const rarityColor = this.getRarityColor(this.card.rarity);
-    const bannerHeight = 32;
-    this.dialogPanel.moveTo(18, 18)
-      .lineTo(14, 26)
-      .lineTo(18, 18 + bannerHeight)
-      .lineTo(cardWidth - 18, 18 + bannerHeight)
-      .lineTo(cardWidth - 14, 26)
-      .lineTo(cardWidth - 18, 18)
-      .lineTo(18, 18)
+    const bannerHeight = 24;
+    this.dialogPanel.moveTo(14, 14)
+      .lineTo(10, 20)
+      .lineTo(14, 14 + bannerHeight)
+      .lineTo(cardWidth - 14, 14 + bannerHeight)
+      .lineTo(cardWidth - 10, 20)
+      .lineTo(cardWidth - 14, 14)
+      .lineTo(14, 14)
       .fill({ color: rarityColor, alpha: 0.85 })
       .stroke({ width: 2, color: Colors.BROWN });
 
     // Art frame
-    const frameMargin = 18;
-    const frameY = 70;
-    const frameHeight = 140;
+    const frameMargin = 14;
+    const frameY = 48;
+    const frameHeight = 90;
     const frameWidth = cardWidth - (frameMargin * 2);
 
-    this.dialogPanel.roundRect(frameMargin, frameY, frameWidth, frameHeight, 10)
+    this.dialogPanel.roundRect(frameMargin, frameY, frameWidth, frameHeight, 8)
       .fill({ color: Colors.BROWN_DARK, alpha: 0.95 })
-      .stroke({ width: 2, color: Colors.GOLD, alpha: 0.95 });
+      .stroke({ width: 1.5, color: Colors.GOLD, alpha: 0.95 });
 
-    this.dialogPanel.roundRect(frameMargin + 2, frameY + 2, frameWidth - 4, frameHeight - 4, 8)
+    this.dialogPanel.roundRect(frameMargin + 2, frameY + 2, frameWidth - 4, frameHeight - 4, 6)
       .stroke({ width: 1, color: Colors.BROWN, alpha: 0.6 });
 
     this.drawFantasyCorners(frameMargin, frameY, frameWidth, frameHeight, Colors.GOLD_BRIGHT);
 
     this.addChild(this.dialogPanel);
 
-    // Energy cost badge
-    const energyBadge = this.createEnergyGem(18, 38, 44, 28);
+    // Energy cost badge (bigger)
+    const energyBadge = this.createEnergyGem(14, 28, 48, 28);
     this.addChild(energyBadge);
 
-    // Group icon (top right)
+    // Group icon (top right, bigger)
     const groupIcon = this.getGroupIcon(this.card.group);
     const groupColor = this.getGroupColor(this.card.group);
 
     const groupIconBg = new Graphics()
-      .circle(cardWidth - 32, 54, 18)
+      .circle(cardWidth - 32, 38, 22)
       .fill({ color: Colors.BROWN_DARK, alpha: 0.95 })
       .stroke({ width: 2, color: Colors.GOLD, alpha: 0.95 });
 
-    groupIconBg.circle(cardWidth - 32, 54, 15)
-      .stroke({ width: 1, color: groupColor, alpha: 0.7 });
+    groupIconBg.circle(cardWidth - 32, 38, 18)
+      .stroke({ width: 2, color: groupColor, alpha: 0.7 });
 
     const groupIconText = new Text({
       text: groupIcon,
       style: {
         fontFamily: 'Kalam',
-        fontSize: 26,
+        fontSize: 24,
         fill: Colors.WHITE
       }
     });
     groupIconText.anchor.set(0.5);
     groupIconText.x = cardWidth - 32;
-    groupIconText.y = 54;
+    groupIconText.y = 38;
     groupIconText.filters = [new DropShadowFilter({
       offset: { x: 0, y: 0 },
-      blur: 8,
+      blur: 10,
       alpha: 0.9,
       color: groupColor
     })];
@@ -129,19 +126,19 @@ export class CardDetailPopup extends Container {
       text: this.card.name,
       style: {
         fontFamily: 'Kalam',
-        fontSize: 18,
+        fontSize: 14,
         fontWeight: 'bold',
         fill: Colors.BROWN_DARK,
         align: 'center',
         wordWrap: true,
-        wordWrapWidth: cardWidth - 80,
-        stroke: { color: Colors.GOLD_BRIGHT, width: 1.5 },
-        dropShadow: { color: Colors.GOLD, blur: 2, angle: Math.PI / 4, distance: 1, alpha: 0.5 }
+        wordWrapWidth: cardWidth - 40,
+        stroke: { color: Colors.GOLD_BRIGHT, width: 1 },
+        dropShadow: { color: Colors.GOLD, blur: 1, angle: Math.PI / 4, distance: 1, alpha: 0.5 }
       }
     });
     cardNameText.anchor.set(0.5, 0);
     cardNameText.x = cardWidth / 2;
-    cardNameText.y = 20;
+    cardNameText.y = 12;
     this.addChild(cardNameText);
 
     // Avatar icon
@@ -149,7 +146,7 @@ export class CardDetailPopup extends Container {
       text: this.card.icon_url || groupIcon,
       style: {
         fontFamily: 'Kalam',
-        fontSize: 80,
+        fontSize: 54,
         fill: Colors.WHITE
       }
     });
@@ -158,33 +155,33 @@ export class CardDetailPopup extends Container {
     avatarIcon.y = frameY + frameHeight / 2;
     avatarIcon.filters = [new DropShadowFilter({
       offset: { x: 0, y: 0 },
-      blur: 12,
+      blur: 8,
       alpha: 0.9,
       color: groupColor
     })];
     this.addChild(avatarIcon);
 
-    // Divider
+    // Divider (move below avatar)
+    const dividerY = frameY + frameHeight + 12;
     const divider = new Graphics();
-    divider.moveTo(24, cardHeight - 120)
-      .lineTo(cardWidth - 24, cardHeight - 120)
-      .stroke({ width: 1.5, color: Colors.BROWN, alpha: 0.5 });
-    divider.circle(cardWidth / 2, cardHeight - 120, 2)
+    divider.moveTo(18, dividerY)
+      .lineTo(cardWidth - 18, dividerY)
+      .stroke({ width: 1, color: Colors.BROWN, alpha: 0.5 });
+    divider.circle(cardWidth / 2, dividerY, 2)
       .fill({ color: Colors.GOLD });
     this.addChild(divider);
 
-    // Description
-    const descY = cardHeight - 110;
+    // Description (below divider)
+    const descY = dividerY + 10;
     const descText = new Text({
       text: this.card.description,
       style: {
         fontFamily: 'Kalam',
-        fontSize: 14,
+        fontSize: 18,
         fill: Colors.BROWN_DARKER,
         align: 'center',
         wordWrap: true,
-        wordWrapWidth: cardWidth - 40,
-        lineHeight: 18
+        wordWrapWidth: cardWidth - 24,
       }
     });
     descText.anchor.set(0.5, 0);
@@ -192,35 +189,9 @@ export class CardDetailPopup extends Container {
     descText.y = descY;
     this.addChild(descText);
 
-    // Effects list
-    let effectsY = descY + descText.height + 12;
-    if (this.card.effects && this.card.effects.length > 0) {
-      const effectsTitle = new Text({
-        text: '⚡ EFFECTS ⚡',
-        style: {
-          fontFamily: 'Kalam',
-          fontSize: 15,
-          fontWeight: 'bold',
-          fill: Colors.ORANGE_RUST_DARK,
-          align: 'center',
-          stroke: { color: Colors.GOLD_BRIGHT, width: 0.5 }
-        }
-      });
-      effectsTitle.anchor.set(0.5, 0);
-      effectsTitle.x = cardWidth / 2;
-      effectsTitle.y = effectsY;
-      this.addChild(effectsTitle);
-
-      effectsY += 22;
-
-      this.card.effects.forEach((effect, index) => {
-        const effectBadge = this.createEffectBadge(
-          effect,
-          cardWidth / 2 - 120,
-          effectsY + (index * 28)
-        );
-        this.addChild(effectBadge);
-      });
+    // show close button on popup mode
+    if (this.popupMode) {
+      this.createCloseButton(cardWidth, cardHeight);
     }
   }
 
@@ -278,85 +249,6 @@ export class CardDetailPopup extends Container {
 
     return gem;
   }
-
-  private createFantasyBadge(text: string, x: number, y: number, color: string, isSmall: boolean): Container {
-    const badge = new Container();
-    const badgeWidth = isSmall ? 100 : 120;
-    const badgeHeight = isSmall ? 24 : 36;
-    const fontSize = isSmall ? 11 : 14;
-
-    // Badge background - parchment style with colored border
-    const bg = new Graphics()
-      .roundRect(0, 0, badgeWidth, badgeHeight, 6)
-      .fill({ color: Colors.PARCHMENT_LIGHT, alpha: 0.95 })
-      .stroke({ width: 2, color: color, alpha: 0.95 });
-    
-    // Inner accent
-    bg.roundRect(2, 2, badgeWidth - 4, badgeHeight - 4, 4)
-      .stroke({ width: 1, color: Colors.GOLD, alpha: 0.4 });
-
-    const badgeText = new Text({
-      text,
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: fontSize,
-        fontWeight: 'bold',
-        fill: Colors.BROWN_DARK,
-        align: 'center',
-        stroke: {
-          color: Colors.GOLD_BRIGHT,
-          width: 0.5
-        }
-      }
-    });
-    badgeText.anchor.set(0.5);
-    badgeText.x = badgeWidth / 2;
-    badgeText.y = badgeHeight / 2;
-
-    badge.addChild(bg, badgeText);
-    badge.x = x;
-    badge.y = y;
-
-    return badge;
-  }
-
-  private createEffectBadge(effect: any, x: number, y: number): Container {
-    const badge = new Container();
-    const badgeWidth = 280;
-    const badgeHeight = 36;
-
-    // Parchment background with ornate border
-    const bg = new Graphics()
-      .roundRect(0, 0, badgeWidth, badgeHeight, 6)
-      .fill({ color: Colors.PARCHMENT_LIGHT, alpha: 0.95 })
-      .stroke({ width: 2, color: Colors.ORANGE_RUST_DARK, alpha: 0.8 });
-    
-    // Inner golden accent
-    bg.roundRect(2, 2, badgeWidth - 4, badgeHeight - 4, 4)
-      .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.4 });
-
-    const effectText = new Text({
-      text: `${effect.type}: ${effect.value}`,
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 16,
-        fill: Colors.BROWN_DARKER,
-        align: 'left',
-        fontWeight: 'bold'
-      }
-    });
-    effectText.x = 14;
-    effectText.y = badgeHeight / 2;
-    effectText.anchor.set(0, 0.5);
-
-    badge.addChild(bg, effectText);
-    badge.x = x;
-    badge.y = y;
-
-    return badge;
-  }
-
-
 
   private drawOrnateCorners(x: number, y: number, width: number, height: number): void {
     const cornerSize = 20;
@@ -468,10 +360,11 @@ export class CardDetailPopup extends Container {
     return rarityColors[rarity?.toLowerCase() || 'common'] || rarityColors.common;
   }
 
+  private createCloseButton(cardWidth: number, cardHeight: number): void {
+  }
+
   public positionAtTop(screenWidth: number, screenHeight: number, padding: number = 20): void {
-    // Position the card detail popup at the top center of the screen
-    // Above the logZone, not overriding p1CharacterZone and p1HandZone
     this.x = (screenWidth - this.CARD_MAX_WIDTH) / 2;
-    this.y = padding;
+    this.y = 70 ;
   }
 }
