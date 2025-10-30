@@ -475,7 +475,22 @@ export class HandZone extends Container {
 
     app.stage.addChild(this.cardTooltip);
 
-    this.cardTooltip.positionAtTop(app.screen.width, app.screen.height);
+    // Position the tooltip centered horizontally and above the battle log zone
+    // Get the CardBattleScene to access the battleLogZone position
+    const scene = this.parent?.parent as any; // HandZone -> CardBattleScene
+    if (scene && scene.battleLogZone) {
+      const logZoneGlobalPos = scene.battleLogZone.toGlobal({ x: 0, y: 0 });
+      // Position tooltip centered horizontally and just above the log zone
+      const tooltipWidth = 300; // CARD_MAX_WIDTH
+      const tooltipHeight = 400; // CARD_MAX_HEIGHT (plus shadows ~8px)
+      
+      this.cardTooltip.x = (app.screen.width - tooltipWidth) / 2;
+      // Position above the log zone with a small gap
+      this.cardTooltip.y = Math.max(10, logZoneGlobalPos.y - tooltipHeight - 20);
+    } else {
+      // Fallback: position at top
+      this.cardTooltip.positionAtTop(app.screen.width, app.screen.height);
+    }
   }
 
   private hideCardTooltip(): void {
