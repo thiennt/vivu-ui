@@ -10,263 +10,17 @@ export class CardDetailPopup extends Container {
   private card: Card;
   private gameWidth: number;
   private gameHeight: number;
-  private isTooltipMode: boolean;
 
-  constructor(params: { card: Card, tooltipMode?: boolean }) {
+  constructor(params: { card: Card }) {
     super();
     this.card = params.card;
-    this.isTooltipMode = params.tooltipMode || false;
     this.gameWidth = navigation.width;
     this.gameHeight = navigation.height;
     this.createDialog();
   }
 
   private createDialog(): void {
-    if (this.isTooltipMode) {
-      this.createTooltipMode();
-    } else {
-      this.createPopupMode();
-    }
-  }
-
-  private createTooltipMode(): void {
-    // Compact tooltip with Slay the Spire style
-    const tooltipWidth = 320;
-    const tooltipHeight = 200;
-
-    // Deep shadow layers for depth (Slay the Spire style)
-    const shadowPanel = new Graphics();
-    shadowPanel.roundRect(4, 4, tooltipWidth, tooltipHeight, 8)
-      .fill({ color: Colors.BLACK, alpha: 0.5 });
-    shadowPanel.roundRect(2, 2, tooltipWidth, tooltipHeight, 8)
-      .fill({ color: Colors.BLACK, alpha: 0.3 });
-    this.addChild(shadowPanel);
-
-    // Main background - aged parchment color
-    this.dialogPanel = new Graphics();
-    this.dialogPanel.roundRect(0, 0, tooltipWidth, tooltipHeight, 8)
-      .fill({ color: Colors.PARCHMENT_LIGHT, alpha: 0.98 })
-      .stroke({ width: 3, color: Colors.GOLD }); // Golden border
-
-    // Inner darker parchment layer for depth
-    this.dialogPanel.roundRect(4, 4, tooltipWidth - 8, tooltipHeight - 8, 6)
-      .fill({ color: Colors.PARCHMENT, alpha: 0.6 });
-
-    // Inner golden highlight
-    this.dialogPanel.roundRect(6, 6, tooltipWidth - 12, tooltipHeight - 12, 5)
-      .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.5 });
-
-    this.addChild(this.dialogPanel);
-
-    // Ornamental top banner - ribbon style
-    const rarityColor = this.getRarityColor(this.card.rarity);
-    const bannerGraphics = new Graphics();
-    
-    // Banner background with decorative ends
-    bannerGraphics.moveTo(8, 12)
-      .lineTo(4, 18)
-      .lineTo(8, 24)
-      .lineTo(tooltipWidth - 8, 24)
-      .lineTo(tooltipWidth - 4, 18)
-      .lineTo(tooltipWidth - 8, 12)
-      .lineTo(8, 12)
-      .fill({ color: rarityColor, alpha: 0.8 })
-      .stroke({ width: 1, color: Colors.BROWN });
-
-    this.addChild(bannerGraphics);
-
-    // Energy cost badge - Hidden to simplify game
-    /*
-    const energyX = 12;
-    const energyY = 35;
-    const energyBadge = this.createEnergyGem(energyX, energyY, 32, 28);
-    this.addChild(energyBadge);
-    */
-
-    // Group icon (top-right) - ornate frame
-    const groupIcon = this.getGroupIcon(this.card.group);
-    const groupColor = this.getGroupColor(this.card.group);
-    
-    // Ornate circle with golden border
-    const groupIconBg = new Graphics()
-      .circle(tooltipWidth - 20, 40, 16)
-      .fill({ color: Colors.BROWN_DARK, alpha: 0.95 })
-      .stroke({ width: 2, color: Colors.GOLD, alpha: 0.9 });
-    
-    // Inner glow
-    groupIconBg.circle(tooltipWidth - 20, 40, 14)
-      .stroke({ width: 1, color: groupColor, alpha: 0.6 });
-
-    const groupIconText = new Text({
-      text: groupIcon,
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 18,
-        fill: Colors.WHITE,
-        dropShadow: {
-          color: Colors.BLACK,
-          blur: 2,
-          angle: Math.PI / 4,
-          distance: 1,
-          alpha: 0.8
-        }
-      }
-    });
-    groupIconText.anchor.set(0.5);
-    groupIconText.x = tooltipWidth - 20;
-    groupIconText.y = 40;
-    this.addChild(groupIconBg, groupIconText);
-
-    // Card name with fantasy styling
-    const cardNameText = new Text({
-      text: this.card.name,
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 18,
-        fontWeight: 'bold',
-        fill: Colors.BROWN_DARK, // Dark brown text on parchment
-        align: 'left',
-        wordWrap: true,
-        wordWrapWidth: 200,
-        stroke: {
-          color: Colors.GOLD_BRIGHT,
-          width: 1
-        },
-        dropShadow: {
-          color: Colors.GOLD,
-          blur: 2,
-          angle: Math.PI / 4,
-          distance: 1,
-          alpha: 0.3
-        }
-      }
-    });
-    cardNameText.x = 52;
-    cardNameText.y = 36;
-    this.addChild(cardNameText);
-
-    // Avatar frame with ornate border
-    const avatarFrameX = 12;
-    const avatarFrameY = 70;
-    const avatarFrameSize = 70;
-
-    // Dark background with golden border
-    const avatarFrame = new Graphics()
-      .roundRect(avatarFrameX, avatarFrameY, avatarFrameSize, avatarFrameSize, 4)
-      .fill({ color: Colors.BROWN_DARK, alpha: 0.95 })
-      .stroke({ width: 2, color: Colors.GOLD, alpha: 0.9 });
-    
-    // Inner bevel effect
-    avatarFrame.roundRect(avatarFrameX + 2, avatarFrameY + 2, avatarFrameSize - 4, avatarFrameSize - 4, 3)
-      .stroke({ width: 1, color: Colors.BROWN, alpha: 0.5 });
-    
-    this.addChild(avatarFrame);
-
-    // Draw ornate corners on avatar frame
-    this.drawFantasyCorners(avatarFrameX, avatarFrameY, avatarFrameSize, avatarFrameSize, Colors.GOLD_BRIGHT);
-
-    // Avatar icon with glow
-    const avatarIcon = new Text({
-      text: groupIcon,
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 48,
-        fill: Colors.WHITE
-      }
-    });
-    avatarIcon.anchor.set(0.5);
-    avatarIcon.x = avatarFrameX + avatarFrameSize / 2;
-    avatarIcon.y = avatarFrameY + avatarFrameSize / 2;
-
-    const avatarShadow = new DropShadowFilter({
-      offset: { x: 0, y: 0 },
-      blur: 8,
-      alpha: 0.8,
-      color: this.getGroupColor(this.card.group)
-    });
-    avatarIcon.filters = [avatarShadow];
-    this.addChild(avatarIcon);
-
-    // Type and rarity badges with fantasy styling
-    const badgeX = avatarFrameX + avatarFrameSize + 10;
-    let badgeY = 75;
-
-    if (this.card.card_type || this.card.group) {
-      const typeBadge = this.createFantasyBadge(
-        (this.card.card_type || this.card.group).toString().toUpperCase(),
-        badgeX,
-        badgeY,
-        Colors.BROWN,
-        true
-      );
-      this.addChild(typeBadge);
-      badgeY += 30;
-    }
-
-    const rarityBadge = this.createFantasyBadge(
-      (this.card.rarity || 'common').toString().toUpperCase(),
-      badgeX,
-      badgeY,
-      rarityColor,
-      true
-    );
-    this.addChild(rarityBadge);
-
-    // Decorative divider
-    const divider = new Graphics();
-    divider.moveTo(12, 150)
-      .lineTo(tooltipWidth - 12, 150)
-      .stroke({ width: 1, color: Colors.BROWN, alpha: 0.5 });
-    
-    // Decorative dots
-    divider.circle(tooltipWidth / 2, 150, 2)
-      .fill({ color: Colors.GOLD });
-    
-    this.addChild(divider);
-
-    // Description on parchment style
-    const descText = new Text({
-      text: this.card.description,
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 11,
-        fill: Colors.BROWN_DARKER, // Darker brown for readability
-        align: 'left',
-        wordWrap: true,
-        wordWrapWidth: tooltipWidth - 24,
-        lineHeight: 14
-      }
-    });
-    descText.x = 12;
-    descText.y = 157;
-    this.addChild(descText);
-
-    // Effects summary with glowing effect
-    if (this.card.effects && this.card.effects.length > 0) {
-      const effectsText = this.card.effects
-        .slice(0, 2)
-        .map(e => `${e.type}: ${e.value}`)
-        .join(' • ');
-
-      const effectsSummary = new Text({
-        text: effectsText,
-        style: {
-          fontFamily: 'Kalam',
-          fontSize: 10,
-          fill: Colors.ORANGE_RUST_DARK,
-          align: 'left',
-          wordWrap: true,
-          wordWrapWidth: tooltipWidth - 24,
-          stroke: {
-            color: Colors.GOLD_BRIGHT,
-            width: 0.5
-          }
-        }
-      });
-      effectsSummary.x = 12;
-      effectsSummary.y = tooltipHeight - 22;
-      this.addChild(effectsSummary);
-    }
+    this.createPopupMode();
   }
 
   private createPopupMode(): void {
@@ -367,7 +121,7 @@ export class CardDetailPopup extends Container {
       text: groupIcon,
       style: {
         fontFamily: 'Kalam',
-        fontSize: 32,
+        fontSize: 36,
         fill: Colors.WHITE
       }
     });
@@ -391,7 +145,7 @@ export class CardDetailPopup extends Container {
       text: this.card.name,
       style: {
         fontFamily: 'Kalam',
-        fontSize: 28,
+        fontSize: 32,
         fontWeight: 'bold',
         fill: Colors.BROWN_DARK, // Dark brown on parchment
         align: 'center',
@@ -420,7 +174,7 @@ export class CardDetailPopup extends Container {
       text: this.card.icon_url || groupIcon,
       style: {
         fontFamily: 'Kalam',
-        fontSize: 130,
+        fontSize: 140,
         fill: Colors.WHITE
       }
     });
@@ -475,12 +229,12 @@ export class CardDetailPopup extends Container {
       text: this.card.description,
       style: {
         fontFamily: 'Kalam',
-        fontSize: 15,
+        fontSize: 18,
         fill: Colors.BROWN_DARKER, // Dark brown for readability
         align: 'center',
         wordWrap: true,
         wordWrapWidth: cardWidth - 60,
-        lineHeight: 20
+        lineHeight: 22
       }
     });
     descText.anchor.set(0.5, 0);
@@ -495,7 +249,7 @@ export class CardDetailPopup extends Container {
         text: '⚡ EFFECTS ⚡',
         style: {
           fontFamily: 'Kalam',
-          fontSize: 18,
+          fontSize: 20,
           fontWeight: 'bold',
           fill: Colors.ORANGE_RUST_DARK,
           align: 'center',
@@ -635,7 +389,7 @@ export class CardDetailPopup extends Container {
   private createEffectBadge(effect: any, x: number, y: number): Container {
     const badge = new Container();
     const badgeWidth = 280;
-    const badgeHeight = 32;
+    const badgeHeight = 36;
 
     // Parchment background with ornate border
     const bg = new Graphics()
@@ -651,7 +405,7 @@ export class CardDetailPopup extends Container {
       text: `${effect.type}: ${effect.value}`,
       style: {
         fontFamily: 'Kalam',
-        fontSize: 14,
+        fontSize: 16,
         fill: Colors.BROWN_DARKER,
         align: 'left',
         fontWeight: 'bold'
@@ -848,10 +602,7 @@ export class CardDetailPopup extends Container {
     this.createDialog();
   }
 
-  public positionAtTop(screenWidth: number, screenHeight: number, _padding: number = 20): void {
-    if (this.isTooltipMode) {
-      this.x = (screenWidth - 320) / 2;
-      this.y = screenHeight * 0.25;
-    }
+  public positionAtTop(_screenWidth: number, _screenHeight: number, _padding: number = 20): void {
+    // Popup is already centered in createPopupMode
   }
 }
