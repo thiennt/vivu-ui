@@ -430,30 +430,38 @@ export class CardDetailPopup extends Container {
   }
 
   public positionAtTop(screenWidth: number, screenHeight: number, padding: number = 20): void {
-    // Offset to account for overlay
-    const offsetX = this.dialogBg ? (screenWidth - this.CARD_MAX_WIDTH) / 2 : (screenWidth - this.CARD_MAX_WIDTH) / 2;
-    const offsetY = this.dialogBg ? 70 : 70;
+    // Create a container for card content (everything except overlay)
+    const contentContainer = new Container();
     
-    // Position all children by offsetting their positions
-    this.children.forEach((child) => {
-      if (child !== this.dialogBg) {
-        child.x += offsetX;
-        child.y += offsetY;
-      }
+    // Move all children except overlay to content container
+    const childrenToMove = this.children.filter(child => child !== this.dialogBg);
+    childrenToMove.forEach(child => {
+      this.removeChild(child);
+      contentContainer.addChild(child);
     });
+    
+    // Position the content container
+    contentContainer.x = (screenWidth - this.CARD_MAX_WIDTH) / 2;
+    contentContainer.y = 70;
+    
+    this.addChild(contentContainer);
   }
 
   public positionAtCenter(screenWidth: number, screenHeight: number): void {
-    // Center the card on screen
-    const offsetX = (screenWidth - this.CARD_MAX_WIDTH) / 2;
-    const offsetY = (screenHeight - this.CARD_MAX_HEIGHT) / 2;
+    // Create a container for card content (everything except overlay)
+    const contentContainer = new Container();
     
-    // Position all children except the overlay background
-    this.children.forEach((child) => {
-      if (child !== this.dialogBg) {
-        child.x += offsetX;
-        child.y += offsetY;
-      }
+    // Move all children except overlay to content container
+    const childrenToMove = this.children.filter(child => child !== this.dialogBg);
+    childrenToMove.forEach(child => {
+      this.removeChild(child);
+      contentContainer.addChild(child);
     });
+    
+    // Center the content container on screen
+    contentContainer.x = (screenWidth - this.CARD_MAX_WIDTH) / 2;
+    contentContainer.y = (screenHeight - this.CARD_MAX_HEIGHT) / 2;
+    
+    this.addChild(contentContainer);
   }
 }
