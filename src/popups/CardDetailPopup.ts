@@ -5,11 +5,8 @@ import { Card, CardType, CardRarity } from '@/types';
 import { DropShadowFilter } from 'pixi-filters';
 
 export class CardDetailPopup extends Container {
-  private dialogBg!: Graphics;
   private dialogPanel!: Graphics;
   private card: Card;
-  private gameWidth: number;
-  private gameHeight: number;
 
   private readonly CARD_MAX_WIDTH = 300;
   private readonly CARD_MAX_HEIGHT = 400;
@@ -17,88 +14,79 @@ export class CardDetailPopup extends Container {
   constructor(params: { card: Card }) {
     super();
     this.card = params.card;
-    this.gameWidth = navigation.width;
-    this.gameHeight = navigation.height;
     this.createDialog();
   }
 
   private createDialog(): void {
-    this.createPopupMode();
+    this.createCardDisplay();
   }
 
-  private createPopupMode(): void {
-    // Use fixed card size
+  private createCardDisplay(): void {
+    // Use fixed card size (same as DeckCard visual style but larger)
     const cardWidth = this.CARD_MAX_WIDTH;
     const cardHeight = this.CARD_MAX_HEIGHT;
-    const cardX = (this.gameWidth - cardWidth) / 2;
-    const cardY = (this.gameHeight - cardHeight) / 2;
 
-    // Create semi-transparent background with vignette
-    this.dialogBg = new Graphics();
-    this.dialogBg.rect(0, 0, this.gameWidth, this.gameHeight)
-      .fill({ color: Colors.BROWN_DARKEST, alpha: 0.85 });
-
-    // Create card with Slay the Spire style
+    // Create card with Slay the Spire style (no background overlay)
     this.dialogPanel = new Graphics();
 
     // Multiple shadow layers for dramatic depth
-    this.dialogPanel.roundRect(cardX + 8, cardY + 8, cardWidth, cardHeight, 16)
+    this.dialogPanel.roundRect(8, 8, cardWidth, cardHeight, 16)
       .fill({ color: Colors.BLACK, alpha: 0.6 });
 
-    this.dialogPanel.roundRect(cardX + 5, cardY + 5, cardWidth, cardHeight, 16)
+    this.dialogPanel.roundRect(5, 5, cardWidth, cardHeight, 16)
       .fill({ color: Colors.BLACK, alpha: 0.4 });
 
-    this.dialogPanel.roundRect(cardX + 2, cardY + 2, cardWidth, cardHeight, 16)
+    this.dialogPanel.roundRect(2, 2, cardWidth, cardHeight, 16)
       .fill({ color: Colors.BLACK, alpha: 0.2 });
 
     // Main card background - aged parchment
-    this.dialogPanel.roundRect(cardX, cardY, cardWidth, cardHeight, 16)
+    this.dialogPanel.roundRect(0, 0, cardWidth, cardHeight, 16)
       .fill({ color: Colors.PARCHMENT_LIGHT, alpha: 0.98 })
       .stroke({ width: 4, color: Colors.GOLD }); // Golden border
 
     // Inner darker parchment layer
-    this.dialogPanel.roundRect(cardX + 6, cardY + 6, cardWidth - 12, cardHeight - 12, 12)
+    this.dialogPanel.roundRect(6, 6, cardWidth - 12, cardHeight - 12, 12)
       .fill({ color: Colors.PARCHMENT, alpha: 0.7 });
 
     // Inner golden highlight/trim
-    this.dialogPanel.roundRect(cardX + 8, cardY + 8, cardWidth - 16, cardHeight - 16, 10)
+    this.dialogPanel.roundRect(8, 8, cardWidth - 16, cardHeight - 16, 10)
       .stroke({ width: 2, color: Colors.GOLD_BRIGHT, alpha: 0.6 });
 
     // Ornate decorative corners on main card
-    this.drawOrnateCorners(cardX, cardY, cardWidth, cardHeight);
+    this.drawOrnateCorners(0, 0, cardWidth, cardHeight);
 
     // Top banner
     const rarityColor = this.getRarityColor(this.card.rarity);
     const bannerHeight = 32;
-    this.dialogPanel.moveTo(cardX + 18, cardY + 18)
-      .lineTo(cardX + 14, cardY + 26)
-      .lineTo(cardX + 18, cardY + 18 + bannerHeight)
-      .lineTo(cardX + cardWidth - 18, cardY + 18 + bannerHeight)
-      .lineTo(cardX + cardWidth - 14, cardY + 26)
-      .lineTo(cardX + cardWidth - 18, cardY + 18)
-      .lineTo(cardX + 18, cardY + 18)
+    this.dialogPanel.moveTo(18, 18)
+      .lineTo(14, 26)
+      .lineTo(18, 18 + bannerHeight)
+      .lineTo(cardWidth - 18, 18 + bannerHeight)
+      .lineTo(cardWidth - 14, 26)
+      .lineTo(cardWidth - 18, 18)
+      .lineTo(18, 18)
       .fill({ color: rarityColor, alpha: 0.85 })
       .stroke({ width: 2, color: Colors.BROWN });
 
     // Art frame
     const frameMargin = 18;
-    const frameY = cardY + 70;
+    const frameY = 70;
     const frameHeight = 140;
     const frameWidth = cardWidth - (frameMargin * 2);
 
-    this.dialogPanel.roundRect(cardX + frameMargin, frameY, frameWidth, frameHeight, 10)
+    this.dialogPanel.roundRect(frameMargin, frameY, frameWidth, frameHeight, 10)
       .fill({ color: Colors.BROWN_DARK, alpha: 0.95 })
       .stroke({ width: 2, color: Colors.GOLD, alpha: 0.95 });
 
-    this.dialogPanel.roundRect(cardX + frameMargin + 2, frameY + 2, frameWidth - 4, frameHeight - 4, 8)
+    this.dialogPanel.roundRect(frameMargin + 2, frameY + 2, frameWidth - 4, frameHeight - 4, 8)
       .stroke({ width: 1, color: Colors.BROWN, alpha: 0.6 });
 
-    this.drawFantasyCorners(cardX + frameMargin, frameY, frameWidth, frameHeight, Colors.GOLD_BRIGHT);
+    this.drawFantasyCorners(frameMargin, frameY, frameWidth, frameHeight, Colors.GOLD_BRIGHT);
 
-    this.addChild(this.dialogBg, this.dialogPanel);
+    this.addChild(this.dialogPanel);
 
     // Energy cost badge
-    const energyBadge = this.createEnergyGem(cardX + 18, cardY + 38, 44, 28);
+    const energyBadge = this.createEnergyGem(18, 38, 44, 28);
     this.addChild(energyBadge);
 
     // Group icon (top right)
@@ -106,11 +94,11 @@ export class CardDetailPopup extends Container {
     const groupColor = this.getGroupColor(this.card.group);
 
     const groupIconBg = new Graphics()
-      .circle(cardX + cardWidth - 32, cardY + 54, 18)
+      .circle(cardWidth - 32, 54, 18)
       .fill({ color: Colors.BROWN_DARK, alpha: 0.95 })
       .stroke({ width: 2, color: Colors.GOLD, alpha: 0.95 });
 
-    groupIconBg.circle(cardX + cardWidth - 32, cardY + 54, 15)
+    groupIconBg.circle(cardWidth - 32, 54, 15)
       .stroke({ width: 1, color: groupColor, alpha: 0.7 });
 
     const groupIconText = new Text({
@@ -122,8 +110,8 @@ export class CardDetailPopup extends Container {
       }
     });
     groupIconText.anchor.set(0.5);
-    groupIconText.x = cardX + cardWidth - 32;
-    groupIconText.y = cardY + 54;
+    groupIconText.x = cardWidth - 32;
+    groupIconText.y = 54;
     groupIconText.filters = [new DropShadowFilter({
       offset: { x: 0, y: 0 },
       blur: 8,
@@ -149,8 +137,8 @@ export class CardDetailPopup extends Container {
       }
     });
     cardNameText.anchor.set(0.5, 0);
-    cardNameText.x = cardX + cardWidth / 2;
-    cardNameText.y = cardY + 20;
+    cardNameText.x = cardWidth / 2;
+    cardNameText.y = 20;
     this.addChild(cardNameText);
 
     // Avatar icon
@@ -163,7 +151,7 @@ export class CardDetailPopup extends Container {
       }
     });
     avatarIcon.anchor.set(0.5);
-    avatarIcon.x = cardX + cardWidth / 2;
+    avatarIcon.x = cardWidth / 2;
     avatarIcon.y = frameY + frameHeight / 2;
     avatarIcon.filters = [new DropShadowFilter({
       offset: { x: 0, y: 0 },
@@ -175,15 +163,15 @@ export class CardDetailPopup extends Container {
 
     // Divider
     const divider = new Graphics();
-    divider.moveTo(cardX + 24, cardY + cardHeight - 120)
-      .lineTo(cardX + cardWidth - 24, cardY + cardHeight - 120)
+    divider.moveTo(24, cardHeight - 120)
+      .lineTo(cardWidth - 24, cardHeight - 120)
       .stroke({ width: 1.5, color: Colors.BROWN, alpha: 0.5 });
-    divider.circle(cardX + cardWidth / 2, cardY + cardHeight - 120, 2)
+    divider.circle(cardWidth / 2, cardHeight - 120, 2)
       .fill({ color: Colors.GOLD });
     this.addChild(divider);
 
     // Description
-    const descY = cardY + cardHeight - 110;
+    const descY = cardHeight - 110;
     const descText = new Text({
       text: this.card.description,
       style: {
@@ -197,7 +185,7 @@ export class CardDetailPopup extends Container {
       }
     });
     descText.anchor.set(0.5, 0);
-    descText.x = cardX + cardWidth / 2;
+    descText.x = cardWidth / 2;
     descText.y = descY;
     this.addChild(descText);
 
@@ -216,7 +204,7 @@ export class CardDetailPopup extends Container {
         }
       });
       effectsTitle.anchor.set(0.5, 0);
-      effectsTitle.x = cardX + cardWidth / 2;
+      effectsTitle.x = cardWidth / 2;
       effectsTitle.y = effectsY;
       this.addChild(effectsTitle);
 
@@ -225,25 +213,12 @@ export class CardDetailPopup extends Container {
       this.card.effects.forEach((effect, index) => {
         const effectBadge = this.createEffectBadge(
           effect,
-          cardX + cardWidth / 2 - 120,
+          cardWidth / 2 - 120,
           effectsY + (index * 28)
         );
         this.addChild(effectBadge);
       });
     }
-
-    // Close button
-    const closeButton = this.createFantasyCloseButton(
-      cardX + cardWidth / 2 - 60,
-      cardY + cardHeight - 54
-    );
-    this.addChild(closeButton);
-
-    // Make background clickable to close
-    this.dialogBg.interactive = true;
-    this.dialogBg.on('pointerdown', () => {
-      navigation.dismissPopup();
-    });
   }
 
   private createEnergyGem(x: number, y: number, width: number, height: number): Container {
@@ -378,68 +353,7 @@ export class CardDetailPopup extends Container {
     return badge;
   }
 
-  private createFantasyCloseButton(x: number, y: number): Container {
-    const button = new Container();
-    const buttonWidth = 140;
-    const buttonHeight = 50;
 
-    // Ornate button with parchment and golden trim
-    const bg = new Graphics()
-      .roundRect(0, 0, buttonWidth, buttonHeight, 10)
-      .fill({ color: Colors.BROWN })
-      .stroke({ width: 3, color: Colors.GOLD });
-    
-    // Inner highlight
-    bg.roundRect(3, 3, buttonWidth - 6, buttonHeight - 6, 8)
-      .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.6 });
-
-    const buttonText = new Text({
-      text: 'CLOSE',
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 18,
-        fontWeight: 'bold',
-        fill: Colors.WHITE,
-        stroke: {
-          color: Colors.BROWN_DARK,
-          width: 2
-        }
-      }
-    });
-    buttonText.anchor.set(0.5);
-    buttonText.x = buttonWidth / 2;
-    buttonText.y = buttonHeight / 2;
-
-    button.addChild(bg, buttonText);
-    button.x = x;
-    button.y = y;
-
-    button.interactive = true;
-    button.cursor = 'pointer';
-    button.on('pointerdown', () => {
-      navigation.dismissPopup();
-    });
-
-    button.on('pointerover', () => {
-      bg.clear();
-      bg.roundRect(0, 0, buttonWidth, buttonHeight, 10)
-        .fill({ color: Colors.BROWN_LIGHT })
-        .stroke({ width: 3, color: Colors.GOLD_BRIGHT });
-      bg.roundRect(3, 3, buttonWidth - 6, buttonHeight - 6, 8)
-        .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.8 });
-    });
-    
-    button.on('pointerout', () => {
-      bg.clear();
-      bg.roundRect(0, 0, buttonWidth, buttonHeight, 10)
-        .fill({ color: Colors.BROWN })
-        .stroke({ width: 3, color: Colors.GOLD });
-      bg.roundRect(3, 3, buttonWidth - 6, buttonHeight - 6, 8)
-        .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.6 });
-    });
-
-    return button;
-  }
 
   private drawOrnateCorners(x: number, y: number, width: number, height: number): void {
     const cornerSize = 20;
@@ -551,14 +465,10 @@ export class CardDetailPopup extends Container {
     return rarityColors[rarity?.toLowerCase() || 'common'] || rarityColors.common;
   }
 
-  resize(width: number, height: number): void {
-    this.gameWidth = width;
-    this.gameHeight = height;
-    this.removeChildren();
-    this.createDialog();
-  }
-
-  public positionAtTop(_screenWidth: number, _screenHeight: number, _padding: number = 20): void {
-    // Popup is already centered in createPopupMode
+  public positionAtTop(screenWidth: number, screenHeight: number, padding: number = 20): void {
+    // Position the card detail popup at the top center of the screen
+    // Above the logZone, not overriding p1CharacterZone and p1HandZone
+    this.x = (screenWidth - this.CARD_MAX_WIDTH) / 2;
+    this.y = padding;
   }
 }
