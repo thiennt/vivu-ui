@@ -267,25 +267,25 @@ export class PlayerCharacterZone extends Container {
       }, 50);
       
       // Make card clickable to perform skill
-      characterCard.interactive = true;
-      characterCard.cursor = 'pointer';
+      // characterCard.interactive = true;
+      // characterCard.cursor = 'pointer';
       
-      characterCard.on('pointerdown', () => {
-        this.onCharacterSkillActivate(character);
-      });
+      // characterCard.on('pointerdown', () => {
+      //   this.onCharacterSkillActivate(character);
+      // });
       
-      // Add hover effect
-      characterCard.on('pointerover', () => {
-        glowGraphics.clear();
-        glowGraphics.roundRect(0, 0, characterCard.width, characterCard.height, 10)
-          .stroke({ width: 4, color: Colors.GOLD_BRIGHT, alpha: 1 });
-      });
+      // // Add hover effect
+      // characterCard.on('pointerover', () => {
+      //   glowGraphics.clear();
+      //   glowGraphics.roundRect(0, 0, characterCard.width, characterCard.height, 10)
+      //     .stroke({ width: 4, color: Colors.GOLD_BRIGHT, alpha: 1 });
+      // });
       
-      characterCard.on('pointerout', () => {
-        glowGraphics.clear();
-        glowGraphics.roundRect(0, 0, characterCard.width, characterCard.height, 10)
-          .stroke({ width: 3, color: Colors.GOLD_BRIGHT, alpha: 0.8 });
-      });
+      // characterCard.on('pointerout', () => {
+      //   glowGraphics.clear();
+      //   glowGraphics.roundRect(0, 0, characterCard.width, characterCard.height, 10)
+      //     .stroke({ width: 3, color: Colors.GOLD_BRIGHT, alpha: 0.8 });
+      // });
     }
   }
 

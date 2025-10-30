@@ -155,8 +155,8 @@ export class PrepareScene extends BaseScene {
     const availableCardWidth = panelWidth - (panelPadding * 2);
     
     // Calculate card width based on available space and spacing
-    const cardWidth = (availableCardWidth - (cardSpacing * (maxPerRow - 1))) / maxPerRow;
-    const cardHeight = cardWidth * (160 / 120); // Match CardBattleScene default ratio
+    const cardWidth = 94;
+    const cardHeight = 114;
     
     // Calculate panel height based on actual card height
     const titleHeight = 40;
@@ -194,10 +194,14 @@ export class PrepareScene extends BaseScene {
     lineupTitle.y = 12;
     lineupContainer.addChild(lineupTitle);
 
+    const availableWidth = panelWidth - (panelPadding * 2);
+    const totalCardWidth = (cardWidth * maxPerRow) + (cardSpacing * (maxPerRow - 1));
+    const startX = panelPadding + (availableWidth - totalCardWidth) / 2;
+
     // Position cards inside the panel with proper spacing
     chars.forEach((char: Character, index: number) => {
       const col = index;
-      const x = panelPadding + col * (cardWidth + cardSpacing);
+      const x = startX + col * (cardWidth + cardSpacing);
       const y = titleHeight;
       const charCard = this.createCharacterCard(char, x, y, cardWidth, cardHeight);
 
@@ -239,11 +243,11 @@ export class PrepareScene extends BaseScene {
     this.deckContainer.addChild(deckTitle);
 
     // Responsive card grid
-    const cardsPerRow = 3;
+    const cardsPerRow = 5;
     const spacing = 8;
     const scrollBoxWidth = this.gameWidth - 40;
-    const cardWidth = (scrollBoxWidth - (cardsPerRow - 1) * spacing) / cardsPerRow;
-    const cardHeight = 160;
+    const cardWidth = 65;
+    const cardHeight = 95;
     const gridContainer = new Container();
 
     this.battleStage?.cards.forEach((card, index) => {

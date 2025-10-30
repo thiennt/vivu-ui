@@ -4,8 +4,8 @@ import { gsap } from 'gsap';
 import { DropShadowFilter } from 'pixi-filters';
 
 const defaultCharacterCardOptions = {
-  width: 120,
-  height: 160,
+  width: 90,
+  height: 120,
 };
 
 export type CharacterCardOptions = typeof defaultCharacterCardOptions;
@@ -58,19 +58,10 @@ export class CharacterCard extends Container {
 
     // Set consistent hit area
     this.hitArea = new Rectangle(0, 0, width, height);
-
-    // Setup interactivity
-    this.setupInteractivity();
   }
 
   private createBackground(): void {
     const { cardWidth: width, cardHeight: height } = this;
-
-    // Shadow
-    const shadow = new Graphics();
-    shadow.roundRect(4, 4, width, height, 10)
-      .fill({ color: Colors.BLACK, alpha: 0.4 });
-    this.cardContainer.addChild(shadow);
 
     // Main background
     const bg = new Graphics();
@@ -231,22 +222,10 @@ export class CharacterCard extends Container {
   private createPortraitFrame(): void {
     const { cardWidth: width } = this;
     
-    const frameTop = 5; // Start inside card padding
+    const frameTop = 0; // Start inside card padding
     const frameHeight = 60; // Avatar height
     const frameInset = 5;
     const frameWidth = width - (frameInset * 2);
-
-    // Portrait frame
-    const frame = new Graphics();
-    frame.roundRect(frameInset, frameTop, frameWidth, frameHeight, 8)
-      .fill({ color: Colors.BLUE_NAVY_DARKER, alpha: 0.95 })
-      .stroke({ width: 2, color: Colors.BLUE_STEEL_DARK });
-    
-    // Inner highlight
-    frame.roundRect(frameInset + 2, frameTop + 2, frameWidth - 4, frameHeight - 4, 6)
-      .stroke({ width: 1, color: Colors.BLUE_STEEL, alpha: 0.4 });
-    
-    this.cardContainer.addChild(frame);
 
     // Avatar container
     this.avatarContainer = new Container();
@@ -266,16 +245,21 @@ export class CharacterCard extends Container {
   private createTextStats(): void {
     const { cardWidth: width } = this;
     const statsY = this.avatarContainer.y + 40; // Below avatar
+
+    // Create ATK stat frame
+    const statFrame = new Graphics();
+    statFrame.roundRect(10, statsY - 12, width - 20, 16, 6)
+      .fill({ color: Colors.BLUE_NAVY_DARKER, alpha: 0.95 });
     
-    // Create stat text: "⚔️ 150  🛡️ 85"
+    this.cardContainer.addChild(statFrame);
+    
     const atkValue = this.character.atk || 0;
-    const defValue = this.character.def || 0;
     
     const statsText = new Text({
-      text: `⚔️ ${atkValue}  🛡️ ${defValue}`,
+      text: `⚔️ ${atkValue}`,
       style: {
         fontFamily: 'Kalam',
-        fontSize: 13,
+        fontSize: 12,
         fontWeight: 'bold',
         fill: Colors.WHITE,
         stroke: { color: Colors.BLUE_NAVY_DARKER, width: 2.5 },
@@ -284,13 +268,43 @@ export class CharacterCard extends Container {
     });
     statsText.anchor.set(0.5);
     statsText.x = width / 2;
-    statsText.y = statsY;
+    statsText.y = statsY - 4;
     
     if (this.isDead) {
       statsText.alpha = 0.5;
     }
-    
+
     this.cardContainer.addChild(statsText);
+
+    // create DEF stat frame should be below ATK
+    const defFrame = new Graphics();
+    defFrame.roundRect(10, statsY + 6, width - 20, 16, 6)
+      .fill({ color: Colors.BLUE_NAVY_DARKER, alpha: 0.95 });
+
+    this.cardContainer.addChild(defFrame);
+    
+    const defValue = this.character.def || 0;
+    
+    const defText = new Text({
+      text: `🛡️ ${defValue}`,
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 11,
+        fontWeight: 'bold',
+        fill: Colors.WHITE,
+        stroke: { color: Colors.BLUE_NAVY_DARKER, width: 2.5 },
+        align: 'center'
+      }
+    });
+    defText.anchor.set(0.5);
+    defText.x = width / 2;
+    defText.y = statsY + 14;
+    
+    if (this.isDead) {
+      defText.alpha = 0.5;
+    }
+
+    this.cardContainer.addChild(defText);
   }
 
   private createStatusIndicator(): void {
@@ -344,7 +358,7 @@ export class CharacterCard extends Container {
     const barX = 10;
 
     // HP Bar
-    const hpBarY = height - 28; // 32px from bottom
+    const hpBarY = height - 15;
     const hpBarHeight = 12;
     
     const hpBarBg = new Graphics();
@@ -487,27 +501,6 @@ export class CharacterCard extends Container {
     this.avatarContainer.addChild(avatar);
   }
 
-  private setupInteractivity(): void {
-    const isInteractive = !this.isDead && !this.hasActed;
-    
-    this.interactive = isInteractive;
-    this.cursor = isInteractive ? 'pointer' : 'default';
-
-    if (!isInteractive) return;
-
-    this.on('pointerover', () => {
-      gsap.to(this.hoverOverlay, { alpha: 0.08, duration: 0.3, ease: 'power2.out' });
-      gsap.to(this.glowEffect, { alpha: 0.9, duration: 0.3, ease: 'power2.out' });
-      gsap.to(this.scale, { x: 1.05, y: 1.05, duration: 0.3, ease: 'power2.out' });
-    });
-
-    this.on('pointerout', () => {
-      gsap.to(this.hoverOverlay, { alpha: 0, duration: 0.3, ease: 'power2.out' });
-      gsap.to(this.glowEffect, { alpha: 0, duration: 0.3, ease: 'power2.out' });
-      gsap.to(this.scale, { x: 1.0, y: 1.0, duration: 0.3, ease: 'power2.out' });
-    });
-  }
-
   public isDraggable(): boolean {
     return !this.isDead && !this.hasActed;
   }
@@ -525,7 +518,5 @@ export class CharacterCard extends Container {
     this.createTextStats();
     this.createStatusIndicator();
     this.createBars();
-    
-    this.setupInteractivity();
   }
 }

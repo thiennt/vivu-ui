@@ -231,6 +231,22 @@ export const battleApi = {
     });
   },
 
+  async getStageEnemies(stage_id: string): Promise<any> {
+    const playerId = sessionStorage.getItem('playerId');
+    return apiRequest(`/players/${playerId}/card-battle/stages/${stage_id}/enemies`, {}, {
+      success: true,
+      code: 200,
+      message: "Stage enemies retrieved successfully",
+      errors: null,
+      data: mockStages.find(stage => stage.id === stage_id)?.characters || [],
+      meta: {
+        playerId,
+        stage_id,
+        timestamp: new Date().toISOString()
+      }
+    });
+  },
+
   async createBattleStage(stage_id: string): Promise<any> {
     const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
     return apiRequest(`/players/${playerId}/card-battle/stages/${stage_id}`, {
@@ -386,8 +402,9 @@ export const equipmentApi = {
    * List all available equipment
    * GET /players/equipment
    */
-  async getAllEquipment(): Promise<any[]> {
-    return apiRequest('/players/equipment', {}, mockAllEquipment);
+  async getAllEquipment(playerId?: string): Promise<any[]> {
+    const pid = playerId || sessionStorage.getItem('playerId') || 'player_fc_001';
+    return apiRequest(`/players/${pid}/equipments`, {}, mockAllEquipment);
   },
 
   /**

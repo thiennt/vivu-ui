@@ -239,12 +239,11 @@ export class CharactersScene extends BaseScene {
     const gridHeight = this.gameHeight - gridTop - backButtonHeight - backButtonMargin - this.STANDARD_PADDING;
 
     const availableWidth = this.gameWidth - 2 * this.STANDARD_PADDING;
-    const isMobile = this.gameWidth < 768;
-    const gap = isMobile ? 6 : this.STANDARD_SPACING;
-    const cardCount = 3;
+    const gap = this.STANDARD_SPACING;
+    const cardCount = 3; // Show 3 cards per row
     
-    const cardWidth = (availableWidth - (gap * (cardCount - 1))) / cardCount;
-    const cardHeight = cardWidth * (160 / 120); // Match CardBattleScene default ratio
+    const cardWidth = 94; // Fixed width for better visibility
+    const cardHeight = 114; // Match CardBattleScene default ratio
 
     const layout = {
       itemsPerRow: cardCount,
@@ -260,10 +259,11 @@ export class CharactersScene extends BaseScene {
       const row = Math.floor(index / layout.itemsPerRow);
       const col = index % layout.itemsPerRow;
 
-      const x = col * (layout.itemWidth + gap);
+      // Calculate position for each card in grid
+      const x = col * availableWidth / layout.itemsPerRow + (availableWidth / layout.itemsPerRow - cardWidth) / 2;
       const y = row * (cardHeight + gap);
 
-      const characterCard = this.createCharacterCard(character, x, y, layout.itemWidth, cardHeight);
+      const characterCard = this.createCharacterCard(character, x, y, cardWidth, cardHeight);
 
       characterCard.interactive = true;
       characterCard.cursor = 'pointer';

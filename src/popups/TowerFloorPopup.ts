@@ -4,6 +4,10 @@ import { Colors } from '@/utils/colors';
 import { Stage, Character } from '@/types';
 import { CardBattleScene } from '@/scenes/CardBattleScene';
 import { PrepareScene } from '@/scenes/PrepareScene';
+import { CharacterCard } from '@/ui/CharacterCard';
+import { LoadingStateManager } from '@/utils/loadingStateManager';
+import { battleApi } from '@/services/api';
+
 
 export class TowerFloorPopup extends Container {
   private dialogBg!: Graphics;
@@ -12,11 +16,32 @@ export class TowerFloorPopup extends Container {
   private gameWidth: number;
   private gameHeight: number;
 
+  private enemies: any[] = [];
+  private loadingManager: LoadingStateManager;
+
   constructor(params: { stage: Stage }) {
     super();
     this.stage = params.stage;
     this.gameWidth = navigation.width;
     this.gameHeight = navigation.height;
+
+    this.loadingManager = new LoadingStateManager(this, this.gameWidth, this.gameHeight);
+  }
+
+  async prepare(): Promise<void> {
+    this.loadingManager.showLoading();
+
+    const response = await battleApi.getStageEnemies(this.stage.id);
+    if (response.success && response.data) {
+      this.enemies = response.data;
+    } else {
+      console.error(`❌ Failed to load enemies: ${response.message}`);
+      if (response.errors) {
+        response.errors.forEach((error: any) => console.error(`   Error: ${error}`));
+      }
+    }
+    
+    this.loadingManager.hideLoading();
     this.createDialog();
   }
 
@@ -95,7 +120,7 @@ export class TowerFloorPopup extends Container {
     dialogTitle.x = this.gameWidth / 2;
     dialogTitle.y = bannerY + bannerHeight / 2;
 
-    const lineup_power = (this.stage.characters || []).reduce(
+    const lineup_power = this.enemies.reduce(
       (sum, c) => sum + (c.atk || 0) + (c.def || 0) + (c.hp || 0),
       0
     );
@@ -259,9 +284,7 @@ export class TowerFloorPopup extends Container {
   }
 
   private createEnemyLineup(container: Container, maxWidth: number): void {
-    const enemies = this.stage.characters || [];
-    
-    if (enemies.length === 0) {
+    if (this.enemies.length === 0) {
       const placeholderText = new Text({
         text: '👹 Mysterious Enemies Await...',
         style: {
@@ -275,17 +298,17 @@ export class TowerFloorPopup extends Container {
       return;
     }
 
-    const enemyWidth = 80;
-    const enemyHeight = 100;
+    const enemyWidth = 94;
+    const enemyHeight = 114;
     const spacing = 10;
     const maxEnemiesPerRow = 3;
-    
-    enemies.forEach((enemy: Character, index: number) => {
+
+    this.enemies.forEach((enemy: any, index: number) => {
       const row = Math.floor(index / maxEnemiesPerRow);
       const col = index % maxEnemiesPerRow;
       
       const enemyCard = this.createEnemyCard(enemy, enemyWidth, enemyHeight);
-      const totalRowWidth = Math.min(enemies.length, maxEnemiesPerRow) * enemyWidth + (Math.min(enemies.length, maxEnemiesPerRow) - 1) * spacing;
+      const totalRowWidth = maxEnemiesPerRow * enemyWidth + (maxEnemiesPerRow - 1) * spacing;
       const offsetX = Math.max(0, (maxWidth - totalRowWidth) / 2);
 
       enemyCard.x = offsetX + col * (enemyWidth + spacing);
@@ -295,84 +318,9 @@ export class TowerFloorPopup extends Container {
     });
   }
 
-  private createEnemyCard(enemy: Character, width: number, height: number): Container {
-    const card = new Container();
-    
-    // Dark enemy card
-    const bg = new Graphics();
-    
-    bg.roundRect(2, 2, width, height, 8)
-      .fill({ color: Colors.BLACK, alpha: 0.4 });
-    
-    bg.roundRect(0, 0, width, height, 8)
-      .fill({ color: Colors.BROWN_DARK, alpha: 0.95 })
-      .stroke({ width: 2, color: Colors.RED_DARK });
-    
-    bg.roundRect(2, 2, width - 4, height - 4, 6)
-      .stroke({ width: 1, color: Colors.RED, alpha: 0.5 });
-    
-    card.addChild(bg);
-
-    (async () => {
-      if (enemy.avatar_url && typeof enemy.avatar_url === 'string') {
-        const texture = await Assets.load(enemy.avatar_url as string);
-        const sprite = new Sprite(texture);
-        sprite.width = 40;
-        sprite.height = 40;
-        sprite.anchor.set(0.5);
-        sprite.x = width / 2;
-        sprite.y = 25;
-        card.addChild(sprite);
-      } else {
-        const enemyIcon = new Text({
-          text: '👹',
-          style: {
-            fontFamily: 'Kalam',
-            fontSize: 24,
-            fill: Colors.RED
-          }
-        });
-        enemyIcon.anchor.set(0.5);
-        enemyIcon.x = width / 2;
-        enemyIcon.y = 25;
-        card.addChild(enemyIcon);
-      }
-      
-      // Enemy name
-      const nameText = new Text({
-        text: enemy.name,
-        style: {
-          fontFamily: 'Kalam',
-          fontSize: 11,
-          fontWeight: 'bold',
-          fill: Colors.WHITE,
-          align: 'center',
-          wordWrap: true,
-          wordWrapWidth: width - 10
-        }
-      });
-      nameText.anchor.set(0.5, 0);
-      nameText.x = width / 2;
-      nameText.y = 48;
-      
-      // Stats
-      const statsText = new Text({
-        text: `❤️${enemy.hp} ⚔️${enemy.atk} 🛡️${enemy.def}`,
-        style: {
-          fontFamily: 'Kalam',
-          fontSize: 10,
-          fill: Colors.PARCHMENT,
-          align: 'center'
-        }
-      });
-      statsText.anchor.set(0.5);
-      statsText.x = width / 2;
-      statsText.y = height - 15;
-
-      card.addChild(nameText, statsText);
-    })();
-    
-    return card;
+  private createEnemyCard(enemy: any, width: number, height: number): Container {
+    const enemyCard = new CharacterCard(enemy, { width, height });
+    return enemyCard;
   }
 
   private createFantasyButton(

@@ -200,11 +200,9 @@ export class LineupScene extends BaseScene {
     this.lineupContainer.label = 'lineupContainer';
 
     const cols = 3;
-    const availableWidth = this.gameWidth - 2 * this.STANDARD_PADDING;
-    const gap = 6;
-    const layout = this.calculateThreeCardsLayout(availableWidth, gap);
-    const slotWidth = Math.min(layout.itemWidth, 100);
-    const slotHeight = slotWidth * (160 / 120); // Match CardBattleScene default ratio
+    const gap = this.STANDARD_PADDING;
+    const slotWidth = 94;
+    const slotHeight = 114;
     const gridWidth = cols * slotWidth + (cols - 1) * gap;
     const startX = (this.gameWidth - gridWidth) / 2;
     const startY = 95;
@@ -288,13 +286,9 @@ export class LineupScene extends BaseScene {
   private createCharacterPool(): void {
     this.poolContainer.label = 'characterPool';
 
-    const availableWidth = this.gameWidth - 2 * this.STANDARD_PADDING;
-    const gap = 6;
-    const layout = this.calculateThreeCardsLayout(availableWidth, gap);
-    const slotWidth = Math.min(layout.itemWidth, 100);
-    const slotHeight = slotWidth * (160 / 120); // Match CardBattleScene default ratio
+    const gap = this.STANDARD_PADDING;
+    const slotHeight = 114;
     const poolTop = 150 + slotHeight + 2 * this.STANDARD_SPACING;
-    const actionButtonHeight = 50;
     const actionButtonY = this.gameHeight - 80;
     const poolBottom = actionButtonY - this.STANDARD_SPACING * 2;
     const poolHeight = poolBottom - poolTop;
@@ -304,10 +298,9 @@ export class LineupScene extends BaseScene {
     const padding = this.STANDARD_PADDING;
     const marginTop = 45;
 
-    const poolLayout = this.calculateThreeCardsLayout(poolWidth - 2 * padding, spacing);
-    const cardWidth = Math.min(poolLayout.itemWidth, 100);
-    const cardHeight = cardWidth * (160 / 120); // Match CardBattleScene default ratio
-    const cardsPerRow = poolLayout.itemsPerRow;
+    const cardWidth = 94;
+    const cardHeight = 114;
+    const cardsPerRow = 3;
 
     // Fantasy pool panel
     const poolBg = new Graphics();
@@ -351,13 +344,14 @@ export class LineupScene extends BaseScene {
     scrollBox.x = 0;
     scrollBox.y = marginTop;
 
+    const availableWidth = poolWidth - 2 * padding;
     const content = new Container();
 
     this.availableCharacters.forEach((character, index) => {
       const col = index % cardsPerRow;
       const row = Math.floor(index / cardsPerRow);
 
-      const x = padding + col * (cardWidth + spacing);
+      const x = col * availableWidth / cardsPerRow + (availableWidth / cardsPerRow - cardWidth) / 2;
       const y = row * (cardHeight + spacing);
 
       const characterCard = this.createPoolCharacterCard(character, x, y, cardWidth, cardHeight);
