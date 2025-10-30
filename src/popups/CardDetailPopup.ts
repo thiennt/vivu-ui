@@ -6,6 +6,7 @@ import { DropShadowFilter } from 'pixi-filters';
 
 export class CardDetailPopup extends Container {
   private dialogPanel!: Graphics;
+  private dialogBg?: Graphics;
   private card: Card;
 
   public static readonly CARD_WIDTH = 250;
@@ -24,8 +25,31 @@ export class CardDetailPopup extends Container {
   }
 
   private createDialog(): void {
+    if (this.popupMode) {
+      this.createOverlay();
+    }
     this.createCardDisplay();
-    this.positionAtTop(navigation.width, navigation.height);
+    if (this.popupMode) {
+      this.positionAtCenter(navigation.width, navigation.height);
+    } else {
+      this.positionAtTop(navigation.width, navigation.height);
+    }
+  }
+
+  private createOverlay(): void {
+    // Create semi-transparent dark overlay
+    this.dialogBg = new Graphics();
+    this.dialogBg.rect(0, 0, navigation.width, navigation.height)
+      .fill({ color: Colors.BLACK, alpha: 0.85 });
+    
+    // Make overlay clickable to close
+    this.dialogBg.interactive = true;
+    this.dialogBg.cursor = 'pointer';
+    this.dialogBg.on('pointerdown', () => {
+      navigation.dismissPopup();
+    });
+
+    this.addChild(this.dialogBg);
   }
 
   private createCardDisplay(): void {
@@ -361,10 +385,75 @@ export class CardDetailPopup extends Container {
   }
 
   private createCloseButton(cardWidth: number, cardHeight: number): void {
+    const buttonSize = 30;
+    const button = new Container();
+    
+    const bg = new Graphics();
+    bg.circle(buttonSize / 2, buttonSize / 2, buttonSize / 2)
+      .fill({ color: Colors.BROWN, alpha: 0.95 })
+      .stroke({ width: 2, color: Colors.GOLD });
+    
+    const buttonText = new Text({
+      text: '✕',
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 18,
+        fontWeight: 'bold',
+        fill: Colors.WHITE
+      }
+    });
+    buttonText.anchor.set(0.5);
+    buttonText.x = buttonSize / 2;
+    buttonText.y = buttonSize / 2;
+    
+    button.addChild(bg, buttonText);
+    button.x = cardWidth - buttonSize - 5;
+    button.y = 5;
+    
+    button.interactive = true;
+    button.cursor = 'pointer';
+    button.on('pointerdown', () => {
+      navigation.dismissPopup();
+    });
+    
+    button.on('pointerover', () => {
+      bg.tint = 0xcccccc;
+      button.scale.set(1.1);
+    });
+    
+    button.on('pointerout', () => {
+      bg.tint = 0xffffff;
+      button.scale.set(1.0);
+    });
+    
+    this.addChild(button);
   }
 
   public positionAtTop(screenWidth: number, screenHeight: number, padding: number = 20): void {
-    this.x = (screenWidth - this.CARD_MAX_WIDTH) / 2;
-    this.y = 70 ;
+    // Offset to account for overlay
+    const offsetX = this.dialogBg ? (screenWidth - this.CARD_MAX_WIDTH) / 2 : (screenWidth - this.CARD_MAX_WIDTH) / 2;
+    const offsetY = this.dialogBg ? 70 : 70;
+    
+    // Position all children by offsetting their positions
+    this.children.forEach((child) => {
+      if (child !== this.dialogBg) {
+        child.x += offsetX;
+        child.y += offsetY;
+      }
+    });
+  }
+
+  public positionAtCenter(screenWidth: number, screenHeight: number): void {
+    // Center the card on screen
+    const offsetX = (screenWidth - this.CARD_MAX_WIDTH) / 2;
+    const offsetY = (screenHeight - this.CARD_MAX_HEIGHT) / 2;
+    
+    // Position all children except the overlay background
+    this.children.forEach((child) => {
+      if (child !== this.dialogBg) {
+        child.x += offsetX;
+        child.y += offsetY;
+      }
+    });
   }
 }
