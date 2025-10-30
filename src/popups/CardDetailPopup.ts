@@ -32,7 +32,7 @@ export class CardDetailPopup extends Container {
     // Card dimensions maintaining 1:1.5 aspect ratio (same as hand cards: 60×90)
     const CARD_MAX_WIDTH = 400;
     const CARD_ASPECT_RATIO = 1.5; // height/width ratio
-    const CARD_MAX_HEIGHT = CARD_MAX_WIDTH * CARD_ASPECT_RATIO;
+    const CARD_MAX_HEIGHT = Math.round(CARD_MAX_WIDTH * CARD_ASPECT_RATIO); // = 600
     
     const cardWidth = Math.min(CARD_MAX_WIDTH, this.gameWidth - 40);
     const cardHeight = Math.min(CARD_MAX_HEIGHT, this.gameHeight - 60);
