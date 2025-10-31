@@ -690,14 +690,14 @@ export class CardBattleScene extends BaseScene {
     const isVictory = this.battleState.winner_team === 1;
     
     // Main panel with victory/defeat colors
-    const panelColor = isVictory ? Colors.GOLD_BRIGHT : Colors.BROWN;
+    const panelColor = isVictory ? Colors.ROBOT_CYAN : Colors.ROBOT_ELEMENT;
     resultBg.roundRect(bannerX, bannerY, bannerWidth, bannerHeight, 15)
-      .fill({ color: Colors.PARCHMENT_LIGHT, alpha: 0.98 })
+      .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.98 })
       .stroke({ width: 4, color: panelColor });
     
     // Inner layer
     resultBg.roundRect(bannerX + 5, bannerY + 5, bannerWidth - 10, bannerHeight - 10, 12)
-      .fill({ color: Colors.PARCHMENT, alpha: 0.6 });
+      .fill({ color: Colors.ROBOT_BG_MID, alpha: 0.6 });
     
     // Golden/brown highlight
     resultBg.roundRect(bannerX + 8, bannerY + 8, bannerWidth - 16, bannerHeight - 16, 10)
@@ -727,9 +727,9 @@ export class CardBattleScene extends BaseScene {
         fontSize: 42,
         fontWeight: 'bold',
         fill: isVictory ? Colors.GREEN_DARK : Colors.RED_DARKEST,
-        stroke: { color: isVictory ? Colors.GOLD_BRIGHT : Colors.BROWN_DARK, width: 3 },
+        stroke: { color: isVictory ? Colors.ROBOT_CYAN : Colors.ROBOT_CYAN, width: 3 },
         dropShadow: {
-          color: isVictory ? Colors.GOLD_BRIGHT : Colors.BLACK,
+          color: isVictory ? Colors.ROBOT_CYAN : Colors.BLACK,
           blur: 5,
           angle: Math.PI / 4,
           distance: 3,
@@ -765,10 +765,10 @@ export class CardBattleScene extends BaseScene {
     backBg.roundRect(2, 2, buttonWidth, buttonHeight, 8)
       .fill({ color: Colors.BLACK, alpha: 0.4 });
     backBg.roundRect(0, 0, buttonWidth, buttonHeight, 8)
-      .fill({ color: Colors.BROWN, alpha: 0.95 })
-      .stroke({ width: 2, color: Colors.GOLD });
+      .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.95 })
+      .stroke({ width: 2, color: Colors.ROBOT_CYAN });
     backBg.roundRect(2, 2, buttonWidth - 4, buttonHeight - 4, 6)
-      .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.6 });
+      .stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 0.6 });
 
     const backText = new Text({
       text: '← Back Home',
@@ -777,7 +777,7 @@ export class CardBattleScene extends BaseScene {
         fontSize: 16,
         fontWeight: 'bold',
         fill: Colors.WHITE,
-        stroke: { color: Colors.BROWN_DARK, width: 2 },
+        stroke: { color: Colors.ROBOT_CYAN, width: 2 },
         align: 'center'
       }
     });
@@ -797,10 +797,10 @@ export class CardBattleScene extends BaseScene {
       backBg.roundRect(2, 2, buttonWidth, buttonHeight, 8)
         .fill({ color: Colors.BLACK, alpha: 0.4 });
       backBg.roundRect(0, 0, buttonWidth, buttonHeight, 8)
-        .fill({ color: Colors.BROWN_LIGHT, alpha: 0.95 })
-        .stroke({ width: 2, color: Colors.GOLD_BRIGHT });
+        .fill({ color: Colors.ROBOT_BG_MID, alpha: 0.95 })
+        .stroke({ width: 2, color: Colors.ROBOT_CYAN });
       backBg.roundRect(2, 2, buttonWidth - 4, buttonHeight - 4, 6)
-        .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.9 });
+        .stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 0.9 });
       backButton.scale.set(1.03);
     });
     
@@ -809,10 +809,10 @@ export class CardBattleScene extends BaseScene {
       backBg.roundRect(2, 2, buttonWidth, buttonHeight, 8)
         .fill({ color: Colors.BLACK, alpha: 0.4 });
       backBg.roundRect(0, 0, buttonWidth, buttonHeight, 8)
-        .fill({ color: Colors.BROWN, alpha: 0.95 })
-        .stroke({ width: 2, color: Colors.GOLD });
+        .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.95 })
+        .stroke({ width: 2, color: Colors.ROBOT_CYAN });
       backBg.roundRect(2, 2, buttonWidth - 4, buttonHeight - 4, 6)
-        .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.6 });
+        .stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 0.6 });
       backButton.scale.set(1.0);
     });
     

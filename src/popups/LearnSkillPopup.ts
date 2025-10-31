@@ -64,11 +64,11 @@ export class LearnSkillPopup extends Container {
     const dialogX = (this.gameWidth - dialogWidth) / 2;
     const dialogY = (this.gameHeight - dialogHeight) / 2;
     
-    // Fantasy parchment panel
+    // Robot theme panel
     this.dialogPanel = new Graphics();
     this.dialogPanel.roundRect(dialogX, dialogY, dialogWidth, dialogHeight, 12)
-      .fill({ color: Colors.PARCHMENT_LIGHT, alpha: 0.98 })
-      .stroke({ width: 3, color: Colors.GOLD });
+      .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.98 })
+      .stroke({ width: 3, color: Colors.ROBOT_CYAN });
     
     const loadingText = new Text({
       text: 'Loading skills...',
@@ -76,7 +76,7 @@ export class LearnSkillPopup extends Container {
         fontFamily: 'Orbitron',
         fontSize: 18,
         fontWeight: 'bold',
-        fill: Colors.BROWN,
+        fill: Colors.ROBOT_ELEMENT,
         align: 'center'
       }
     });
@@ -98,7 +98,7 @@ export class LearnSkillPopup extends Container {
     const dialogX = (this.gameWidth - dialogWidth) / 2;
     const dialogY = (this.gameHeight - dialogHeight) / 2;
     
-    // Fantasy parchment panel
+    // Robot theme panel
     this.dialogPanel = new Graphics();
     
     // Shadow
@@ -107,19 +107,19 @@ export class LearnSkillPopup extends Container {
     
     // Main parchment
     this.dialogPanel.roundRect(dialogX, dialogY, dialogWidth, dialogHeight, 12)
-      .fill({ color: Colors.PARCHMENT_LIGHT, alpha: 0.98 })
-      .stroke({ width: 3, color: Colors.GOLD });
+      .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.98 })
+      .stroke({ width: 3, color: Colors.ROBOT_CYAN });
     
     // Inner layer
     this.dialogPanel.roundRect(dialogX + 4, dialogY + 4, dialogWidth - 8, dialogHeight - 8, 10)
-      .fill({ color: Colors.PARCHMENT, alpha: 0.6 });
+      .fill({ color: Colors.ROBOT_BG_MID, alpha: 0.6 });
     
     // Golden highlight
     this.dialogPanel.roundRect(dialogX + 6, dialogY + 6, dialogWidth - 12, dialogHeight - 12, 9)
-      .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.5 });
+      .stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 0.5 });
     
     // Decorative corners
-    this.drawPanelCorners(this.dialogPanel, dialogX, dialogY, dialogWidth, dialogHeight, Colors.GOLD_BRIGHT);
+    this.drawPanelCorners(this.dialogPanel, dialogX, dialogY, dialogWidth, dialogHeight, Colors.ROBOT_CYAN);
 
     // Title banner
     const bannerWidth = dialogWidth - 80;
@@ -135,8 +135,8 @@ export class LearnSkillPopup extends Container {
       .lineTo(bannerX + bannerWidth, bannerY + bannerHeight / 2)
       .lineTo(bannerX + bannerWidth - 10, bannerY)
       .lineTo(bannerX + 10, bannerY)
-      .fill({ color: Colors.BROWN, alpha: 0.95 })
-      .stroke({ width: 2, color: Colors.GOLD });
+      .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.95 })
+      .stroke({ width: 2, color: Colors.ROBOT_CYAN });
 
     const skillTypeLabel = this.skillType.replace('_', ' ').toUpperCase();
     const dialogTitle = new Text({
@@ -146,7 +146,7 @@ export class LearnSkillPopup extends Container {
         fontSize: 18,
         fontWeight: 'bold',
         fill: Colors.WHITE,
-        stroke: { color: Colors.BROWN_DARK, width: 2 },
+        stroke: { color: Colors.ROBOT_CYAN, width: 2 },
         align: 'center'
       }
     });
@@ -159,7 +159,7 @@ export class LearnSkillPopup extends Container {
       style: {
         fontFamily: 'Orbitron',
         fontSize: 14,
-        fill: Colors.BROWN,
+        fill: Colors.ROBOT_ELEMENT,
         align: 'center'
       }
     });
@@ -179,8 +179,8 @@ export class LearnSkillPopup extends Container {
       const optionBg = new Graphics();
       
       optionBg.roundRect(0, 0, dialogWidth - 40, 60, 6)
-        .fill({ color: Colors.PARCHMENT, alpha: 0.5 })
-        .stroke({ width: 2, color: Colors.GOLD, alpha: 0.5 });
+        .fill({ color: Colors.ROBOT_BG_MID, alpha: 0.5 })
+        .stroke({ width: 2, color: Colors.ROBOT_CYAN, alpha: 0.5 });
       
       // Skill type badge
       const badgeColor = this.skillType === 'active_skill' ? Colors.SKILL_ACTIVE : Colors.SKILL_PASSIVE;
@@ -208,7 +208,7 @@ export class LearnSkillPopup extends Container {
           fontFamily: 'Orbitron',
           fontSize: 14,
           fontWeight: 'bold',
-          fill: Colors.BROWN_DARK
+          fill: Colors.ROBOT_CYAN
         }
       });
       skillName.x = 10;
@@ -242,17 +242,17 @@ export class LearnSkillPopup extends Container {
       optionContainer.on('pointerover', () => {
         optionBg.clear();
         optionBg.roundRect(0, 0, dialogWidth - 40, 60, 6)
-          .fill({ color: Colors.GOLD_BRIGHT, alpha: 0.3 })
-          .stroke({ width: 2, color: Colors.GOLD });
+          .fill({ color: Colors.ROBOT_CYAN, alpha: 0.3 })
+          .stroke({ width: 2, color: Colors.ROBOT_CYAN });
         optionBg.roundRect(2, 2, dialogWidth - 44, 56, 5)
-          .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.8 });
+          .stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 0.8 });
       });
       
       optionContainer.on('pointerout', () => {
         optionBg.clear();
         optionBg.roundRect(0, 0, dialogWidth - 40, 60, 6)
-          .fill({ color: Colors.PARCHMENT, alpha: 0.5 })
-          .stroke({ width: 2, color: Colors.GOLD, alpha: 0.5 });
+          .fill({ color: Colors.ROBOT_BG_MID, alpha: 0.5 })
+          .stroke({ width: 2, color: Colors.ROBOT_CYAN, alpha: 0.5 });
       });
       
       skillOptions.push(optionContainer);
@@ -319,10 +319,10 @@ export class LearnSkillPopup extends Container {
     bg.roundRect(2, 2, width, height, 8)
       .fill({ color: Colors.BLACK, alpha: 0.4 });
     bg.roundRect(0, 0, width, height, 8)
-      .fill({ color: Colors.BROWN, alpha: 0.95 })
-      .stroke({ width: 2, color: Colors.GOLD });
+      .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.95 })
+      .stroke({ width: 2, color: Colors.ROBOT_CYAN });
     bg.roundRect(2, 2, width - 4, height - 4, 6)
-      .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.6 });
+      .stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 0.6 });
     
     const buttonText = new Text({
       text,
@@ -331,7 +331,7 @@ export class LearnSkillPopup extends Container {
         fontSize: 14,
         fontWeight: 'bold',
         fill: Colors.WHITE,
-        stroke: { color: Colors.BROWN_DARK, width: 2 }
+        stroke: { color: Colors.ROBOT_CYAN, width: 2 }
       }
     });
     buttonText.anchor.set(0.5);
@@ -351,10 +351,10 @@ export class LearnSkillPopup extends Container {
       bg.roundRect(2, 2, width, height, 8)
         .fill({ color: Colors.BLACK, alpha: 0.4 });
       bg.roundRect(0, 0, width, height, 8)
-        .fill({ color: Colors.BROWN_LIGHT, alpha: 0.95 })
-        .stroke({ width: 2, color: Colors.GOLD_BRIGHT });
+        .fill({ color: Colors.ROBOT_BG_MID, alpha: 0.95 })
+        .stroke({ width: 2, color: Colors.ROBOT_CYAN });
       bg.roundRect(2, 2, width - 4, height - 4, 6)
-        .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.9 });
+        .stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 0.9 });
       button.scale.set(1.02);
     });
     
@@ -363,10 +363,10 @@ export class LearnSkillPopup extends Container {
       bg.roundRect(2, 2, width, height, 8)
         .fill({ color: Colors.BLACK, alpha: 0.4 });
       bg.roundRect(0, 0, width, height, 8)
-        .fill({ color: Colors.BROWN, alpha: 0.95 })
-        .stroke({ width: 2, color: Colors.GOLD });
+        .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.95 })
+        .stroke({ width: 2, color: Colors.ROBOT_CYAN });
       bg.roundRect(2, 2, width - 4, height - 4, 6)
-        .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.6 });
+        .stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 0.6 });
       button.scale.set(1.0);
     });
     

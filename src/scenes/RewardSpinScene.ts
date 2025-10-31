@@ -29,10 +29,10 @@ export class RewardSpinScene extends BaseScene {
   
   // Wheel segments
   private segments: SpinSegment[] = [
-    { label: 'Gold', emoji: '💰', color: Colors.GOLD, reward: { type: 'gold', amount: 100 } },
+    { label: 'Gold', emoji: '💰', color: Colors.ROBOT_CYAN, reward: { type: 'gold', amount: 100 } },
     { label: 'Experience', emoji: '⭐', color: Colors.BLUE_SKY, reward: { type: 'exp', amount: 50 } },
     { label: 'Dice', emoji: '🎲', color: Colors.PURPLE_BRIGHT, reward: { type: 'dice', amount: 5 } },
-    { label: 'Gold', emoji: '💰', color: Colors.GOLD_BRIGHT, reward: { type: 'gold', amount: 200 } },
+    { label: 'Gold', emoji: '💰', color: Colors.ROBOT_CYAN, reward: { type: 'gold', amount: 200 } },
     { label: 'Energy', emoji: '⚡', color: Colors.ORANGE_EMBER, reward: { type: 'energy', amount: 10 } },
     { label: 'Experience', emoji: '⭐', color: Colors.BLUE_BRIGHT, reward: { type: 'exp', amount: 100 } },
     { label: 'Dice', emoji: '🎲', color: Colors.PURPLE_MYSTIC, reward: { type: 'dice', amount: 10 } },
@@ -88,18 +88,18 @@ export class RewardSpinScene extends BaseScene {
     
     // Dark fantasy background with gradient
     bg.rect(0, 0, this.gameWidth, this.gameHeight)
-      .fill({ color: Colors.BROWN_DARKEST, alpha: 1.0 });
+      .fill({ color: Colors.ROBOT_BG_DARK, alpha: 1.0 });
     
     // Overlay texture
     bg.rect(0, 0, this.gameWidth, this.gameHeight)
-      .fill({ color: Colors.BROWN_DARK, alpha: 0.3 });
+      .fill({ color: Colors.ROBOT_CYAN, alpha: 0.3 });
     
     // Add mystical particles
     for (let i = 0; i < 30; i++) {
       const particle = new Graphics();
       const size = 1 + Math.random() * 2.5;
       particle.circle(Math.random() * this.gameWidth, Math.random() * this.gameHeight, size)
-        .fill({ color: Colors.GOLD_BRIGHT, alpha: 0.2 + Math.random() * 0.4 });
+        .fill({ color: Colors.ROBOT_CYAN, alpha: 0.2 + Math.random() * 0.4 });
       this.container.addChild(particle);
     }
   }
@@ -118,8 +118,8 @@ export class RewardSpinScene extends BaseScene {
       .lineTo(bannerX + bannerWidth, bannerY + bannerHeight / 2)
       .lineTo(bannerX + bannerWidth - 12, bannerY)
       .lineTo(bannerX + 12, bannerY)
-      .fill({ color: Colors.BROWN, alpha: 0.95 })
-      .stroke({ width: 2.5, color: Colors.GOLD });
+      .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.95 })
+      .stroke({ width: 2.5, color: Colors.ROBOT_CYAN });
     
     banner.moveTo(bannerX + 15, bannerY + 3)
       .lineTo(bannerX + bannerWidth - 15, bannerY + 3)
@@ -128,7 +128,7 @@ export class RewardSpinScene extends BaseScene {
       .lineTo(bannerX + 15, bannerY + bannerHeight - 3)
       .lineTo(bannerX + 4, bannerY + bannerHeight / 2)
       .lineTo(bannerX + 15, bannerY + 3)
-      .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.6 });
+      .stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 0.6 });
 
     const title = new Text({
       text: '🎡 Reward Spin Wheel 🎡',
@@ -137,9 +137,9 @@ export class RewardSpinScene extends BaseScene {
         fontSize: 26,
         fontWeight: 'bold',
         fill: Colors.WHITE,
-        stroke: { color: Colors.BROWN_DARK, width: 2 },
+        stroke: { color: Colors.ROBOT_CYAN, width: 2 },
         dropShadow: {
-          color: Colors.GOLD_BRIGHT,
+          color: Colors.ROBOT_CYAN,
           blur: 4,
           angle: Math.PI / 4,
           distance: 2,
@@ -156,7 +156,7 @@ export class RewardSpinScene extends BaseScene {
       style: {
         fontFamily: 'Orbitron',
         fontSize: 14,
-        fill: Colors.GOLD,
+        fill: Colors.ROBOT_CYAN,
         align: 'center'
       }
     });
@@ -195,7 +195,7 @@ export class RewardSpinScene extends BaseScene {
       segmentGraphics.arc(0, 0, wheelRadius, startAngle, endAngle);
       segmentGraphics.lineTo(0, 0);
       segmentGraphics.fill({ color: segment.color, alpha: 0.9 });
-      segmentGraphics.stroke({ width: 3, color: Colors.GOLD });
+      segmentGraphics.stroke({ width: 3, color: Colors.ROBOT_CYAN });
       
       this.wheel.addChild(segmentGraphics);
       
@@ -227,7 +227,7 @@ export class RewardSpinScene extends BaseScene {
           fontSize: 11,
           fontWeight: 'bold',
           fill: Colors.WHITE,
-          stroke: { color: Colors.BROWN_DARKEST, width: 2 }
+          stroke: { color: Colors.ROBOT_BG_DARK, width: 2 }
         }
       });
       label.anchor.set(0.5);
@@ -240,18 +240,18 @@ export class RewardSpinScene extends BaseScene {
     // Outer rim
     const rim = new Graphics();
     rim.circle(0, 0, wheelRadius)
-      .stroke({ width: 4, color: Colors.GOLD_BRIGHT });
+      .stroke({ width: 4, color: Colors.ROBOT_CYAN });
     rim.circle(0, 0, wheelRadius - 5)
-      .stroke({ width: 2, color: Colors.GOLD, alpha: 0.6 });
+      .stroke({ width: 2, color: Colors.ROBOT_CYAN, alpha: 0.6 });
     this.wheel.addChild(rim);
     
     // Center hub
     const hub = new Graphics();
     hub.circle(0, 0, 20)
-      .fill({ color: Colors.BROWN_DARK, alpha: 0.95 })
-      .stroke({ width: 3, color: Colors.GOLD_BRIGHT });
+      .fill({ color: Colors.ROBOT_CYAN, alpha: 0.95 })
+      .stroke({ width: 3, color: Colors.ROBOT_CYAN });
     hub.circle(0, 0, 12)
-      .fill({ color: Colors.GOLD, alpha: 0.8 });
+      .fill({ color: Colors.ROBOT_CYAN, alpha: 0.8 });
     this.wheel.addChild(hub);
     
     // Position wheel
@@ -275,7 +275,7 @@ export class RewardSpinScene extends BaseScene {
       .lineTo(centerX + pointerSize / 2, centerY - wheelRadius - 15 - pointerSize)
       .lineTo(centerX, centerY - wheelRadius - 15)
       .fill({ color: Colors.RED_BRIGHT, alpha: 1 })
-      .stroke({ width: 2, color: Colors.GOLD_BRIGHT });
+      .stroke({ width: 2, color: Colors.ROBOT_CYAN });
     
     this.container.addChild(this.pointer);
   }
@@ -305,11 +305,11 @@ export class RewardSpinScene extends BaseScene {
         fontFamily: 'Orbitron',
         fontSize: 20,
         fontWeight: 'bold',
-        fill: Colors.GOLD_BRIGHT,
-        stroke: { color: Colors.BROWN_DARK, width: 2 },
+        fill: Colors.ROBOT_CYAN,
+        stroke: { color: Colors.ROBOT_CYAN, width: 2 },
         align: 'center',
         dropShadow: {
-          color: Colors.GOLD,
+          color: Colors.ROBOT_CYAN,
           blur: 3,
           angle: Math.PI / 4,
           distance: 2,
@@ -414,9 +414,9 @@ export class RewardSpinScene extends BaseScene {
     
     const bg = new Graphics();
     
-    const mainColor = disabled ? Colors.GRAY : Colors.BROWN;
-    const strokeColor = disabled ? Colors.GRAY_MID : Colors.GOLD;
-    const highlightColor = disabled ? Colors.GRAY_LIGHT : Colors.GOLD_BRIGHT;
+    const mainColor = disabled ? Colors.GRAY : Colors.ROBOT_ELEMENT;
+    const strokeColor = disabled ? Colors.GRAY_MID : Colors.ROBOT_CYAN;
+    const highlightColor = disabled ? Colors.GRAY_LIGHT : Colors.ROBOT_CYAN;
     const textColor = disabled ? Colors.GRAY_LIGHTER : Colors.WHITE;
     
     bg.roundRect(2, 2, width, height, 8)
@@ -434,7 +434,7 @@ export class RewardSpinScene extends BaseScene {
         fontSize: 16,
         fontWeight: 'bold',
         fill: textColor,
-        stroke: { color: Colors.BROWN_DARK, width: 2 }
+        stroke: { color: Colors.ROBOT_CYAN, width: 2 }
       }
     });
     buttonText.anchor.set(0.5);
@@ -454,10 +454,10 @@ export class RewardSpinScene extends BaseScene {
         bg.roundRect(2, 2, width, height, 8)
           .fill({ color: Colors.BLACK, alpha: 0.4 });
         bg.roundRect(0, 0, width, height, 8)
-          .fill({ color: Colors.BROWN_LIGHT, alpha: 0.95 })
-          .stroke({ width: 2, color: Colors.GOLD_BRIGHT });
+          .fill({ color: Colors.ROBOT_BG_MID, alpha: 0.95 })
+          .stroke({ width: 2, color: Colors.ROBOT_CYAN });
         bg.roundRect(2, 2, width - 4, height - 4, 6)
-          .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.9 });
+          .stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 0.9 });
         button.scale.set(1.02);
       });
       
@@ -466,10 +466,10 @@ export class RewardSpinScene extends BaseScene {
         bg.roundRect(2, 2, width, height, 8)
           .fill({ color: Colors.BLACK, alpha: 0.4 });
         bg.roundRect(0, 0, width, height, 8)
-          .fill({ color: Colors.BROWN, alpha: 0.95 })
-          .stroke({ width: 2, color: Colors.GOLD });
+          .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.95 })
+          .stroke({ width: 2, color: Colors.ROBOT_CYAN });
         bg.roundRect(2, 2, width - 4, height - 4, 6)
-          .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.6 });
+          .stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 0.6 });
         button.scale.set(1.0);
       });
       

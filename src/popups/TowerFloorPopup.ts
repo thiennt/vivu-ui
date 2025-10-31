@@ -56,7 +56,7 @@ export class TowerFloorPopup extends Container {
     const dialogX = (this.gameWidth - dialogWidth) / 2;
     const dialogY = (this.gameHeight - dialogHeight) / 2;
     
-    // Fantasy parchment dialog panel
+    // Robot theme dialog panel
     this.dialogPanel = new Graphics();
     
     // Shadow
@@ -65,19 +65,19 @@ export class TowerFloorPopup extends Container {
     
     // Main parchment panel
     this.dialogPanel.roundRect(dialogX, dialogY, dialogWidth, dialogHeight, 12)
-      .fill({ color: Colors.PARCHMENT_LIGHT, alpha: 0.98 })
-      .stroke({ width: 3, color: Colors.GOLD });
+      .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.98 })
+      .stroke({ width: 3, color: Colors.ROBOT_CYAN });
     
     // Inner layer
     this.dialogPanel.roundRect(dialogX + 4, dialogY + 4, dialogWidth - 8, dialogHeight - 8, 10)
-      .fill({ color: Colors.PARCHMENT, alpha: 0.6 });
+      .fill({ color: Colors.ROBOT_BG_MID, alpha: 0.6 });
     
     // Golden highlight
     this.dialogPanel.roundRect(dialogX + 6, dialogY + 6, dialogWidth - 12, dialogHeight - 12, 9)
-      .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.5 });
+      .stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 0.5 });
     
     // Decorative corners
-    this.drawPanelCorners(this.dialogPanel, dialogX, dialogY, dialogWidth, dialogHeight, Colors.GOLD_BRIGHT);
+    this.drawPanelCorners(this.dialogPanel, dialogX, dialogY, dialogWidth, dialogHeight, Colors.ROBOT_CYAN);
 
     // Dialog title banner
     const bannerWidth = dialogWidth - 80;
@@ -93,8 +93,8 @@ export class TowerFloorPopup extends Container {
       .lineTo(bannerX + bannerWidth, bannerY + bannerHeight / 2)
       .lineTo(bannerX + bannerWidth - 10, bannerY)
       .lineTo(bannerX + 10, bannerY)
-      .fill({ color: Colors.BROWN, alpha: 0.95 })
-      .stroke({ width: 2, color: Colors.GOLD });
+      .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.95 })
+      .stroke({ width: 2, color: Colors.ROBOT_CYAN });
     
     titleBanner.moveTo(bannerX + 12, bannerY + 2)
       .lineTo(bannerX + bannerWidth - 12, bannerY + 2)
@@ -103,7 +103,7 @@ export class TowerFloorPopup extends Container {
       .lineTo(bannerX + 12, bannerY + bannerHeight - 2)
       .lineTo(bannerX + 3, bannerY + bannerHeight / 2)
       .lineTo(bannerX + 12, bannerY + 2)
-      .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.6 });
+      .stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 0.6 });
 
     const dialogTitle = new Text({
       text: `🗼 ${this.stage.name}`,
@@ -112,7 +112,7 @@ export class TowerFloorPopup extends Container {
         fontSize: 22,
         fontWeight: 'bold',
         fill: Colors.WHITE,
-        stroke: { color: Colors.BROWN_DARK, width: 2 },
+        stroke: { color: Colors.ROBOT_CYAN, width: 2 },
         align: 'center'
       }
     });
@@ -131,8 +131,8 @@ export class TowerFloorPopup extends Container {
     
     const enemyPanel = new Graphics();
     enemyPanel.roundRect(dialogX + 15, enemySectionY, dialogWidth - 30, enemySectionHeight, 8)
-      .fill({ color: Colors.PARCHMENT, alpha: 0.5 })
-      .stroke({ width: 2, color: Colors.GOLD, alpha: 0.7 });
+      .fill({ color: Colors.ROBOT_BG_MID, alpha: 0.5 })
+      .stroke({ width: 2, color: Colors.ROBOT_CYAN, alpha: 0.7 });
 
     const enemyTitle = new Text({
       text: `⚔️ Enemy Lineup ⚡${lineup_power}`,
@@ -140,8 +140,8 @@ export class TowerFloorPopup extends Container {
         fontFamily: 'Orbitron',
         fontSize: 16,
         fontWeight: 'bold',
-        fill: Colors.BROWN_DARK,
-        stroke: { color: Colors.GOLD_BRIGHT, width: 0.5 }
+        fill: Colors.ROBOT_CYAN,
+        stroke: { color: Colors.ROBOT_CYAN, width: 0.5 }
       }
     });
     enemyTitle.x = dialogX + 25;
@@ -165,11 +165,11 @@ export class TowerFloorPopup extends Container {
       .fill({ color: Colors.BLACK, alpha: 0.3 });
     
     rewardPanel.roundRect(dialogX + 15, rewardSectionY, dialogWidth - 30, rewardSectionHeight, 8)
-      .fill({ color: Colors.GOLD_BRIGHT, alpha: 0.25 })
-      .stroke({ width: 2, color: Colors.GOLD });
+      .fill({ color: Colors.ROBOT_CYAN, alpha: 0.25 })
+      .stroke({ width: 2, color: Colors.ROBOT_CYAN });
     
     rewardPanel.roundRect(dialogX + 17, rewardSectionY + 2, dialogWidth - 34, rewardSectionHeight - 4, 7)
-      .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.8 });
+      .stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 0.8 });
 
     const rewardTitle = new Text({
       text: '🏆 Battle Rewards',
@@ -177,8 +177,8 @@ export class TowerFloorPopup extends Container {
         fontFamily: 'Orbitron',
         fontSize: 16,
         fontWeight: 'bold',
-        fill: Colors.BROWN_DARK,
-        stroke: { color: Colors.GOLD_BRIGHT, width: 0.5 }
+        fill: Colors.ROBOT_CYAN,
+        stroke: { color: Colors.ROBOT_CYAN, width: 0.5 }
       }
     });
     rewardTitle.x = dialogX + 25;
@@ -190,7 +190,7 @@ export class TowerFloorPopup extends Container {
       style: {
         fontFamily: 'Orbitron',
         fontSize: 28,
-        fill: Colors.BROWN_DARK
+        fill: Colors.ROBOT_CYAN
       }
     });
     treasureChest.x = dialogX + 30;
@@ -202,7 +202,7 @@ export class TowerFloorPopup extends Container {
         fontFamily: 'Orbitron',
         fontSize: 14,
         fontWeight: 'bold',
-        fill: Colors.BROWN_DARK,
+        fill: Colors.ROBOT_CYAN,
         align: 'left',
         wordWrap: true,
         wordWrapWidth: dialogWidth - 140
@@ -291,7 +291,7 @@ export class TowerFloorPopup extends Container {
           fontFamily: 'Orbitron',
           fontSize: 16,
           fontStyle: 'italic',
-          fill: Colors.BROWN
+          fill: Colors.ROBOT_ELEMENT
         }
       });
       container.addChild(placeholderText);
@@ -338,9 +338,9 @@ export class TowerFloorPopup extends Container {
       .fill({ color: Colors.BLACK, alpha: 0.5 });
     bg.roundRect(0, 0, width, height, 8)
       .fill({ color: Colors.RED_DARK, alpha: 0.95 })
-      .stroke({ width: 2, color: Colors.GOLD_BRIGHT });
+      .stroke({ width: 2, color: Colors.ROBOT_CYAN });
     bg.roundRect(2, 2, width - 4, height - 4, 6)
-      .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.8 });
+      .stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 0.8 });
     
     const buttonText = new Text({
       text,
@@ -349,7 +349,7 @@ export class TowerFloorPopup extends Container {
         fontSize: 18,
         fontWeight: 'bold',
         fill: Colors.WHITE,
-        stroke: { color: Colors.BROWN_DARK, width: 2 }
+        stroke: { color: Colors.ROBOT_CYAN, width: 2 }
       }
     });
     buttonText.anchor.set(0.5);
@@ -370,9 +370,9 @@ export class TowerFloorPopup extends Container {
         .fill({ color: Colors.BLACK, alpha: 0.5 });
       bg.roundRect(0, 0, width, height, 8)
         .fill({ color: Colors.RED, alpha: 0.95 })
-        .stroke({ width: 2, color: Colors.GOLD_BRIGHT });
+        .stroke({ width: 2, color: Colors.ROBOT_CYAN });
       bg.roundRect(2, 2, width - 4, height - 4, 6)
-        .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 1 });
+        .stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 1 });
       button.scale.set(1.03);
     });
     
@@ -382,9 +382,9 @@ export class TowerFloorPopup extends Container {
         .fill({ color: Colors.BLACK, alpha: 0.5 });
       bg.roundRect(0, 0, width, height, 8)
         .fill({ color: Colors.RED_DARK, alpha: 0.95 })
-        .stroke({ width: 2, color: Colors.GOLD_BRIGHT });
+        .stroke({ width: 2, color: Colors.ROBOT_CYAN });
       bg.roundRect(2, 2, width - 4, height - 4, 6)
-        .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.8 });
+        .stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 0.8 });
       button.scale.set(1.0);
     });
     
@@ -402,8 +402,8 @@ export class TowerFloorPopup extends Container {
     
     const bg = new Graphics();
     bg.circle(width / 2, height / 2, width / 2)
-      .fill({ color: Colors.BROWN, alpha: 0.95 })
-      .stroke({ width: 2, color: Colors.GOLD });
+      .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.95 })
+      .stroke({ width: 2, color: Colors.ROBOT_CYAN });
     
     const buttonText = new Text({
       text: '✕',

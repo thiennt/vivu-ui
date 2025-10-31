@@ -158,11 +158,11 @@ export class ItemsScene extends BaseScene {
     
     // Dark fantasy background
     bg.rect(0, 0, this.gameWidth, this.gameHeight)
-      .fill({ color: Colors.BROWN_DARKEST, alpha: 1.0 });
+      .fill({ color: Colors.ROBOT_BG_DARK, alpha: 1.0 });
     
     // Subtle brown texture
     bg.rect(0, 0, this.gameWidth, this.gameHeight)
-      .fill({ color: Colors.BROWN_DARK, alpha: 0.3 });
+      .fill({ color: Colors.ROBOT_CYAN, alpha: 0.3 });
     
     this.backgroundContainer.addChild(bg);
   }
@@ -183,8 +183,8 @@ export class ItemsScene extends BaseScene {
       .lineTo(bannerX + bannerWidth, bannerY + bannerHeight / 2)
       .lineTo(bannerX + bannerWidth - 12, bannerY)
       .lineTo(bannerX + 12, bannerY)
-      .fill({ color: Colors.BROWN, alpha: 0.95 })
-      .stroke({ width: 2.5, color: Colors.GOLD });
+      .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.95 })
+      .stroke({ width: 2.5, color: Colors.ROBOT_CYAN });
     
     // Inner highlight
     banner.moveTo(bannerX + 15, bannerY + 3)
@@ -194,7 +194,7 @@ export class ItemsScene extends BaseScene {
       .lineTo(bannerX + 15, bannerY + bannerHeight - 3)
       .lineTo(bannerX + 4, bannerY + bannerHeight / 2)
       .lineTo(bannerX + 15, bannerY + 3)
-      .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.6 });
+      .stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 0.6 });
 
     const title = new Text({
       text: '⚒️ Craft Equipment ⚒️',
@@ -203,9 +203,9 @@ export class ItemsScene extends BaseScene {
         fontSize: 24,
         fontWeight: 'bold',
         fill: Colors.WHITE,
-        stroke: { color: Colors.BROWN_DARK, width: 2 },
+        stroke: { color: Colors.ROBOT_CYAN, width: 2 },
         dropShadow: {
-          color: Colors.GOLD_BRIGHT,
+          color: Colors.ROBOT_CYAN,
           blur: 3,
           angle: Math.PI / 4,
           distance: 2,
@@ -222,7 +222,7 @@ export class ItemsScene extends BaseScene {
       style: {
         fontFamily: 'Orbitron',
         fontSize: 12,
-        fill: Colors.GOLD,
+        fill: Colors.ROBOT_CYAN,
         align: 'center'
       }
     });
@@ -333,7 +333,7 @@ export class ItemsScene extends BaseScene {
         fontFamily: 'Orbitron',
         fontSize: 16,
         fontWeight: 'bold',
-        fill: Colors.GOLD_BRIGHT,
+        fill: Colors.ROBOT_CYAN,
         stroke: { color: Colors.BLACK, width: 2 }
       }
     });
@@ -369,7 +369,7 @@ export class ItemsScene extends BaseScene {
       bg.clear();
       bg.roundRect(0, 0, card.width, card.height, 8)
         .fill({ color: Colors.BLUE_NAVY_DARK, alpha: 0.95 })
-        .stroke({ width: 3, color: Colors.GOLD_BRIGHT });
+        .stroke({ width: 3, color: Colors.ROBOT_CYAN });
     }
     
     this.updateCraftingArea();
@@ -381,7 +381,7 @@ export class ItemsScene extends BaseScene {
     
     const bg = new Graphics();
     bg.rect(0, areaY, this.gameWidth, areaHeight)
-      .fill({ color: Colors.BROWN_DARKER, alpha: 0.95 });
+      .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.95 });
     
     this.craftingContainer.addChild(bg);
     
@@ -417,7 +417,7 @@ export class ItemsScene extends BaseScene {
         style: {
           fontFamily: 'Orbitron',
           fontSize: 12,
-          fill: Colors.GOLD,
+          fill: Colors.ROBOT_CYAN,
           align: 'center'
         }
       });
@@ -437,7 +437,7 @@ export class ItemsScene extends BaseScene {
         const itemCard = new Graphics();
         itemCard.roundRect(x, y, itemWidth, 60, 6)
           .fill({ color: Colors.BLUE_NAVY, alpha: 0.9 })
-          .stroke({ width: 2, color: Colors.GOLD });
+          .stroke({ width: 2, color: Colors.ROBOT_CYAN });
         
         const nameText = new Text({
           text: item.name,
@@ -460,7 +460,7 @@ export class ItemsScene extends BaseScene {
             fontFamily: 'Orbitron',
             fontSize: 14,
             fontWeight: 'bold',
-            fill: Colors.GOLD_BRIGHT
+            fill: Colors.ROBOT_CYAN
           }
         });
         levelText.anchor.set(0.5);
@@ -585,10 +585,10 @@ export class ItemsScene extends BaseScene {
     bg.roundRect(2, 2, width, height, 8)
       .fill({ color: Colors.BLACK, alpha: 0.4 });
     bg.roundRect(0, 0, width, height, 8)
-      .fill({ color: Colors.BROWN, alpha: 0.95 })
-      .stroke({ width: 2, color: Colors.GOLD });
+      .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.95 })
+      .stroke({ width: 2, color: Colors.ROBOT_CYAN });
     bg.roundRect(2, 2, width - 4, height - 4, 6)
-      .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.6 });
+      .stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 0.6 });
     
     const buttonText = new Text({
       text: text,
@@ -597,7 +597,7 @@ export class ItemsScene extends BaseScene {
         fontSize: 14,
         fontWeight: 'bold',
         fill: Colors.WHITE,
-        stroke: { color: Colors.BROWN_DARK, width: 2 }
+        stroke: { color: Colors.ROBOT_CYAN, width: 2 }
       }
     });
     buttonText.anchor.set(0.5);
@@ -615,10 +615,10 @@ export class ItemsScene extends BaseScene {
       bg.roundRect(2, 2, width, height, 8)
         .fill({ color: Colors.BLACK, alpha: 0.4 });
       bg.roundRect(0, 0, width, height, 8)
-        .fill({ color: Colors.BROWN_LIGHT, alpha: 0.95 })
-        .stroke({ width: 2, color: Colors.GOLD_BRIGHT });
+        .fill({ color: Colors.ROBOT_BG_MID, alpha: 0.95 })
+        .stroke({ width: 2, color: Colors.ROBOT_CYAN });
       bg.roundRect(2, 2, width - 4, height - 4, 6)
-        .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.9 });
+        .stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 0.9 });
       button.scale.set(1.02);
     });
     
@@ -627,10 +627,10 @@ export class ItemsScene extends BaseScene {
       bg.roundRect(2, 2, width, height, 8)
         .fill({ color: Colors.BLACK, alpha: 0.4 });
       bg.roundRect(0, 0, width, height, 8)
-        .fill({ color: Colors.BROWN, alpha: 0.95 })
-        .stroke({ width: 2, color: Colors.GOLD });
+        .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.95 })
+        .stroke({ width: 2, color: Colors.ROBOT_CYAN });
       bg.roundRect(2, 2, width - 4, height - 4, 6)
-        .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.6 });
+        .stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 0.6 });
       button.scale.set(1.0);
     });
     
