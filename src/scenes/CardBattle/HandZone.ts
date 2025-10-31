@@ -223,7 +223,7 @@ export class HandZone extends Container {
     const buttonText = new Text({
       text,
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Roboto',
         fontSize: text.includes('END TURN') ? 16 : 14,
         fontWeight: 'bold',
         fill: Colors.WHITE,

@@ -193,7 +193,7 @@ export class CharacterDetailScene extends BaseScene {
     const title = new Text({
       text: this.character!.name,
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Roboto',
         fontSize: 26,
         fontWeight: 'bold',
         fill: Colors.WHITE,
@@ -321,7 +321,7 @@ export class CharacterDetailScene extends BaseScene {
       const labelText = new Text({
         text: stat.label,
         style: {
-          fontFamily: 'Kalam',
+          fontFamily: 'Roboto',
           fontSize: 10,
           fill: Colors.BLUE_STEEL_LIGHT
         }
@@ -333,7 +333,7 @@ export class CharacterDetailScene extends BaseScene {
       const valueText = new Text({
         text: stat.value.toString(),
         style: {
-          fontFamily: 'Kalam',
+          fontFamily: 'Roboto',
           fontSize: 16,
           fontWeight: 'bold',
           fill: Colors.WHITE
@@ -427,7 +427,7 @@ export class CharacterDetailScene extends BaseScene {
     const labelText = new Text({
       text: label,
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Roboto',
         fontSize: 13,
         fontWeight: isActive ? 'bold' : 'normal',
         fill: isActive ? Colors.WHITE : Colors.BLUE_STEEL_LIGHT
@@ -560,7 +560,7 @@ export class CharacterDetailScene extends BaseScene {
     const title = new Text({
       text: '⚔️ Combat Stats',
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Roboto',
         fontSize: 14,
         fontWeight: 'bold',
         fill: Colors.BLUE_STEEL_LIGHT
@@ -609,7 +609,7 @@ export class CharacterDetailScene extends BaseScene {
       const nameText = new Text({
         text: stat.name,
         style: {
-          fontFamily: 'Kalam',
+          fontFamily: 'Roboto',
           fontSize: 13,
           fontWeight: 'bold',
           fill: Colors.WHITE
@@ -622,7 +622,7 @@ export class CharacterDetailScene extends BaseScene {
       const valueText = new Text({
         text: stat.value.toString(),
         style: {
-          fontFamily: 'Kalam',
+          fontFamily: 'Roboto',
           fontSize: 14,
           fontWeight: 'bold',
           fill: stat.color
@@ -673,7 +673,7 @@ export class CharacterDetailScene extends BaseScene {
     const title = new Text({
       text: '⚡ Character Skill',
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Roboto',
         fontSize: 16,
         fontWeight: 'bold',
         fill: Colors.BLUE_STEEL_LIGHT,
@@ -718,7 +718,7 @@ export class CharacterDetailScene extends BaseScene {
       const typeBadgeText = new Text({
         text: this.getSkillTypeName(skill.skill_type),
         style: {
-          fontFamily: 'Kalam',
+          fontFamily: 'Roboto',
           fontSize: 11,
           fontWeight: 'bold',
           fill: Colors.WHITE
@@ -734,7 +734,7 @@ export class CharacterDetailScene extends BaseScene {
       const skillName = new Text({
         text: skill.name,
         style: {
-          fontFamily: 'Kalam',
+          fontFamily: 'Roboto',
           fontSize: 18,
           fontWeight: 'bold',
           fill: Colors.WHITE,
@@ -770,7 +770,7 @@ export class CharacterDetailScene extends BaseScene {
       const descText = new Text({
         text: skill.description || 'No description available',
         style: {
-          fontFamily: 'Kalam',
+          fontFamily: 'Roboto',
           fontSize: 13,
           fill: Colors.GRAY_LIGHTER,
           wordWrap: true,
@@ -810,7 +810,7 @@ export class CharacterDetailScene extends BaseScene {
           const dmgText = new Text({
             text: `Damage: ${skill.damage}%`,
             style: {
-              fontFamily: 'Kalam',
+              fontFamily: 'Roboto',
               fontSize: 12,
               fill: Colors.WHITE
             }
@@ -834,7 +834,7 @@ export class CharacterDetailScene extends BaseScene {
           const cdText = new Text({
             text: `CD: ${skill.cooldown} turns`,
             style: {
-              fontFamily: 'Kalam',
+              fontFamily: 'Roboto',
               fontSize: 12,
               fill: Colors.WHITE
             }
@@ -857,7 +857,7 @@ export class CharacterDetailScene extends BaseScene {
           const costText = new Text({
             text: `Cost: ${skill.cost} MP`,
             style: {
-              fontFamily: 'Kalam',
+              fontFamily: 'Roboto',
               fontSize: 12,
               fill: Colors.WHITE
             }
@@ -896,7 +896,7 @@ export class CharacterDetailScene extends BaseScene {
       const emptyText = new Text({
         text: 'No Skill Equipped',
         style: {
-          fontFamily: 'Kalam',
+          fontFamily: 'Roboto',
           fontSize: 16,
           fontStyle: 'italic',
           fill: Colors.BLUE_STEEL,
@@ -971,7 +971,7 @@ export class CharacterDetailScene extends BaseScene {
     const buttonText = new Text({
       text: text,
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Roboto',
         fontSize: 13,
         fontWeight: 'bold',
         fill: Colors.WHITE,
@@ -1142,7 +1142,7 @@ export class CharacterDetailScene extends BaseScene {
     const title = new Text({
       text: '⚔️ Equipment',
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Roboto',
         fontSize: 16,
         fontWeight: 'bold',
         fill: Colors.BLUE_STEEL_LIGHT,
@@ -1195,7 +1195,7 @@ export class CharacterDetailScene extends BaseScene {
     const bonusTitle = new Text({
       text: '✨ Total Equipment Bonuses',
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Roboto',
         fontSize: 16,
         fontWeight: 'bold',
         fill: Colors.BLUE_STEEL_LIGHT,
@@ -1261,7 +1261,7 @@ export class CharacterDetailScene extends BaseScene {
     const badgeText = new Text({
       text: slot.name.toUpperCase(),
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Roboto',
         fontSize: 10,
         fontWeight: 'bold',
         fill: isEmpty ? Colors.BLUE_STEEL_LIGHT : Colors.WHITE
@@ -1277,7 +1277,7 @@ export class CharacterDetailScene extends BaseScene {
     const itemText = new Text({
       text: slot.item,
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Roboto',
         fontSize: 15,
         fontWeight: isEmpty ? 'normal' : 'bold',
         fill: isEmpty ? Colors.BLUE_STEEL : Colors.WHITE,
@@ -1294,7 +1294,7 @@ export class CharacterDetailScene extends BaseScene {
       const statsText = new Text({
         text: this.getEquipmentStatsText(slot.equipment),
         style: {
-          fontFamily: 'Kalam',
+          fontFamily: 'Roboto',
           fontSize: 12,
           fill: Colors.GREEN_MINT,
           wordWrap: true,
@@ -1308,7 +1308,7 @@ export class CharacterDetailScene extends BaseScene {
       const emptyHint = new Text({
         text: 'Tap to equip item',
         style: {
-          fontFamily: 'Kalam',
+          fontFamily: 'Roboto',
           fontSize: 11,
           fill: Colors.BLUE_STEEL,
           fontStyle: 'italic'
@@ -1341,7 +1341,7 @@ export class CharacterDetailScene extends BaseScene {
       const equippedText = new Text({
         text: 'EQUIPPED',
         style: {
-          fontFamily: 'Kalam',
+          fontFamily: 'Roboto',
           fontSize: 9,
           fontWeight: 'bold',
           fill: Colors.BLUE_MIDNIGHT
@@ -1407,7 +1407,7 @@ export class CharacterDetailScene extends BaseScene {
     const buttonText = new Text({
       text: text,
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Roboto',
         fontSize: 12,
         fontWeight: 'bold',
         fill: Colors.WHITE,
@@ -1515,7 +1515,7 @@ export class CharacterDetailScene extends BaseScene {
       const labelText = new Text({
         text: stat.label,
         style: {
-          fontFamily: 'Kalam',
+          fontFamily: 'Roboto',
           fontSize: 11,
           fill: Colors.BLUE_STEEL_LIGHT
         }
@@ -1530,7 +1530,7 @@ export class CharacterDetailScene extends BaseScene {
       const valueText = new Text({
         text: `+${stat.value}`,
         style: {
-          fontFamily: 'Kalam',
+          fontFamily: 'Roboto',
           fontSize: 14,
           fontWeight: 'bold',
           fill: hasBonus ? stat.color : Colors.BLUE_STEEL_DARK
@@ -1674,7 +1674,7 @@ export class CharacterDetailScene extends BaseScene {
     const buttonText = new Text({
       text: text,
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Roboto',
         fontSize: 14,
         fontWeight: 'bold',
         fill: Colors.WHITE,

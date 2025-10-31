@@ -169,7 +169,7 @@ export class BattleScene extends BaseScene {
     const team1Label = new Text({
       text: 'Enemies',
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Roboto',
         fontSize: 14, // Reduced from 18
         fontWeight: 'bold',
         fill: Colors.TEXT_PRIMARY
@@ -182,7 +182,7 @@ export class BattleScene extends BaseScene {
     const team2Label = new Text({
       text: 'Allies',
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Roboto',
         fontSize: 14, // Reduced from 18
         fontWeight: 'bold',
         fill: Colors.TEXT_PRIMARY
@@ -236,7 +236,7 @@ export class BattleScene extends BaseScene {
     const symbolText = new Text({
       text: character.ticker,
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Roboto',
         fontSize: 11, // Reduced from 14
         fontWeight: 'bold',
         fill: Colors.TEXT_WHITE,
@@ -251,7 +251,7 @@ export class BattleScene extends BaseScene {
     const levelText = new Text({
       text: `Lv.${character.level}`,
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Roboto',
         fontSize: 9, // Reduced from 10
         fill: Colors.TEXT_SECONDARY,
         align: 'center'
@@ -276,7 +276,7 @@ export class BattleScene extends BaseScene {
     const hpText = new Text({
       text: `HP: ${character.hp}/${character.hp}`,
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Roboto',
         fontSize: 7, // Reduced from 8
         fill: Colors.TEXT_SECONDARY,
         align: 'center'
@@ -302,7 +302,7 @@ export class BattleScene extends BaseScene {
     const energyText = new Text({
       text: `EN: ${character.current_energy}/${maxEnergy}`,
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Roboto',
         fontSize: 8,
         fill: Colors.TEXT_SECONDARY,
         align: 'center'
@@ -316,7 +316,7 @@ export class BattleScene extends BaseScene {
     const statsText = new Text({
       text: `ATK: ${character.atk} DEF: ${character.def}`,
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Roboto',
         fontSize: 7,
         fill: Colors.TEXT_TERTIARY,
         align: 'center'
@@ -358,7 +358,7 @@ export class BattleScene extends BaseScene {
     const logTitle = new Text({
       text: 'Battle Log',
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Roboto',
         fontSize: 12, // Reduced from 14
         fontWeight: 'bold',
         fill: Colors.TEXT_PRIMARY
@@ -595,7 +595,7 @@ export class BattleScene extends BaseScene {
     const damageText = new Text({
       text: `-${damage}`,
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Roboto',
         fontSize: 20,
         fontWeight: 'bold',
         fill: Colors.EFFECT_DAMAGE_RED,
@@ -826,7 +826,7 @@ export class BattleScene extends BaseScene {
         const defeatedText = new Text({
           text: 'DEFEATED',
           style: {
-            fontFamily: 'Kalam',
+            fontFamily: 'Roboto',
             fontSize: 10,
             fontWeight: 'bold',
             fill: Colors.HP_CRITICAL,
@@ -858,7 +858,7 @@ export class BattleScene extends BaseScene {
       const logText = new Text({
         text: log,
         style: {
-          fontFamily: 'Kalam',
+          fontFamily: 'Roboto',
           fontSize: 10,
           fill: Colors.TEXT_SECONDARY
         }

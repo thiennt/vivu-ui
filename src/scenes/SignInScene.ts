@@ -63,7 +63,7 @@ export class SignInScene extends BaseScene {
     const titleText = new Text({
       text: 'Welcome to Vivu',
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Roboto',
         fontSize: 32,
         fontWeight: 'bold',
         fill: Colors.TEXT_PRIMARY,

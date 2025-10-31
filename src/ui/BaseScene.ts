@@ -191,7 +191,7 @@ export abstract class BaseScene extends Container {
     const title = new Text({
       text: text,
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Roboto',
         fontSize: 28, // Reduced from 36 for 400x700
         fontWeight: 'bold',
         fill: Colors.TEXT_PRIMARY,

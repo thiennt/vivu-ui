@@ -60,7 +60,7 @@ export class Button extends Container {
     this.buttonText = new Text({
       text: opts.text,
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Roboto',
         fontSize: responsiveFontSize,
         fontWeight: 'bold',
         fill: Colors.TEXT_BUTTON,

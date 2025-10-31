@@ -211,7 +211,7 @@ export class HomeScene extends BaseScene {
     const title = new Text({
       text: '⚔️ VIVU ⚔️',
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Roboto',
         fontSize: 38,
         fontWeight: 'bold',
         fill: Colors.WHITE,
@@ -289,7 +289,7 @@ export class HomeScene extends BaseScene {
     const playerName = new Text({
       text: `${this.player.username}`,
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Roboto',
         fontSize: 20,
         fontWeight: 'bold',
         fill: Colors.BROWN_DARK,
@@ -302,7 +302,7 @@ export class HomeScene extends BaseScene {
     const playerLevel = new Text({
       text: `⭐ Level: ${this.player.level}`,
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Roboto',
         fontSize: 17,
         fill: Colors.BROWN_DARKER
       }
@@ -313,7 +313,7 @@ export class HomeScene extends BaseScene {
     const playerExp = new Text({
       text: `✨ EXP: ${this.player.exp}`,
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Roboto',
         fontSize: 17,
         fill: Colors.BROWN_DARKER
       }
@@ -426,7 +426,7 @@ export class HomeScene extends BaseScene {
     const buttonText = new Text({
       text: text,
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Roboto',
         fontSize: 18,
         fontWeight: 'bold',
         fill: Colors.WHITE,

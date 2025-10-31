@@ -165,7 +165,7 @@ export class TowerScene extends BaseScene {
     const title = new Text({
       text: '🗼 Battle Tower 🗼',
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Roboto',
         fontSize: 26,
         fontWeight: 'bold',
         fill: Colors.WHITE,
@@ -315,7 +315,7 @@ export class TowerScene extends BaseScene {
     const floorNumber = new Text({
       text: stage.name,
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Roboto',
         fontSize: 16,
         fontWeight: 'bold',
         fill: isAccessible ? Colors.PURPLE_DARKER : Colors.GRAY,
@@ -333,7 +333,7 @@ export class TowerScene extends BaseScene {
       towerIcon = new Text({
         text: '🔒',
         style: {
-          fontFamily: 'Kalam',
+          fontFamily: 'Roboto',
           fontSize: 48,
           fill: Colors.GRAY
         }
@@ -342,7 +342,7 @@ export class TowerScene extends BaseScene {
       towerIcon = new Text({
         text: '✓',
         style: {
-          fontFamily: 'Kalam',
+          fontFamily: 'Roboto',
           fontSize: 48,
           fill: Colors.GREEN_BRIGHT,
           stroke: { color: Colors.GREEN_FOREST_DARK, width: 2 }
@@ -352,7 +352,7 @@ export class TowerScene extends BaseScene {
       towerIcon = new Text({
         text: '🗼',
         style: {
-          fontFamily: 'Kalam',
+          fontFamily: 'Roboto',
           fontSize: 48,
           fill: Colors.PURPLE
         }
@@ -467,7 +467,7 @@ export class TowerScene extends BaseScene {
     const buttonText = new Text({
       text: text,
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Roboto',
         fontSize: 14,
         fontWeight: 'bold',
         fill: Colors.WHITE,
