@@ -355,7 +355,7 @@ export class HomeScene extends BaseScene {
       { text: '👥 Characters', screen: CharactersScene },
       { text: '🃏 Card Battle', screen: CardBattleScene },
       { text: '🧑‍🤝‍🧑 Lineup', screen: LineupScene },
-      { text: '⚒️ Craft Equipment', screen: CraftEquipmentScene },
+      //{ text: '⚒️ Craft Equipment', screen: CraftEquipmentScene },
       // { text: '✨ Craft Skills', screen: CraftSkillScene }, // Hidden to simplify game
     ];
     

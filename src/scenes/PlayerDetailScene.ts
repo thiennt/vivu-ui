@@ -233,8 +233,6 @@ export class PlayerDetailScene extends BaseScene {
     
     const startY = 85;
     const padding = this.STANDARD_PADDING;
-    
-    // Single combined panel
     const availableWidth = this.gameWidth - 2 * padding;
     const panelWidth = Math.min(580, availableWidth);
     const panelX = (this.gameWidth - panelWidth) / 2;
@@ -244,15 +242,23 @@ export class PlayerDetailScene extends BaseScene {
     const currentStr = this.player.str + this.tempStatChanges.str;
     const currentAgi = this.player.agi + this.tempStatChanges.agi;
     
-    // Combined stats panel
-    const statsPanel = this.createCombinedStatsPanel(
+    // Player info panel with avatar
+    const playerInfoPanel = this.createPlayerInfoPanel(
       panelWidth,
       [
         { label: '👤 Username:', value: this.player.username },
         { label: '⭐ Level:', value: this.player.level.toString() },
         { label: '✨ Experience:', value: this.player.exp.toString() },
         { label: '🎭 Characters:', value: this.characters.length.toString() },
-      ],
+      ]
+    );
+    
+    playerInfoPanel.x = panelX;
+    playerInfoPanel.y = startY;
+    
+    // Statistics panel (below player info)
+    const statsPanel = this.createStatisticsPanel(
+      panelWidth,
       [
         { label: '❤️ Stamina:', value: `${currentSta}${this.tempStatChanges.sta !== 0 ? ` (+${this.tempStatChanges.sta})` : ''}` },
         { label: '💪 Strength:', value: `${currentStr}${this.tempStatChanges.str !== 0 ? ` (+${this.tempStatChanges.str})` : ''}` },
@@ -262,21 +268,17 @@ export class PlayerDetailScene extends BaseScene {
     );
     
     statsPanel.x = panelX;
-    statsPanel.y = startY;
+    statsPanel.y = startY + 155; // Position below player info panel
     
-    this.statsContainer.addChild(statsPanel);
+    this.statsContainer.addChild(playerInfoPanel, statsPanel);
   }
 
-  private createCombinedStatsPanel(
+  private createPlayerInfoPanel(
     width: number,
-    playerInfo: Array<{label: string, value: string}>,
-    statistics: Array<{label: string, value: string}>
+    playerInfo: Array<{label: string, value: string}>
   ): Container {
     const panel = new Container();
-    
-    // Calculate height based on content
-    const sectionHeight = Math.max(playerInfo.length, statistics.length) * 22 + 50;
-    const height = sectionHeight + 20;
+    const height = 145;
     
     // Parchment panel
     const bg = new Graphics();
@@ -296,16 +298,8 @@ export class PlayerDetailScene extends BaseScene {
     
     panel.addChild(bg);
     
-    // Divider line in the middle
-    const dividerX = width / 2;
-    const divider = new Graphics();
-    divider.moveTo(dividerX, 15)
-      .lineTo(dividerX, height - 15)
-      .stroke({ width: 2, color: Colors.GOLD, alpha: 0.5 });
-    panel.addChild(divider);
-    
-    // Left section - Player Info
-    const leftTitle = new Text({
+    // Title
+    const title = new Text({
       text: '📜 Player Info',
       style: {
         fontFamily: 'Kalam',
@@ -315,10 +309,36 @@ export class PlayerDetailScene extends BaseScene {
         stroke: { color: Colors.GOLD_BRIGHT, width: 0.5 }
       }
     });
-    leftTitle.x = 12;
-    leftTitle.y = 12;
-    panel.addChild(leftTitle);
+    title.x = 12;
+    title.y = 12;
+    panel.addChild(title);
     
+    // Avatar circle on the left
+    const avatarSize = 80;
+    const avatarX = 20;
+    const avatarY = 50;
+    
+    const avatarBg = new Graphics();
+    avatarBg.circle(avatarX + avatarSize / 2, avatarY + avatarSize / 2, avatarSize / 2 + 3)
+      .fill({ color: Colors.GOLD, alpha: 0.3 });
+    avatarBg.circle(avatarX + avatarSize / 2, avatarY + avatarSize / 2, avatarSize / 2)
+      .fill({ color: Colors.BROWN_LIGHT, alpha: 0.95 })
+      .stroke({ width: 2, color: Colors.GOLD });
+    
+    const avatarEmoji = new Text({
+      text: '👤',
+      style: {
+        fontSize: 48
+      }
+    });
+    avatarEmoji.anchor.set(0.5);
+    avatarEmoji.x = avatarX + avatarSize / 2;
+    avatarEmoji.y = avatarY + avatarSize / 2;
+    
+    panel.addChild(avatarBg, avatarEmoji);
+    
+    // Player info on the right
+    const infoStartX = avatarX + avatarSize + 20;
     playerInfo.forEach((item, index) => {
       const statText = new Text({
         text: `${item.label} ${item.value}`,
@@ -328,13 +348,41 @@ export class PlayerDetailScene extends BaseScene {
           fill: Colors.BROWN_DARKER
         }
       });
-      statText.x = 12;
-      statText.y = 40 + (index * 22);
+      statText.x = infoStartX;
+      statText.y = 45 + (index * 22);
       panel.addChild(statText);
     });
     
-    // Right section - Statistics
-    const rightTitle = new Text({
+    return panel;
+  }
+
+  private createStatisticsPanel(
+    width: number,
+    statistics: Array<{label: string, value: string}>
+  ): Container {
+    const panel = new Container();
+    const height = statistics.length * 22 + 60;
+    
+    // Parchment panel
+    const bg = new Graphics();
+    
+    bg.roundRect(3, 3, width, height, 10)
+      .fill({ color: Colors.BLACK, alpha: 0.4 });
+    
+    bg.roundRect(0, 0, width, height, 10)
+      .fill({ color: Colors.PARCHMENT_LIGHT, alpha: 0.98 })
+      .stroke({ width: 2, color: Colors.GOLD });
+    
+    bg.roundRect(3, 3, width - 6, height - 6, 8)
+      .fill({ color: Colors.PARCHMENT, alpha: 0.6 });
+    
+    bg.roundRect(5, 5, width - 10, height - 10, 7)
+      .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.5 });
+    
+    panel.addChild(bg);
+    
+    // Title
+    const title = new Text({
       text: '⚔️ Statistics',
       style: {
         fontFamily: 'Kalam',
@@ -344,10 +392,11 @@ export class PlayerDetailScene extends BaseScene {
         stroke: { color: Colors.GOLD_BRIGHT, width: 0.5 }
       }
     });
-    rightTitle.x = dividerX + 12;
-    rightTitle.y = 12;
-    panel.addChild(rightTitle);
+    title.x = 12;
+    title.y = 12;
+    panel.addChild(title);
     
+    // Statistics list
     statistics.forEach((item, index) => {
       const statText = new Text({
         text: `${item.label} ${item.value}`,
@@ -357,8 +406,8 @@ export class PlayerDetailScene extends BaseScene {
           fill: Colors.BROWN_DARKER
         }
       });
-      statText.x = dividerX + 12;
-      statText.y = 40 + (index * 22);
+      statText.x = 12;
+      statText.y = 45 + (index * 22);
       panel.addChild(statText);
     });
     
@@ -370,8 +419,8 @@ export class PlayerDetailScene extends BaseScene {
 
     const padding = this.STANDARD_PADDING;
     
-    // Position below the combined stats panel (height ~158) + gap
-    const startY = 260;
+    // Position below player info (145) + stats panel (148) + gaps
+    const startY = 85 + 155 + 148 + 15;
     
     const panelWidth = Math.min(580, this.gameWidth - 2 * padding);
     const panelHeight = this.player.points <= 0 ? 90 : 190;
@@ -689,10 +738,11 @@ export class PlayerDetailScene extends BaseScene {
     if (!this.player) return;
     
     // Position after point distribution panel
-    // Stats: 85 + 158 = 243
-    // Point: 260 + (90 or 190) = 350 or 450
+    // Player info: 85 + 145 = 230
+    // Stats: 230 + 10 + 148 = 388
+    // Point: 388 + 15 + (90 or 190) = 493 or 593
     const pointPanelHeight = this.player.points <= 0 ? 90 : 190;
-    const baseY = 260 + pointPanelHeight + 15;
+    const baseY = 85 + 155 + 148 + 15 + pointPanelHeight + 15;
     
     const availableWidth = this.gameWidth - 2 * this.STANDARD_PADDING;
     const gap = 10;
