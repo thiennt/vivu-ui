@@ -66,16 +66,16 @@ export class CardDetailPopup extends Container {
 
     // Main card background
     this.dialogPanel.roundRect(0, 0, cardWidth, cardHeight, 14)
-      .fill({ color: Colors.PARCHMENT_LIGHT, alpha: 0.98 })
-      .stroke({ width: 3, color: Colors.GOLD });
+      .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.98 })
+      .stroke({ width: 3, color: Colors.ROBOT_CYAN });
 
     // Inner layer
     this.dialogPanel.roundRect(5, 5, cardWidth - 10, cardHeight - 10, 10)
-      .fill({ color: Colors.PARCHMENT, alpha: 0.7 });
+      .fill({ color: Colors.ROBOT_BG_MID, alpha: 0.7 });
 
     // Inner trim
     this.dialogPanel.roundRect(7, 7, cardWidth - 14, cardHeight - 14, 8)
-      .stroke({ width: 1.5, color: Colors.GOLD_BRIGHT, alpha: 0.6 });
+      .stroke({ width: 1.5, color: Colors.ROBOT_CYAN, alpha: 0.6 });
 
     this.drawOrnateCorners(0, 0, cardWidth, cardHeight);
 
@@ -90,7 +90,7 @@ export class CardDetailPopup extends Container {
       .lineTo(cardWidth - 14, 14)
       .lineTo(14, 14)
       .fill({ color: rarityColor, alpha: 0.85 })
-      .stroke({ width: 2, color: Colors.BROWN });
+      .stroke({ width: 2, color: Colors.ROBOT_ELEMENT });
 
     // Art frame
     const frameMargin = 14;
@@ -99,13 +99,13 @@ export class CardDetailPopup extends Container {
     const frameWidth = cardWidth - (frameMargin * 2);
 
     this.dialogPanel.roundRect(frameMargin, frameY, frameWidth, frameHeight, 8)
-      .fill({ color: Colors.BROWN_DARK, alpha: 0.95 })
-      .stroke({ width: 1.5, color: Colors.GOLD, alpha: 0.95 });
+      .fill({ color: Colors.ROBOT_CYAN, alpha: 0.95 })
+      .stroke({ width: 1.5, color: Colors.ROBOT_CYAN, alpha: 0.95 });
 
     this.dialogPanel.roundRect(frameMargin + 2, frameY + 2, frameWidth - 4, frameHeight - 4, 6)
-      .stroke({ width: 1, color: Colors.BROWN, alpha: 0.6 });
+      .stroke({ width: 1, color: Colors.ROBOT_ELEMENT, alpha: 0.6 });
 
-    this.drawFantasyCorners(frameMargin, frameY, frameWidth, frameHeight, Colors.GOLD_BRIGHT);
+    this.drawFantasyCorners(frameMargin, frameY, frameWidth, frameHeight, Colors.ROBOT_CYAN);
 
     this.addChild(this.dialogPanel);
 
@@ -119,8 +119,8 @@ export class CardDetailPopup extends Container {
 
     const groupIconBg = new Graphics()
       .circle(cardWidth - 32, 38, 22)
-      .fill({ color: Colors.BROWN_DARK, alpha: 0.95 })
-      .stroke({ width: 2, color: Colors.GOLD, alpha: 0.95 });
+      .fill({ color: Colors.ROBOT_CYAN, alpha: 0.95 })
+      .stroke({ width: 2, color: Colors.ROBOT_CYAN, alpha: 0.95 });
 
     groupIconBg.circle(cardWidth - 32, 38, 18)
       .stroke({ width: 2, color: groupColor, alpha: 0.7 });
@@ -152,12 +152,12 @@ export class CardDetailPopup extends Container {
         fontFamily: 'Orbitron',
         fontSize: 14,
         fontWeight: 'bold',
-        fill: Colors.BROWN_DARK,
+        fill: Colors.ROBOT_CYAN,
         align: 'center',
         wordWrap: true,
         wordWrapWidth: cardWidth - 40,
-        stroke: { color: Colors.GOLD_BRIGHT, width: 1 },
-        dropShadow: { color: Colors.GOLD, blur: 1, angle: Math.PI / 4, distance: 1, alpha: 0.5 }
+        stroke: { color: Colors.ROBOT_CYAN, width: 1 },
+        dropShadow: { color: Colors.ROBOT_CYAN, blur: 1, angle: Math.PI / 4, distance: 1, alpha: 0.5 }
       }
     });
     cardNameText.anchor.set(0.5, 0);
@@ -190,9 +190,9 @@ export class CardDetailPopup extends Container {
     const divider = new Graphics();
     divider.moveTo(18, dividerY)
       .lineTo(cardWidth - 18, dividerY)
-      .stroke({ width: 1, color: Colors.BROWN, alpha: 0.5 });
+      .stroke({ width: 1, color: Colors.ROBOT_ELEMENT, alpha: 0.5 });
     divider.circle(cardWidth / 2, dividerY, 2)
-      .fill({ color: Colors.GOLD });
+      .fill({ color: Colors.ROBOT_CYAN });
     this.addChild(divider);
 
     // Description (below divider)
@@ -202,7 +202,7 @@ export class CardDetailPopup extends Container {
       style: {
         fontFamily: 'Orbitron',
         fontSize: 18,
-        fill: Colors.BROWN_DARKER,
+        fill: Colors.ROBOT_ELEMENT,
         align: 'center',
         wordWrap: true,
         wordWrapWidth: cardWidth - 24,
@@ -227,12 +227,12 @@ export class CardDetailPopup extends Container {
     
     // Dark background
     gemBg.roundRect(0, 0, width, height, height / 4)
-      .fill({ color: Colors.BROWN_DARK, alpha: 0.95 })
-      .stroke({ width: 2, color: Colors.GOLD, alpha: 0.95 });
+      .fill({ color: Colors.ROBOT_CYAN, alpha: 0.95 })
+      .stroke({ width: 2, color: Colors.ROBOT_CYAN, alpha: 0.95 });
     
     // Inner shine/highlight
     gemBg.roundRect(2, 2, width - 4, height - 4, height / 4 - 1)
-      .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.6 });
+      .stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 0.6 });
 
     const energyIcon = new Text({
       text: '⚡',
@@ -241,7 +241,7 @@ export class CardDetailPopup extends Container {
         fontSize: height * 0.45,
         fill: Colors.ORANGE,
         dropShadow: {
-          color: Colors.GOLD_BRIGHT,
+          color: Colors.ROBOT_CYAN,
           blur: 4,
           angle: 0,
           distance: 0,
@@ -260,7 +260,7 @@ export class CardDetailPopup extends Container {
         fontSize: height * 0.55,
         fontWeight: 'bold',
         fill: Colors.WHITE,
-        stroke: { color: Colors.BROWN_DARK, width: 3 }
+        stroke: { color: Colors.ROBOT_CYAN, width: 3 }
       }
     });
     energyText.anchor.set(0.5);
@@ -276,7 +276,7 @@ export class CardDetailPopup extends Container {
 
   private drawOrnateCorners(x: number, y: number, width: number, height: number): void {
     const cornerSize = 20;
-    const cornerColor = Colors.GOLD_BRIGHT;
+    const cornerColor = Colors.ROBOT_CYAN;
 
     // Top-left ornate corner
     this.dialogPanel.moveTo(x, y + cornerSize)
@@ -390,8 +390,8 @@ export class CardDetailPopup extends Container {
     
     const bg = new Graphics();
     bg.circle(buttonSize / 2, buttonSize / 2, buttonSize / 2)
-      .fill({ color: Colors.BROWN, alpha: 0.95 })
-      .stroke({ width: 2, color: Colors.GOLD });
+      .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.95 })
+      .stroke({ width: 2, color: Colors.ROBOT_CYAN });
     
     const buttonText = new Text({
       text: '✕',

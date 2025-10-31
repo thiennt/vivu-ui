@@ -78,7 +78,7 @@ export class EquipmentChangePopup extends Container {
     const dialogX = (this.gameWidth - dialogWidth) / 2;
     const dialogY = (this.gameHeight - dialogHeight) / 2;
     
-    // Fantasy parchment panel
+    // Robot theme panel
     this.dialogPanel = new Graphics();
     
     // Shadow
@@ -87,19 +87,19 @@ export class EquipmentChangePopup extends Container {
     
     // Main parchment
     this.dialogPanel.roundRect(dialogX, dialogY, dialogWidth, dialogHeight, 12)
-      .fill({ color: Colors.PARCHMENT_LIGHT, alpha: 0.98 })
-      .stroke({ width: 3, color: Colors.GOLD });
+      .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.98 })
+      .stroke({ width: 3, color: Colors.ROBOT_CYAN });
     
     // Inner layer
     this.dialogPanel.roundRect(dialogX + 4, dialogY + 4, dialogWidth - 8, dialogHeight - 8, 10)
-      .fill({ color: Colors.PARCHMENT, alpha: 0.6 });
+      .fill({ color: Colors.ROBOT_BG_MID, alpha: 0.6 });
     
     // Golden highlight
     this.dialogPanel.roundRect(dialogX + 6, dialogY + 6, dialogWidth - 12, dialogHeight - 12, 9)
-      .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.5 });
+      .stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 0.5 });
     
     // Decorative corners
-    this.drawPanelCorners(this.dialogPanel, dialogX, dialogY, dialogWidth, dialogHeight, Colors.GOLD_BRIGHT);
+    this.drawPanelCorners(this.dialogPanel, dialogX, dialogY, dialogWidth, dialogHeight, Colors.ROBOT_CYAN);
 
     // Title banner
     const bannerWidth = dialogWidth - 80;
@@ -115,8 +115,8 @@ export class EquipmentChangePopup extends Container {
       .lineTo(bannerX + bannerWidth, bannerY + bannerHeight / 2)
       .lineTo(bannerX + bannerWidth - 10, bannerY)
       .lineTo(bannerX + 10, bannerY)
-      .fill({ color: Colors.BROWN, alpha: 0.95 })
-      .stroke({ width: 2, color: Colors.GOLD });
+      .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.95 })
+      .stroke({ width: 2, color: Colors.ROBOT_CYAN });
 
     const dialogTitle = new Text({
       text: `⚔️ Change ${this.slotName}`,
@@ -125,7 +125,7 @@ export class EquipmentChangePopup extends Container {
         fontSize: 18,
         fontWeight: 'bold',
         fill: Colors.WHITE,
-        stroke: { color: Colors.BROWN_DARK, width: 2 },
+        stroke: { color: Colors.ROBOT_CYAN, width: 2 },
         align: 'center'
       }
     });
@@ -139,7 +139,7 @@ export class EquipmentChangePopup extends Container {
       style: {
         fontFamily: 'Orbitron',
         fontSize: 14,
-        fill: Colors.BROWN,
+        fill: Colors.ROBOT_ELEMENT,
         align: 'center'
       }
     });
@@ -163,16 +163,16 @@ export class EquipmentChangePopup extends Container {
       if (isCurrentItem) {
         // Highlight current item
         optionBg.roundRect(0, 0, dialogWidth - 40, 55, 6)
-          .fill({ color: Colors.GOLD_BRIGHT, alpha: 0.3 })
-          .stroke({ width: 2, color: Colors.GOLD });
+          .fill({ color: Colors.ROBOT_CYAN, alpha: 0.3 })
+          .stroke({ width: 2, color: Colors.ROBOT_CYAN });
         
         optionBg.roundRect(2, 2, dialogWidth - 44, 51, 5)
-          .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.6 });
+          .stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 0.6 });
       } else {
         // Regular equipment card
         optionBg.roundRect(0, 0, dialogWidth - 40, 55, 6)
-          .fill({ color: Colors.PARCHMENT, alpha: 0.5 })
-          .stroke({ width: 2, color: Colors.GOLD, alpha: 0.5 });
+          .fill({ color: Colors.ROBOT_BG_MID, alpha: 0.5 })
+          .stroke({ width: 2, color: Colors.ROBOT_CYAN, alpha: 0.5 });
       }
       
       const equipmentName = new Text({
@@ -181,8 +181,8 @@ export class EquipmentChangePopup extends Container {
           fontFamily: 'Orbitron',
           fontSize: 14,
           fontWeight: 'bold',
-          fill: isCurrentItem ? Colors.BROWN_DARK : Colors.BROWN_DARKER,
-          stroke: isCurrentItem ? { color: Colors.GOLD_BRIGHT, width: 0.5 } : undefined
+          fill: isCurrentItem ? Colors.ROBOT_CYAN : Colors.ROBOT_ELEMENT,
+          stroke: isCurrentItem ? { color: Colors.ROBOT_CYAN, width: 0.5 } : undefined
         }
       });
       equipmentName.x = 10;
@@ -193,7 +193,7 @@ export class EquipmentChangePopup extends Container {
         style: {
           fontFamily: 'Orbitron',
           fontSize: 11,
-          fill: Colors.BROWN_WOOD,
+          fill: Colors.ROBOT_ELEMENT,
           wordWrap: true,
           wordWrapWidth: dialogWidth - 60
         }
@@ -217,17 +217,17 @@ export class EquipmentChangePopup extends Container {
         optionContainer.on('pointerover', () => {
           optionBg.clear();
           optionBg.roundRect(0, 0, dialogWidth - 40, 55, 6)
-            .fill({ color: Colors.GOLD_BRIGHT, alpha: 0.4 })
-            .stroke({ width: 2, color: Colors.GOLD });
+            .fill({ color: Colors.ROBOT_CYAN, alpha: 0.4 })
+            .stroke({ width: 2, color: Colors.ROBOT_CYAN });
           optionBg.roundRect(2, 2, dialogWidth - 44, 51, 5)
-            .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.8 });
+            .stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 0.8 });
         });
         
         optionContainer.on('pointerout', () => {
           optionBg.clear();
           optionBg.roundRect(0, 0, dialogWidth - 40, 55, 6)
-            .fill({ color: Colors.PARCHMENT, alpha: 0.5 })
-            .stroke({ width: 2, color: Colors.GOLD, alpha: 0.5 });
+            .fill({ color: Colors.ROBOT_BG_MID, alpha: 0.5 })
+            .stroke({ width: 2, color: Colors.ROBOT_CYAN, alpha: 0.5 });
         });
       }
       
@@ -295,10 +295,10 @@ export class EquipmentChangePopup extends Container {
     bg.roundRect(2, 2, width, height, 8)
       .fill({ color: Colors.BLACK, alpha: 0.4 });
     bg.roundRect(0, 0, width, height, 8)
-      .fill({ color: Colors.BROWN, alpha: 0.95 })
-      .stroke({ width: 2, color: Colors.GOLD });
+      .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.95 })
+      .stroke({ width: 2, color: Colors.ROBOT_CYAN });
     bg.roundRect(2, 2, width - 4, height - 4, 6)
-      .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.6 });
+      .stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 0.6 });
     
     const buttonText = new Text({
       text,
@@ -307,7 +307,7 @@ export class EquipmentChangePopup extends Container {
         fontSize: 14,
         fontWeight: 'bold',
         fill: Colors.WHITE,
-        stroke: { color: Colors.BROWN_DARK, width: 2 }
+        stroke: { color: Colors.ROBOT_CYAN, width: 2 }
       }
     });
     buttonText.anchor.set(0.5);
@@ -327,10 +327,10 @@ export class EquipmentChangePopup extends Container {
       bg.roundRect(2, 2, width, height, 8)
         .fill({ color: Colors.BLACK, alpha: 0.4 });
       bg.roundRect(0, 0, width, height, 8)
-        .fill({ color: Colors.BROWN_LIGHT, alpha: 0.95 })
-        .stroke({ width: 2, color: Colors.GOLD_BRIGHT });
+        .fill({ color: Colors.ROBOT_BG_MID, alpha: 0.95 })
+        .stroke({ width: 2, color: Colors.ROBOT_CYAN });
       bg.roundRect(2, 2, width - 4, height - 4, 6)
-        .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.9 });
+        .stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 0.9 });
       button.scale.set(1.02);
     });
     
@@ -339,10 +339,10 @@ export class EquipmentChangePopup extends Container {
       bg.roundRect(2, 2, width, height, 8)
         .fill({ color: Colors.BLACK, alpha: 0.4 });
       bg.roundRect(0, 0, width, height, 8)
-        .fill({ color: Colors.BROWN, alpha: 0.95 })
-        .stroke({ width: 2, color: Colors.GOLD });
+        .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.95 })
+        .stroke({ width: 2, color: Colors.ROBOT_CYAN });
       bg.roundRect(2, 2, width - 4, height - 4, 6)
-        .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.6 });
+        .stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 0.6 });
       button.scale.set(1.0);
     });
     

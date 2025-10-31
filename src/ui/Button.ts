@@ -40,15 +40,15 @@ export class Button extends Container {
     
     // Button background with robot theme styling
     this.bg = new Graphics();
-    const buttonGradient = Colors.BUTTON_PRIMARY;
     
-    // Add glow effect
+    // Add outer glow effect (shadow/glow)
     this.bg.roundRect(-2, -2, this.adjustedWidth + 4, this.adjustedHeight + 4, 10)
-      .fill({ color: Colors.BUTTON_PRIMARY, alpha: 0.3 });
+      .fill({ color: Colors.ROBOT_CYAN, alpha: 0.4 });
     
+    // Main button background
     this.bg.roundRect(0, 0, this.adjustedWidth, this.adjustedHeight, 8)
-      .fill(buttonGradient)
-      .stroke({ width: 2, color: Colors.BUTTON_BORDER });
+      .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.95 })
+      .stroke({ width: 2, color: Colors.ROBOT_CYAN });
     
     this.addChild(this.bg);
 
@@ -61,17 +61,24 @@ export class Button extends Container {
       Math.min(18, this.adjustedHeight * 0.45) // Reduced max from 20 to 18
     );
 
-    // Button text
+    // Button text with robot theme
     this.buttonText = new Text({
       text: opts.text,
       style: {
         fontFamily: 'Orbitron',
         fontSize: responsiveFontSize,
         fontWeight: 'bold',
-        fill: Colors.TEXT_BUTTON,
+        fill: Colors.ROBOT_CYAN_LIGHT,
         align: 'center',
         wordWrap: true,
-        wordWrapWidth: this.adjustedWidth * 0.9
+        wordWrapWidth: this.adjustedWidth * 0.9,
+        dropShadow: {
+          color: Colors.ROBOT_CYAN,
+          blur: 4,
+          angle: 0,
+          distance: 0,
+          alpha: 0.6
+        }
       }
     });
     this.buttonText.anchor.set(0.5);
@@ -93,11 +100,11 @@ export class Button extends Container {
   }
 
   private handleHover() {
-    this.bg.tint = Colors.BUTTON_HOVER;
+    this.bg.tint = Colors.ROBOT_CYAN_MID;
   }
 
   private handleOut() {
-    this.bg.tint = Colors.ACTIVE_WHITE;
+    this.bg.tint = 0xFFFFFF;
   }
 
   /**

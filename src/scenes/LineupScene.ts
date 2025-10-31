@@ -109,16 +109,16 @@ export class LineupScene extends BaseScene {
     
     // Dark fantasy battlefield background
     bg.rect(0, 0, this.gameWidth, this.gameHeight)
-      .fill({ color: Colors.BROWN_DARKEST, alpha: 1.0 });
+      .fill({ color: Colors.ROBOT_BG_DARK, alpha: 1.0 });
     
     // Battle texture overlay
     bg.rect(0, 0, this.gameWidth, this.gameHeight)
-      .fill({ color: Colors.BROWN_DARK, alpha: 0.3 });
+      .fill({ color: Colors.ROBOT_CYAN, alpha: 0.3 });
 
     // Tactical grid with golden lines
     const gridSpacing = 40;
     const grid = new Graphics();
-    grid.stroke({ width: 1, color: Colors.GOLD, alpha: 0.15 });
+    grid.stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 0.15 });
 
     for (let x = 0; x <= this.gameWidth; x += gridSpacing) {
       grid.moveTo(x, 0);
@@ -147,8 +147,8 @@ export class LineupScene extends BaseScene {
       .lineTo(bannerX + bannerWidth, bannerY + bannerHeight / 2)
       .lineTo(bannerX + bannerWidth - 12, bannerY)
       .lineTo(bannerX + 12, bannerY)
-      .fill({ color: Colors.BROWN, alpha: 0.95 })
-      .stroke({ width: 2.5, color: Colors.GOLD });
+      .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.95 })
+      .stroke({ width: 2.5, color: Colors.ROBOT_CYAN });
     
     banner.moveTo(bannerX + 15, bannerY + 3)
       .lineTo(bannerX + bannerWidth - 15, bannerY + 3)
@@ -157,7 +157,7 @@ export class LineupScene extends BaseScene {
       .lineTo(bannerX + 15, bannerY + bannerHeight - 3)
       .lineTo(bannerX + 4, bannerY + bannerHeight / 2)
       .lineTo(bannerX + 15, bannerY + 3)
-      .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.6 });
+      .stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 0.6 });
 
     const title = new Text({
       text: '⚔️ Battle Lineup ⚔️',
@@ -166,9 +166,9 @@ export class LineupScene extends BaseScene {
         fontSize: 24,
         fontWeight: 'bold',
         fill: Colors.WHITE,
-        stroke: { color: Colors.BROWN_DARK, width: 2 },
+        stroke: { color: Colors.ROBOT_CYAN, width: 2 },
         dropShadow: {
-          color: Colors.GOLD_BRIGHT,
+          color: Colors.ROBOT_CYAN,
           blur: 3,
           angle: Math.PI / 4,
           distance: 2,
@@ -185,7 +185,7 @@ export class LineupScene extends BaseScene {
       style: {
         fontFamily: 'Orbitron',
         fontSize: 12,
-        fill: Colors.GOLD,
+        fill: Colors.ROBOT_CYAN,
         align: 'center'
       }
     });
@@ -246,12 +246,12 @@ export class LineupScene extends BaseScene {
     
     // Main slot - parchment
     bg.roundRect(0, 0, width, height, 8)
-      .fill({ color: Colors.PARCHMENT_LIGHT, alpha: 0.5 })
-      .stroke({ width: 2, color: Colors.GOLD, alpha: 0.8 });
+      .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.5 })
+      .stroke({ width: 2, color: Colors.ROBOT_CYAN, alpha: 0.8 });
     
     // Inner layer
     bg.roundRect(2, 2, width - 4, height - 4, 6)
-      .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.4 });
+      .stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 0.4 });
 
     const positionText = new Text({
       text: `${positionIndex + 1}`,
@@ -259,8 +259,8 @@ export class LineupScene extends BaseScene {
         fontFamily: 'Orbitron',
         fontSize: 28,
         fontWeight: 'bold',
-        fill: Colors.BROWN,
-        stroke: { color: Colors.GOLD_BRIGHT, width: 1 }
+        fill: Colors.ROBOT_ELEMENT,
+        stroke: { color: Colors.ROBOT_CYAN, width: 1 }
       }
     });
     positionText.anchor.set(0.5);
@@ -311,16 +311,16 @@ export class LineupScene extends BaseScene {
     
     // Main parchment panel
     poolBg.roundRect(0, 0, poolWidth, poolHeight, 12)
-      .fill({ color: Colors.PARCHMENT_LIGHT, alpha: 0.95 })
-      .stroke({ width: 2, color: Colors.GOLD });
+      .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.95 })
+      .stroke({ width: 2, color: Colors.ROBOT_CYAN });
     
     // Inner layer
     poolBg.roundRect(3, 3, poolWidth - 6, poolHeight - 6, 10)
-      .fill({ color: Colors.PARCHMENT, alpha: 0.6 });
+      .fill({ color: Colors.ROBOT_BG_MID, alpha: 0.6 });
     
     // Golden highlight
     poolBg.roundRect(5, 5, poolWidth - 10, poolHeight - 10, 9)
-      .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.5 });
+      .stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 0.5 });
 
     // Title
     const poolTitle = new Text({
@@ -329,8 +329,8 @@ export class LineupScene extends BaseScene {
         fontFamily: 'Orbitron',
         fontSize: 18,
         fontWeight: 'bold',
-        fill: Colors.BROWN_DARK,
-        stroke: { color: Colors.GOLD_BRIGHT, width: 0.5 }
+        fill: Colors.ROBOT_CYAN,
+        stroke: { color: Colors.ROBOT_CYAN, width: 0.5 }
       }
     });
     poolTitle.x = padding + 5;
@@ -575,10 +575,10 @@ export class LineupScene extends BaseScene {
     bg.roundRect(2, 2, width, height, 8)
       .fill({ color: Colors.BLACK, alpha: 0.4 });
     bg.roundRect(0, 0, width, height, 8)
-      .fill({ color: Colors.BROWN, alpha: 0.95 })
-      .stroke({ width: 2, color: Colors.GOLD });
+      .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.95 })
+      .stroke({ width: 2, color: Colors.ROBOT_CYAN });
     bg.roundRect(2, 2, width - 4, height - 4, 6)
-      .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.6 });
+      .stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 0.6 });
     
     const buttonText = new Text({
       text: text,
@@ -587,7 +587,7 @@ export class LineupScene extends BaseScene {
         fontSize: 13,
         fontWeight: 'bold',
         fill: Colors.WHITE,
-        stroke: { color: Colors.BROWN_DARK, width: 2 }
+        stroke: { color: Colors.ROBOT_CYAN, width: 2 }
       }
     });
     buttonText.anchor.set(0.5);
@@ -605,10 +605,10 @@ export class LineupScene extends BaseScene {
       bg.roundRect(2, 2, width, height, 8)
         .fill({ color: Colors.BLACK, alpha: 0.4 });
       bg.roundRect(0, 0, width, height, 8)
-        .fill({ color: Colors.BROWN_LIGHT, alpha: 0.95 })
-        .stroke({ width: 2, color: Colors.GOLD_BRIGHT });
+        .fill({ color: Colors.ROBOT_BG_MID, alpha: 0.95 })
+        .stroke({ width: 2, color: Colors.ROBOT_CYAN });
       bg.roundRect(2, 2, width - 4, height - 4, 6)
-        .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.9 });
+        .stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 0.9 });
       button.scale.set(1.02);
     });
     
@@ -617,10 +617,10 @@ export class LineupScene extends BaseScene {
       bg.roundRect(2, 2, width, height, 8)
         .fill({ color: Colors.BLACK, alpha: 0.4 });
       bg.roundRect(0, 0, width, height, 8)
-        .fill({ color: Colors.BROWN, alpha: 0.95 })
-        .stroke({ width: 2, color: Colors.GOLD });
+        .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.95 })
+        .stroke({ width: 2, color: Colors.ROBOT_CYAN });
       bg.roundRect(2, 2, width - 4, height - 4, 6)
-        .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.6 });
+        .stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 0.6 });
       button.scale.set(1.0);
     });
     

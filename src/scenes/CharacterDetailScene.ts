@@ -1160,7 +1160,7 @@ export class CharacterDetailScene extends BaseScene {
         item: this.characterEquipment?.weapon?.name || '(empty)',
         type: 'weapon',
         equipment: this.characterEquipment?.weapon,
-        color: Colors.GOLD_BRIGHT
+        color: Colors.ROBOT_CYAN
       },
       {
         name: 'Armor',
