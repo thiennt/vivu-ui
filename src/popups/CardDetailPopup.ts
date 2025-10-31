@@ -430,21 +430,9 @@ export class CardDetailPopup extends Container {
   }
 
   public positionAtTop(screenWidth: number, screenHeight: number, padding: number = 20): void {
-    // Create a container for card content (everything except overlay)
-    const contentContainer = new Container();
-    
-    // Move all children except overlay to content container
-    const childrenToMove = this.children.filter(child => child !== this.dialogBg);
-    childrenToMove.forEach(child => {
-      this.removeChild(child);
-      contentContainer.addChild(child);
-    });
-    
     // Position the content container
-    contentContainer.x = (screenWidth - this.CARD_MAX_WIDTH) / 2;
-    contentContainer.y = 70;
-    
-    this.addChild(contentContainer);
+    this.x = (screenWidth - this.CARD_MAX_WIDTH) / 2;
+    this.y = 70;
   }
 
   public positionAtCenter(screenWidth: number, screenHeight: number): void {

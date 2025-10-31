@@ -86,7 +86,7 @@ export class PlayerDetailScene extends BaseScene {
     this.createHeader();
     this.createPlayerStats();
     this.createPointDistributionPanel();
-    this.createCharacterCollection();
+    //this.createCharacterCollection();
     this.createBackButton();
   }
 
@@ -127,7 +127,7 @@ export class PlayerDetailScene extends BaseScene {
     this.createHeader();
     this.createPlayerStats();
     this.createPointDistributionPanel();
-    this.createCharacterCollection();
+    //this.createCharacterCollection();
     this.createBackButton();
     
     // Calculate content height for scrolling
@@ -309,7 +309,7 @@ export class PlayerDetailScene extends BaseScene {
       text: '📜 Player Info',
       style: {
         fontFamily: 'Kalam',
-        fontSize: 16,
+        fontSize: 20,
         fontWeight: 'bold',
         fill: Colors.BROWN_DARK,
         stroke: { color: Colors.GOLD_BRIGHT, width: 0.5 }
@@ -324,7 +324,7 @@ export class PlayerDetailScene extends BaseScene {
         text: `${item.label} ${item.value}`,
         style: {
           fontFamily: 'Kalam',
-          fontSize: 13,
+          fontSize: 16,
           fill: Colors.BROWN_DARKER
         }
       });
@@ -338,7 +338,7 @@ export class PlayerDetailScene extends BaseScene {
       text: '⚔️ Statistics',
       style: {
         fontFamily: 'Kalam',
-        fontSize: 16,
+        fontSize: 20,
         fontWeight: 'bold',
         fill: Colors.BROWN_DARK,
         stroke: { color: Colors.GOLD_BRIGHT, width: 0.5 }
@@ -353,7 +353,7 @@ export class PlayerDetailScene extends BaseScene {
         text: `${item.label} ${item.value}`,
         style: {
           fontFamily: 'Kalam',
-          fontSize: 13,
+          fontSize: 16,
           fill: Colors.BROWN_DARKER
         }
       });
@@ -400,7 +400,7 @@ export class PlayerDetailScene extends BaseScene {
       text: '✨ Attribute Points ✨',
       style: {
         fontFamily: 'Kalam',
-        fontSize: 16,
+        fontSize: 20,
         fontWeight: 'bold',
         fill: Colors.BROWN_DARK,
         stroke: { color: Colors.GOLD_BRIGHT, width: 0.5 }
@@ -416,7 +416,7 @@ export class PlayerDetailScene extends BaseScene {
         text: 'No points available to distribute',
         style: {
           fontFamily: 'Kalam',
-          fontSize: 14,
+          fontSize: 16,
           fill: Colors.BROWN,
           fontStyle: 'italic'
         }
@@ -436,7 +436,7 @@ export class PlayerDetailScene extends BaseScene {
       text: `⭐ ${this.remainingPoints} pts`,
       style: {
         fontFamily: 'Kalam',
-        fontSize: 14,
+        fontSize: 16,
         fontWeight: 'bold',
         fill: Colors.BROWN_DARK,
         stroke: { color: Colors.GOLD_BRIGHT, width: 0.5 }

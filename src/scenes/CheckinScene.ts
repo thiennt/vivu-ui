@@ -401,8 +401,8 @@ export class CheckinScene extends BaseScene {
     const gap = isMobile ? 6 : this.STANDARD_SPACING;
     const cardCount = 3;
     
-    const cardWidth = (availableWidth - (gap * (cardCount - 1))) / cardCount;
-    const cardHeight = cardWidth * (160 / 120); // Match CardBattleScene default ratio
+    const cardWidth = 94;
+    const cardHeight = 114;
 
     const layout = {
       itemsPerRow: cardCount,
@@ -441,10 +441,10 @@ export class CheckinScene extends BaseScene {
       const row = Math.floor(index / layout.itemsPerRow);
       const col = index % layout.itemsPerRow;
 
-      const x = col * (layout.itemWidth + gap);
+      const x = col * availableWidth / layout.itemsPerRow + (availableWidth / layout.itemsPerRow - cardWidth) / 2;
       const y = row * (cardHeight + gap);
-
-      const characterCard = this.createCharacterCard(character, x, y, layout.itemWidth, cardHeight);
+      
+      const characterCard = this.createCharacterCard(character, x, y, cardWidth, cardHeight);
 
       gridContent.addChild(characterCard);
     }
