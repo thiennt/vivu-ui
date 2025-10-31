@@ -73,7 +73,7 @@ export class LearnSkillPopup extends Container {
     const loadingText = new Text({
       text: 'Loading skills...',
       style: {
-        fontFamily: 'Roboto',
+        fontFamily: 'Orbitron',
         fontSize: 18,
         fontWeight: 'bold',
         fill: Colors.BROWN,
@@ -142,7 +142,7 @@ export class LearnSkillPopup extends Container {
     const dialogTitle = new Text({
       text: `📜 Learn ${skillTypeLabel}`,
       style: {
-        fontFamily: 'Roboto',
+        fontFamily: 'Orbitron',
         fontSize: 18,
         fontWeight: 'bold',
         fill: Colors.WHITE,
@@ -157,7 +157,7 @@ export class LearnSkillPopup extends Container {
     const instructionText = new Text({
       text: 'Choose a skill to learn:',
       style: {
-        fontFamily: 'Roboto',
+        fontFamily: 'Orbitron',
         fontSize: 14,
         fill: Colors.BROWN,
         align: 'center'
@@ -192,7 +192,7 @@ export class LearnSkillPopup extends Container {
       const badgeText = new Text({
         text: this.skillType === 'active_skill' ? 'ACTIVE' : 'PASSIVE',
         style: {
-          fontFamily: 'Roboto',
+          fontFamily: 'Orbitron',
           fontSize: 9,
           fontWeight: 'bold',
           fill: Colors.WHITE
@@ -205,7 +205,7 @@ export class LearnSkillPopup extends Container {
       const skillName = new Text({
         text: skill.name,
         style: {
-          fontFamily: 'Roboto',
+          fontFamily: 'Orbitron',
           fontSize: 14,
           fontWeight: 'bold',
           fill: Colors.BROWN_DARK
@@ -217,7 +217,7 @@ export class LearnSkillPopup extends Container {
       const skillDescription = new Text({
         text: skill.description,
         style: {
-          fontFamily: 'Roboto',
+          fontFamily: 'Orbitron',
           fontSize: 11,
           fill: Colors.BROWN_WOOD,
           wordWrap: true,
@@ -327,7 +327,7 @@ export class LearnSkillPopup extends Container {
     const buttonText = new Text({
       text,
       style: {
-        fontFamily: 'Roboto',
+        fontFamily: 'Orbitron',
         fontSize: 14,
         fontWeight: 'bold',
         fill: Colors.WHITE,

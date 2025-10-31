@@ -79,7 +79,7 @@ export class SkillChangePopup extends Container {
     const loadingText = new Text({
       text: 'Loading skills...',
       style: {
-        fontFamily: 'Roboto',
+        fontFamily: 'Orbitron',
         fontSize: 18,
         fontWeight: 'bold',
         fill: Colors.TEXT_PRIMARY,
@@ -114,7 +114,7 @@ export class SkillChangePopup extends Container {
     const dialogTitle = new Text({
       text: `Change ${this.skillType.replace('_', ' ').toUpperCase()} Skill`,
       style: {
-        fontFamily: 'Roboto',
+        fontFamily: 'Orbitron',
         fontSize: 18,
         fontWeight: 'bold',
         fill: Colors.TEXT_PRIMARY,
@@ -129,7 +129,7 @@ export class SkillChangePopup extends Container {
     const currentText = new Text({
       text: `Current: ${this.currentSkill.name}`,
       style: {
-        fontFamily: 'Roboto',
+        fontFamily: 'Orbitron',
         fontSize: 14,
         fontWeight: 'bold',
         fill: Colors.TEXT_SECONDARY,
@@ -157,7 +157,7 @@ export class SkillChangePopup extends Container {
       const skillName = new Text({
         text: skill.name,
         style: {
-          fontFamily: 'Roboto',
+          fontFamily: 'Orbitron',
           fontSize: 14,
           fontWeight: 'bold',
           fill: isCurrentSkill ? Colors.TEXT_BUTTON : Colors.TEXT_PRIMARY
@@ -169,7 +169,7 @@ export class SkillChangePopup extends Container {
       const skillDescription = new Text({
         text: skill.description,
         style: {
-          fontFamily: 'Roboto',
+          fontFamily: 'Orbitron',
           fontSize: 12,
           fill: isCurrentSkill ? Colors.TEXT_BUTTON : Colors.TEXT_SECONDARY,
           wordWrap: true,
@@ -243,7 +243,7 @@ export class SkillChangePopup extends Container {
     const buttonText = new Text({
       text,
       style: {
-        fontFamily: 'Roboto',
+        fontFamily: 'Orbitron',
         fontSize: 14,
         fontWeight: 'bold',
         fill: Colors.TEXT_BUTTON

@@ -138,7 +138,7 @@ export class DeckCard extends Container {
     const energyIcon = new Text({
       text: '⚡',
       style: {
-        fontFamily: 'Roboto',
+        fontFamily: 'Orbitron',
         fontSize: Math.max(8, Math.round(14 * fontScale)),
         fill: Colors.ORANGE,
         dropShadow: {
@@ -157,7 +157,7 @@ export class DeckCard extends Container {
     const energyText = new Text({
       text: card.energy_cost.toString(),
       style: {
-        fontFamily: 'Roboto',
+        fontFamily: 'Orbitron',
         fontSize: Math.max(12, Math.round(14 * fontScale)),
         fontWeight: 'bold',
         fill: Colors.WHITE,
@@ -199,7 +199,7 @@ export class DeckCard extends Container {
     const groupIconText = new Text({
       text: groupIcon,
       style: {
-        fontFamily: 'Roboto',
+        fontFamily: 'Orbitron',
         fontSize: Math.max(10, Math.round(12 * fontScale)),
         align: 'center',
         fill: Colors.WHITE,
@@ -220,7 +220,7 @@ export class DeckCard extends Container {
     const avatarIcon = new Text({
       text: card.icon_url || groupIcon,  // Fallback to group icon if no avatar
       style: {
-        fontFamily: 'Roboto',
+        fontFamily: 'Orbitron',
         fontSize: Math.max(28, Math.round(36 * fontScale)),
         align: 'center',
         fill: Colors.WHITE

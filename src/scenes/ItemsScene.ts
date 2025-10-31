@@ -199,7 +199,7 @@ export class ItemsScene extends BaseScene {
     const title = new Text({
       text: '⚒️ Craft Equipment ⚒️',
       style: {
-        fontFamily: 'Roboto',
+        fontFamily: 'Orbitron',
         fontSize: 24,
         fontWeight: 'bold',
         fill: Colors.WHITE,
@@ -220,7 +220,7 @@ export class ItemsScene extends BaseScene {
     const subtitle = new Text({
       text: 'Merge 2 same level items to upgrade',
       style: {
-        fontFamily: 'Roboto',
+        fontFamily: 'Orbitron',
         fontSize: 12,
         fill: Colors.GOLD,
         align: 'center'
@@ -312,7 +312,7 @@ export class ItemsScene extends BaseScene {
     const nameText = new Text({
       text: item.name || 'Equipment',
       style: {
-        fontFamily: 'Roboto',
+        fontFamily: 'Orbitron',
         fontSize: 13,
         fontWeight: 'bold',
         fill: Colors.WHITE,
@@ -330,7 +330,7 @@ export class ItemsScene extends BaseScene {
     const levelText = new Text({
       text: `Lv.${item.level || 1}`,
       style: {
-        fontFamily: 'Roboto',
+        fontFamily: 'Orbitron',
         fontSize: 16,
         fontWeight: 'bold',
         fill: Colors.GOLD_BRIGHT,
@@ -388,7 +388,7 @@ export class ItemsScene extends BaseScene {
     const title = new Text({
       text: 'Selected Items',
       style: {
-        fontFamily: 'Roboto',
+        fontFamily: 'Orbitron',
         fontSize: 14,
         fontWeight: 'bold',
         fill: Colors.WHITE,
@@ -415,7 +415,7 @@ export class ItemsScene extends BaseScene {
       const emptyText = new Text({
         text: 'Select 2 items of same level to craft',
         style: {
-          fontFamily: 'Roboto',
+          fontFamily: 'Orbitron',
           fontSize: 12,
           fill: Colors.GOLD,
           align: 'center'
@@ -442,7 +442,7 @@ export class ItemsScene extends BaseScene {
         const nameText = new Text({
           text: item.name,
           style: {
-            fontFamily: 'Roboto',
+            fontFamily: 'Orbitron',
             fontSize: 11,
             fill: Colors.WHITE,
             align: 'center',
@@ -457,7 +457,7 @@ export class ItemsScene extends BaseScene {
         const levelText = new Text({
           text: `Lv.${item.level || 1}`,
           style: {
-            fontFamily: 'Roboto',
+            fontFamily: 'Orbitron',
             fontSize: 14,
             fontWeight: 'bold',
             fill: Colors.GOLD_BRIGHT
@@ -479,7 +479,7 @@ export class ItemsScene extends BaseScene {
           const resultText = new Text({
             text: `→ Lv.${level1 + 1} Equipment`,
             style: {
-              fontFamily: 'Roboto',
+              fontFamily: 'Orbitron',
               fontSize: 13,
               fontWeight: 'bold',
               fill: Colors.GREEN_BRIGHT,
@@ -494,7 +494,7 @@ export class ItemsScene extends BaseScene {
           const errorText = new Text({
             text: '⚠ Items must be same level',
             style: {
-              fontFamily: 'Roboto',
+              fontFamily: 'Orbitron',
               fontSize: 12,
               fill: Colors.RED,
               align: 'center'
@@ -552,7 +552,7 @@ export class ItemsScene extends BaseScene {
     const successText = new Text({
       text: '✓ Crafted Successfully!',
       style: {
-        fontFamily: 'Roboto',
+        fontFamily: 'Orbitron',
         fontSize: 16,
         fontWeight: 'bold',
         fill: Colors.GREEN_BRIGHT,
@@ -593,7 +593,7 @@ export class ItemsScene extends BaseScene {
     const buttonText = new Text({
       text: text,
       style: {
-        fontFamily: 'Roboto',
+        fontFamily: 'Orbitron',
         fontSize: 14,
         fontWeight: 'bold',
         fill: Colors.WHITE,

@@ -121,7 +121,7 @@ export class DungeonScene extends BaseScene {
     const subtitle = new Text({
       text: 'Select a dungeon to explore',
       style: {
-        fontFamily: 'Roboto',
+        fontFamily: 'Orbitron',
         fontSize: 18,
         fill: Colors.TEXT_SECONDARY,
         align: 'center'
@@ -199,7 +199,7 @@ export class DungeonScene extends BaseScene {
     const title = new Text({
       text: dungeon.name,
       style: {
-        fontFamily: 'Roboto',
+        fontFamily: 'Orbitron',
         fontSize: titleFontSize,
         fontWeight: 'bold',
         fill: Colors.TEXT_PRIMARY,
@@ -215,7 +215,7 @@ export class DungeonScene extends BaseScene {
     const description = new Text({
       text: dungeon.description,
       style: {
-        fontFamily: 'Roboto',
+        fontFamily: 'Orbitron',
         fontSize: descFontSize,
         fill: Colors.TEXT_SECONDARY,
         wordWrap: true,
@@ -230,7 +230,7 @@ export class DungeonScene extends BaseScene {
     const requiredLevel = new Text({
       text: `Required Level: ${dungeon.requiredLevel}`,
       style: {
-        fontFamily: 'Roboto',
+        fontFamily: 'Orbitron',
         fontSize: levelFontSize,
         fontWeight: 'bold',
         fill: Colors.RARITY_LEGENDARY
@@ -243,7 +243,7 @@ export class DungeonScene extends BaseScene {
     const stages = new Text({
       text: `Stages: ${dungeon.stages.length}`,
       style: {
-        fontFamily: 'Roboto',
+        fontFamily: 'Orbitron',
         fontSize: stagesFontSize,
         fill: Colors.TEXT_TERTIARY
       }

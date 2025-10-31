@@ -44,7 +44,7 @@ export class SkillDetailPopup extends Container {
     const dialogTitle = new Text({
       text: 'Skill Details',
       style: {
-        fontFamily: 'Roboto',
+        fontFamily: 'Orbitron',
         fontSize: 20,
         fontWeight: 'bold',
         fill: Colors.TEXT_PRIMARY,
@@ -59,7 +59,7 @@ export class SkillDetailPopup extends Container {
     const skillNameText = new Text({
       text: this.skill.name,
       style: {
-        fontFamily: 'Roboto',
+        fontFamily: 'Orbitron',
         fontSize: 18,
         fontWeight: 'bold',
         fill: Colors.RARITY_LEGENDARY,
@@ -80,7 +80,7 @@ export class SkillDetailPopup extends Container {
     const skillDescText = new Text({
       text: this.skill.description,
       style: {
-        fontFamily: 'Roboto',
+        fontFamily: 'Orbitron',
         fontSize: 14,
         fill: Colors.TEXT_SECONDARY,
         align: 'left',
@@ -136,7 +136,7 @@ export class SkillDetailPopup extends Container {
     const badgeText = new Text({
       text: skillType.replace('_', ' ').toUpperCase(),
       style: {
-        fontFamily: 'Roboto',
+        fontFamily: 'Orbitron',
         fontSize: 10,
         fontWeight: 'bold',
         fill: Colors.TEXT_WHITE
@@ -171,7 +171,7 @@ export class SkillDetailPopup extends Container {
     const buttonText = new Text({
       text,
       style: {
-        fontFamily: 'Roboto',
+        fontFamily: 'Orbitron',
         fontSize: 14,
         fontWeight: 'bold',
         fill: Colors.TEXT_BUTTON

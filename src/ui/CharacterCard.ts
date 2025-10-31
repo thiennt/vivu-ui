@@ -176,7 +176,7 @@ export class CharacterCard extends Container {
       const countText = new Text({
         text: `${effect.stacks || effect.duration || ''}`,
         style: {
-          fontFamily: 'Roboto',
+          fontFamily: 'Orbitron',
           fontSize: 7,
           fontWeight: 'bold',
           fill: Colors.WHITE
@@ -258,7 +258,7 @@ export class CharacterCard extends Container {
     const statsText = new Text({
       text: `⚔️ ${atkValue}`,
       style: {
-        fontFamily: 'Roboto',
+        fontFamily: 'Orbitron',
         fontSize: 12,
         fontWeight: 'bold',
         fill: Colors.WHITE,
@@ -288,7 +288,7 @@ export class CharacterCard extends Container {
     const defText = new Text({
       text: `🛡️ ${defValue}`,
       style: {
-        fontFamily: 'Roboto',
+        fontFamily: 'Orbitron',
         fontSize: 11,
         fontWeight: 'bold',
         fill: Colors.WHITE,
@@ -340,7 +340,7 @@ export class CharacterCard extends Container {
     const iconText = new Text({
       text: icon,
       style: {
-        fontFamily: 'Roboto',
+        fontFamily: 'Orbitron',
         fontSize: 22,
         fontWeight: 'bold',
         fill: Colors.WHITE
@@ -388,7 +388,7 @@ export class CharacterCard extends Container {
     const hpText = new Text({
       text: `${Math.max(0, this.character.hp)}/${this.character.max_hp}`,
       style: {
-        fontFamily: 'Roboto',
+        fontFamily: 'Orbitron',
         fontSize: 10,
         fontWeight: 'bold',
         fill: this.isDead ? Colors.RED : Colors.WHITE,

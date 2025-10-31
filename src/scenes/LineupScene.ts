@@ -162,7 +162,7 @@ export class LineupScene extends BaseScene {
     const title = new Text({
       text: '⚔️ Battle Lineup ⚔️',
       style: {
-        fontFamily: 'Roboto',
+        fontFamily: 'Orbitron',
         fontSize: 24,
         fontWeight: 'bold',
         fill: Colors.WHITE,
@@ -183,7 +183,7 @@ export class LineupScene extends BaseScene {
     const subtitle = new Text({
       text: 'Drag to swap • Click to move',
       style: {
-        fontFamily: 'Roboto',
+        fontFamily: 'Orbitron',
         fontSize: 12,
         fill: Colors.GOLD,
         align: 'center'
@@ -256,7 +256,7 @@ export class LineupScene extends BaseScene {
     const positionText = new Text({
       text: `${positionIndex + 1}`,
       style: {
-        fontFamily: 'Roboto',
+        fontFamily: 'Orbitron',
         fontSize: 28,
         fontWeight: 'bold',
         fill: Colors.BROWN,
@@ -326,7 +326,7 @@ export class LineupScene extends BaseScene {
     const poolTitle = new Text({
       text: '🎭 Available Heroes',
       style: {
-        fontFamily: 'Roboto',
+        fontFamily: 'Orbitron',
         fontSize: 18,
         fontWeight: 'bold',
         fill: Colors.BROWN_DARK,
@@ -583,7 +583,7 @@ export class LineupScene extends BaseScene {
     const buttonText = new Text({
       text: text,
       style: {
-        fontFamily: 'Roboto',
+        fontFamily: 'Orbitron',
         fontSize: 13,
         fontWeight: 'bold',
         fill: Colors.WHITE,
