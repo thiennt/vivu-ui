@@ -45,12 +45,12 @@ export class DeckCard extends Container {
     
     // Main card background - aged parchment
     this.bg.roundRect(0, 0, width, height, 5)
-      .fill({ color: Colors.PARCHMENT_LIGHT, alpha: 0.98 })  // Parchment color
+      .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.98 })  // Parchment color
       .stroke({ width: 2, color: Colors.GOLD });   // Golden border
     
     // Inner darker parchment layer for depth
     this.bg.roundRect(2, 2, width - 4, height - 4, 4)
-      .fill({ color: Colors.PARCHMENT, alpha: 0.6 });
+      .fill({ color: Colors.ROBOT_BG_MID, alpha: 0.6 });
     
     // Inner golden highlight
     this.bg.roundRect(3, 3, width - 6, height - 6, 3)
@@ -64,12 +64,12 @@ export class DeckCard extends Container {
     
     // Dark inner frame for avatar/art with golden border
     this.bg.roundRect(frameMargin, frameY, frameWidth, frameHeight, 3)
-      .fill({ color: Colors.BROWN_DARK, alpha: 0.95 })
+      .fill({ color: Colors.ROBOT_CYAN, alpha: 0.95 })
       .stroke({ width: 1.5, color: Colors.GOLD, alpha: 0.9 });
     
     // Inner bevel effect
     this.bg.roundRect(frameMargin + 1, frameY + 1, frameWidth - 2, frameHeight - 2, 2)
-      .stroke({ width: 0.8, color: Colors.BROWN, alpha: 0.5 });
+      .stroke({ width: 0.8, color: Colors.ROBOT_ELEMENT, alpha: 0.5 });
     
     // Fantasy corner decorations with golden accents
     const cornerSize = 4;
@@ -128,7 +128,7 @@ export class DeckCard extends Container {
     
     const energyCostBg = new Graphics()
       .roundRect(energyX, energyY, energyBgWidth, energyBgHeight, 4)
-      .fill({ color: Colors.BROWN_DARK, alpha: 0.95 })
+      .fill({ color: Colors.ROBOT_CYAN, alpha: 0.95 })
       .stroke({ width: 1.5, color: Colors.GOLD, alpha: 0.95 });  // Golden border
     
     // Inner highlight for gem effect
@@ -161,7 +161,7 @@ export class DeckCard extends Container {
         fontSize: Math.max(12, Math.round(14 * fontScale)),
         fontWeight: 'bold',
         fill: Colors.WHITE,
-        stroke: { color: Colors.BROWN_DARK, width: 1.5 }
+        stroke: { color: Colors.ROBOT_CYAN, width: 1.5 }
       }
     });
     energyText.anchor.set(0.5);
@@ -189,7 +189,7 @@ export class DeckCard extends Container {
     const groupIconRadius = 10;
     const groupIconBg = new Graphics()
       .circle(width - 12, 16, groupIconRadius)
-      .fill({ color: Colors.BROWN_DARK, alpha: 0.95 })
+      .fill({ color: Colors.ROBOT_CYAN, alpha: 0.95 })
       .stroke({ width: 1.5, color: Colors.GOLD, alpha: 0.9 });
     
     // Inner magical glow ring

@@ -273,15 +273,22 @@ export class PlayerDetailScene extends BaseScene {
     
     panel.addChild(bg);
     
-    // Title
+    // Title with robot theme
     const title = new Text({
       text: '📜 Player Info',
       style: {
         fontFamily: 'Orbitron',
-        fontSize: 20,
+        fontSize: 18,
         fontWeight: 'bold',
-        fill: Colors.BROWN_DARK,
-        stroke: { color: Colors.GOLD_BRIGHT, width: 0.5 }
+        fill: Colors.ROBOT_CYAN,
+        letterSpacing: 2,
+        dropShadow: {
+          color: Colors.ROBOT_CYAN,
+          blur: 4,
+          angle: 0,
+          distance: 0,
+          alpha: 0.5
+        }
       }
     });
     title.x = 12;
@@ -763,20 +770,20 @@ export class PlayerDetailScene extends BaseScene {
     const cardWidth = (availableWidth - (gap * (cardCount - 1))) / cardCount;
     const cardHeight = cardWidth * (160 / 120); // Match CardBattleScene default ratio
 
-    // Title
+    // Title with robot theme
     const collectionTitle = new Text({ 
       text: '🎭 Character Collection', 
       style: {
         fontFamily: 'Orbitron',
         fontSize: 20,
         fontWeight: 'bold',
-        fill: Colors.WHITE,
-        stroke: { color: Colors.BROWN_DARK, width: 2 },
+        fill: Colors.ROBOT_CYAN,
+        letterSpacing: 2,
         dropShadow: {
-          color: Colors.GOLD_BRIGHT,
-          blur: 3,
-          angle: Math.PI / 4,
-          distance: 2,
+          color: Colors.ROBOT_CYAN,
+          blur: 6,
+          angle: 0,
+          distance: 0,
           alpha: 0.6
         }
       }

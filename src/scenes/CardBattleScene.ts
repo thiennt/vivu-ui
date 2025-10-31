@@ -748,7 +748,7 @@ export class CardBattleScene extends BaseScene {
       style: {
         fontFamily: 'Orbitron',
         fontSize: 16,
-        fill: Colors.BROWN_WOOD,
+        fill: Colors.ROBOT_ELEMENT,
         align: 'center'
       }
     });

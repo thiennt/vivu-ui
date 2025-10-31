@@ -193,7 +193,7 @@ export class EquipmentChangePopup extends Container {
         style: {
           fontFamily: 'Orbitron',
           fontSize: 11,
-          fill: Colors.BROWN_WOOD,
+          fill: Colors.ROBOT_ELEMENT,
           wordWrap: true,
           wordWrapWidth: dialogWidth - 60
         }
