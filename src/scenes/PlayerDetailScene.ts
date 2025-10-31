@@ -253,7 +253,7 @@ export class PlayerDetailScene extends BaseScene {
     
     // Avatar emoji/icon (using character's name first letter or emoji)
     const avatarText = new Text({
-      text: avatarCharacter.code || avatarCharacter.name?.charAt(0) || '👤',
+      text: (avatarCharacter as any).code || avatarCharacter.tokenSymbol || avatarCharacter.name?.charAt(0) || '👤',
       style: {
         fontFamily: 'Kalam',
         fontSize: 36,
@@ -290,7 +290,7 @@ export class PlayerDetailScene extends BaseScene {
     // Get character tickers for display
     const characterTickers = this.characters
       .slice(0, 5) // Show up to 5 tickers
-      .map(char => char.code || char.name?.substring(0, 3) || '?')
+      .map(char => (char as any).code || char.tokenSymbol || char.name?.substring(0, 3) || '?')
       .join(', ');
     const tickersDisplay = characterTickers + (this.characters.length > 5 ? '...' : '');
     
