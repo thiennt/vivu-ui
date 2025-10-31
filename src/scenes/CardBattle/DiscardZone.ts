@@ -33,7 +33,7 @@ export class DiscardZone extends Container {
     // Simple label
     this.discardLabel.text = 'DISCARD';
     this.discardLabel.style = {
-      fontFamily: 'Kalam',
+      fontFamily: 'Orbitron',
       fontSize: 11,
       fontWeight: 'bold',
       fill: Colors.TEXT_PRIMARY,

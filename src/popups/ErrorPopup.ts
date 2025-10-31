@@ -39,7 +39,7 @@ export class ErrorPopup extends Container {
     const errorTitle = new Text({
       text: 'Error',
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 24,
         fontWeight: 'bold',
         fill: Colors.MODAL_BORDER,
@@ -54,7 +54,7 @@ export class ErrorPopup extends Container {
     const errorMessage = new Text({
       text: this.message,
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 16,
         fill: Colors.TEXT_PRIMARY,
         align: 'center',

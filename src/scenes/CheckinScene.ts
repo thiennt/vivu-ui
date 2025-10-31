@@ -218,7 +218,7 @@ export class CheckinScene extends BaseScene {
     const title = new Text({
       text: '📅 Daily Check-In 📅',
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 24,
         fontWeight: 'bold',
         fill: Colors.WHITE,
@@ -244,7 +244,7 @@ export class CheckinScene extends BaseScene {
     const subtitle = new Text({
       text: subtitleText,
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 14,
         fill: this.hasCheckedInToday ? Colors.GREEN_LIGHT : Colors.GOLD,
         align: 'center'
@@ -291,7 +291,7 @@ export class CheckinScene extends BaseScene {
     const rewardTitle = new Text({
       text: '🎁 Rewards Received',
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 14,
         fontWeight: 'bold',
         fill: Colors.BROWN_DARK,
@@ -306,7 +306,7 @@ export class CheckinScene extends BaseScene {
     const rewardText = new Text({
       text: `x${this.checkinReward.dice || 0} 🎟️`,
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 18,
         fontWeight: 'bold',
         fill: Colors.BROWN_DARK,
@@ -414,7 +414,7 @@ export class CheckinScene extends BaseScene {
     const sectionTitle = new Text({
       text: '🎭 Unlocked Characters',
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 18,
         fontWeight: 'bold',
         fill: Colors.WHITE,
@@ -502,7 +502,7 @@ export class CheckinScene extends BaseScene {
     const buttonText = new Text({
       text: text,
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 16,
         fontWeight: 'bold',
         fill: textColor,

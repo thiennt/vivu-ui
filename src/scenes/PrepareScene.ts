@@ -115,7 +115,7 @@ export class PrepareScene extends BaseScene {
     const title = new Text({
       text: `⚔️ ${this.stage.name} ⚔️`,
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 24,
         fontWeight: 'bold',
         fill: Colors.WHITE,
@@ -183,7 +183,7 @@ export class PrepareScene extends BaseScene {
     const lineupTitle = new Text({
       text: `🧑‍🤝‍🧑 Your Lineup ⚡${lineup_power}`,
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 16,
         fontWeight: 'bold',
         fill: Colors.BROWN_DARK,
@@ -223,7 +223,7 @@ export class PrepareScene extends BaseScene {
     const deckTitle = new Text({
       text: `🃏 Battle Deck (${this.battleStage?.cards.length || 0} cards)`,
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 18,
         fontWeight: 'bold',
         fill: Colors.WHITE,
@@ -368,7 +368,7 @@ export class PrepareScene extends BaseScene {
     const buttonText = new Text({
       text: text,
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 16,
         fontWeight: 'bold',
         fill: Colors.WHITE,

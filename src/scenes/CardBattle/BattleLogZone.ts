@@ -61,7 +61,7 @@ export class BattleLogZone extends Container {
     // Golden title - easier to read
     this.logTitle.text = '📜 BATTLE LOG 📜';
     this.logTitle.style = {
-      fontFamily: 'Kalam',
+      fontFamily: 'Orbitron',
       fontSize: 18,
       fontWeight: 'bold',
       fill: Colors.GOLD_BRIGHT,
@@ -81,7 +81,7 @@ export class BattleLogZone extends Container {
 
     // Turn display - bright and readable
     this.turnText.style = {
-      fontFamily: 'Kalam',
+      fontFamily: 'Orbitron',
       fontSize: 16,
       fontWeight: 'bold',
       fill: Colors.WHITE,
@@ -101,7 +101,7 @@ export class BattleLogZone extends Container {
 
     // Phase text - bright with strong contrast
     this.phaseText.style = {
-      fontFamily: 'Kalam',
+      fontFamily: 'Orbitron',
       fontSize: 13,
       fontWeight: 'bold',
       fill: Colors.WHITE,
@@ -121,7 +121,7 @@ export class BattleLogZone extends Container {
 
     // Notification styling - bright colors
     this.notificationText.style = {
-      fontFamily: 'Kalam',
+      fontFamily: 'Orbitron',
       fontSize: 14,
       fontWeight: 'bold',
       fill: Colors.WHITE,

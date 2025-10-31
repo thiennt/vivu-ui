@@ -143,7 +143,7 @@ export class BottomNavigationMenu extends Container {
     const labelText = new Text({
       text: label,
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 10,
         fill: Colors.PARCHMENT_LIGHTEST,
         align: 'center',

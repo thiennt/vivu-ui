@@ -109,7 +109,7 @@ export class StageScene extends BaseScene {
     const subtitle = new Text({
       text: 'Choose your stage',
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 18,
         fill: Colors.TEXT_SECONDARY,
         align: 'center'
@@ -137,7 +137,7 @@ export class StageScene extends BaseScene {
     const stageTitle = new Text({
       text: 'Stages:',
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 18,
         fontWeight: 'bold',
         fill: Colors.TEXT_PRIMARY
@@ -185,7 +185,7 @@ export class StageScene extends BaseScene {
     const buttonText = new Text({
       text,
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 14,
         fontWeight: 'bold',
         fill: textColor,
@@ -259,7 +259,7 @@ export class StageScene extends BaseScene {
     const stageNumber = new Text({
       text: `Stage ${stage.stageNumber}`,
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 16,
         fontWeight: 'bold',
         fill: Colors.TEXT_PRIMARY
@@ -272,7 +272,7 @@ export class StageScene extends BaseScene {
     const stageName = new Text({
       text: stage.name,
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 14,
         fontWeight: 'bold',
         fill: Colors.TEXT_SECONDARY,
@@ -294,7 +294,7 @@ export class StageScene extends BaseScene {
     const difficulty = new Text({
       text: stage.difficulty.toString(),
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 12,
         fontWeight: 'bold',
         fill: difficultyColors[stage.difficulty] || Colors.TEXT_WHITE
@@ -307,7 +307,7 @@ export class StageScene extends BaseScene {
     const rewardText = new Text({
       text: `Rewards: ${stage.rewards.length} items`,
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 10,
         fill: Colors.TEXT_TERTIARY
       }

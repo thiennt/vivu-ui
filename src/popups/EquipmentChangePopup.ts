@@ -121,7 +121,7 @@ export class EquipmentChangePopup extends Container {
     const dialogTitle = new Text({
       text: `⚔️ Change ${this.slotName}`,
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 18,
         fontWeight: 'bold',
         fill: Colors.WHITE,
@@ -137,7 +137,7 @@ export class EquipmentChangePopup extends Container {
     const currentText = new Text({
       text: `Current: ${this.currentItem}`,
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 14,
         fill: Colors.BROWN,
         align: 'center'
@@ -178,7 +178,7 @@ export class EquipmentChangePopup extends Container {
       const equipmentName = new Text({
         text: equipment.name,
         style: {
-          fontFamily: 'Kalam',
+          fontFamily: 'Orbitron',
           fontSize: 14,
           fontWeight: 'bold',
           fill: isCurrentItem ? Colors.BROWN_DARK : Colors.BROWN_DARKER,
@@ -191,7 +191,7 @@ export class EquipmentChangePopup extends Container {
       const equipmentDescription = new Text({
         text: equipment.description,
         style: {
-          fontFamily: 'Kalam',
+          fontFamily: 'Orbitron',
           fontSize: 11,
           fill: Colors.BROWN_WOOD,
           wordWrap: true,
@@ -303,7 +303,7 @@ export class EquipmentChangePopup extends Container {
     const buttonText = new Text({
       text,
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 14,
         fontWeight: 'bold',
         fill: Colors.WHITE,

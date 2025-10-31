@@ -154,23 +154,23 @@ export class HomeScene extends BaseScene {
     
     const availableHeight = this.getContentHeight();
     
-    // Fantasy dark background with texture
+    // Robot dark background
     const bg = new Graphics();
     bg.rect(0, 0, this.gameWidth, availableHeight)
-      .fill({ color: Colors.BROWN_DARKEST, alpha: 1.0 });
+      .fill({ color: Colors.ROBOT_BG_DARK, alpha: 1.0 });
     
-    // Add subtle brown texture overlay
+    // Add subtle overlay
     bg.rect(0, 0, this.gameWidth, availableHeight)
-      .fill({ color: Colors.BROWN_DARK, alpha: 0.3 });
+      .fill({ color: Colors.ROBOT_BG_MID, alpha: 0.3 });
     
     bgContainer.addChild(bg);
     
-    // Add mystical floating particles (golden theme)
+    // Add mystical floating particles (cyan theme)
     for (let i = 0; i < 20; i++) {
       const particle = new Graphics();
       const size = 1 + Math.random() * 2;
       particle.circle(0, 0, size)
-        .fill({ color: Colors.GOLD_BRIGHT, alpha: 0.2 + Math.random() * 0.3 });
+        .fill({ color: Colors.ROBOT_CYAN, alpha: 0.2 + Math.random() * 0.3 });
       particle.x = Math.random() * this.gameWidth;
       particle.y = Math.random() * availableHeight;
       bgContainer.addChild(particle);
@@ -195,10 +195,10 @@ export class HomeScene extends BaseScene {
       .lineTo(bannerX + bannerWidth, bannerY + bannerHeight / 2)
       .lineTo(bannerX + bannerWidth - 15, bannerY)
       .lineTo(bannerX + 15, bannerY)
-      .fill({ color: Colors.BROWN, alpha: 0.95 })
-      .stroke({ width: 3, color: Colors.GOLD });
+      .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.95 })
+      .stroke({ width: 3, color: Colors.ROBOT_CYAN });
     
-    // Inner golden highlight
+    // Inner cyan highlight
     banner.moveTo(bannerX + 18, bannerY + 4)
       .lineTo(bannerX + bannerWidth - 18, bannerY + 4)
       .lineTo(bannerX + bannerWidth - 5, bannerY + bannerHeight / 2)
@@ -206,22 +206,22 @@ export class HomeScene extends BaseScene {
       .lineTo(bannerX + 18, bannerY + bannerHeight - 4)
       .lineTo(bannerX + 5, bannerY + bannerHeight / 2)
       .lineTo(bannerX + 18, bannerY + 4)
-      .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.6 });
+      .stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 0.6 });
     
     const title = new Text({
       text: '⚔️ VIVU ⚔️',
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 38,
         fontWeight: 'bold',
-        fill: Colors.WHITE,
-        stroke: { color: Colors.BROWN_DARK, width: 2 },
+        fill: Colors.ROBOT_CYAN_LIGHT,
+        stroke: { color: Colors.ROBOT_BG_DARK, width: 2 },
         dropShadow: {
-          color: Colors.GOLD_BRIGHT,
-          blur: 4,
+          color: Colors.ROBOT_CYAN,
+          blur: 6,
           angle: Math.PI / 4,
           distance: 2,
-          alpha: 0.6
+          alpha: 0.8
         }
       }
     });
@@ -238,28 +238,32 @@ export class HomeScene extends BaseScene {
     const panelWidth = Math.min(this.gameWidth - 2 * this.STANDARD_PADDING, 400);
     const panelHeight = 100;
     
-    // Fantasy parchment panel
+    // Robot panel
     const bg = new Graphics();
+    
+    // Outer glow
+    bg.roundRect(-2, -2, panelWidth + 4, panelHeight + 4, 12)
+      .fill({ color: Colors.ROBOT_CYAN, alpha: 0.2 });
     
     // Shadow
     bg.roundRect(3, 3, panelWidth, panelHeight, 10)
       .fill({ color: Colors.BLACK, alpha: 0.4 });
     
-    // Main parchment
+    // Main panel
     bg.roundRect(0, 0, panelWidth, panelHeight, 10)
-      .fill({ color: Colors.PARCHMENT_LIGHT, alpha: 0.98 })
-      .stroke({ width: 2, color: Colors.GOLD });
+      .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.95 })
+      .stroke({ width: 2, color: Colors.ROBOT_CYAN });
     
     // Inner layer
     bg.roundRect(3, 3, panelWidth - 6, panelHeight - 6, 8)
-      .fill({ color: Colors.PARCHMENT, alpha: 0.6 });
+      .fill({ color: Colors.ROBOT_CONTAINER, alpha: 0.6 });
     
-    // Golden highlight
+    // Cyan highlight
     bg.roundRect(5, 5, panelWidth - 10, panelHeight - 10, 7)
-      .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.5 });
+      .stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 0.5 });
     
     // Decorative corners
-    this.drawPanelCorners(bg, 0, 0, panelWidth, panelHeight, Colors.GOLD_BRIGHT);
+    this.drawPanelCorners(bg, 0, 0, panelWidth, panelHeight, Colors.ROBOT_CYAN);
     
     // Avatar circle on the left
     const avatarSize = 65;
@@ -268,10 +272,10 @@ export class HomeScene extends BaseScene {
     
     const avatarBg = new Graphics();
     avatarBg.circle(avatarX + avatarSize / 2, avatarY + avatarSize / 2, avatarSize / 2 + 3)
-      .fill({ color: Colors.GOLD, alpha: 0.3 });
+      .fill({ color: Colors.ROBOT_CYAN, alpha: 0.3 });
     avatarBg.circle(avatarX + avatarSize / 2, avatarY + avatarSize / 2, avatarSize / 2)
-      .fill({ color: Colors.BROWN_LIGHT, alpha: 0.95 })
-      .stroke({ width: 2, color: Colors.GOLD });
+      .fill({ color: Colors.ROBOT_CONTAINER, alpha: 0.95 })
+      .stroke({ width: 2, color: Colors.ROBOT_CYAN });
     
     const avatarEmoji = new Text({
       text: '👤',
@@ -289,11 +293,11 @@ export class HomeScene extends BaseScene {
     const playerName = new Text({
       text: `${this.player.username}`,
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 20,
         fontWeight: 'bold',
-        fill: Colors.BROWN_DARK,
-        stroke: { color: Colors.GOLD_BRIGHT, width: 0.5 }
+        fill: Colors.ROBOT_CYAN_LIGHT,
+        stroke: { color: Colors.ROBOT_BG_DARK, width: 0.5 }
       }
     });
     playerName.x = infoStartX;
@@ -302,9 +306,9 @@ export class HomeScene extends BaseScene {
     const playerLevel = new Text({
       text: `⭐ Level: ${this.player.level}`,
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 17,
-        fill: Colors.BROWN_DARKER
+        fill: Colors.ROBOT_CYAN_MID
       }
     });
     playerLevel.x = infoStartX;
@@ -313,9 +317,9 @@ export class HomeScene extends BaseScene {
     const playerExp = new Text({
       text: `✨ EXP: ${this.player.exp}`,
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 17,
-        fill: Colors.BROWN_DARKER
+        fill: Colors.ROBOT_CYAN_MID
       }
     });
     playerExp.x = infoStartX;
@@ -410,27 +414,31 @@ export class HomeScene extends BaseScene {
     
     const bg = new Graphics();
     
+    // Outer glow
+    bg.roundRect(-2, -2, width + 4, height + 4, 10)
+      .fill({ color: Colors.ROBOT_CYAN, alpha: 0.3 });
+    
     // Shadow
     bg.roundRect(3, 3, width, height, 8)
       .fill({ color: Colors.BLACK, alpha: 0.4 });
     
-    // Main button - wooden style
+    // Main button - robot style
     bg.roundRect(0, 0, width, height, 8)
-      .fill({ color: Colors.BROWN, alpha: 0.95 })
-      .stroke({ width: 2, color: Colors.GOLD });
+      .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.95 })
+      .stroke({ width: 2, color: Colors.ROBOT_CYAN });
     
     // Inner highlight
     bg.roundRect(2, 2, width - 4, height - 4, 6)
-      .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.6 });
+      .stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 0.6 });
     
     const buttonText = new Text({
       text: text,
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 18,
         fontWeight: 'bold',
-        fill: Colors.WHITE,
-        stroke: { color: Colors.BROWN_DARK, width: 2 }
+        fill: Colors.ROBOT_CYAN_LIGHT,
+        stroke: { color: Colors.ROBOT_BG_DARK, width: 2 }
       }
     });
     buttonText.anchor.set(0.5);
@@ -445,25 +453,29 @@ export class HomeScene extends BaseScene {
     
     button.on('pointerover', () => {
       bg.clear();
+      bg.roundRect(-2, -2, width + 4, height + 4, 10)
+        .fill({ color: Colors.ROBOT_CYAN, alpha: 0.5 });
       bg.roundRect(3, 3, width, height, 8)
         .fill({ color: Colors.BLACK, alpha: 0.4 });
       bg.roundRect(0, 0, width, height, 8)
-        .fill({ color: Colors.BROWN_LIGHT, alpha: 0.95 })
-        .stroke({ width: 2, color: Colors.GOLD_BRIGHT });
+        .fill({ color: Colors.ROBOT_CYAN, alpha: 0.3 })
+        .stroke({ width: 2, color: Colors.ROBOT_CYAN });
       bg.roundRect(2, 2, width - 4, height - 4, 6)
-        .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.9 });
+        .stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 0.9 });
       button.scale.set(1.02);
     });
     
     button.on('pointerout', () => {
       bg.clear();
+      bg.roundRect(-2, -2, width + 4, height + 4, 10)
+        .fill({ color: Colors.ROBOT_CYAN, alpha: 0.3 });
       bg.roundRect(3, 3, width, height, 8)
         .fill({ color: Colors.BLACK, alpha: 0.4 });
       bg.roundRect(0, 0, width, height, 8)
-        .fill({ color: Colors.BROWN, alpha: 0.95 })
-        .stroke({ width: 2, color: Colors.GOLD });
+        .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.95 })
+        .stroke({ width: 2, color: Colors.ROBOT_CYAN });
       bg.roundRect(2, 2, width - 4, height - 4, 6)
-        .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.6 });
+        .stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 0.6 });
       button.scale.set(1.0);
     });
     
@@ -473,12 +485,12 @@ export class HomeScene extends BaseScene {
   }
 
   private createDecorations(): void {
-    // Add floating golden particles
+    // Add floating cyan particles
     for (let i = 0; i < 12; i++) {
       const decoration = new Graphics();
       const size = 2 + Math.random() * 3;
       decoration.circle(0, 0, size)
-        .fill({ color: Colors.GOLD_BRIGHT, alpha: 0.4 + Math.random() * 0.3 });
+        .fill({ color: Colors.ROBOT_CYAN, alpha: 0.4 + Math.random() * 0.3 });
       
       decoration.x = Math.random() * this.gameWidth;
       decoration.y = Math.random() * this.gameHeight;

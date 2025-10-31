@@ -710,7 +710,7 @@ export class CardBattleScene extends BaseScene {
     const iconText = new Text({
       text: isVictory ? '🏆' : '💀',
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 64,
         fill: Colors.WHITE
       }
@@ -723,7 +723,7 @@ export class CardBattleScene extends BaseScene {
     const resultText = new Text({
       text: isVictory ? 'VICTORY!' : 'DEFEAT!',
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 42,
         fontWeight: 'bold',
         fill: isVictory ? Colors.GREEN_DARK : Colors.RED_DARKEST,
@@ -746,7 +746,7 @@ export class CardBattleScene extends BaseScene {
     const subtitleText = new Text({
       text: isVictory ? 'Well fought, hero!' : 'Try again, brave warrior!',
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 16,
         fill: Colors.BROWN_WOOD,
         align: 'center'
@@ -773,7 +773,7 @@ export class CardBattleScene extends BaseScene {
     const backText = new Text({
       text: '← Back Home',
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 16,
         fontWeight: 'bold',
         fill: Colors.WHITE,

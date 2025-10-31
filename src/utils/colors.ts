@@ -131,6 +131,15 @@ export const Colors = {
   BLUE_DRAW: '#66B9FF',
   BLUE_RARE: '#5792C1',
 
+  // Robot Theme Colors
+  ROBOT_BG_DARK: '#0f111a',          // Dark background
+  ROBOT_BG_MID: '#1f2633',           // Mid background
+  ROBOT_CONTAINER: '#142229',        // Container background (rgba(20, 34, 41, 0.85))
+  ROBOT_ELEMENT: '#222f3e',          // Robot element background
+  ROBOT_CYAN: '#0ff3c6',             // Primary cyan
+  ROBOT_CYAN_LIGHT: '#aefeff',       // Light cyan text
+  ROBOT_CYAN_MID: '#7ee7c7',         // Mid cyan
+
   // Transparent base
   TRANSPARENT: 'rgba(0, 0, 0, 0)',
 
@@ -138,22 +147,22 @@ export const Colors = {
   // SEMANTIC COLOR ALIASES - Descriptive names for specific use cases
   // ============================================================================
 
-  // Background colors - Ancient Forest theme
-  BACKGROUND_PRIMARY: '#1A0F0A',     // = FOREST_DARK
-  BACKGROUND_SECONDARY: '#2A1810',   // = FOREST_EMERALD
+  // Background colors - Robot theme
+  BACKGROUND_PRIMARY: '#0f111a',     // = ROBOT_BG_DARK
+  BACKGROUND_SECONDARY: '#1f2633',   // = ROBOT_BG_MID
 
   // Text colors
-  TEXT_PRIMARY: '#F0F4E8',           // = IVORY_SOFT
-  TEXT_SECONDARY: '#A9C1A9',         // = SAGE_GREEN
-  TEXT_TERTIARY: '#D4B35F',          // = GOLD_ANTIQUE
-  TEXT_WHITE: '#FFFFFF',             // = WHITE
-  TEXT_BUTTON: '#F0F4E8',            // = IVORY_SOFT
-  TEXT_ON_DARK: '#F0F4E8',           // = IVORY_SOFT
+  TEXT_PRIMARY: '#aefeff',           // = ROBOT_CYAN_LIGHT
+  TEXT_SECONDARY: '#7ee7c7',         // = ROBOT_CYAN_MID
+  TEXT_TERTIARY: '#0ff3c6',          // = ROBOT_CYAN
+  TEXT_WHITE: '#aefeff',             // = ROBOT_CYAN_LIGHT
+  TEXT_BUTTON: '#1f2633',            // = ROBOT_BG_MID (dark on cyan button)
+  TEXT_ON_DARK: '#aefeff',           // = ROBOT_CYAN_LIGHT
 
   // Button colors
-  BUTTON_PRIMARY: '#8B6D31',         // = GOLD_DARK
-  BUTTON_BORDER: '#4A6C5D',          // = FOREST_BORDER_ALT
-  BUTTON_HOVER: '#A88A45',           // = GOLD_LIGHTER
+  BUTTON_PRIMARY: '#0ff3c6',         // = ROBOT_CYAN
+  BUTTON_BORDER: '#0ff3c6',          // = ROBOT_CYAN
+  BUTTON_HOVER: '#7ee7c7',           // = ROBOT_CYAN_MID
 
   // Card rarity colors
   RARITY_COMMON: '#729683',          // = FOREST_STONE
@@ -176,32 +185,32 @@ export const Colors = {
   LINEUP_BACK: '#4CA5B3',            // = FOREST_LAKE
 
   // Card elements
-  CARD_BORDER: '#3D5A50',            // = FOREST_BORDER
-  CARD_BACKGROUND: '#2A4C44',        // = FOREST_EMERALD
-  CARD_BACK: '#8B6D31',              // = GOLD_DARK
-  CARD_DISCARD: '#3D5A50',           // = FOREST_BORDER
-  CARD_DECO_BG: '#182D29',           // = FOREST_DARKER
-  CARD_STAT_BG: '#2A4C44',           // = FOREST_EMERALD
-  CARD_AVATAR_BG: '#3D5A50',         // = FOREST_BORDER
-  CARD_HP_BAR: '#E05E33',            // = ORANGE_EMBER
-  CARD_ENERGY_BAR: '#5ECCD9',        // = CYAN_BRIGHT
-  CARD_BACK_DARK: '#1C3A33',         // = FOREST_DARK
-  CARD_BACK_PATTERN_1: '#2A4C44',    // = FOREST_EMERALD
-  CARD_BACK_PATTERN_2: '#3D5A50',    // = FOREST_BORDER
+  CARD_BORDER: '#0ff3c6',            // = ROBOT_CYAN
+  CARD_BACKGROUND: '#222f3e',        // = ROBOT_ELEMENT
+  CARD_BACK: '#222f3e',              // = ROBOT_ELEMENT
+  CARD_DISCARD: '#0ff3c6',           // = ROBOT_CYAN
+  CARD_DECO_BG: '#1f2633',           // = ROBOT_BG_MID
+  CARD_STAT_BG: '#222f3e',           // = ROBOT_ELEMENT
+  CARD_AVATAR_BG: '#142229',         // = ROBOT_CONTAINER
+  CARD_HP_BAR: '#0ff3c6',            // = ROBOT_CYAN
+  CARD_ENERGY_BAR: '#0ff3c6',        // = ROBOT_CYAN
+  CARD_BACK_DARK: '#0f111a',         // = ROBOT_BG_DARK
+  CARD_BACK_PATTERN_1: '#222f3e',    // = ROBOT_ELEMENT
+  CARD_BACK_PATTERN_2: '#0ff3c6',    // = ROBOT_CYAN
 
   // Panel and container backgrounds
-  PANEL_BACKGROUND: '#2A4C44',       // = FOREST_EMERALD
-  CONTAINER_BACKGROUND: '#1C3A33',   // = FOREST_DARK
+  PANEL_BACKGROUND: '#222f3e',       // = ROBOT_ELEMENT
+  CONTAINER_BACKGROUND: '#142229',   // = ROBOT_CONTAINER
 
   // UI elements
-  UI_BACKGROUND: '#2A4C44',          // = FOREST_EMERALD
-  UI_BORDER: '#3D5A50',              // = FOREST_BORDER
-  UI_BORDER_GLOW: '#D9A441',         // = GOLD_ANCIENT
-  ENERGY_ACTIVE: '#D9A441',          // = GOLD_ANCIENT
-  ENERGY_INACTIVE: '#3D5A50',        // = FOREST_BORDER
-  ENERGY_TEXT: '#D9A441',            // = GOLD_ANCIENT
-  ENERGY_BAR: '#4CA5B3',             // = FOREST_LAKE
-  ENERGY_BAR_FULL: '#5ECCD9',        // = CYAN_BRIGHT
+  UI_BACKGROUND: '#222f3e',          // = ROBOT_ELEMENT
+  UI_BORDER: '#0ff3c6',              // = ROBOT_CYAN
+  UI_BORDER_GLOW: '#0ff3c6',         // = ROBOT_CYAN
+  ENERGY_ACTIVE: '#0ff3c6',          // = ROBOT_CYAN
+  ENERGY_INACTIVE: '#222f3e',        // = ROBOT_ELEMENT
+  ENERGY_TEXT: '#0ff3c6',            // = ROBOT_CYAN
+  ENERGY_BAR: '#0ff3c6',             // = ROBOT_CYAN
+  ENERGY_BAR_FULL: '#7ee7c7',        // = ROBOT_CYAN_MID
 
   // HP bar colors
   HP_BAR_BACKGROUND: '#3D5A50',      // = FOREST_BORDER
@@ -221,21 +230,21 @@ export const Colors = {
   ERROR: '#E05E33',                  // = ORANGE_EMBER
 
   // Decorative elements
-  DECORATION_MAGIC: '#9568A7',       // = PURPLE_MYSTIC
-  DECORATION_FRAME: '#D9A441',       // = GOLD_ANCIENT
-  DECORATION_INNER_GLOW: '#F0E68C',  // = YELLOW_SUNLIGHT
+  DECORATION_MAGIC: '#0ff3c6',       // = ROBOT_CYAN
+  DECORATION_FRAME: '#0ff3c6',       // = ROBOT_CYAN
+  DECORATION_INNER_GLOW: '#7ee7c7',  // = ROBOT_CYAN_MID
 
   // Battle zone colors
-  BATTLEFIELD_PRIMARY: '#182D29',    // = FOREST_DARKER
-  BATTLEFIELD_SECONDARY: '#1C3A33',  // = FOREST_DARK
-  BATTLEFIELD_ACCENT: '#D9A441',     // = GOLD_ANCIENT
-  BATTLEFIELD_BORDER: '#8B6D31',     // = GOLD_DARK
-  BATTLEFIELD_INNER_GLOW: '#F0E68C', // = YELLOW_SUNLIGHT
-  BATTLE_MAGIC_AURA: '#9568A7',      // = PURPLE_MYSTIC
-  BATTLE_ENERGY_GLOW: '#D9A441',     // = GOLD_ANCIENT
-  BATTLE_FRAME_GOLD: '#D9A441',      // = GOLD_ANCIENT
-  BATTLE_SHADOW_DEEP: '#121F1D',
-  BATTLE_LOG_BG: 'rgba(18, 31, 29, 0.8)',
+  BATTLEFIELD_PRIMARY: '#0f111a',    // = ROBOT_BG_DARK
+  BATTLEFIELD_SECONDARY: '#1f2633',  // = ROBOT_BG_MID
+  BATTLEFIELD_ACCENT: '#0ff3c6',     // = ROBOT_CYAN
+  BATTLEFIELD_BORDER: '#0ff3c6',     // = ROBOT_CYAN
+  BATTLEFIELD_INNER_GLOW: '#7ee7c7', // = ROBOT_CYAN_MID
+  BATTLE_MAGIC_AURA: '#0ff3c6',      // = ROBOT_CYAN
+  BATTLE_ENERGY_GLOW: '#0ff3c6',     // = ROBOT_CYAN
+  BATTLE_FRAME_GOLD: '#0ff3c6',      // = ROBOT_CYAN
+  BATTLE_SHADOW_DEEP: '#0f111a',
+  BATTLE_LOG_BG: 'rgba(15, 17, 26, 0.8)',
 
   // Stat colors
   STAT_HP: '#5FAD56',                // = GREEN_VIBRANT
@@ -262,16 +271,16 @@ export const Colors = {
   DIFFICULTY_NIGHTMARE: '#9568A7',   // = PURPLE_MYSTIC
 
   // Overlay and modal colors
-  OVERLAY_DARK: 'rgba(18, 31, 29, 0.8)',
-  MODAL_BORDER: '#8B6D31',           // = GOLD_DARK
-  SHADOW_COLOR: 'rgba(18, 31, 29, 0.7)',
+  OVERLAY_DARK: 'rgba(15, 17, 26, 0.85)',
+  MODAL_BORDER: '#0ff3c6',           // = ROBOT_CYAN
+  SHADOW_COLOR: 'rgba(15, 17, 26, 0.7)',
 
   // Hover and interaction states
-  HOVER_TINT: 'rgba(240, 244, 232, 0.05)',
-  HOVER_LIGHT: 'rgba(240, 244, 232, 0.1)',
-  HOVER_LIGHTEST: 'rgba(240, 244, 232, 0.15)',
-  HOVER_BLUE: '#4CA5B3',             // = FOREST_LAKE
-  ACTIVE_WHITE: '#F0F4E8',           // = IVORY_SOFT
+  HOVER_TINT: 'rgba(15, 243, 198, 0.05)',
+  HOVER_LIGHT: 'rgba(15, 243, 198, 0.1)',
+  HOVER_LIGHTEST: 'rgba(15, 243, 198, 0.15)',
+  HOVER_BLUE: '#0ff3c6',             // = ROBOT_CYAN
+  ACTIVE_WHITE: '#aefeff',           // = ROBOT_CYAN_LIGHT
 
   // Rarity frame colors (for CharacterCard)
   FRAME_LEGENDARY: '#D9A441',        // = GOLD_ANCIENT
@@ -309,16 +318,16 @@ export const Colors = {
   EFFECT_STROKE_DARK_GREEN: '#0F312A', // = FOREST_DARKEST
 
   // Glow colors
-  GLOW_COLOR: '#D9A441',             // = GOLD_ANCIENT
-  MYSTICAL_GLOW: '#9568A7',          // = PURPLE_MYSTIC
-  EPIC_BORDER_GLOW: '#D4CE8D',       // = YELLOW_GOLDEN_WIND
-  HERO_GLOW_ORANGE: '#D9A441',       // = GOLD_ANCIENT
+  GLOW_COLOR: '#0ff3c6',             // = ROBOT_CYAN
+  MYSTICAL_GLOW: '#0ff3c6',          // = ROBOT_CYAN
+  EPIC_BORDER_GLOW: '#7ee7c7',       // = ROBOT_CYAN_MID
+  HERO_GLOW_ORANGE: '#0ff3c6',       // = ROBOT_CYAN
 
   // Defeated/dimmed state
-  DEFEATED_OVERLAY: 'rgba(18, 31, 29, 0.7)',
-  DEFEATED_TEXT: '#D9A441',          // = GOLD_ANCIENT
-  DIMMED_OVERLAY: 'rgba(18, 31, 29, 0.6)',
-  EMPTY_SLOT: '#2A4C44',             // = FOREST_EMERALD
+  DEFEATED_OVERLAY: 'rgba(15, 17, 26, 0.7)',
+  DEFEATED_TEXT: '#0ff3c6',          // = ROBOT_CYAN
+  DIMMED_OVERLAY: 'rgba(15, 17, 26, 0.6)',
+  EMPTY_SLOT: '#222f3e',             // = ROBOT_ELEMENT
 
   // Sheen and lighting effects
   SHEEN_WHITE: 'rgba(240, 244, 232, 0.2)',

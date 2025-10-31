@@ -133,7 +133,7 @@ export class RewardSpinScene extends BaseScene {
     const title = new Text({
       text: '🎡 Reward Spin Wheel 🎡',
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 26,
         fontWeight: 'bold',
         fill: Colors.WHITE,
@@ -154,7 +154,7 @@ export class RewardSpinScene extends BaseScene {
     const subtitle = new Text({
       text: '✨ Spin to win amazing rewards! ✨',
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 14,
         fill: Colors.GOLD,
         align: 'center'
@@ -209,7 +209,7 @@ export class RewardSpinScene extends BaseScene {
       const emoji = new Text({
         text: segment.emoji,
         style: {
-          fontFamily: 'Kalam',
+          fontFamily: 'Orbitron',
           fontSize: 24,
         }
       });
@@ -223,7 +223,7 @@ export class RewardSpinScene extends BaseScene {
       const label = new Text({
         text: segment.label,
         style: {
-          fontFamily: 'Kalam',
+          fontFamily: 'Orbitron',
           fontSize: 11,
           fontWeight: 'bold',
           fill: Colors.WHITE,
@@ -302,7 +302,7 @@ export class RewardSpinScene extends BaseScene {
     this.resultText = new Text({
       text: '',
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 20,
         fontWeight: 'bold',
         fill: Colors.GOLD_BRIGHT,
@@ -430,7 +430,7 @@ export class RewardSpinScene extends BaseScene {
     const buttonText = new Text({
       text: text,
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 16,
         fontWeight: 'bold',
         fill: textColor,

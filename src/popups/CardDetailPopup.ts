@@ -128,7 +128,7 @@ export class CardDetailPopup extends Container {
     const groupIconText = new Text({
       text: groupIcon,
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 24,
         fill: Colors.WHITE
       }
@@ -149,7 +149,7 @@ export class CardDetailPopup extends Container {
     const cardNameText = new Text({
       text: this.card.name,
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 14,
         fontWeight: 'bold',
         fill: Colors.BROWN_DARK,
@@ -169,7 +169,7 @@ export class CardDetailPopup extends Container {
     const avatarIcon = new Text({
       text: this.card.icon_url || groupIcon,
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 54,
         fill: Colors.WHITE
       }
@@ -200,7 +200,7 @@ export class CardDetailPopup extends Container {
     const descText = new Text({
       text: this.card.description,
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 18,
         fill: Colors.BROWN_DARKER,
         align: 'center',
@@ -237,7 +237,7 @@ export class CardDetailPopup extends Container {
     const energyIcon = new Text({
       text: '⚡',
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: height * 0.45,
         fill: Colors.ORANGE,
         dropShadow: {
@@ -256,7 +256,7 @@ export class CardDetailPopup extends Container {
     const energyText = new Text({
       text: this.card.energy_cost.toString(),
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: height * 0.55,
         fontWeight: 'bold',
         fill: Colors.WHITE,
@@ -396,7 +396,7 @@ export class CardDetailPopup extends Container {
     const buttonText = new Text({
       text: '✕',
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 18,
         fontWeight: 'bold',
         fill: Colors.WHITE

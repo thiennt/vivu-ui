@@ -197,7 +197,7 @@ export class CharactersScene extends BaseScene {
     const title = new Text({
       text: '🎭 Character Gallery 🎭',
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 24,
         fontWeight: 'bold',
         fill: Colors.WHITE,
@@ -218,7 +218,7 @@ export class CharactersScene extends BaseScene {
     const subtitle = new Text({
       text: `${this.characters.length} Heroes`,
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 14,
         fill: Colors.GOLD,
         align: 'center'
@@ -345,7 +345,7 @@ export class CharactersScene extends BaseScene {
     const buttonText = new Text({
       text: text,
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 14,
         fontWeight: 'bold',
         fill: Colors.WHITE,

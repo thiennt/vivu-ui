@@ -207,7 +207,7 @@ export class PlayerDetailScene extends BaseScene {
     const title = new Text({
       text: '👤 Player Profile 👤',
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 22,
         fontWeight: 'bold',
         fill: Colors.WHITE,
@@ -302,7 +302,7 @@ export class PlayerDetailScene extends BaseScene {
     const title = new Text({
       text: '📜 Player Info',
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 20,
         fontWeight: 'bold',
         fill: Colors.BROWN_DARK,
@@ -343,7 +343,7 @@ export class PlayerDetailScene extends BaseScene {
       const statText = new Text({
         text: `${item.label} ${item.value}`,
         style: {
-          fontFamily: 'Kalam',
+          fontFamily: 'Orbitron',
           fontSize: 16,
           fill: Colors.BROWN_DARKER
         }
@@ -385,7 +385,7 @@ export class PlayerDetailScene extends BaseScene {
     const title = new Text({
       text: '⚔️ Statistics',
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 20,
         fontWeight: 'bold',
         fill: Colors.BROWN_DARK,
@@ -401,7 +401,7 @@ export class PlayerDetailScene extends BaseScene {
       const statText = new Text({
         text: `${item.label} ${item.value}`,
         style: {
-          fontFamily: 'Kalam',
+          fontFamily: 'Orbitron',
           fontSize: 16,
           fill: Colors.BROWN_DARKER
         }
@@ -448,7 +448,7 @@ export class PlayerDetailScene extends BaseScene {
     const titleText = new Text({
       text: '✨ Attribute Points ✨',
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 20,
         fontWeight: 'bold',
         fill: Colors.BROWN_DARK,
@@ -464,7 +464,7 @@ export class PlayerDetailScene extends BaseScene {
       const noPointsText = new Text({
         text: 'No points available to distribute',
         style: {
-          fontFamily: 'Kalam',
+          fontFamily: 'Orbitron',
           fontSize: 16,
           fill: Colors.BROWN,
           fontStyle: 'italic'
@@ -484,7 +484,7 @@ export class PlayerDetailScene extends BaseScene {
     const remainingText = new Text({
       text: `⭐ ${this.remainingPoints} pts`,
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 16,
         fontWeight: 'bold',
         fill: Colors.BROWN_DARK,
@@ -511,7 +511,7 @@ export class PlayerDetailScene extends BaseScene {
       const nameText = new Text({
         text: stat.name,
         style: {
-          fontFamily: 'Kalam',
+          fontFamily: 'Orbitron',
           fontSize: 14,
           fontWeight: 'bold',
           fill: Colors.BROWN_DARK
@@ -525,7 +525,7 @@ export class PlayerDetailScene extends BaseScene {
       const valueText = new Text({
         text: `${currentValue}`,
         style: {
-          fontFamily: 'Kalam',
+          fontFamily: 'Orbitron',
           fontSize: 16,
           fontWeight: 'bold',
           fill: Colors.BROWN_DARK
@@ -624,7 +624,7 @@ export class PlayerDetailScene extends BaseScene {
     const buttonText = new Text({
       text: text,
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 16,
         fontWeight: 'bold',
         fill: Colors.WHITE,
@@ -685,7 +685,7 @@ export class PlayerDetailScene extends BaseScene {
     const buttonText = new Text({
       text: text,
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 13,
         fontWeight: 'bold',
         fill: Colors.WHITE,
@@ -755,7 +755,7 @@ export class PlayerDetailScene extends BaseScene {
     const collectionTitle = new Text({ 
       text: '🎭 Character Collection', 
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 20,
         fontWeight: 'bold',
         fill: Colors.WHITE,

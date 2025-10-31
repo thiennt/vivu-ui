@@ -199,7 +199,7 @@ export class CraftSkillScene extends BaseScene {
     const title = new Text({
       text: '✨ Craft Skills ✨',
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 24,
         fontWeight: 'bold',
         fill: Colors.WHITE,
@@ -220,7 +220,7 @@ export class CraftSkillScene extends BaseScene {
     const subtitle = new Text({
       text: 'Merge 2 same level skills to upgrade',
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 12,
         fill: Colors.GOLD,
         align: 'center'
@@ -312,7 +312,7 @@ export class CraftSkillScene extends BaseScene {
     const nameText = new Text({
       text: skill.name || 'Skill',
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 13,
         fontWeight: 'bold',
         fill: Colors.WHITE,
@@ -330,7 +330,7 @@ export class CraftSkillScene extends BaseScene {
     const levelText = new Text({
       text: `Lv.${skill.level || 1}`,
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 16,
         fontWeight: 'bold',
         fill: Colors.GOLD_BRIGHT,
@@ -388,7 +388,7 @@ export class CraftSkillScene extends BaseScene {
     const title = new Text({
       text: 'Selected Skills',
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 14,
         fontWeight: 'bold',
         fill: Colors.WHITE,
@@ -415,7 +415,7 @@ export class CraftSkillScene extends BaseScene {
       const emptyText = new Text({
         text: 'Select 2 skills of same level to craft',
         style: {
-          fontFamily: 'Kalam',
+          fontFamily: 'Orbitron',
           fontSize: 12,
           fill: Colors.GOLD,
           align: 'center'
@@ -442,7 +442,7 @@ export class CraftSkillScene extends BaseScene {
         const nameText = new Text({
           text: skill.name,
           style: {
-            fontFamily: 'Kalam',
+            fontFamily: 'Orbitron',
             fontSize: 11,
             fill: Colors.WHITE,
             align: 'center',
@@ -457,7 +457,7 @@ export class CraftSkillScene extends BaseScene {
         const levelText = new Text({
           text: `Lv.${skill.level || 1}`,
           style: {
-            fontFamily: 'Kalam',
+            fontFamily: 'Orbitron',
             fontSize: 14,
             fontWeight: 'bold',
             fill: Colors.GOLD_BRIGHT
@@ -479,7 +479,7 @@ export class CraftSkillScene extends BaseScene {
           const resultText = new Text({
             text: `→ Lv.${level1 + 1} Skill`,
             style: {
-              fontFamily: 'Kalam',
+              fontFamily: 'Orbitron',
               fontSize: 13,
               fontWeight: 'bold',
               fill: Colors.GREEN_BRIGHT,
@@ -494,7 +494,7 @@ export class CraftSkillScene extends BaseScene {
           const errorText = new Text({
             text: '⚠ Skills must be same level',
             style: {
-              fontFamily: 'Kalam',
+              fontFamily: 'Orbitron',
               fontSize: 12,
               fill: Colors.RED,
               align: 'center'
@@ -552,7 +552,7 @@ export class CraftSkillScene extends BaseScene {
     const successText = new Text({
       text: '✓ Crafted Successfully!',
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 16,
         fontWeight: 'bold',
         fill: Colors.GREEN_BRIGHT,
@@ -593,7 +593,7 @@ export class CraftSkillScene extends BaseScene {
     const buttonText = new Text({
       text: text,
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 14,
         fontWeight: 'bold',
         fill: Colors.WHITE,

@@ -62,7 +62,7 @@ export class HeroCard extends Container {
     const nameText = new Text({
       text: character.name,
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: nameSize,
         fontWeight: 'bold',
         fill: Colors.TEXT_WHITE,
@@ -133,7 +133,7 @@ export class HeroCard extends Container {
     const expText = new Text({
       text: `EXP: ${character.exp}`,
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: expSize,
         fill: Colors.TEXT_SECONDARY,
         align: 'center'
@@ -157,7 +157,7 @@ export class HeroCard extends Container {
       const statText = new Text({
         text: stat,
         style: {
-          fontFamily: 'Kalam',
+          fontFamily: 'Orbitron',
           fontSize: statSize,
           fill: Colors.TEXT_SECONDARY
         }
@@ -175,7 +175,7 @@ export class HeroCard extends Container {
     const hpText = new Text({
       text: `❤️ ${character.hp}`,
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 14,
         fill: Colors.TEXT_SECONDARY
       }
@@ -186,7 +186,7 @@ export class HeroCard extends Container {
     const atkText = new Text({
       text: `⚔️ ${character.atk}`,
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 14,
         fill: Colors.TEXT_SECONDARY
       }
@@ -197,7 +197,7 @@ export class HeroCard extends Container {
     const defText = new Text({
       text: `🛡️ ${character.def}`,
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 14,
         fill: Colors.TEXT_SECONDARY
       }

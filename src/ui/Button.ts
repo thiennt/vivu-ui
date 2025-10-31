@@ -38,9 +38,14 @@ export class Button extends Container {
     const maxWidth = opts.gameWidth - (2 * opts.standardPadding);
     this.adjustedWidth = Math.min(opts.width, maxWidth);
     
-    // Button background with orange gradient styling
+    // Button background with robot theme styling
     this.bg = new Graphics();
     const buttonGradient = Colors.BUTTON_PRIMARY;
+    
+    // Add glow effect
+    this.bg.roundRect(-2, -2, this.adjustedWidth + 4, this.adjustedHeight + 4, 10)
+      .fill({ color: Colors.BUTTON_PRIMARY, alpha: 0.3 });
+    
     this.bg.roundRect(0, 0, this.adjustedWidth, this.adjustedHeight, 8)
       .fill(buttonGradient)
       .stroke({ width: 2, color: Colors.BUTTON_BORDER });
@@ -60,7 +65,7 @@ export class Button extends Container {
     this.buttonText = new Text({
       text: opts.text,
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: responsiveFontSize,
         fontWeight: 'bold',
         fill: Colors.TEXT_BUTTON,

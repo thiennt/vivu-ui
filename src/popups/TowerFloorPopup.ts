@@ -108,7 +108,7 @@ export class TowerFloorPopup extends Container {
     const dialogTitle = new Text({
       text: `🗼 ${this.stage.name}`,
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 22,
         fontWeight: 'bold',
         fill: Colors.WHITE,
@@ -137,7 +137,7 @@ export class TowerFloorPopup extends Container {
     const enemyTitle = new Text({
       text: `⚔️ Enemy Lineup ⚡${lineup_power}`,
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 16,
         fontWeight: 'bold',
         fill: Colors.BROWN_DARK,
@@ -174,7 +174,7 @@ export class TowerFloorPopup extends Container {
     const rewardTitle = new Text({
       text: '🏆 Battle Rewards',
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 16,
         fontWeight: 'bold',
         fill: Colors.BROWN_DARK,
@@ -188,7 +188,7 @@ export class TowerFloorPopup extends Container {
     const treasureChest = new Text({
       text: this.stage.is_completed ? '🎟️ x1' : '🎟️ x10',
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 28,
         fill: Colors.BROWN_DARK
       }
@@ -199,7 +199,7 @@ export class TowerFloorPopup extends Container {
     const chestText = new Text({
       text: 'Crystal Ball',
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 14,
         fontWeight: 'bold',
         fill: Colors.BROWN_DARK,
@@ -288,7 +288,7 @@ export class TowerFloorPopup extends Container {
       const placeholderText = new Text({
         text: '👹 Mysterious Enemies Await...',
         style: {
-          fontFamily: 'Kalam',
+          fontFamily: 'Orbitron',
           fontSize: 16,
           fontStyle: 'italic',
           fill: Colors.BROWN
@@ -345,7 +345,7 @@ export class TowerFloorPopup extends Container {
     const buttonText = new Text({
       text,
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 18,
         fontWeight: 'bold',
         fill: Colors.WHITE,
@@ -408,7 +408,7 @@ export class TowerFloorPopup extends Container {
     const buttonText = new Text({
       text: '✕',
       style: {
-        fontFamily: 'Kalam',
+        fontFamily: 'Orbitron',
         fontSize: 18,
         fontWeight: 'bold',
         fill: Colors.WHITE
