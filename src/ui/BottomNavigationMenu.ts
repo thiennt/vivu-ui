@@ -14,21 +14,21 @@ export class BottomNavigationMenu extends Container {
   }
 
   private createBottomMenu(): void {
-    // Fantasy wooden bar background
+    // Robot theme navigation bar background
     const menuBg = new Graphics();
     
     // Shadow at top
     menuBg.rect(0, 0, this.gameWidth, 2)
       .fill({ color: Colors.BLACK, alpha: 0.5 });
     
-    // Main wooden bar
+    // Main robot bar background
     menuBg.rect(0, 0, this.gameWidth, this.menuHeight)
-      .fill({ color: Colors.BROWN_DARK_WOOD, alpha: 0.98 })
-      .stroke({ width: 2, color: Colors.GOLD_BRONZE, alpha: 0.9 });
+      .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.95 })
+      .stroke({ width: 2, color: Colors.ROBOT_CYAN, alpha: 0.9 });
     
-    // Top golden border
+    // Top cyan glow border
     menuBg.rect(0, 0, this.gameWidth, 3)
-      .fill({ color: Colors.GOLD, alpha: 0.7 });
+      .fill({ color: Colors.ROBOT_CYAN, alpha: 0.7 });
 
     this.addChild(menuBg);
 
@@ -119,19 +119,20 @@ export class BottomNavigationMenu extends Container {
     itemBg.rect(0, 0, width, height)
       .fill({ color: Colors.BLACK, alpha: 0 });
 
-    // Icon with glow
+    // Icon with cyan glow
     const iconText = new Text({
       text: icon,
       style: {
         fontFamily: 'Arial',
         fontSize: 26,
+        fill: Colors.ROBOT_CYAN_LIGHT,
         align: 'center',
         dropShadow: {
-          color: Colors.GOLD_BRIGHT,
-          blur: 3,
+          color: Colors.ROBOT_CYAN,
+          blur: 4,
           angle: 0,
           distance: 0,
-          alpha: 0.5
+          alpha: 0.6
         }
       }
     });
@@ -139,15 +140,15 @@ export class BottomNavigationMenu extends Container {
     iconText.x = width / 2;
     iconText.y = height / 2 - 8;
 
-    // Label with fantasy style
+    // Label with robot style
     const labelText = new Text({
       text: label,
       style: {
         fontFamily: 'Orbitron',
         fontSize: 10,
-        fill: Colors.PARCHMENT_LIGHTEST,
+        fill: Colors.ROBOT_CYAN_MID,
         align: 'center',
-        stroke: { color: Colors.BROWN_DARK, width: 1 }
+        stroke: { color: Colors.ROBOT_BG_DARK, width: 1 }
       }
     });
     labelText.anchor.set(0.5);
@@ -160,11 +161,11 @@ export class BottomNavigationMenu extends Container {
     item.interactive = true;
     item.cursor = 'pointer';
 
-    // Hover effects - golden highlight
+    // Hover effects - cyan highlight
     item.on('pointerover', () => {
       itemBg.clear();
       itemBg.rect(0, 0, width, height)
-        .fill({ color: Colors.GOLD_BRIGHT, alpha: 0.2 });
+        .fill({ color: Colors.ROBOT_CYAN, alpha: 0.2 });
       iconText.scale.set(1.1);
     });
 
