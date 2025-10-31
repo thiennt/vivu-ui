@@ -229,28 +229,14 @@ export class HomeScene extends BaseScene {
     title.x = this.gameWidth / 2;
     title.y = bannerY + bannerHeight / 2;
     
-    const subtitle = new Text({
-      text: 'Crypto Card Adventures',
-      style: {
-        fontFamily: 'Kalam',
-        fontSize: 14,
-        fontStyle: 'italic',
-        fill: Colors.GOLD,
-        align: 'center'
-      }
-    });
-    subtitle.anchor.set(0.5);
-    subtitle.x = this.gameWidth / 2;
-    subtitle.y = bannerY + bannerHeight + 15;
-    
-    this.container.addChild(banner, title, subtitle);
+    this.container.addChild(banner, title);
   }
 
   private createPlayerInfo(): void {
     const playerPanel = new Container();
     
-    const panelWidth = Math.min(this.gameWidth - 2 * this.STANDARD_PADDING, 380);
-    const panelHeight = 90;
+    const panelWidth = Math.min(this.gameWidth - 2 * this.STANDARD_PADDING, 400);
+    const panelHeight = 100;
     
     // Fantasy parchment panel
     const bg = new Graphics();
@@ -275,45 +261,69 @@ export class HomeScene extends BaseScene {
     // Decorative corners
     this.drawPanelCorners(bg, 0, 0, panelWidth, panelHeight, Colors.GOLD_BRIGHT);
     
-    // Player info text
+    // Avatar circle on the left
+    const avatarSize = 65;
+    const avatarX = 15;
+    const avatarY = (panelHeight - avatarSize) / 2;
+    
+    const avatarBg = new Graphics();
+    avatarBg.circle(avatarX + avatarSize / 2, avatarY + avatarSize / 2, avatarSize / 2 + 3)
+      .fill({ color: Colors.GOLD, alpha: 0.3 });
+    avatarBg.circle(avatarX + avatarSize / 2, avatarY + avatarSize / 2, avatarSize / 2)
+      .fill({ color: Colors.BROWN_LIGHT, alpha: 0.95 })
+      .stroke({ width: 2, color: Colors.GOLD });
+    
+    const avatarEmoji = new Text({
+      text: '👤',
+      style: {
+        fontSize: 38
+      }
+    });
+    avatarEmoji.anchor.set(0.5);
+    avatarEmoji.x = avatarX + avatarSize / 2;
+    avatarEmoji.y = avatarY + avatarSize / 2;
+    
+    // Player info text on the right
+    const infoStartX = avatarX + avatarSize + 20;
+    
     const playerName = new Text({
-      text: `👑 Welcome, ${this.player.username}!`,
+      text: `${this.player.username}`,
       style: {
         fontFamily: 'Kalam',
-        fontSize: 16,
+        fontSize: 20,
         fontWeight: 'bold',
         fill: Colors.BROWN_DARK,
         stroke: { color: Colors.GOLD_BRIGHT, width: 0.5 }
       }
     });
-    playerName.x = 12;
-    playerName.y = 12;
+    playerName.x = infoStartX;
+    playerName.y = 20;
     
     const playerLevel = new Text({
       text: `⭐ Level: ${this.player.level}`,
       style: {
         fontFamily: 'Kalam',
-        fontSize: 14,
+        fontSize: 17,
         fill: Colors.BROWN_DARKER
       }
     });
-    playerLevel.x = 12;
-    playerLevel.y = 38;
+    playerLevel.x = infoStartX;
+    playerLevel.y = 48;
     
     const playerExp = new Text({
       text: `✨ EXP: ${this.player.exp}`,
       style: {
         fontFamily: 'Kalam',
-        fontSize: 14,
+        fontSize: 17,
         fill: Colors.BROWN_DARKER
       }
     });
-    playerExp.x = 12;
-    playerExp.y = 60;
+    playerExp.x = infoStartX;
+    playerExp.y = 72;
     
-    playerPanel.addChild(bg, playerName, playerLevel, playerExp);
+    playerPanel.addChild(bg, avatarBg, avatarEmoji, playerName, playerLevel, playerExp);
     playerPanel.x = (this.gameWidth - panelWidth) / 2;
-    playerPanel.y = 135;
+    playerPanel.y = 115;
     
     this.container.addChild(playerPanel);
   }
@@ -359,10 +369,10 @@ export class HomeScene extends BaseScene {
       // { text: '✨ Craft Skills', screen: CraftSkillScene }, // Hidden to simplify game
     ];
     
-    const buttonWidth = Math.min(this.gameWidth - 2 * this.STANDARD_PADDING, 380);
-    const buttonHeight = 45;
+    const buttonWidth = Math.min(this.gameWidth - 2 * this.STANDARD_PADDING, 400);
+    const buttonHeight = 48;
     
-    const headerHeight = 240;
+    const headerHeight = 235;
     const availableHeight = this.gameHeight - headerHeight - this.STANDARD_PADDING;
     const totalButtonHeight = buttons.length * buttonHeight + (buttons.length - 1) * this.STANDARD_SPACING;
     
@@ -417,7 +427,7 @@ export class HomeScene extends BaseScene {
       text: text,
       style: {
         fontFamily: 'Kalam',
-        fontSize: 16,
+        fontSize: 18,
         fontWeight: 'bold',
         fill: Colors.WHITE,
         stroke: { color: Colors.BROWN_DARK, width: 2 }
