@@ -208,7 +208,7 @@ export class PlayerDetailScene extends BaseScene {
       text: '👤 Player Profile 👤',
       style: {
         fontFamily: 'Kalam',
-        fontSize: 22,
+        fontSize: 24,
         fontWeight: 'bold',
         fill: Colors.WHITE,
         stroke: { color: Colors.BROWN_DARK, width: 2 },
@@ -226,12 +226,55 @@ export class PlayerDetailScene extends BaseScene {
     title.y = bannerY + bannerHeight / 2;
     
     this.headerContainer.addChild(banner, title);
+    
+    // Add player avatar below the banner
+    this.createPlayerAvatar();
+  }
+  
+  private createPlayerAvatar(): void {
+    if (!this.player || !this.characters || this.characters.length === 0) return;
+    
+    // Use the first character's avatar as the player's avatar
+    const avatarCharacter = this.characters[0];
+    const avatarSize = 80;
+    const avatarY = 75;
+    
+    // Avatar container
+    const avatarContainer = new Container();
+    
+    // Avatar background circle
+    const avatarBg = new Graphics();
+    avatarBg.circle(0, 0, avatarSize / 2 + 4)
+      .fill({ color: Colors.GOLD, alpha: 0.95 })
+      .stroke({ width: 3, color: Colors.GOLD_BRIGHT });
+    
+    avatarBg.circle(0, 0, avatarSize / 2)
+      .fill({ color: Colors.BROWN_LIGHT, alpha: 1 });
+    
+    // Avatar emoji/icon (using character's name first letter or emoji)
+    const avatarText = new Text({
+      text: avatarCharacter.code || avatarCharacter.name?.charAt(0) || '👤',
+      style: {
+        fontFamily: 'Kalam',
+        fontSize: 36,
+        fontWeight: 'bold',
+        fill: Colors.WHITE,
+        stroke: { color: Colors.BROWN_DARK, width: 2 }
+      }
+    });
+    avatarText.anchor.set(0.5);
+    
+    avatarContainer.addChild(avatarBg, avatarText);
+    avatarContainer.x = this.gameWidth / 2;
+    avatarContainer.y = avatarY;
+    
+    this.headerContainer.addChild(avatarContainer);
   }
 
   private createPlayerStats(): void {
     if (!this.player) return;
     
-    const startY = 85;
+    const startY = 165; // Adjusted to make room for avatar
     const padding = this.STANDARD_PADDING;
     
     // Single combined panel
@@ -244,6 +287,13 @@ export class PlayerDetailScene extends BaseScene {
     const currentStr = this.player.str + this.tempStatChanges.str;
     const currentAgi = this.player.agi + this.tempStatChanges.agi;
     
+    // Get character tickers for display
+    const characterTickers = this.characters
+      .slice(0, 5) // Show up to 5 tickers
+      .map(char => char.code || char.name?.substring(0, 3) || '?')
+      .join(', ');
+    const tickersDisplay = characterTickers + (this.characters.length > 5 ? '...' : '');
+    
     // Combined stats panel
     const statsPanel = this.createCombinedStatsPanel(
       panelWidth,
@@ -252,6 +302,7 @@ export class PlayerDetailScene extends BaseScene {
         { label: '⭐ Level:', value: this.player.level.toString() },
         { label: '✨ Experience:', value: this.player.exp.toString() },
         { label: '🎭 Characters:', value: this.characters.length.toString() },
+        { label: '🎯 Tickers:', value: tickersDisplay },
       ],
       [
         { label: '❤️ Stamina:', value: `${currentSta}${this.tempStatChanges.sta !== 0 ? ` (+${this.tempStatChanges.sta})` : ''}` },
@@ -274,8 +325,8 @@ export class PlayerDetailScene extends BaseScene {
   ): Container {
     const panel = new Container();
     
-    // Calculate height based on content
-    const sectionHeight = Math.max(playerInfo.length, statistics.length) * 22 + 50;
+    // Calculate height based on content (increased spacing for larger font)
+    const sectionHeight = Math.max(playerInfo.length, statistics.length) * 26 + 50;
     const height = sectionHeight + 20;
     
     // Parchment panel
@@ -309,7 +360,7 @@ export class PlayerDetailScene extends BaseScene {
       text: '📜 Player Info',
       style: {
         fontFamily: 'Kalam',
-        fontSize: 20,
+        fontSize: 22,
         fontWeight: 'bold',
         fill: Colors.BROWN_DARK,
         stroke: { color: Colors.GOLD_BRIGHT, width: 0.5 }
@@ -324,12 +375,12 @@ export class PlayerDetailScene extends BaseScene {
         text: `${item.label} ${item.value}`,
         style: {
           fontFamily: 'Kalam',
-          fontSize: 16,
+          fontSize: 18,
           fill: Colors.BROWN_DARKER
         }
       });
       statText.x = 12;
-      statText.y = 40 + (index * 22);
+      statText.y = 42 + (index * 26);
       panel.addChild(statText);
     });
     
@@ -338,7 +389,7 @@ export class PlayerDetailScene extends BaseScene {
       text: '⚔️ Statistics',
       style: {
         fontFamily: 'Kalam',
-        fontSize: 20,
+        fontSize: 22,
         fontWeight: 'bold',
         fill: Colors.BROWN_DARK,
         stroke: { color: Colors.GOLD_BRIGHT, width: 0.5 }
@@ -353,12 +404,12 @@ export class PlayerDetailScene extends BaseScene {
         text: `${item.label} ${item.value}`,
         style: {
           fontFamily: 'Kalam',
-          fontSize: 16,
+          fontSize: 18,
           fill: Colors.BROWN_DARKER
         }
       });
       statText.x = dividerX + 12;
-      statText.y = 40 + (index * 22);
+      statText.y = 42 + (index * 26);
       panel.addChild(statText);
     });
     
@@ -370,8 +421,8 @@ export class PlayerDetailScene extends BaseScene {
 
     const padding = this.STANDARD_PADDING;
     
-    // Position below the combined stats panel (height ~158) + gap
-    const startY = 260;
+    // Position below the combined stats panel (adjusted for new layout with avatar and larger fonts)
+    const startY = 355;
     
     const panelWidth = Math.min(580, this.gameWidth - 2 * padding);
     const panelHeight = this.player.points <= 0 ? 90 : 190;
@@ -400,7 +451,7 @@ export class PlayerDetailScene extends BaseScene {
       text: '✨ Attribute Points ✨',
       style: {
         fontFamily: 'Kalam',
-        fontSize: 20,
+        fontSize: 22,
         fontWeight: 'bold',
         fill: Colors.BROWN_DARK,
         stroke: { color: Colors.GOLD_BRIGHT, width: 0.5 }
@@ -416,7 +467,7 @@ export class PlayerDetailScene extends BaseScene {
         text: 'No points available to distribute',
         style: {
           fontFamily: 'Kalam',
-          fontSize: 16,
+          fontSize: 18,
           fill: Colors.BROWN,
           fontStyle: 'italic'
         }
@@ -436,7 +487,7 @@ export class PlayerDetailScene extends BaseScene {
       text: `⭐ ${this.remainingPoints} pts`,
       style: {
         fontFamily: 'Kalam',
-        fontSize: 16,
+        fontSize: 18,
         fontWeight: 'bold',
         fill: Colors.BROWN_DARK,
         stroke: { color: Colors.GOLD_BRIGHT, width: 0.5 }
@@ -463,7 +514,7 @@ export class PlayerDetailScene extends BaseScene {
         text: stat.name,
         style: {
           fontFamily: 'Kalam',
-          fontSize: 14,
+          fontSize: 16,
           fontWeight: 'bold',
           fill: Colors.BROWN_DARK
         }
@@ -477,7 +528,7 @@ export class PlayerDetailScene extends BaseScene {
         text: `${currentValue}`,
         style: {
           fontFamily: 'Kalam',
-          fontSize: 16,
+          fontSize: 18,
           fontWeight: 'bold',
           fill: Colors.BROWN_DARK
         }
