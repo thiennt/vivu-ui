@@ -92,14 +92,14 @@ export class RewardSpinScene extends BaseScene {
     
     // Overlay texture
     bg.rect(0, 0, this.gameWidth, this.gameHeight)
-      .fill({ color: Colors.ROBOT_CYAN, alpha: 0.3 });
+      .fill({ color: Colors.ROBOT_BG_MID, alpha: 0.3 });
     
     // Add mystical particles
     for (let i = 0; i < 30; i++) {
       const particle = new Graphics();
       const size = 1 + Math.random() * 2.5;
       particle.circle(Math.random() * this.gameWidth, Math.random() * this.gameHeight, size)
-        .fill({ color: Colors.ROBOT_CYAN, alpha: 0.2 + Math.random() * 0.4 });
+        .fill({ color: Colors.ROBOT_CYAN, alpha: 0.2 + Math.random() * 0.3 });
       this.container.addChild(particle);
     }
   }
@@ -136,8 +136,8 @@ export class RewardSpinScene extends BaseScene {
         fontFamily: 'Orbitron',
         fontSize: 26,
         fontWeight: 'bold',
-        fill: Colors.WHITE,
-        stroke: { color: Colors.ROBOT_CYAN, width: 2 },
+        fill: Colors.ROBOT_CYAN_LIGHT,
+        stroke: { color: Colors.ROBOT_BG_DARK, width: 2 },
         dropShadow: {
           color: Colors.ROBOT_CYAN,
           blur: 4,
@@ -226,7 +226,7 @@ export class RewardSpinScene extends BaseScene {
           fontFamily: 'Orbitron',
           fontSize: 11,
           fontWeight: 'bold',
-          fill: Colors.WHITE,
+          fill: Colors.ROBOT_CYAN_LIGHT,
           stroke: { color: Colors.ROBOT_BG_DARK, width: 2 }
         }
       });
@@ -417,7 +417,7 @@ export class RewardSpinScene extends BaseScene {
     const mainColor = disabled ? Colors.GRAY : Colors.ROBOT_ELEMENT;
     const strokeColor = disabled ? Colors.GRAY_MID : Colors.ROBOT_CYAN;
     const highlightColor = disabled ? Colors.GRAY_LIGHT : Colors.ROBOT_CYAN;
-    const textColor = disabled ? Colors.GRAY_LIGHTER : Colors.WHITE;
+    const textColor = disabled ? Colors.GRAY_LIGHTER : Colors.ROBOT_CYAN_LIGHT;
     
     bg.roundRect(2, 2, width, height, 8)
       .fill({ color: Colors.BLACK, alpha: 0.4 });
@@ -434,7 +434,7 @@ export class RewardSpinScene extends BaseScene {
         fontSize: 16,
         fontWeight: 'bold',
         fill: textColor,
-        stroke: { color: Colors.ROBOT_CYAN, width: 2 }
+        stroke: { color: Colors.ROBOT_BG_DARK, width: 2 }
       }
     });
     buttonText.anchor.set(0.5);

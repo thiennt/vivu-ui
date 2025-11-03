@@ -160,7 +160,7 @@ export class CharactersScene extends BaseScene {
     
     // Subtle brown texture
     bg.rect(0, 0, this.gameWidth, this.gameHeight)
-      .fill({ color: Colors.ROBOT_CYAN, alpha: 0.3 });
+      .fill({ color: Colors.ROBOT_BG_MID, alpha: 0.3 });
     
     this.backgroundContainer.addChild(bg);
   }
@@ -200,8 +200,8 @@ export class CharactersScene extends BaseScene {
         fontFamily: 'Orbitron',
         fontSize: 24,
         fontWeight: 'bold',
-        fill: Colors.WHITE,
-        stroke: { color: Colors.ROBOT_CYAN, width: 2 },
+        fill: Colors.ROBOT_CYAN_LIGHT,
+        stroke: { color: Colors.ROBOT_BG_DARK, width: 2 },
         dropShadow: {
           color: Colors.ROBOT_CYAN,
           blur: 3,
@@ -348,8 +348,8 @@ export class CharactersScene extends BaseScene {
         fontFamily: 'Orbitron',
         fontSize: 14,
         fontWeight: 'bold',
-        fill: Colors.WHITE,
-        stroke: { color: Colors.ROBOT_CYAN, width: 2 }
+        fill: Colors.ROBOT_CYAN_LIGHT,
+        stroke: { color: Colors.ROBOT_BG_DARK, width: 2 }
       }
     });
     buttonText.anchor.set(0.5);
