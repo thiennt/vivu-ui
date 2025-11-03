@@ -10,6 +10,7 @@ const defaultButtonOptions = {
   gameWidth: 800,
   gameHeight: 600,
   standardPadding: 8, // Reduced from 10
+  disabled: false,
 };
 
 export type ButtonOptions = typeof defaultButtonOptions;
@@ -23,12 +24,14 @@ export class Button extends Container {
   private adjustedWidth: number;
   private adjustedHeight: number;
   private onClick?: () => void;
+  private disabled: boolean;
 
   constructor(options: Partial<ButtonOptions> & { onClick?: () => void } = {}) {
     super();
     
     const opts = { ...defaultButtonOptions, ...options };
     this.onClick = options.onClick;
+    this.disabled = opts.disabled;
     
     // Ensure minimum touch target for mobile but more compact for 400x700
     const minHeight = Math.min(40, opts.gameHeight * 0.07); // Reduced from 44 and 0.08
@@ -38,17 +41,9 @@ export class Button extends Container {
     const maxWidth = opts.gameWidth - (2 * opts.standardPadding);
     this.adjustedWidth = Math.min(opts.width, maxWidth);
     
-    // Button background with robot theme styling
+    // Button background with fantasy button styling
     this.bg = new Graphics();
-    
-    // Add outer glow effect (shadow/glow)
-    this.bg.roundRect(-2, -2, this.adjustedWidth + 4, this.adjustedHeight + 4, 10)
-      .fill({ color: Colors.ROBOT_CYAN, alpha: 0.4 });
-    
-    // Main button background
-    this.bg.roundRect(0, 0, this.adjustedWidth, this.adjustedHeight, 8)
-      .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.95 })
-      .stroke({ width: 2, color: Colors.ROBOT_CYAN });
+    this.drawButton();
     
     this.addChild(this.bg);
 
@@ -61,23 +56,22 @@ export class Button extends Container {
       Math.min(18, this.adjustedHeight * 0.45) // Reduced max from 20 to 18
     );
 
-    // Button text with robot theme
+    // Button text with fantasy button styling
+    const textColor = this.disabled ? Colors.GRAY_LIGHTER : Colors.WHITE;
+    const strokeColor = this.disabled ? Colors.ROBOT_BG_DARK : Colors.ROBOT_CYAN;
     this.buttonText = new Text({
       text: opts.text,
       style: {
         fontFamily: 'Orbitron',
         fontSize: responsiveFontSize,
         fontWeight: 'bold',
-        fill: Colors.ROBOT_CYAN_LIGHT,
+        fill: textColor,
         align: 'center',
         wordWrap: true,
         wordWrapWidth: this.adjustedWidth * 0.9,
-        dropShadow: {
-          color: Colors.ROBOT_CYAN,
-          blur: 4,
-          angle: 0,
-          distance: 0,
-          alpha: 0.6
+        stroke: {
+          color: strokeColor,
+          width: 2
         }
       }
     });
@@ -87,24 +81,51 @@ export class Button extends Container {
     
     this.addChild(this.buttonText);
     
-    this.interactive = true;
-    this.cursor = 'pointer';
-    
-    // Hover effects
-    this.on('pointerover', this.handleHover.bind(this));
-    this.on('pointerout', this.handleOut.bind(this));
-    
-    if (this.onClick) {
-      this.on('pointerdown', this.onClick);
+    if (!this.disabled) {
+      this.interactive = true;
+      this.cursor = 'pointer';
+      
+      // Hover effects
+      this.on('pointerover', this.handleHover.bind(this));
+      this.on('pointerout', this.handleOut.bind(this));
+      
+      if (this.onClick) {
+        this.on('pointerdown', this.onClick);
+      }
     }
   }
 
+  private drawButton(hovered: boolean = false) {
+    this.bg.clear();
+    
+    // Drop shadow effect
+    this.bg.roundRect(2, 2, this.adjustedWidth, this.adjustedHeight, 8)
+      .fill({ color: Colors.BLACK, alpha: 0.4 });
+    
+    // Determine colors based on disabled state
+    const mainColor = this.disabled ? Colors.GRAY : (hovered ? Colors.ROBOT_BG_MID : Colors.ROBOT_ELEMENT);
+    const strokeColor = this.disabled ? Colors.GRAY_MID : Colors.ROBOT_CYAN;
+    const highlightColor = this.disabled ? Colors.GRAY_LIGHT : Colors.ROBOT_CYAN;
+    const innerAlpha = this.disabled ? 0.6 : (hovered ? 0.9 : 0.6);
+    
+    // Main button background
+    this.bg.roundRect(0, 0, this.adjustedWidth, this.adjustedHeight, 8)
+      .fill({ color: mainColor, alpha: 0.95 })
+      .stroke({ width: 2, color: strokeColor });
+    
+    // Inner highlight border
+    this.bg.roundRect(2, 2, this.adjustedWidth - 4, this.adjustedHeight - 4, 6)
+      .stroke({ width: 1, color: highlightColor, alpha: innerAlpha });
+  }
+
   private handleHover() {
-    this.bg.tint = Colors.ROBOT_CYAN_MID;
+    this.drawButton(true);
+    this.scale.set(1.02);
   }
 
   private handleOut() {
-    this.bg.tint = 0xFFFFFF;
+    this.drawButton(false);
+    this.scale.set(1.0);
   }
 
   /**

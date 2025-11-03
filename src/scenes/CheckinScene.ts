@@ -332,7 +332,7 @@ export class CheckinScene extends BaseScene {
         
     const buttonText = this.hasCheckedInToday ? '✓ Checked In Today' : '🎁 Check In Now';
     
-    const checkinButton = this.createFantasyButton(
+    const checkinButton = this.createButton(
       buttonText,
       (this.gameWidth - buttonWidth) / 2,
       90,
@@ -343,6 +343,7 @@ export class CheckinScene extends BaseScene {
           this.performCheckin();
         }
       },
+      16, // baseFontSize
       this.hasCheckedInToday // disabled state
     );
 
@@ -460,7 +461,7 @@ export class CheckinScene extends BaseScene {
     const buttonWidth = Math.min(180, this.gameWidth - 2 * this.STANDARD_PADDING);
     const buttonHeight = 45;
     
-    const backButton = this.createFantasyButton(
+    const backButton = this.createButton(
       '← Back',
       (this.gameWidth - buttonWidth) / 2,
       this.gameHeight - buttonHeight - 20,
@@ -472,84 +473,7 @@ export class CheckinScene extends BaseScene {
     this.buttonContainer.addChild(backButton);
   }
 
-  private createFantasyButton(
-    text: string,
-    x: number,
-    y: number,
-    width: number,
-    height: number,
-    onClick: () => void,
-    disabled: boolean = false
-  ): Container {
-    const button = new Container();
-    
-    const bg = new Graphics();
-    
-    // Determine colors based on disabled state
-    const mainColor = disabled ? Colors.GRAY : Colors.ROBOT_ELEMENT;
-    const strokeColor = disabled ? Colors.GRAY_MID : Colors.ROBOT_CYAN;
-    const highlightColor = disabled ? Colors.GRAY_LIGHT : Colors.ROBOT_CYAN;
-    const textColor = disabled ? Colors.GRAY_LIGHTER : Colors.ROBOT_CYAN_LIGHT;
-    
-    bg.roundRect(2, 2, width, height, 8)
-      .fill({ color: Colors.BLACK, alpha: 0.4 });
-    bg.roundRect(0, 0, width, height, 8)
-      .fill({ color: mainColor, alpha: 0.95 })
-      .stroke({ width: 2, color: strokeColor });
-    bg.roundRect(2, 2, width - 4, height - 4, 6)
-      .stroke({ width: 1, color: highlightColor, alpha: 0.6 });
 
-    const buttonText = new Text({
-      text: text,
-      style: {
-        fontFamily: 'Orbitron',
-        fontSize: 16,
-        fontWeight: 'bold',
-        fill: textColor,
-        stroke: { color: Colors.ROBOT_BG_DARK, width: 2 }
-      }
-    });
-    buttonText.anchor.set(0.5);
-    buttonText.x = width / 2;
-    buttonText.y = height / 2;
-    
-    button.addChild(bg, buttonText);
-    button.x = x;
-    button.y = y;
-    
-    if (!disabled) {
-      button.interactive = true;
-      button.cursor = 'pointer';
-      
-      button.on('pointerover', () => {
-        bg.clear();
-        bg.roundRect(2, 2, width, height, 8)
-          .fill({ color: Colors.BLACK, alpha: 0.4 });
-        bg.roundRect(0, 0, width, height, 8)
-          .fill({ color: Colors.ROBOT_BG_MID, alpha: 0.95 })
-          .stroke({ width: 2, color: Colors.ROBOT_CYAN });
-        bg.roundRect(2, 2, width - 4, height - 4, 6)
-          .stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 0.9 });
-        button.scale.set(1.02);
-      });
-      
-      button.on('pointerout', () => {
-        bg.clear();
-        bg.roundRect(2, 2, width, height, 8)
-          .fill({ color: Colors.BLACK, alpha: 0.4 });
-        bg.roundRect(0, 0, width, height, 8)
-          .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.95 })
-          .stroke({ width: 2, color: Colors.ROBOT_CYAN });
-        bg.roundRect(2, 2, width - 4, height - 4, 6)
-          .stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 0.6 });
-        button.scale.set(1.0);
-      });
-      
-      button.on('pointerdown', onClick);
-    }
-    
-    return button;
-  }
 
   update(): void {
     // No update logic needed for static scene

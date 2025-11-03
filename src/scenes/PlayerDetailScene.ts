@@ -563,7 +563,7 @@ export class PlayerDetailScene extends BaseScene {
     const buttonY = panelHeight - 40;
     const buttonHeight = 34;
     
-    const resetButton = this.createFantasyButton(
+    const resetButton = this.createButton(
       'Reset',
       panelWidth - 155,
       buttonY,
@@ -576,7 +576,7 @@ export class PlayerDetailScene extends BaseScene {
       }
     );
     
-    const confirmButton = this.createFantasyButton(
+    const confirmButton = this.createButton(
       'Confirm',
       panelWidth - 77,
       buttonY,
@@ -676,76 +676,6 @@ export class PlayerDetailScene extends BaseScene {
     return button;
   }
 
-  private createFantasyButton(
-    text: string,
-    x: number,
-    y: number,
-    width: number,
-    height: number,
-    onClick: () => void
-  ): Container {
-    const button = new Container();
-    
-    const bg = new Graphics();
-    // Outer glow
-    bg.roundRect(-2, -2, width + 4, height + 4, 8)
-      .fill({ color: Colors.ROBOT_CYAN, alpha: 0.3 });
-    // Main button
-    bg.roundRect(0, 0, width, height, 8)
-      .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.95 })
-      .stroke({ width: 1, color: Colors.ROBOT_CYAN });
-
-    const buttonText = new Text({
-      text: text,
-      style: {
-        fontFamily: 'Orbitron',
-        fontSize: 13,
-        fontWeight: 'bold',
-        fill: Colors.ROBOT_CYAN_LIGHT,
-        dropShadow: {
-          color: Colors.ROBOT_CYAN,
-          blur: 3,
-          angle: 0,
-          distance: 0,
-          alpha: 0.5
-        }
-      }
-    });
-    buttonText.anchor.set(0.5);
-    buttonText.x = width / 2;
-    buttonText.y = height / 2;
-    
-    button.addChild(bg, buttonText);
-    button.x = x;
-    button.y = y;
-    button.interactive = true;
-    button.cursor = 'pointer';
-    
-    button.on('pointerover', () => {
-      bg.clear();
-      bg.roundRect(-2, -2, width + 4, height + 4, 8)
-        .fill({ color: Colors.ROBOT_CYAN, alpha: 0.5 });
-      bg.roundRect(0, 0, width, height, 8)
-        .fill({ color: Colors.ROBOT_BG_MID, alpha: 0.95 })
-        .stroke({ width: 1, color: Colors.ROBOT_CYAN });
-      button.scale.set(1.02);
-    });
-    
-    button.on('pointerout', () => {
-      bg.clear();
-      bg.roundRect(-2, -2, width + 4, height + 4, 8)
-        .fill({ color: Colors.ROBOT_CYAN, alpha: 0.3 });
-      bg.roundRect(0, 0, width, height, 8)
-        .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.95 })
-        .stroke({ width: 1, color: Colors.ROBOT_CYAN });
-      button.scale.set(1.0);
-    });
-    
-    button.on('pointerdown', onClick);
-    
-    return button;
-  }
-
   private refreshPointDistributionPanel(): void {
     this.pointDistributionContainer.removeChildren();
     this.statsContainer.removeChildren();
@@ -821,7 +751,7 @@ export class PlayerDetailScene extends BaseScene {
     // View all button
     const buttonWidth = 180;
     const buttonHeight = 40;
-    const viewAllButton = this.createFantasyButton(
+    const viewAllButton = this.createButton(
       'View All',
       (this.gameWidth - buttonWidth) / 2,
       scrollBox.y + Math.min(maxScrollHeight, contentHeight) + 12,
@@ -849,7 +779,7 @@ export class PlayerDetailScene extends BaseScene {
     const buttonWidth = Math.min(160, this.gameWidth - 2 * this.STANDARD_PADDING);
     const buttonHeight = 40;
     
-    const backButton = this.createFantasyButton(
+    const backButton = this.createButton(
       '← Back',
       this.STANDARD_PADDING,
       this.gameHeight - buttonHeight - this.STANDARD_PADDING,

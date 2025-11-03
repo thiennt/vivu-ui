@@ -434,7 +434,7 @@ export class TowerScene extends BaseScene {
     const buttonWidth = Math.min(160, this.gameWidth - 2 * this.STANDARD_PADDING);
     const buttonHeight = 42;
     
-    const backButton = this.createFantasyButton(
+    const backButton = this.createButton(
       '← Back to Home',
       this.STANDARD_PADDING,
       this.gameHeight - buttonHeight - this.STANDARD_PADDING,
@@ -443,74 +443,6 @@ export class TowerScene extends BaseScene {
       () => navigation.showScreen(HomeScene)
     );
     this.buttonContainer.addChild(backButton);
-  }
-
-  private createFantasyButton(
-    text: string,
-    x: number,
-    y: number,
-    width: number,
-    height: number,
-    onClick: () => void
-  ): Container {
-    const button = new Container();
-    
-    const bg = new Graphics();
-    bg.roundRect(2, 2, width, height, 8)
-      .fill({ color: Colors.BLACK, alpha: 0.5 });
-    bg.roundRect(0, 0, width, height, 8)
-      .fill({ color: Colors.PURPLE_DARKER, alpha: 0.95 })
-      .stroke({ width: 2, color: Colors.PURPLE });
-    bg.roundRect(2, 2, width - 4, height - 4, 6)
-      .stroke({ width: 1, color: Colors.PURPLE_VIVID, alpha: 0.6 });
-    
-    const buttonText = new Text({
-      text: text,
-      style: {
-        fontFamily: 'Orbitron',
-        fontSize: 14,
-        fontWeight: 'bold',
-        fill: Colors.WHITE,
-        stroke: { color: Colors.PURPLE_DARKEST, width: 2 }
-      }
-    });
-    buttonText.anchor.set(0.5);
-    buttonText.x = width / 2;
-    buttonText.y = height / 2;
-    
-    button.addChild(bg, buttonText);
-    button.x = x;
-    button.y = y;
-    button.interactive = true;
-    button.cursor = 'pointer';
-    
-    button.on('pointerover', () => {
-      bg.clear();
-      bg.roundRect(2, 2, width, height, 8)
-        .fill({ color: Colors.BLACK, alpha: 0.5 });
-      bg.roundRect(0, 0, width, height, 8)
-        .fill({ color: Colors.PURPLE_DARK_ALT, alpha: 0.95 })
-        .stroke({ width: 2, color: Colors.PURPLE_VIVID });
-      bg.roundRect(2, 2, width - 4, height - 4, 6)
-        .stroke({ width: 1, color: Colors.PURPLE_VIVID, alpha: 0.9 });
-      button.scale.set(1.02);
-    });
-    
-    button.on('pointerout', () => {
-      bg.clear();
-      bg.roundRect(2, 2, width, height, 8)
-        .fill({ color: Colors.BLACK, alpha: 0.5 });
-      bg.roundRect(0, 0, width, height, 8)
-        .fill({ color: Colors.PURPLE_DARKER, alpha: 0.95 })
-        .stroke({ width: 2, color: Colors.PURPLE });
-      bg.roundRect(2, 2, width - 4, height - 4, 6)
-        .stroke({ width: 1, color: Colors.PURPLE_VIVID, alpha: 0.6 });
-      button.scale.set(1.0);
-    });
-    
-    button.on('pointerdown', onClick);
-    
-    return button;
   }
 
   private showFloorPopup(stage: Stage): void {

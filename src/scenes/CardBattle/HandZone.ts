@@ -149,10 +149,10 @@ export class HandZone extends Container {
     const buttonHeight = 46;
 
     if (this.playerNo === 1) {
-      // END TURN button - fantasy style
+      // END TURN button
       const buttonY = height - buttonHeight - scene.STANDARD_PADDING;
       
-      const endTurnButton = this.createFantasyButton(
+      const endTurnButton = scene.createButton(
         '⚔️ END TURN',
         (width - buttonWidth) / 2,
         buttonY,
@@ -162,7 +162,8 @@ export class HandZone extends Container {
           if (this.isInteractable && this.endTurnCallback) {
             this.endTurnCallback();
           }
-        }
+        },
+        16 // baseFontSize for END TURN
       );
       
       endTurnButton.interactive = this.isInteractable;
@@ -171,10 +172,10 @@ export class HandZone extends Container {
       
       this.buttonContainer.addChild(endTurnButton);
     } else {
-      // BACK button - fantasy style
+      // BACK button
       const buttonY = scene.STANDARD_PADDING;
       
-      const backButton = this.createFantasyButton(
+      const backButton = scene.createButton(
         '← BACK',
         scene.STANDARD_PADDING,
         buttonY,
@@ -191,88 +192,7 @@ export class HandZone extends Container {
     }
   }
 
-  private createFantasyButton(
-    text: string,
-    x: number,
-    y: number,
-    width: number,
-    height: number,
-    onClick: () => void
-  ): Container {
-    const button = new Container();
-    
-    const bg = new Graphics();
-    
-    // Shadow
-    bg.roundRect(2, 2, width, height, 8)
-      .fill({ color: Colors.BLACK, alpha: 0.5 });
-    
-    // Main wooden button
-    bg.roundRect(0, 0, width, height, 8)
-      .fill({ color: Colors.BROWN, alpha: 0.98 })
-      .stroke({ width: 2, color: Colors.GOLD });
-    
-    // Inner wooden texture
-    bg.roundRect(2, 2, width - 4, height - 4, 6)
-      .fill({ color: Colors.BROWN_LIGHT, alpha: 0.3 });
-    
-    // Golden highlight
-    bg.roundRect(3, 3, width - 6, height - 6, 5)
-      .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.6 });
-    
-    const buttonText = new Text({
-      text,
-      style: {
-        fontFamily: 'Orbitron',
-        fontSize: text.includes('END TURN') ? 16 : 14,
-        fontWeight: 'bold',
-        fill: Colors.WHITE,
-        stroke: { color: Colors.BROWN_DARK, width: 2 },
-        align: 'center'
-      }
-    });
-    buttonText.anchor.set(0.5);
-    buttonText.x = width / 2;
-    buttonText.y = height / 2;
-    
-    button.addChild(bg, buttonText);
-    button.x = x;
-    button.y = y;
-    
-    button.interactive = true;
-    button.cursor = 'pointer';
-    button.on('pointerdown', onClick);
-    
-    button.on('pointerover', () => {
-      bg.clear();
-      bg.roundRect(2, 2, width, height, 8)
-        .fill({ color: Colors.BLACK, alpha: 0.5 });
-      bg.roundRect(0, 0, width, height, 8)
-        .fill({ color: Colors.BROWN_LIGHT, alpha: 0.98 })
-        .stroke({ width: 2, color: Colors.GOLD_BRIGHT });
-      bg.roundRect(2, 2, width - 4, height - 4, 6)
-        .fill({ color: Colors.BROWN_LIGHTEST, alpha: 0.4 });
-      bg.roundRect(3, 3, width - 6, height - 6, 5)
-        .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.9 });
-      button.scale.set(1.03);
-    });
-    
-    button.on('pointerout', () => {
-      bg.clear();
-      bg.roundRect(2, 2, width, height, 8)
-        .fill({ color: Colors.BLACK, alpha: 0.5 });
-      bg.roundRect(0, 0, width, height, 8)
-        .fill({ color: Colors.BROWN, alpha: 0.98 })
-        .stroke({ width: 2, color: Colors.GOLD });
-      bg.roundRect(2, 2, width - 4, height - 4, 6)
-        .fill({ color: Colors.BROWN_LIGHT, alpha: 0.3 });
-      bg.roundRect(3, 3, width - 6, height - 6, 5)
-        .stroke({ width: 1, color: Colors.GOLD_BRIGHT, alpha: 0.6 });
-      button.scale.set(1.0);
-    });
-    
-    return button;
-  }
+
 
   setCardDropCallback(callback: (card: Card, dropTarget: string, cardPosition?: number) => void): void {
     this.onCardDropCallback = callback;
