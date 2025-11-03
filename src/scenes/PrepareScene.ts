@@ -118,8 +118,8 @@ export class PrepareScene extends BaseScene {
         fontFamily: 'Orbitron',
         fontSize: 24,
         fontWeight: 'bold',
-        fill: Colors.WHITE,
-        stroke: { color: Colors.ROBOT_CYAN, width: 2 },
+        fill: Colors.ROBOT_CYAN_LIGHT,
+        stroke: { color: Colors.ROBOT_BG_DARK, width: 2 },
         dropShadow: {
           color: Colors.ROBOT_CYAN,
           blur: 4,
@@ -226,8 +226,8 @@ export class PrepareScene extends BaseScene {
         fontFamily: 'Orbitron',
         fontSize: 18,
         fontWeight: 'bold',
-        fill: Colors.WHITE,
-        stroke: { color: Colors.ROBOT_CYAN, width: 2 },
+        fill: Colors.ROBOT_CYAN_LIGHT,
+        stroke: { color: Colors.ROBOT_BG_DARK, width: 2 },
         dropShadow: {
           color: Colors.ROBOT_CYAN,
           blur: 3,
@@ -371,8 +371,8 @@ export class PrepareScene extends BaseScene {
         fontFamily: 'Orbitron',
         fontSize: 16,
         fontWeight: 'bold',
-        fill: Colors.WHITE,
-        stroke: { color: Colors.ROBOT_CYAN, width: 2 }
+        fill: Colors.ROBOT_CYAN_LIGHT,
+        stroke: { color: Colors.ROBOT_BG_DARK, width: 2 }
       }
     });
     buttonText.anchor.set(0.5);

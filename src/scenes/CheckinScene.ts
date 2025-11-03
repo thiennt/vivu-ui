@@ -221,8 +221,8 @@ export class CheckinScene extends BaseScene {
         fontFamily: 'Orbitron',
         fontSize: 24,
         fontWeight: 'bold',
-        fill: Colors.WHITE,
-        stroke: { color: Colors.ROBOT_CYAN, width: 2 },
+        fill: Colors.ROBOT_CYAN_LIGHT,
+        stroke: { color: Colors.ROBOT_BG_DARK, width: 2 },
         dropShadow: {
           color: Colors.ROBOT_CYAN,
           blur: 4,
@@ -295,7 +295,7 @@ export class CheckinScene extends BaseScene {
         fontSize: 14,
         fontWeight: 'bold',
         fill: Colors.ROBOT_CYAN,
-        stroke: { color: Colors.ROBOT_CYAN, width: 0.5 }
+        stroke: { color: Colors.ROBOT_BG_DARK, width: 0.5 }
       }
     });
     rewardTitle.anchor.set(0.5, 0);
@@ -417,8 +417,8 @@ export class CheckinScene extends BaseScene {
         fontFamily: 'Orbitron',
         fontSize: 18,
         fontWeight: 'bold',
-        fill: Colors.WHITE,
-        stroke: { color: Colors.ROBOT_CYAN, width: 2 },
+        fill: Colors.ROBOT_CYAN_LIGHT,
+        stroke: { color: Colors.ROBOT_BG_DARK, width: 2 },
         dropShadow: {
           color: Colors.ROBOT_CYAN,
           blur: 3,
@@ -489,7 +489,7 @@ export class CheckinScene extends BaseScene {
     const mainColor = disabled ? Colors.GRAY : Colors.ROBOT_ELEMENT;
     const strokeColor = disabled ? Colors.GRAY_MID : Colors.ROBOT_CYAN;
     const highlightColor = disabled ? Colors.GRAY_LIGHT : Colors.ROBOT_CYAN;
-    const textColor = disabled ? Colors.GRAY_LIGHTER : Colors.WHITE;
+    const textColor = disabled ? Colors.GRAY_LIGHTER : Colors.ROBOT_CYAN_LIGHT;
     
     bg.roundRect(2, 2, width, height, 8)
       .fill({ color: Colors.BLACK, alpha: 0.4 });
@@ -506,7 +506,7 @@ export class CheckinScene extends BaseScene {
         fontSize: 16,
         fontWeight: 'bold',
         fill: textColor,
-        stroke: { color: Colors.ROBOT_CYAN, width: 2 }
+        stroke: { color: Colors.ROBOT_BG_DARK, width: 2 }
       }
     });
     buttonText.anchor.set(0.5);

@@ -185,7 +185,7 @@ export class PlayerDetailScene extends BaseScene {
         fontFamily: 'Orbitron',
         fontSize: 24,
         fontWeight: 'bold',
-        fill: Colors.ROBOT_CYAN,
+        fill: Colors.ROBOT_CYAN_LIGHT,
         letterSpacing: 2,
         dropShadow: {
           color: Colors.ROBOT_CYAN,
