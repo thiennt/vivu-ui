@@ -113,7 +113,7 @@ export class LineupScene extends BaseScene {
     
     // Battle texture overlay
     bg.rect(0, 0, this.gameWidth, this.gameHeight)
-      .fill({ color: Colors.ROBOT_CYAN, alpha: 0.3 });
+      .fill({ color: Colors.ROBOT_BG_MID, alpha: 0.3 });
 
     // Tactical grid with golden lines
     const gridSpacing = 40;

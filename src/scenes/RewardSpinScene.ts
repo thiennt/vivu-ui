@@ -92,14 +92,14 @@ export class RewardSpinScene extends BaseScene {
     
     // Overlay texture
     bg.rect(0, 0, this.gameWidth, this.gameHeight)
-      .fill({ color: Colors.ROBOT_CYAN, alpha: 0.3 });
+      .fill({ color: Colors.ROBOT_BG_MID, alpha: 0.3 });
     
     // Add mystical particles
     for (let i = 0; i < 30; i++) {
       const particle = new Graphics();
       const size = 1 + Math.random() * 2.5;
       particle.circle(Math.random() * this.gameWidth, Math.random() * this.gameHeight, size)
-        .fill({ color: Colors.ROBOT_CYAN, alpha: 0.2 + Math.random() * 0.4 });
+        .fill({ color: Colors.ROBOT_CYAN, alpha: 0.2 + Math.random() * 0.3 });
       this.container.addChild(particle);
     }
   }

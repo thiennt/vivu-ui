@@ -160,7 +160,7 @@ export class CharactersScene extends BaseScene {
     
     // Subtle brown texture
     bg.rect(0, 0, this.gameWidth, this.gameHeight)
-      .fill({ color: Colors.ROBOT_CYAN, alpha: 0.3 });
+      .fill({ color: Colors.ROBOT_BG_MID, alpha: 0.3 });
     
     this.backgroundContainer.addChild(bg);
   }

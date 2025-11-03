@@ -176,14 +176,14 @@ export class CheckinScene extends BaseScene {
     
     // Brown texture overlay
     bg.rect(0, 0, this.gameWidth, this.gameHeight)
-      .fill({ color: Colors.ROBOT_CYAN, alpha: 0.3 });
+      .fill({ color: Colors.ROBOT_BG_MID, alpha: 0.3 });
     
     // Add mystical golden particles
     for (let i = 0; i < 20; i++) {
       const particle = new Graphics();
       const size = 1 + Math.random() * 2;
       particle.circle(Math.random() * this.gameWidth, Math.random() * this.gameHeight, size)
-        .fill({ color: Colors.ROBOT_CYAN, alpha: 0.3 + Math.random() * 0.3 });
+        .fill({ color: Colors.ROBOT_CYAN, alpha: 0.2 + Math.random() * 0.3 });
       this.backgroundContainer.addChild(particle);
     }
   }

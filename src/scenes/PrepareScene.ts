@@ -80,7 +80,7 @@ export class PrepareScene extends BaseScene {
     
     // Battle texture overlay
     background.rect(0, 0, this.gameWidth, this.gameHeight)
-      .fill({ color: Colors.ROBOT_CYAN, alpha: 0.3 });
+      .fill({ color: Colors.ROBOT_BG_MID, alpha: 0.3 });
     
     this.container.addChild(background);
   }
