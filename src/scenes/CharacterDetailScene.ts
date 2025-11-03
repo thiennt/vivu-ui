@@ -152,13 +152,13 @@ export class CharacterDetailScene extends BaseScene {
   private createBackground(): void {
     const bg = new Graphics();
 
-    // Dark hero portrait background
+    // Robot theme dark background
     bg.rect(0, 0, this.gameWidth, this.gameHeight)
-      .fill({ color: Colors.BLUE_NAVY_DARK, alpha: 1.0 });
+      .fill({ color: Colors.ROBOT_BG_DARK, alpha: 1.0 });
 
-    // Darker overlay for portrait feel
+    // Darker overlay with cyan tint
     bg.rect(0, 0, this.gameWidth, this.gameHeight)
-      .fill({ color: Colors.BLUE_NAVY, alpha: 0.5 });
+      .fill({ color: Colors.ROBOT_BG_MID, alpha: 0.3 });
 
     this.backgroundContainer.addChild(bg);
   }
@@ -178,8 +178,8 @@ export class CharacterDetailScene extends BaseScene {
       .lineTo(bannerX + bannerWidth, bannerY + bannerHeight / 2)
       .lineTo(bannerX + bannerWidth - 12, bannerY)
       .lineTo(bannerX + 12, bannerY)
-      .fill({ color: Colors.PURPLE_DARKER, alpha: 0.95 })
-      .stroke({ width: 2.5, color: Colors.BLUE_STEEL_LIGHT });
+      .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.95 })
+      .stroke({ width: 2.5, color: Colors.ROBOT_CYAN });
 
     banner.moveTo(bannerX + 15, bannerY + 3)
       .lineTo(bannerX + bannerWidth - 15, bannerY + 3)
@@ -188,7 +188,7 @@ export class CharacterDetailScene extends BaseScene {
       .lineTo(bannerX + 15, bannerY + bannerHeight - 3)
       .lineTo(bannerX + 4, bannerY + bannerHeight / 2)
       .lineTo(bannerX + 15, bannerY + 3)
-      .stroke({ width: 1, color: Colors.BLUE_STEEL, alpha: 0.6 });
+      .stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 0.6 });
 
     const title = new Text({
       text: this.character!.name,
@@ -197,13 +197,13 @@ export class CharacterDetailScene extends BaseScene {
         fontSize: 26,
         fontWeight: 'bold',
         fill: Colors.WHITE,
-        stroke: { color: Colors.BLUE_NAVY_DARK, width: 2 },
+        stroke: { color: Colors.ROBOT_CYAN, width: 2 },
         dropShadow: {
-          color: Colors.BLUE_STEEL,
+          color: Colors.ROBOT_CYAN,
           blur: 4,
           angle: Math.PI / 4,
           distance: 2,
-          alpha: 0.7
+          alpha: 0.6
         }
       }
     });
@@ -220,42 +220,42 @@ export class CharacterDetailScene extends BaseScene {
 
     const headerPanelContainer = new Container();
 
-    // Fantasy hero info panel
+    // Robot theme hero info panel
     const headerPanel = new Graphics();
 
-    // Shadow
-    headerPanel.roundRect(3, 3, panelWidth, 125, 10)
-      .fill({ color: Colors.BLACK, alpha: 0.5 });
+    // Outer glow
+    headerPanel.roundRect(3, 3, panelWidth, 125, 14)
+      .fill({ color: Colors.ROBOT_CYAN, alpha: 0.25 });
 
     // Main portrait panel
-    headerPanel.roundRect(0, 0, panelWidth, 125, 10)
-      .fill({ color: Colors.BLUE_NAVY_DARK, alpha: 0.98 })
-      .stroke({ width: 2, color: Colors.BLUE_STEEL_DARK });
+    headerPanel.roundRect(0, 0, panelWidth, 125, 14)
+      .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.7 })
+      .stroke({ width: 1, color: Colors.ROBOT_CYAN });
 
     // Inner layer
-    headerPanel.roundRect(3, 3, panelWidth - 6, 119, 8)
-      .fill({ color: Colors.BLUE_NAVY, alpha: 0.7 });
+    headerPanel.roundRect(3, 3, panelWidth - 6, 119, 12)
+      .fill({ color: Colors.ROBOT_BG_MID, alpha: 0.5 });
 
-    // Steel highlight
-    headerPanel.roundRect(5, 5, panelWidth - 10, 115, 7)
-      .stroke({ width: 1, color: Colors.BLUE_STEEL, alpha: 0.4 });
+    // Cyan highlight
+    headerPanel.roundRect(5, 5, panelWidth - 10, 115, 10)
+      .stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 0.4 });
 
-    // Avatar with ornate frame
+    // Avatar with robot frame
     const avatarSize = 90;
     const avatar = new Graphics();
 
-    // Avatar frame shadow
+    // Avatar frame glow
     avatar.roundRect(padding + 2, 17 + 2, avatarSize, avatarSize, 8)
-      .fill({ color: Colors.BLACK, alpha: 0.5 });
+      .fill({ color: Colors.ROBOT_CYAN, alpha: 0.3 });
 
     // Avatar frame
     avatar.roundRect(padding, 17, avatarSize, avatarSize, 8)
-      .fill({ color: Colors.BLUE_NAVY_DARKER, alpha: 0.95 })
-      .stroke({ width: 2, color: Colors.BLUE_STEEL_DARK });
+      .fill({ color: Colors.ROBOT_BG_MID, alpha: 0.95 })
+      .stroke({ width: 1, color: Colors.ROBOT_CYAN });
 
     // Inner avatar frame
     avatar.roundRect(padding + 2, 19, avatarSize - 4, avatarSize - 4, 6)
-      .stroke({ width: 1, color: Colors.BLUE_STEEL, alpha: 0.5 });
+      .stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 0.5 });
 
     // Avatar sprite
     const avatarTexture = await Assets.load(this.character!.avatar_url || 'https://pixijs.com/assets/bunny.png');
@@ -269,7 +269,7 @@ export class CharacterDetailScene extends BaseScene {
     // Rarity indicator gem
     const rarityBadge = new Graphics();
     rarityBadge.circle(padding + avatarSize - 12, 27, 10)
-      .fill({ color: Colors.BLUE_NAVY_DARK, alpha: 0.95 })
+      .fill({ color: Colors.ROBOT_BG_DARK, alpha: 0.95 })
       .stroke({ width: 2, color: this.getRarityColor(this.character!.rarity) });
 
     headerPanelContainer.addChild(
@@ -299,8 +299,8 @@ export class CharacterDetailScene extends BaseScene {
       // Stat badge
       const statBadge = new Graphics();
       statBadge.roundRect(x, y, statWidth - 8, 40, 6)
-        .fill({ color: Colors.BLUE_NAVY_DARKER, alpha: 0.95 })
-        .stroke({ width: 1.5, color: Colors.BLUE_STEEL_DARK });
+        .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.95 })
+        .stroke({ width: 1.5, color: Colors.ROBOT_CYAN });
 
       statBadge.roundRect(x + 2, y + 2, statWidth - 12, 36, 4)
         .stroke({ width: 1, color: stat.color, alpha: 0.6 });
@@ -323,7 +323,7 @@ export class CharacterDetailScene extends BaseScene {
         style: {
           fontFamily: 'Orbitron',
           fontSize: 10,
-          fill: Colors.BLUE_STEEL_LIGHT
+          fill: Colors.ROBOT_CYAN_MID
         }
       });
       labelText.x = x + 30;
@@ -399,17 +399,17 @@ export class CharacterDetailScene extends BaseScene {
     const bg = new Graphics();
 
     if (isActive) {
-      // Active tab styling
+      // Active tab styling - robot theme
       bg.roundRect(0, 0, width, height, 8)
-        .fill({ color: Colors.PURPLE_DARKER, alpha: 0.95 })
-        .stroke({ width: 2, color: Colors.BLUE_STEEL_LIGHT });
+        .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.95 })
+        .stroke({ width: 2, color: Colors.ROBOT_CYAN });
       bg.roundRect(2, 2, width - 4, height - 4, 6)
-        .stroke({ width: 1, color: Colors.BLUE_STEEL, alpha: 0.8 });
+        .stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 0.8 });
     } else {
-      // Inactive tab styling
+      // Inactive tab styling - robot theme
       bg.roundRect(0, 0, width, height, 8)
-        .fill({ color: Colors.GRAY_DARKER, alpha: 0.8 })
-        .stroke({ width: 1.5, color: Colors.BLUE_STEEL_DARK });
+        .fill({ color: Colors.ROBOT_BG_MID, alpha: 0.8 })
+        .stroke({ width: 1.5, color: Colors.ROBOT_CYAN, alpha: 0.4 });
     }
 
     const iconText = new Text({
@@ -417,7 +417,7 @@ export class CharacterDetailScene extends BaseScene {
       style: {
         fontFamily: 'Arial',
         fontSize: 16,
-        fill: isActive ? Colors.WHITE : Colors.BLUE_STEEL_LIGHT
+        fill: isActive ? Colors.WHITE : Colors.ROBOT_CYAN_MID
       }
     });
     iconText.anchor.set(0.5);
@@ -430,7 +430,7 @@ export class CharacterDetailScene extends BaseScene {
         fontFamily: 'Orbitron',
         fontSize: 13,
         fontWeight: isActive ? 'bold' : 'normal',
-        fill: isActive ? Colors.WHITE : Colors.BLUE_STEEL_LIGHT
+        fill: isActive ? Colors.WHITE : Colors.ROBOT_CYAN_MID
       }
     });
     labelText.anchor.set(0.5);
@@ -447,15 +447,15 @@ export class CharacterDetailScene extends BaseScene {
       button.on('pointerover', () => {
         bg.clear();
         bg.roundRect(0, 0, width, height, 8)
-          .fill({ color: Colors.GRAY_DARK, alpha: 0.9 })
-          .stroke({ width: 1.5, color: Colors.BLUE_STEEL });
+          .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.6 })
+          .stroke({ width: 1.5, color: Colors.ROBOT_CYAN, alpha: 0.7 });
       });
 
       button.on('pointerout', () => {
         bg.clear();
         bg.roundRect(0, 0, width, height, 8)
-          .fill({ color: Colors.GRAY_DARKER, alpha: 0.8 })
-          .stroke({ width: 1.5, color: Colors.BLUE_STEEL_DARK });
+          .fill({ color: Colors.ROBOT_BG_MID, alpha: 0.8 })
+          .stroke({ width: 1.5, color: Colors.ROBOT_CYAN, alpha: 0.4 });
       });
     }
 
@@ -545,14 +545,14 @@ export class CharacterDetailScene extends BaseScene {
       .fill({ color: Colors.BLACK, alpha: 0.5 });
 
     otherStatsPanel.roundRect(0, 0, panelWidth, otherStatsHeight, 10)
-      .fill({ color: Colors.BLUE_NAVY_DARK, alpha: 0.98 })
-      .stroke({ width: 2, color: Colors.BLUE_STEEL_DARK });
+      .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.98 })
+      .stroke({ width: 2, color: Colors.ROBOT_CYAN });
 
     otherStatsPanel.roundRect(3, 3, panelWidth - 6, otherStatsHeight - 6, 8)
-      .fill({ color: Colors.BLUE_NAVY, alpha: 0.7 });
+      .fill({ color: Colors.ROBOT_BG_MID, alpha: 0.7 });
 
     otherStatsPanel.roundRect(5, 5, panelWidth - 10, otherStatsHeight - 10, 7)
-      .stroke({ width: 1, color: Colors.BLUE_STEEL, alpha: 0.4 });
+      .stroke({ width: 1, color: Colors.ROBOT_CYAN_MID, alpha: 0.4 });
 
     otherStatsContainer.addChild(otherStatsPanel);
 
@@ -563,7 +563,7 @@ export class CharacterDetailScene extends BaseScene {
         fontFamily: 'Orbitron',
         fontSize: 14,
         fontWeight: 'bold',
-        fill: Colors.BLUE_STEEL_LIGHT
+        fill: Colors.ROBOT_CYAN_LIGHT
       }
     });
     title.x = 10;
@@ -590,7 +590,7 @@ export class CharacterDetailScene extends BaseScene {
       // Stat background bar
       const statBg = new Graphics();
       statBg.roundRect(10, y, panelWidth - 20, 28, 6)
-        .fill({ color: Colors.BLUE_NAVY_DARKER, alpha: 0.7 })
+        .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.7 })
         .stroke({ width: 1, color: stat.color, alpha: 0.4 });
 
       // Icon
@@ -658,14 +658,14 @@ export class CharacterDetailScene extends BaseScene {
       .fill({ color: Colors.BLACK, alpha: 0.5 });
 
     skillsPanel.roundRect(0, 0, panelWidth, panelHeight, 10)
-      .fill({ color: Colors.BLUE_NAVY_DARK, alpha: 0.98 })
-      .stroke({ width: 2, color: Colors.BLUE_STEEL_DARK });
+      .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.98 })
+      .stroke({ width: 2, color: Colors.ROBOT_CYAN });
 
     skillsPanel.roundRect(3, 3, panelWidth - 6, panelHeight - 6, 8)
-      .fill({ color: Colors.BLUE_NAVY, alpha: 0.7 });
+      .fill({ color: Colors.ROBOT_BG_MID, alpha: 0.7 });
 
     skillsPanel.roundRect(5, 5, panelWidth - 10, panelHeight - 10, 7)
-      .stroke({ width: 1, color: Colors.BLUE_STEEL, alpha: 0.4 });
+      .stroke({ width: 1, color: Colors.ROBOT_CYAN_MID, alpha: 0.4 });
 
     this.skillsContainer.addChild(skillsPanel);
 
@@ -676,8 +676,8 @@ export class CharacterDetailScene extends BaseScene {
         fontFamily: 'Orbitron',
         fontSize: 16,
         fontWeight: 'bold',
-        fill: Colors.BLUE_STEEL_LIGHT,
-        stroke: { color: Colors.BLUE_NAVY_DARK, width: 1 }
+        fill: Colors.ROBOT_CYAN_LIGHT,
+        stroke: { color: Colors.ROBOT_ELEMENT, width: 1 }
       }
     });
     title.x = 10;
@@ -690,7 +690,7 @@ export class CharacterDetailScene extends BaseScene {
       const iconBg = new Graphics();
       iconBg.roundRect(15, 50, iconSize, iconSize, 12)
         .fill({ color: this.getSkillTypeColor(skill.skill_type), alpha: 0.9 })
-        .stroke({ width: 3, color: Colors.BLUE_STEEL_LIGHT });
+        .stroke({ width: 3, color: Colors.ROBOT_CYAN_LIGHT });
 
       iconBg.roundRect(18, 53, iconSize - 6, iconSize - 6, 10)
         .stroke({ width: 1, color: Colors.WHITE, alpha: 0.3 });
@@ -712,8 +712,8 @@ export class CharacterDetailScene extends BaseScene {
       // Skill type badge
       const typeBadge = new Graphics();
       typeBadge.roundRect(15, 138, 80, 22, 11)
-        .fill({ color: Colors.PURPLE_DARKER, alpha: 0.95 })
-        .stroke({ width: 2, color: Colors.BLUE_STEEL_LIGHT });
+        .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.95 })
+        .stroke({ width: 2, color: Colors.ROBOT_CYAN_LIGHT });
 
       const typeBadgeText = new Text({
         text: this.getSkillTypeName(skill.skill_type),
@@ -738,9 +738,9 @@ export class CharacterDetailScene extends BaseScene {
           fontSize: 18,
           fontWeight: 'bold',
           fill: Colors.WHITE,
-          stroke: { color: Colors.BLUE_NAVY_DARK, width: 2 },
+          stroke: { color: Colors.ROBOT_ELEMENT, width: 2 },
           dropShadow: {
-            color: Colors.BLUE_STEEL,
+            color: Colors.ROBOT_CYAN_MID,
             blur: 2,
             angle: Math.PI / 4,
             distance: 1,
@@ -758,7 +758,7 @@ export class CharacterDetailScene extends BaseScene {
         this.showSkillDetailPopup(skill);
       });
       skillName.on('pointerover', () => {
-        skillName.style.fill = Colors.BLUE_STEEL;
+        skillName.style.fill = Colors.ROBOT_CYAN_MID;
       });
       skillName.on('pointerout', () => {
         skillName.style.fill = Colors.WHITE;
@@ -791,8 +791,8 @@ export class CharacterDetailScene extends BaseScene {
         // Stats background
         const statsBg = new Graphics();
         statsBg.roundRect(110, statsY, panelWidth - 125, 60, 8)
-          .fill({ color: Colors.BLUE_NAVY_DARKER, alpha: 0.8 })
-          .stroke({ width: 1.5, color: Colors.BLUE_STEEL_DARK });
+          .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.8 })
+          .stroke({ width: 1.5, color: Colors.ROBOT_CYAN });
 
         this.skillsContainer.addChild(statsBg);
 
@@ -886,7 +886,7 @@ export class CharacterDetailScene extends BaseScene {
         text: '❓',
         style: {
           fontSize: 64,
-          fill: Colors.BLUE_STEEL_DARK
+          fill: Colors.ROBOT_CYAN
         }
       });
       emptyIcon.anchor.set(0.5);
@@ -899,8 +899,8 @@ export class CharacterDetailScene extends BaseScene {
           fontFamily: 'Orbitron',
           fontSize: 16,
           fontStyle: 'italic',
-          fill: Colors.BLUE_STEEL,
-          stroke: { color: Colors.BLUE_NAVY_DARK, width: 1 }
+          fill: Colors.ROBOT_CYAN_MID,
+          stroke: { color: Colors.ROBOT_ELEMENT, width: 1 }
         }
       });
       emptyText.anchor.set(0.5);
@@ -962,11 +962,11 @@ export class CharacterDetailScene extends BaseScene {
 
     const bg = new Graphics();
     bg.roundRect(0, 0, width, height, 8)
-      .fill({ color: Colors.PURPLE_DARKER, alpha: 0.95 })
-      .stroke({ width: 2, color: Colors.BLUE_STEEL_LIGHT });
+      .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.95 })
+      .stroke({ width: 2, color: Colors.ROBOT_CYAN_LIGHT });
 
     bg.roundRect(2, 2, width - 4, height - 4, 6)
-      .stroke({ width: 1, color: Colors.BLUE_STEEL, alpha: 0.6 });
+      .stroke({ width: 1, color: Colors.ROBOT_CYAN_MID, alpha: 0.6 });
 
     const buttonText = new Text({
       text: text,
@@ -975,7 +975,7 @@ export class CharacterDetailScene extends BaseScene {
         fontSize: 13,
         fontWeight: 'bold',
         fill: Colors.WHITE,
-        stroke: { color: Colors.BLUE_NAVY_DARK, width: 1.5 }
+        stroke: { color: Colors.ROBOT_ELEMENT, width: 1.5 }
       }
     });
     buttonText.anchor.set(0.5);
@@ -991,20 +991,20 @@ export class CharacterDetailScene extends BaseScene {
     button.on('pointerover', () => {
       bg.clear();
       bg.roundRect(0, 0, width, height, 8)
-        .fill({ color: Colors.PURPLE_DARK_ALT, alpha: 0.95 })
-        .stroke({ width: 2, color: Colors.BLUE_STEEL_LIGHT });
+        .fill({ color: Colors.ROBOT_CYAN, alpha: 0.95 })
+        .stroke({ width: 2, color: Colors.ROBOT_CYAN_LIGHT });
       bg.roundRect(2, 2, width - 4, height - 4, 6)
-        .stroke({ width: 1, color: Colors.BLUE_STEEL, alpha: 0.9 });
+        .stroke({ width: 1, color: Colors.ROBOT_CYAN_MID, alpha: 0.9 });
       button.scale.set(1.03);
     });
 
     button.on('pointerout', () => {
       bg.clear();
       bg.roundRect(0, 0, width, height, 8)
-        .fill({ color: Colors.PURPLE_DARKER, alpha: 0.95 })
-        .stroke({ width: 2, color: Colors.BLUE_STEEL_LIGHT });
+        .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.95 })
+        .stroke({ width: 2, color: Colors.ROBOT_CYAN_LIGHT });
       bg.roundRect(2, 2, width - 4, height - 4, 6)
-        .stroke({ width: 1, color: Colors.BLUE_STEEL, alpha: 0.6 });
+        .stroke({ width: 1, color: Colors.ROBOT_CYAN_MID, alpha: 0.6 });
       button.scale.set(1.0);
     });
 
@@ -1145,8 +1145,8 @@ export class CharacterDetailScene extends BaseScene {
         fontFamily: 'Orbitron',
         fontSize: 16,
         fontWeight: 'bold',
-        fill: Colors.BLUE_STEEL_LIGHT,
-        stroke: { color: Colors.BLUE_NAVY_DARK, width: 1 }
+        fill: Colors.ROBOT_CYAN_LIGHT,
+        stroke: { color: Colors.ROBOT_ELEMENT, width: 1 }
       }
     });
     title.x = 10;
@@ -1168,7 +1168,7 @@ export class CharacterDetailScene extends BaseScene {
         item: this.characterEquipment?.armor?.name || '(empty)',
         type: 'armor',
         equipment: this.characterEquipment?.armor,
-        color: Colors.BLUE_BRIGHT
+        color: Colors.ROBOT_CYAN
       },
       {
         name: 'Accessory',
@@ -1176,7 +1176,7 @@ export class CharacterDetailScene extends BaseScene {
         item: this.characterEquipment?.accessory?.name || '(empty)',
         type: 'accessory',
         equipment: this.characterEquipment?.accessory,
-        color: Colors.PURPLE_BRIGHTER
+        color: Colors.ROBOT_CYAN_LIGHT
       }
     ];
 
@@ -1198,8 +1198,8 @@ export class CharacterDetailScene extends BaseScene {
         fontFamily: 'Orbitron',
         fontSize: 16,
         fontWeight: 'bold',
-        fill: Colors.BLUE_STEEL_LIGHT,
-        stroke: { color: Colors.BLUE_NAVY_DARK, width: 1 }
+        fill: Colors.ROBOT_CYAN_LIGHT,
+        stroke: { color: Colors.ROBOT_ELEMENT, width: 1 }
       }
     });
     bonusTitle.x = 10;
@@ -1220,14 +1220,14 @@ export class CharacterDetailScene extends BaseScene {
     // Card background
     const bg = new Graphics();
     bg.roundRect(0, 0, width, height, 10)
-      .fill({ color: Colors.BLUE_NAVY_DARK, alpha: 0.98 })
-      .stroke({ width: 2, color: isEmpty ? Colors.BLUE_STEEL_DARK : slot.color, alpha: isEmpty ? 0.5 : 0.8 });
+      .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.98 })
+      .stroke({ width: 2, color: isEmpty ? Colors.ROBOT_CYAN : slot.color, alpha: isEmpty ? 0.5 : 0.8 });
 
     bg.roundRect(3, 3, width - 6, height - 6, 8)
-      .fill({ color: Colors.BLUE_NAVY, alpha: 0.7 });
+      .fill({ color: Colors.ROBOT_BG_MID, alpha: 0.7 });
 
     bg.roundRect(5, 5, width - 10, height - 10, 7)
-      .stroke({ width: 1, color: isEmpty ? Colors.BLUE_STEEL_DARK : slot.color, alpha: 0.4 });
+      .stroke({ width: 1, color: isEmpty ? Colors.ROBOT_CYAN : slot.color, alpha: 0.4 });
 
     card.addChild(bg);
 
@@ -1236,13 +1236,13 @@ export class CharacterDetailScene extends BaseScene {
     const iconBg = new Graphics();
     iconBg.roundRect(15, 15, iconSize, iconSize, 10)
       .fill({ color: isEmpty ? Colors.GRAY_DARKER : slot.color, alpha: isEmpty ? 0.3 : 0.2 })
-      .stroke({ width: 2.5, color: isEmpty ? Colors.BLUE_STEEL_DARK : slot.color, alpha: isEmpty ? 0.5 : 0.8 });
+      .stroke({ width: 2.5, color: isEmpty ? Colors.ROBOT_CYAN : slot.color, alpha: isEmpty ? 0.5 : 0.8 });
 
     const iconText = new Text({
       text: slot.icon,
       style: {
         fontSize: 32,
-        fill: isEmpty ? Colors.BLUE_STEEL : slot.color
+        fill: isEmpty ? Colors.ROBOT_CYAN_MID : slot.color
       }
     });
     iconText.anchor.set(0.5);
@@ -1256,7 +1256,7 @@ export class CharacterDetailScene extends BaseScene {
     const badge = new Graphics();
     badge.roundRect(90, 15, badgeWidth, 22, 11)
       .fill({ color: isEmpty ? Colors.GRAY_DARK : slot.color, alpha: isEmpty ? 0.5 : 0.3 })
-      .stroke({ width: 1.5, color: isEmpty ? Colors.BLUE_STEEL_DARK : slot.color });
+      .stroke({ width: 1.5, color: isEmpty ? Colors.ROBOT_CYAN : slot.color });
 
     const badgeText = new Text({
       text: slot.name.toUpperCase(),
@@ -1264,7 +1264,7 @@ export class CharacterDetailScene extends BaseScene {
         fontFamily: 'Orbitron',
         fontSize: 10,
         fontWeight: 'bold',
-        fill: isEmpty ? Colors.BLUE_STEEL_LIGHT : Colors.WHITE
+        fill: isEmpty ? Colors.ROBOT_CYAN_LIGHT : Colors.WHITE
       }
     });
     badgeText.anchor.set(0.5);
@@ -1280,9 +1280,9 @@ export class CharacterDetailScene extends BaseScene {
         fontFamily: 'Orbitron',
         fontSize: 15,
         fontWeight: isEmpty ? 'normal' : 'bold',
-        fill: isEmpty ? Colors.BLUE_STEEL : Colors.WHITE,
+        fill: isEmpty ? Colors.ROBOT_CYAN_MID : Colors.WHITE,
         fontStyle: isEmpty ? 'italic' : 'normal',
-        stroke: { color: Colors.BLUE_NAVY_DARK, width: isEmpty ? 0 : 1.5 }
+        stroke: { color: Colors.ROBOT_ELEMENT, width: isEmpty ? 0 : 1.5 }
       }
     });
     itemText.x = 90;
@@ -1310,7 +1310,7 @@ export class CharacterDetailScene extends BaseScene {
         style: {
           fontFamily: 'Orbitron',
           fontSize: 11,
-          fill: Colors.BLUE_STEEL,
+          fill: Colors.ROBOT_CYAN_MID,
           fontStyle: 'italic'
         }
       });
@@ -1344,7 +1344,7 @@ export class CharacterDetailScene extends BaseScene {
           fontFamily: 'Orbitron',
           fontSize: 9,
           fontWeight: 'bold',
-          fill: Colors.BLUE_MIDNIGHT
+          fill: Colors.ROBOT_BG_DARK
         }
       });
       equippedText.anchor.set(0.5);
@@ -1360,23 +1360,23 @@ export class CharacterDetailScene extends BaseScene {
     card.on('pointerover', () => {
       bg.clear();
       bg.roundRect(0, 0, width, height, 10)
-        .fill({ color: Colors.BLUE_NAVY_DARK, alpha: 0.98 })
-        .stroke({ width: 3, color: isEmpty ? Colors.BLUE_STEEL : slot.color });
+        .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.98 })
+        .stroke({ width: 3, color: isEmpty ? Colors.ROBOT_CYAN_MID : slot.color });
       bg.roundRect(3, 3, width - 6, height - 6, 8)
-        .fill({ color: Colors.BLUE_NAVY, alpha: 0.7 });
+        .fill({ color: Colors.ROBOT_BG_MID, alpha: 0.7 });
       bg.roundRect(5, 5, width - 10, height - 10, 7)
-        .stroke({ width: 1, color: isEmpty ? Colors.BLUE_STEEL : slot.color, alpha: 0.6 });
+        .stroke({ width: 1, color: isEmpty ? Colors.ROBOT_CYAN_MID : slot.color, alpha: 0.6 });
     });
 
     card.on('pointerout', () => {
       bg.clear();
       bg.roundRect(0, 0, width, height, 10)
-        .fill({ color: Colors.BLUE_NAVY_DARK, alpha: 0.98 })
-        .stroke({ width: 2, color: isEmpty ? Colors.BLUE_STEEL_DARK : slot.color, alpha: isEmpty ? 0.5 : 0.8 });
+        .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.98 })
+        .stroke({ width: 2, color: isEmpty ? Colors.ROBOT_CYAN : slot.color, alpha: isEmpty ? 0.5 : 0.8 });
       bg.roundRect(3, 3, width - 6, height - 6, 8)
-        .fill({ color: Colors.BLUE_NAVY, alpha: 0.7 });
+        .fill({ color: Colors.ROBOT_BG_MID, alpha: 0.7 });
       bg.roundRect(5, 5, width - 10, height - 10, 7)
-        .stroke({ width: 1, color: isEmpty ? Colors.BLUE_STEEL_DARK : slot.color, alpha: 0.4 });
+        .stroke({ width: 1, color: isEmpty ? Colors.ROBOT_CYAN : slot.color, alpha: 0.4 });
     });
 
     card.on('pointerdown', () => {
@@ -1398,11 +1398,11 @@ export class CharacterDetailScene extends BaseScene {
 
     const bg = new Graphics();
     bg.roundRect(0, 0, width, height, 7)
-      .fill({ color: Colors.PURPLE_DARKER, alpha: 0.95 })
-      .stroke({ width: 2, color: Colors.BLUE_STEEL_LIGHT });
+      .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.95 })
+      .stroke({ width: 2, color: Colors.ROBOT_CYAN_LIGHT });
 
     bg.roundRect(2, 2, width - 4, height - 4, 5)
-      .stroke({ width: 1, color: Colors.BLUE_STEEL, alpha: 0.6 });
+      .stroke({ width: 1, color: Colors.ROBOT_CYAN_MID, alpha: 0.6 });
 
     const buttonText = new Text({
       text: text,
@@ -1411,7 +1411,7 @@ export class CharacterDetailScene extends BaseScene {
         fontSize: 12,
         fontWeight: 'bold',
         fill: Colors.WHITE,
-        stroke: { color: Colors.BLUE_NAVY_DARK, width: 1.5 }
+        stroke: { color: Colors.ROBOT_ELEMENT, width: 1.5 }
       }
     });
     buttonText.anchor.set(0.5);
@@ -1427,20 +1427,20 @@ export class CharacterDetailScene extends BaseScene {
     button.on('pointerover', () => {
       bg.clear();
       bg.roundRect(0, 0, width, height, 7)
-        .fill({ color: Colors.PURPLE_DARK_ALT, alpha: 0.95 })
-        .stroke({ width: 2, color: Colors.BLUE_STEEL_LIGHT });
+        .fill({ color: Colors.ROBOT_CYAN, alpha: 0.95 })
+        .stroke({ width: 2, color: Colors.ROBOT_CYAN_LIGHT });
       bg.roundRect(2, 2, width - 4, height - 4, 5)
-        .stroke({ width: 1, color: Colors.BLUE_STEEL, alpha: 0.9 });
+        .stroke({ width: 1, color: Colors.ROBOT_CYAN_MID, alpha: 0.9 });
       button.scale.set(1.05);
     });
 
     button.on('pointerout', () => {
       bg.clear();
       bg.roundRect(0, 0, width, height, 7)
-        .fill({ color: Colors.PURPLE_DARKER, alpha: 0.95 })
-        .stroke({ width: 2, color: Colors.BLUE_STEEL_LIGHT });
+        .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.95 })
+        .stroke({ width: 2, color: Colors.ROBOT_CYAN_LIGHT });
       bg.roundRect(2, 2, width - 4, height - 4, 5)
-        .stroke({ width: 1, color: Colors.BLUE_STEEL, alpha: 0.6 });
+        .stroke({ width: 1, color: Colors.ROBOT_CYAN_MID, alpha: 0.6 });
       button.scale.set(1.0);
     });
 
@@ -1468,14 +1468,14 @@ export class CharacterDetailScene extends BaseScene {
 
     const bg = new Graphics();
     bg.roundRect(0, 0, width, height, 10)
-      .fill({ color: Colors.BLUE_NAVY_DARK, alpha: 0.98 })
-      .stroke({ width: 2, color: Colors.BLUE_STEEL_DARK });
+      .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.98 })
+      .stroke({ width: 2, color: Colors.ROBOT_CYAN });
 
     bg.roundRect(3, 3, width - 6, height - 6, 8)
-      .fill({ color: Colors.BLUE_NAVY, alpha: 0.7 });
+      .fill({ color: Colors.ROBOT_BG_MID, alpha: 0.7 });
 
     bg.roundRect(5, 5, width - 10, height - 10, 7)
-      .stroke({ width: 1, color: Colors.BLUE_STEEL, alpha: 0.4 });
+      .stroke({ width: 1, color: Colors.ROBOT_CYAN_MID, alpha: 0.4 });
 
     panel.addChild(bg);
 
@@ -1500,7 +1500,7 @@ export class CharacterDetailScene extends BaseScene {
       // Bonus stat row
       const statBg = new Graphics();
       statBg.roundRect(x, y, (width / 2) - 20, 32, 6)
-        .fill({ color: Colors.BLUE_NAVY_DARKER, alpha: 0.8 })
+        .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.8 })
         .stroke({ width: 1, color: stat.color, alpha: 0.5 });
 
       // Icon
@@ -1517,7 +1517,7 @@ export class CharacterDetailScene extends BaseScene {
         style: {
           fontFamily: 'Orbitron',
           fontSize: 11,
-          fill: Colors.BLUE_STEEL_LIGHT
+          fill: Colors.ROBOT_CYAN_LIGHT
         }
       });
       labelText.x = x + 32;
@@ -1533,7 +1533,7 @@ export class CharacterDetailScene extends BaseScene {
           fontFamily: 'Orbitron',
           fontSize: 14,
           fontWeight: 'bold',
-          fill: hasBonus ? stat.color : Colors.BLUE_STEEL_DARK
+          fill: hasBonus ? stat.color : Colors.ROBOT_CYAN
         }
       });
       valueText.x = x + 32;
@@ -1666,10 +1666,10 @@ export class CharacterDetailScene extends BaseScene {
     bg.roundRect(2, 2, width, height, 8)
       .fill({ color: Colors.BLACK, alpha: 0.5 });
     bg.roundRect(0, 0, width, height, 8)
-      .fill({ color: Colors.PURPLE_DARKER, alpha: 0.95 })
-      .stroke({ width: 2, color: Colors.BLUE_STEEL_LIGHT });
+      .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.95 })
+      .stroke({ width: 2, color: Colors.ROBOT_CYAN_LIGHT });
     bg.roundRect(2, 2, width - 4, height - 4, 6)
-      .stroke({ width: 1, color: Colors.BLUE_STEEL, alpha: 0.6 });
+      .stroke({ width: 1, color: Colors.ROBOT_CYAN_MID, alpha: 0.6 });
 
     const buttonText = new Text({
       text: text,
@@ -1678,7 +1678,7 @@ export class CharacterDetailScene extends BaseScene {
         fontSize: 14,
         fontWeight: 'bold',
         fill: Colors.WHITE,
-        stroke: { color: Colors.BLUE_NAVY_DARK, width: 2 }
+        stroke: { color: Colors.ROBOT_ELEMENT, width: 2 }
       }
     });
     buttonText.anchor.set(0.5);
@@ -1696,10 +1696,10 @@ export class CharacterDetailScene extends BaseScene {
       bg.roundRect(2, 2, width, height, 8)
         .fill({ color: Colors.BLACK, alpha: 0.5 });
       bg.roundRect(0, 0, width, height, 8)
-        .fill({ color: Colors.PURPLE_DARK_ALT, alpha: 0.95 })
-        .stroke({ width: 2, color: Colors.BLUE_STEEL_LIGHT });
+        .fill({ color: Colors.ROBOT_CYAN, alpha: 0.95 })
+        .stroke({ width: 2, color: Colors.ROBOT_CYAN_LIGHT });
       bg.roundRect(2, 2, width - 4, height - 4, 6)
-        .stroke({ width: 1, color: Colors.BLUE_STEEL, alpha: 0.9 });
+        .stroke({ width: 1, color: Colors.ROBOT_CYAN_MID, alpha: 0.9 });
       button.scale.set(1.02);
     });
 
@@ -1708,10 +1708,10 @@ export class CharacterDetailScene extends BaseScene {
       bg.roundRect(2, 2, width, height, 8)
         .fill({ color: Colors.BLACK, alpha: 0.5 });
       bg.roundRect(0, 0, width, height, 8)
-        .fill({ color: Colors.PURPLE_DARKER, alpha: 0.95 })
-        .stroke({ width: 2, color: Colors.BLUE_STEEL_LIGHT });
+        .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.95 })
+        .stroke({ width: 2, color: Colors.ROBOT_CYAN_LIGHT });
       bg.roundRect(2, 2, width - 4, height - 4, 6)
-        .stroke({ width: 1, color: Colors.BLUE_STEEL, alpha: 0.6 });
+        .stroke({ width: 1, color: Colors.ROBOT_CYAN_MID, alpha: 0.6 });
       button.scale.set(1.0);
     });
 
