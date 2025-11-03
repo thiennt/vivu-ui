@@ -385,13 +385,14 @@ export class HomeScene extends BaseScene {
       this.STANDARD_SPACING;
     
     buttons.forEach((buttonData, index) => {
-      const button = this.createFantasyButton(
+      const button = this.createButton(
         buttonData.text,
         0,
         index * (buttonHeight + spacing),
         buttonWidth,
         buttonHeight,
-        () => navigation.showScreen(buttonData.screen)
+        () => navigation.showScreen(buttonData.screen),
+        18
       );
       buttonContainer.addChild(button);
     });
@@ -402,87 +403,7 @@ export class HomeScene extends BaseScene {
     this.container.addChild(buttonContainer);
   }
 
-  private createFantasyButton(
-    text: string,
-    x: number,
-    y: number,
-    width: number,
-    height: number,
-    onClick: () => void
-  ): Container {
-    const button = new Container();
-    
-    const bg = new Graphics();
-    
-    // Outer glow
-    bg.roundRect(-2, -2, width + 4, height + 4, 10)
-      .fill({ color: Colors.ROBOT_CYAN, alpha: 0.3 });
-    
-    // Shadow
-    bg.roundRect(3, 3, width, height, 8)
-      .fill({ color: Colors.BLACK, alpha: 0.4 });
-    
-    // Main button - robot style
-    bg.roundRect(0, 0, width, height, 8)
-      .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.95 })
-      .stroke({ width: 2, color: Colors.ROBOT_CYAN });
-    
-    // Inner highlight
-    bg.roundRect(2, 2, width - 4, height - 4, 6)
-      .stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 0.6 });
-    
-    const buttonText = new Text({
-      text: text,
-      style: {
-        fontFamily: 'Orbitron',
-        fontSize: 18,
-        fontWeight: 'bold',
-        fill: Colors.ROBOT_CYAN_LIGHT,
-        stroke: { color: Colors.ROBOT_BG_DARK, width: 2 }
-      }
-    });
-    buttonText.anchor.set(0.5);
-    buttonText.x = width / 2;
-    buttonText.y = height / 2;
-    
-    button.addChild(bg, buttonText);
-    button.x = x;
-    button.y = y;
-    button.interactive = true;
-    button.cursor = 'pointer';
-    
-    button.on('pointerover', () => {
-      bg.clear();
-      bg.roundRect(-2, -2, width + 4, height + 4, 10)
-        .fill({ color: Colors.ROBOT_CYAN, alpha: 0.5 });
-      bg.roundRect(3, 3, width, height, 8)
-        .fill({ color: Colors.BLACK, alpha: 0.4 });
-      bg.roundRect(0, 0, width, height, 8)
-        .fill({ color: Colors.ROBOT_CYAN, alpha: 0.3 })
-        .stroke({ width: 2, color: Colors.ROBOT_CYAN });
-      bg.roundRect(2, 2, width - 4, height - 4, 6)
-        .stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 0.9 });
-      button.scale.set(1.02);
-    });
-    
-    button.on('pointerout', () => {
-      bg.clear();
-      bg.roundRect(-2, -2, width + 4, height + 4, 10)
-        .fill({ color: Colors.ROBOT_CYAN, alpha: 0.3 });
-      bg.roundRect(3, 3, width, height, 8)
-        .fill({ color: Colors.BLACK, alpha: 0.4 });
-      bg.roundRect(0, 0, width, height, 8)
-        .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.95 })
-        .stroke({ width: 2, color: Colors.ROBOT_CYAN });
-      bg.roundRect(2, 2, width - 4, height - 4, 6)
-        .stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 0.6 });
-      button.scale.set(1.0);
-    });
-    
-    button.on('pointerdown', onClick);
-    
-    return button;
-  }
+
 
   private createDecorations(): void {
     // Add floating cyan particles

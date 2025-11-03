@@ -286,14 +286,15 @@ export class RewardSpinScene extends BaseScene {
     const buttonX = (this.gameWidth - buttonWidth) / 2;
     const buttonY = 420;
     
-    this.spinButton = this.createFantasyButton(
+    this.spinButton = this.createButton(
       '🎯 SPIN THE WHEEL',
       buttonX,
       buttonY,
       buttonWidth,
       buttonHeight,
       () => this.performSpin(),
-      false
+      16, // baseFontSize
+      false // disabled
     );
 
     this.container.addChild(this.spinButton);
@@ -389,7 +390,7 @@ export class RewardSpinScene extends BaseScene {
     const buttonWidth = Math.min(180, this.gameWidth - 2 * this.STANDARD_PADDING);
     const buttonHeight = 45;
     
-    const backButton = this.createFantasyButton(
+    const backButton = this.createButton(
       '← Back',
       (this.gameWidth - buttonWidth) / 2,
       this.gameHeight - buttonHeight - 20,
@@ -399,84 +400,6 @@ export class RewardSpinScene extends BaseScene {
     );
 
     this.container.addChild(backButton);
-  }
-
-  private createFantasyButton(
-    text: string,
-    x: number,
-    y: number,
-    width: number,
-    height: number,
-    onClick: () => void,
-    disabled: boolean = false
-  ): Container {
-    const button = new Container();
-    
-    const bg = new Graphics();
-    
-    const mainColor = disabled ? Colors.GRAY : Colors.ROBOT_ELEMENT;
-    const strokeColor = disabled ? Colors.GRAY_MID : Colors.ROBOT_CYAN;
-    const highlightColor = disabled ? Colors.GRAY_LIGHT : Colors.ROBOT_CYAN;
-    const textColor = disabled ? Colors.GRAY_LIGHTER : Colors.ROBOT_CYAN_LIGHT;
-    
-    bg.roundRect(2, 2, width, height, 8)
-      .fill({ color: Colors.BLACK, alpha: 0.4 });
-    bg.roundRect(0, 0, width, height, 8)
-      .fill({ color: mainColor, alpha: 0.95 })
-      .stroke({ width: 2, color: strokeColor });
-    bg.roundRect(2, 2, width - 4, height - 4, 6)
-      .stroke({ width: 1, color: highlightColor, alpha: 0.6 });
-
-    const buttonText = new Text({
-      text: text,
-      style: {
-        fontFamily: 'Orbitron',
-        fontSize: 16,
-        fontWeight: 'bold',
-        fill: textColor,
-        stroke: { color: Colors.ROBOT_BG_DARK, width: 2 }
-      }
-    });
-    buttonText.anchor.set(0.5);
-    buttonText.x = width / 2;
-    buttonText.y = height / 2;
-    
-    button.addChild(bg, buttonText);
-    button.x = x;
-    button.y = y;
-    
-    if (!disabled) {
-      button.eventMode = 'static';
-      button.cursor = 'pointer';
-      
-      button.on('pointerover', () => {
-        bg.clear();
-        bg.roundRect(2, 2, width, height, 8)
-          .fill({ color: Colors.BLACK, alpha: 0.4 });
-        bg.roundRect(0, 0, width, height, 8)
-          .fill({ color: Colors.ROBOT_BG_MID, alpha: 0.95 })
-          .stroke({ width: 2, color: Colors.ROBOT_CYAN });
-        bg.roundRect(2, 2, width - 4, height - 4, 6)
-          .stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 0.9 });
-        button.scale.set(1.02);
-      });
-      
-      button.on('pointerout', () => {
-        bg.clear();
-        bg.roundRect(2, 2, width, height, 8)
-          .fill({ color: Colors.BLACK, alpha: 0.4 });
-        bg.roundRect(0, 0, width, height, 8)
-          .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.95 })
-          .stroke({ width: 2, color: Colors.ROBOT_CYAN });
-        bg.roundRect(2, 2, width - 4, height - 4, 6)
-          .stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 0.6 });
-        button.scale.set(1.0);
-      });
-      
-      button.on('pointerdown', onClick);
-    }
-    
-    return button;
   }
 
   update(): void {

@@ -520,7 +520,7 @@ export class LineupScene extends BaseScene {
     const y = this.gameHeight - buttonHeight - this.STANDARD_PADDING;
 
     // Fantasy buttons
-    const backButton = this.createFantasyButton(
+    const backButton = this.createButton(
       '← Back',
       this.STANDARD_PADDING,
       y,
@@ -529,7 +529,7 @@ export class LineupScene extends BaseScene {
       () => navigation.showScreen(HomeScene)
     );
 
-    const saveButton = this.createFantasyButton(
+    const saveButton = this.createButton(
       '💾 Save',
       startX + buttonWidth + this.STANDARD_SPACING,
       y,
@@ -538,7 +538,7 @@ export class LineupScene extends BaseScene {
       () => this.saveLineup()
     );
 
-    const autoButton = this.createFantasyButton(
+    const autoButton = this.createButton(
       '⚡ Auto',
       startX + (buttonWidth + this.STANDARD_SPACING) * 2,
       y,
@@ -559,73 +559,5 @@ export class LineupScene extends BaseScene {
     );
 
     this.buttonContainer.addChild(backButton, saveButton, autoButton);
-  }
-
-  private createFantasyButton(
-    text: string,
-    x: number,
-    y: number,
-    width: number,
-    height: number,
-    onClick: () => void
-  ): Container {
-    const button = new Container();
-    
-    const bg = new Graphics();
-    bg.roundRect(2, 2, width, height, 8)
-      .fill({ color: Colors.BLACK, alpha: 0.4 });
-    bg.roundRect(0, 0, width, height, 8)
-      .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.95 })
-      .stroke({ width: 2, color: Colors.ROBOT_CYAN });
-    bg.roundRect(2, 2, width - 4, height - 4, 6)
-      .stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 0.6 });
-    
-    const buttonText = new Text({
-      text: text,
-      style: {
-        fontFamily: 'Orbitron',
-        fontSize: 13,
-        fontWeight: 'bold',
-        fill: Colors.ROBOT_CYAN_LIGHT,
-        stroke: { color: Colors.ROBOT_BG_DARK, width: 2 }
-      }
-    });
-    buttonText.anchor.set(0.5);
-    buttonText.x = width / 2;
-    buttonText.y = height / 2;
-    
-    button.addChild(bg, buttonText);
-    button.x = x;
-    button.y = y;
-    button.interactive = true;
-    button.cursor = 'pointer';
-    
-    button.on('pointerover', () => {
-      bg.clear();
-      bg.roundRect(2, 2, width, height, 8)
-        .fill({ color: Colors.BLACK, alpha: 0.4 });
-      bg.roundRect(0, 0, width, height, 8)
-        .fill({ color: Colors.ROBOT_BG_MID, alpha: 0.95 })
-        .stroke({ width: 2, color: Colors.ROBOT_CYAN });
-      bg.roundRect(2, 2, width - 4, height - 4, 6)
-        .stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 0.9 });
-      button.scale.set(1.02);
-    });
-    
-    button.on('pointerout', () => {
-      bg.clear();
-      bg.roundRect(2, 2, width, height, 8)
-        .fill({ color: Colors.BLACK, alpha: 0.4 });
-      bg.roundRect(0, 0, width, height, 8)
-        .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.95 })
-        .stroke({ width: 2, color: Colors.ROBOT_CYAN });
-      bg.roundRect(2, 2, width - 4, height - 4, 6)
-        .stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 0.6 });
-      button.scale.set(1.0);
-    });
-    
-    button.on('pointerdown', onClick);
-    
-    return button;
   }
 }

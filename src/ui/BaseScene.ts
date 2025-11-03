@@ -170,7 +170,8 @@ export abstract class BaseScene extends Container {
     width: number = 200, 
     height: number = 50,
     onClick?: () => void,
-    baseFontSize: number = 18
+    baseFontSize: number = 14,
+    disabled: boolean = false
   ): Button {
     const button = new Button({
       text,
@@ -178,6 +179,7 @@ export abstract class BaseScene extends Container {
       height,
       onClick,
       baseFontSize,
+      disabled,
       gameWidth: this.gameWidth,
       gameHeight: this.gameHeight,
       standardPadding: this.STANDARD_PADDING

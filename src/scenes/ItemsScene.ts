@@ -515,7 +515,7 @@ export class ItemsScene extends BaseScene {
     const buttonY = this.gameHeight - buttonHeight - this.STANDARD_PADDING;
     
     // Back button
-    const backButton = this.createFantasyButton(
+    const backButton = this.createButton(
       '← Back',
       this.STANDARD_PADDING,
       buttonY,
@@ -526,7 +526,7 @@ export class ItemsScene extends BaseScene {
     this.buttonContainer.addChild(backButton);
     
     // Craft button
-    const craftButton = this.createFantasyButton(
+    const craftButton = this.createButton(
       '⚒️ Craft',
       this.gameWidth - buttonWidth - this.STANDARD_PADDING,
       buttonY,
@@ -571,73 +571,7 @@ export class ItemsScene extends BaseScene {
     }, 2000);
   }
 
-  private createFantasyButton(
-    text: string,
-    x: number,
-    y: number,
-    width: number,
-    height: number,
-    onClick: () => void
-  ): Container {
-    const button = new Container();
-    
-    const bg = new Graphics();
-    bg.roundRect(2, 2, width, height, 8)
-      .fill({ color: Colors.BLACK, alpha: 0.4 });
-    bg.roundRect(0, 0, width, height, 8)
-      .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.95 })
-      .stroke({ width: 2, color: Colors.ROBOT_CYAN });
-    bg.roundRect(2, 2, width - 4, height - 4, 6)
-      .stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 0.6 });
-    
-    const buttonText = new Text({
-      text: text,
-      style: {
-        fontFamily: 'Orbitron',
-        fontSize: 14,
-        fontWeight: 'bold',
-        fill: Colors.WHITE,
-        stroke: { color: Colors.ROBOT_CYAN, width: 2 }
-      }
-    });
-    buttonText.anchor.set(0.5);
-    buttonText.x = width / 2;
-    buttonText.y = height / 2;
-    
-    button.addChild(bg, buttonText);
-    button.x = x;
-    button.y = y;
-    button.interactive = true;
-    button.cursor = 'pointer';
-    
-    button.on('pointerover', () => {
-      bg.clear();
-      bg.roundRect(2, 2, width, height, 8)
-        .fill({ color: Colors.BLACK, alpha: 0.4 });
-      bg.roundRect(0, 0, width, height, 8)
-        .fill({ color: Colors.ROBOT_BG_MID, alpha: 0.95 })
-        .stroke({ width: 2, color: Colors.ROBOT_CYAN });
-      bg.roundRect(2, 2, width - 4, height - 4, 6)
-        .stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 0.9 });
-      button.scale.set(1.02);
-    });
-    
-    button.on('pointerout', () => {
-      bg.clear();
-      bg.roundRect(2, 2, width, height, 8)
-        .fill({ color: Colors.BLACK, alpha: 0.4 });
-      bg.roundRect(0, 0, width, height, 8)
-        .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.95 })
-        .stroke({ width: 2, color: Colors.ROBOT_CYAN });
-      bg.roundRect(2, 2, width - 4, height - 4, 6)
-        .stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 0.6 });
-      button.scale.set(1.0);
-    });
-    
-    button.on('pointerdown', onClick);
-    
-    return button;
-  }
+
 
   update(): void {
     // No specific animations needed
