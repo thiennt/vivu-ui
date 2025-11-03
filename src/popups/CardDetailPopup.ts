@@ -40,7 +40,7 @@ export class CardDetailPopup extends Container {
     // Create semi-transparent dark overlay
     this.dialogBg = new Graphics();
     this.dialogBg.rect(0, 0, navigation.width, navigation.height)
-      .fill({ color: Colors.BLACK, alpha: 0.85 });
+      .fill({ color: Colors.BLACK, alpha: 0.9 });
     
     // Make overlay clickable to close
     this.dialogBg.interactive = true;
@@ -58,119 +58,106 @@ export class CardDetailPopup extends Container {
 
     this.dialogPanel = new Graphics();
 
-    // Shadows
-    this.dialogPanel.roundRect(6, 6, cardWidth, cardHeight, 14)
-      .fill({ color: Colors.BLACK, alpha: 0.6 });
-    this.dialogPanel.roundRect(3, 3, cardWidth, cardHeight, 14)
-      .fill({ color: Colors.BLACK, alpha: 0.3 });
+    // Clean shadow
+    this.dialogPanel.roundRect(4, 4, cardWidth, cardHeight, 12)
+      .fill({ color: Colors.BLACK, alpha: 0.5 });
 
-    // Main card background
-    this.dialogPanel.roundRect(0, 0, cardWidth, cardHeight, 14)
-      .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.98 })
-      .stroke({ width: 3, color: Colors.ROBOT_CYAN });
+    // Main card background - darker for better contrast
+    this.dialogPanel.roundRect(0, 0, cardWidth, cardHeight, 12)
+      .fill({ color: 0x0a0e1a, alpha: 1 })
+      .stroke({ width: 2, color: Colors.ROBOT_CYAN, alpha: 1 });
 
-    // Inner layer
-    this.dialogPanel.roundRect(5, 5, cardWidth - 10, cardHeight - 10, 10)
-      .fill({ color: Colors.ROBOT_BG_MID, alpha: 0.7 });
+    // Subtle inner glow
+    this.dialogPanel.roundRect(2, 2, cardWidth - 4, cardHeight - 4, 10)
+      .stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 0.3 });
 
-    // Inner trim
-    this.dialogPanel.roundRect(7, 7, cardWidth - 14, cardHeight - 14, 8)
-      .stroke({ width: 1.5, color: Colors.ROBOT_CYAN, alpha: 0.6 });
-
-    this.drawOrnateCorners(0, 0, cardWidth, cardHeight);
-
-    // Top banner
+    // Top banner - cleaner design
     const rarityColor = this.getRarityColor(this.card.rarity);
-    const bannerHeight = 24;
-    this.dialogPanel.moveTo(14, 14)
-      .lineTo(10, 20)
-      .lineTo(14, 14 + bannerHeight)
-      .lineTo(cardWidth - 14, 14 + bannerHeight)
-      .lineTo(cardWidth - 10, 20)
-      .lineTo(cardWidth - 14, 14)
-      .lineTo(14, 14)
-      .fill({ color: rarityColor, alpha: 0.85 })
-      .stroke({ width: 2, color: Colors.ROBOT_ELEMENT });
+    const bannerHeight = 28;
+    this.dialogPanel.roundRect(10, 10, cardWidth - 20, bannerHeight, 6)
+      .fill({ color: rarityColor, alpha: 0.2 })
+      .stroke({ width: 2, color: rarityColor, alpha: 0.8 });
 
-    // Art frame
-    const frameMargin = 14;
-    const frameY = 48;
-    const frameHeight = 90;
+    // Card name - improved readability (moved to top)
+    const cardNameText = new Text({
+      text: this.card.name,
+      style: {
+        fontFamily: 'Orbitron',
+        fontSize: 15,
+        fontWeight: 'bold',
+        fill: Colors.WHITE,
+        align: 'center',
+        wordWrap: true,
+        wordWrapWidth: cardWidth - 40,
+        dropShadow: { 
+          color: Colors.ROBOT_CYAN, 
+          blur: 8, 
+          angle: Math.PI / 4, 
+          distance: 2, 
+          alpha: 0.8 
+        }
+      }
+    });
+    cardNameText.anchor.set(0.5, 0.5);
+    cardNameText.x = cardWidth / 2;
+    cardNameText.y = 24;
+
+    // Art frame - cleaner, more minimal
+    const frameMargin = 15;
+    const frameY = 52;
+    const frameHeight = 100;
     const frameWidth = cardWidth - (frameMargin * 2);
 
+    // Frame with neon glow
     this.dialogPanel.roundRect(frameMargin, frameY, frameWidth, frameHeight, 8)
-      .fill({ color: Colors.ROBOT_CYAN, alpha: 0.95 })
-      .stroke({ width: 1.5, color: Colors.ROBOT_CYAN, alpha: 0.95 });
+      .fill({ color: 0x051420, alpha: 1 })
+      .stroke({ width: 2, color: Colors.ROBOT_CYAN, alpha: 0.8 });
 
-    this.dialogPanel.roundRect(frameMargin + 2, frameY + 2, frameWidth - 4, frameHeight - 4, 6)
-      .stroke({ width: 1, color: Colors.ROBOT_ELEMENT, alpha: 0.6 });
-
-    this.drawFantasyCorners(frameMargin, frameY, frameWidth, frameHeight, Colors.ROBOT_CYAN);
+    // Inner frame accent
+    this.dialogPanel.roundRect(frameMargin + 3, frameY + 3, frameWidth - 6, frameHeight - 6, 6)
+      .stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 0.4 });
 
     this.addChild(this.dialogPanel);
+    this.addChild(cardNameText);
 
-    // Energy cost badge (bigger)
-    const energyBadge = this.createEnergyGem(14, 28, 48, 28);
+    // Energy cost badge - positioned at top-left of frame
+    const energyBadge = this.createEnergyGem(frameMargin, frameY, 50, 32);
     this.addChild(energyBadge);
 
-    // Group icon (top right, bigger)
-    const groupIcon = this.getGroupIcon(this.card.group);
-    const groupColor = this.getGroupColor(this.card.group);
+    // Group icon - positioned at top-right of frame
+    const { icon: groupIcon, color: groupColor } = this.getGroupIconColor(this.card.group);
 
     const groupIconBg = new Graphics()
-      .circle(cardWidth - 32, 38, 22)
-      .fill({ color: Colors.ROBOT_CYAN, alpha: 0.95 })
-      .stroke({ width: 2, color: Colors.ROBOT_CYAN, alpha: 0.95 });
-
-    groupIconBg.circle(cardWidth - 32, 38, 18)
-      .stroke({ width: 2, color: groupColor, alpha: 0.7 });
-
+      .circle(frameWidth - 10, frameY + 20, 20)
+      .fill({ color: 0x051420, alpha: 1 })
+      .stroke({ width: 2, color: groupColor, alpha: 0.8 });
+    
     const groupIconText = new Text({
       text: groupIcon,
       style: {
         fontFamily: 'Orbitron',
-        fontSize: 24,
+        fontSize: 22,
         fill: Colors.WHITE
       }
     });
     groupIconText.anchor.set(0.5);
-    groupIconText.x = cardWidth - 32;
-    groupIconText.y = 38;
+    groupIconText.x = frameWidth - 10;
+    groupIconText.y = frameY + 20;
     groupIconText.filters = [new DropShadowFilter({
       offset: { x: 0, y: 0 },
-      blur: 10,
-      alpha: 0.9,
+      blur: 12,
+      alpha: 0.8,
       color: groupColor
     })];
 
     this.addChild(groupIconBg, groupIconText);
 
-    // Card name
-    const cardNameText = new Text({
-      text: this.card.name,
-      style: {
-        fontFamily: 'Orbitron',
-        fontSize: 14,
-        fontWeight: 'bold',
-        fill: Colors.ROBOT_CYAN,
-        align: 'center',
-        wordWrap: true,
-        wordWrapWidth: cardWidth - 40,
-        stroke: { color: Colors.ROBOT_CYAN, width: 1 },
-        dropShadow: { color: Colors.ROBOT_CYAN, blur: 1, angle: Math.PI / 4, distance: 1, alpha: 0.5 }
-      }
-    });
-    cardNameText.anchor.set(0.5, 0);
-    cardNameText.x = cardWidth / 2;
-    cardNameText.y = 12;
-    this.addChild(cardNameText);
-
-    // Avatar icon
+    // Avatar icon with stronger glow
     const avatarIcon = new Text({
       text: this.card.icon_url || groupIcon,
       style: {
         fontFamily: 'Orbitron',
-        fontSize: 54,
+        fontSize: 60,
         fill: Colors.WHITE
       }
     });
@@ -179,33 +166,43 @@ export class CardDetailPopup extends Container {
     avatarIcon.y = frameY + frameHeight / 2;
     avatarIcon.filters = [new DropShadowFilter({
       offset: { x: 0, y: 0 },
-      blur: 8,
+      blur: 20,
       alpha: 0.9,
-      color: groupColor
+      color: Colors.ROBOT_CYAN
     })];
     this.addChild(avatarIcon);
 
-    // Divider (move below avatar)
-    const dividerY = frameY + frameHeight + 12;
+    // Clean divider
+    const dividerY = frameY + frameHeight + 15;
     const divider = new Graphics();
-    divider.moveTo(18, dividerY)
-      .lineTo(cardWidth - 18, dividerY)
-      .stroke({ width: 1, color: Colors.ROBOT_ELEMENT, alpha: 0.5 });
-    divider.circle(cardWidth / 2, dividerY, 2)
-      .fill({ color: Colors.ROBOT_CYAN });
+    divider.moveTo(25, dividerY)
+      .lineTo(cardWidth - 25, dividerY)
+      .stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 0.5 });
+    
+    // Accent dots
+    divider.circle(25, dividerY, 2).fill({ color: Colors.ROBOT_CYAN, alpha: 0.8 });
+    divider.circle(cardWidth - 25, dividerY, 2).fill({ color: Colors.ROBOT_CYAN, alpha: 0.8 });
     this.addChild(divider);
 
-    // Description (below divider)
-    const descY = dividerY + 10;
+    // Description - improved readability
+    const descY = dividerY + 12;
     const descText = new Text({
       text: this.card.description,
       style: {
         fontFamily: 'Orbitron',
-        fontSize: 18,
-        fill: Colors.ROBOT_ELEMENT,
+        fontSize: 16,
+        fill: Colors.WHITE,
         align: 'center',
         wordWrap: true,
-        wordWrapWidth: cardWidth - 24,
+        wordWrapWidth: cardWidth - 30,
+        lineHeight: 22,
+        dropShadow: {
+          color: Colors.BLACK,
+          blur: 2,
+          angle: 0,
+          distance: 1,
+          alpha: 0.8
+        }
       }
     });
     descText.anchor.set(0.5, 0);
@@ -222,30 +219,29 @@ export class CardDetailPopup extends Container {
   private createEnergyGem(x: number, y: number, width: number, height: number): Container {
     const gem = new Container();
 
-    // Gem shape (hexagonal/diamond style)
+    // Clean gem background
     const gemBg = new Graphics();
     
-    // Dark background
-    gemBg.roundRect(0, 0, width, height, height / 4)
-      .fill({ color: Colors.ROBOT_CYAN, alpha: 0.95 })
-      .stroke({ width: 2, color: Colors.ROBOT_CYAN, alpha: 0.95 });
+    gemBg.roundRect(0, 0, width, height, 8)
+      .fill({ color: 0x051420, alpha: 1 })
+      .stroke({ width: 2, color: Colors.ROBOT_CYAN, alpha: 0.8 });
     
-    // Inner shine/highlight
-    gemBg.roundRect(2, 2, width - 4, height - 4, height / 4 - 1)
-      .stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 0.6 });
+    // Inner accent
+    gemBg.roundRect(3, 3, width - 6, height - 6, 6)
+      .stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 0.3 });
 
     const energyIcon = new Text({
       text: '⚡',
       style: {
         fontFamily: 'Orbitron',
-        fontSize: height * 0.45,
+        fontSize: height * 0.5,
         fill: Colors.ORANGE,
         dropShadow: {
-          color: Colors.ROBOT_CYAN,
-          blur: 4,
+          color: Colors.ORANGE,
+          blur: 8,
           angle: 0,
           distance: 0,
-          alpha: 0.8
+          alpha: 0.9
         }
       }
     });
@@ -257,10 +253,16 @@ export class CardDetailPopup extends Container {
       text: this.card.energy_cost.toString(),
       style: {
         fontFamily: 'Orbitron',
-        fontSize: height * 0.55,
+        fontSize: height * 0.6,
         fontWeight: 'bold',
         fill: Colors.WHITE,
-        stroke: { color: Colors.ROBOT_CYAN, width: 3 }
+        dropShadow: {
+          color: Colors.BLACK,
+          blur: 2,
+          angle: 0,
+          distance: 1,
+          alpha: 0.8
+        }
       }
     });
     energyText.anchor.set(0.5);
@@ -274,132 +276,61 @@ export class CardDetailPopup extends Container {
     return gem;
   }
 
-  private drawOrnateCorners(x: number, y: number, width: number, height: number): void {
-    const cornerSize = 20;
-    const cornerColor = Colors.ROBOT_CYAN;
+  private getGroupIconColor(group: string): { icon: string; color: string } {
+    let groupIcon = '';
+    let iconColor: string = Colors.ROBOT_CYAN;
 
-    // Top-left ornate corner
-    this.dialogPanel.moveTo(x, y + cornerSize)
-      .lineTo(x, y)
-      .lineTo(x + cornerSize, y)
-      .stroke({ width: 3, color: cornerColor, alpha: 0.9 });
-    
-    // Small decorative flourish
-    this.dialogPanel.circle(x + 8, y + 8, 2)
-      .fill({ color: cornerColor });
+    if (group.includes('Damage')) {
+      groupIcon = '⚔️';
+      iconColor = Colors.RED;
+    } else if (group.includes('Healing')) {
+      groupIcon = '❤️';
+      iconColor = Colors.GREEN_BRIGHT;
+    } else if (group.includes('Buff')) {
+      groupIcon = '🔼';
+      iconColor = Colors.BLUE_SKY;
+    } else {
+      groupIcon = '✨';
+      iconColor = Colors.PURPLE;
+    }
 
-    // Top-right
-    this.dialogPanel.moveTo(x + width - cornerSize, y)
-      .lineTo(x + width, y)
-      .lineTo(x + width, y + cornerSize)
-      .stroke({ width: 3, color: cornerColor, alpha: 0.9 });
-    
-    this.dialogPanel.circle(x + width - 8, y + 8, 2)
-      .fill({ color: cornerColor });
-
-    // Bottom-left
-    this.dialogPanel.moveTo(x, y + height - cornerSize)
-      .lineTo(x, y + height)
-      .lineTo(x + cornerSize, y + height)
-      .stroke({ width: 3, color: cornerColor, alpha: 0.9 });
-    
-    this.dialogPanel.circle(x + 8, y + height - 8, 2)
-      .fill({ color: cornerColor });
-
-    // Bottom-right
-    this.dialogPanel.moveTo(x + width - cornerSize, y + height)
-      .lineTo(x + width, y + height)
-      .lineTo(x + width, y + height - cornerSize)
-      .stroke({ width: 3, color: cornerColor, alpha: 0.9 });
-    
-    this.dialogPanel.circle(x + width - 8, y + height - 8, 2)
-      .fill({ color: cornerColor });
-  }
-
-  private drawFantasyCorners(x: number, y: number, width: number, height: number, color: string): void {
-    const cornerSize = 12;
-
-    // More elaborate corner decorations
-    const cornerGraphics = new Graphics();
-
-    // Top-left L-shape with ornament
-    cornerGraphics.moveTo(x, y + cornerSize)
-      .lineTo(x, y)
-      .lineTo(x + cornerSize, y)
-      .stroke({ width: 2, color: color, alpha: 0.9 });
-    
-    cornerGraphics.circle(x + 5, y + 5, 1.5)
-      .fill({ color: color });
-
-    // Top-right
-    cornerGraphics.moveTo(x + width - cornerSize, y)
-      .lineTo(x + width, y)
-      .lineTo(x + width, y + cornerSize)
-      .stroke({ width: 2, color: color, alpha: 0.9 });
-    
-    cornerGraphics.circle(x + width - 5, y + 5, 1.5)
-      .fill({ color: color });
-
-    // Bottom-left
-    cornerGraphics.moveTo(x, y + height - cornerSize)
-      .lineTo(x, y + height)
-      .lineTo(x + cornerSize, y + height)
-      .stroke({ width: 2, color: color, alpha: 0.9 });
-    
-    cornerGraphics.circle(x + 5, y + height - 5, 1.5)
-      .fill({ color: color });
-
-    // Bottom-right
-    cornerGraphics.moveTo(x + width - cornerSize, y + height)
-      .lineTo(x + width, y + height)
-      .lineTo(x + width, y + height - cornerSize)
-      .stroke({ width: 2, color: color, alpha: 0.9 });
-    
-    cornerGraphics.circle(x + width - 5, y + height - 5, 1.5)
-      .fill({ color: color });
-
-    this.addChild(cornerGraphics);
-  }
-
-  private getGroupIcon(group: string): string {
-    const groupLower = group.toLowerCase();
-    if (groupLower.includes('attack') || groupLower.includes('damage')) return '⚔️';
-    return '✨';
-  }
-
-  private getGroupColor(group: string): string {
-    const groupLower = group.toLowerCase();
-    if (groupLower.includes('attack') || groupLower.includes('damage')) return Colors.RED;
-    return Colors.GREEN_BRIGHT;
+    return { icon: groupIcon, color: iconColor };
   }
 
   private getRarityColor(rarity?: string): string {
     const rarityColors: { [key: string]: string } = {
-      common: Colors.GRAY_SILVER,    // Grey
-      uncommon: Colors.GREEN_BRIGHT,  // Green
-      rare: Colors.BLUE_SKY,      // Blue
-      epic: Colors.PURPLE_BRIGHT,      // Purple
-      legendary: Colors.ORANGE  // Gold/Orange
+      common: Colors.GRAY_SILVER,
+      uncommon: Colors.GREEN_BRIGHT,
+      rare: Colors.BLUE_SKY,
+      epic: Colors.PURPLE_BRIGHT,
+      legendary: Colors.ORANGE
     };
     return rarityColors[rarity?.toLowerCase() || 'common'] || rarityColors.common;
   }
 
   private createCloseButton(cardWidth: number, cardHeight: number): void {
-    const buttonSize = 30;
+    const buttonSize = 32;
     const button = new Container();
     
     const bg = new Graphics();
     bg.circle(buttonSize / 2, buttonSize / 2, buttonSize / 2)
-      .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.95 })
-      .stroke({ width: 2, color: Colors.ROBOT_CYAN });
+      .fill({ color: 0x051420, alpha: 1 })
+      .stroke({ width: 2, color: Colors.ROBOT_CYAN, alpha: 0.8 });
     
     const buttonText = new Text({
       text: '✕',
       style: {
         fontFamily: 'Orbitron',
-        fontSize: 18,
+        fontSize: 20,
         fontWeight: 'bold',
-        fill: Colors.WHITE
+        fill: Colors.WHITE,
+        dropShadow: {
+          color: Colors.BLACK,
+          blur: 2,
+          angle: 0,
+          distance: 1,
+          alpha: 0.8
+        }
       }
     });
     buttonText.anchor.set(0.5);
@@ -407,8 +338,8 @@ export class CardDetailPopup extends Container {
     buttonText.y = buttonSize / 2;
     
     button.addChild(bg, buttonText);
-    button.x = cardWidth - buttonSize - 5;
-    button.y = 5;
+    button.x = cardWidth - buttonSize - 8;
+    button.y = 8;
     
     button.interactive = true;
     button.cursor = 'pointer';
@@ -417,12 +348,18 @@ export class CardDetailPopup extends Container {
     });
     
     button.on('pointerover', () => {
-      bg.tint = 0xcccccc;
-      button.scale.set(1.1);
+      bg.clear();
+      bg.circle(buttonSize / 2, buttonSize / 2, buttonSize / 2)
+        .fill({ color: Colors.ROBOT_CYAN, alpha: 0.3 })
+        .stroke({ width: 2, color: Colors.ROBOT_CYAN, alpha: 1 });
+      button.scale.set(1.05);
     });
     
     button.on('pointerout', () => {
-      bg.tint = 0xffffff;
+      bg.clear();
+      bg.circle(buttonSize / 2, buttonSize / 2, buttonSize / 2)
+        .fill({ color: 0x051420, alpha: 1 })
+        .stroke({ width: 2, color: Colors.ROBOT_CYAN, alpha: 0.8 });
       button.scale.set(1.0);
     });
     
@@ -430,23 +367,19 @@ export class CardDetailPopup extends Container {
   }
 
   public positionAtTop(screenWidth: number, screenHeight: number, padding: number = 20): void {
-    // Position the content container
     this.x = (screenWidth - this.CARD_MAX_WIDTH) / 2;
     this.y = 70;
   }
 
   public positionAtCenter(screenWidth: number, screenHeight: number): void {
-    // Create a container for card content (everything except overlay)
     const contentContainer = new Container();
     
-    // Move all children except overlay to content container
     const childrenToMove = this.children.filter(child => child !== this.dialogBg);
     childrenToMove.forEach(child => {
       this.removeChild(child);
       contentContainer.addChild(child);
     });
     
-    // Center the content container on screen
     contentContainer.x = (screenWidth - this.CARD_MAX_WIDTH) / 2;
     contentContainer.y = (screenHeight - this.CARD_MAX_HEIGHT) / 2;
     

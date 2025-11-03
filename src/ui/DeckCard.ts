@@ -16,11 +16,10 @@ const defaultDeckCardOptions = {
 export type DeckCardOptions = typeof defaultDeckCardOptions;
 
 /**
- * A compact deck card optimized for 70x100px with Slay the Spire fantasy style
+ * A compact deck card with Neon Cyan style - clean and readable
  */
 export class DeckCard extends Container {
   private bg: Graphics;
-  private hoverOverlay: Graphics;
   public card: Card;
 
   constructor(
@@ -33,120 +32,50 @@ export class DeckCard extends Container {
     this.card = card;
     const { width, height, fontScale, enableHover } = opts;
 
-    // Fantasy-styled card background with parchment look
+    // Clean neon-styled card background
     this.bg = new Graphics();
     
-    // Multi-layer shadow for depth (Slay the Spire style)
-    this.bg.roundRect(2.5, 2.5, width, height, 5)
-      .fill({ color: Colors.BLACK, alpha: 0.4 });
+    // Main card background - dark with cyan accent
+    this.bg.roundRect(0, 0, width, height, 6)
+      .fill({ color: Colors.ROBOT_BG_DARK, alpha: 0.95 })
+      .stroke({ width: 2, color: Colors.ROBOT_CYAN, alpha: 0.8 });
     
-    this.bg.roundRect(1.5, 1.5, width, height, 5)
-      .fill({ color: Colors.BLACK, alpha: 0.2 });
-    
-    // Main card background - aged parchment
-    this.bg.roundRect(0, 0, width, height, 5)
-      .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.98 })  // Parchment color
-      .stroke({ width: 2, color: Colors.GOLD });   // Golden border
-    
-    // Inner darker parchment layer for depth
-    this.bg.roundRect(2, 2, width - 4, height - 4, 4)
-      .fill({ color: Colors.ROBOT_BG_MID, alpha: 0.6 });
-    
-    // Inner golden highlight
-    this.bg.roundRect(3, 3, width - 6, height - 6, 3)
-      .stroke({ width: 0.8, color: Colors.GOLD_BRIGHT, alpha: 0.5 });
-
-    // Avatar/Art frame in center with ornate border
-    const frameMargin = 6;
-    const frameY = 28;
-    const frameHeight = height - 34;
+    // Art/Avatar frame in center with clean neon border
+    const frameMargin = 8;
+    const frameY = 30;
+    const frameHeight = height - 38;
     const frameWidth = width - (frameMargin * 2);
     
-    // Dark inner frame for avatar/art with golden border
-    this.bg.roundRect(frameMargin, frameY, frameWidth, frameHeight, 3)
-      .fill({ color: Colors.ROBOT_CYAN, alpha: 0.95 })
-      .stroke({ width: 1.5, color: Colors.GOLD, alpha: 0.9 });
-    
-    // Inner bevel effect
-    this.bg.roundRect(frameMargin + 1, frameY + 1, frameWidth - 2, frameHeight - 2, 2)
-      .stroke({ width: 0.8, color: Colors.ROBOT_ELEMENT, alpha: 0.5 });
-    
-    // Fantasy corner decorations with golden accents
-    const cornerSize = 4;
-    const cornerColor = Colors.GOLD_BRIGHT;
-    
-    // Top-left corner
-    this.bg.moveTo(frameMargin, frameY + cornerSize)
-      .lineTo(frameMargin, frameY)
-      .lineTo(frameMargin + cornerSize, frameY)
-      .stroke({ width: 1.2, color: cornerColor, alpha: 0.9 });
-    
-    // Small decorative dot
-    this.bg.circle(frameMargin + 2, frameY + 2, 0.8)
-      .fill({ color: cornerColor });
-    
-    // Top-right corner
-    this.bg.moveTo(frameMargin + frameWidth - cornerSize, frameY)
-      .lineTo(frameMargin + frameWidth, frameY)
-      .lineTo(frameMargin + frameWidth, frameY + cornerSize)
-      .stroke({ width: 1.2, color: cornerColor, alpha: 0.9 });
-    
-    this.bg.circle(frameMargin + frameWidth - 2, frameY + 2, 0.8)
-      .fill({ color: cornerColor });
-    
-    // Bottom-left corner
-    this.bg.moveTo(frameMargin, frameY + frameHeight - cornerSize)
-      .lineTo(frameMargin, frameY + frameHeight)
-      .lineTo(frameMargin + cornerSize, frameY + frameHeight)
-      .stroke({ width: 1.2, color: cornerColor, alpha: 0.9 });
-    
-    this.bg.circle(frameMargin + 2, frameY + frameHeight - 2, 0.8)
-      .fill({ color: cornerColor });
-    
-    // Bottom-right corner
-    this.bg.moveTo(frameMargin + frameWidth - cornerSize, frameY + frameHeight)
-      .lineTo(frameMargin + frameWidth, frameY + frameHeight)
-      .lineTo(frameMargin + frameWidth, frameY + frameHeight - cornerSize)
-      .stroke({ width: 1.2, color: cornerColor, alpha: 0.9 });
-    
-    this.bg.circle(frameMargin + frameWidth - 2, frameY + frameHeight - 2, 0.8)
-      .fill({ color: cornerColor });
+    // // Dark frame with cyan glow
+    // this.bg.roundRect(frameMargin, frameY, frameWidth, frameHeight, 4)
+    //   .fill({ color: Colors.BLACK, alpha: 0.6 })
+    //   .stroke({ width: 2, color: Colors.ROBOT_CYAN, alpha: 0.9 });
 
     this.addChild(this.bg);
 
-    // Hover overlay (initially hidden) - subtle golden tint
-    this.hoverOverlay = new Graphics();
-    this.hoverOverlay.roundRect(0, 0, width, height, 5)
-      .fill({ color: Colors.GOLD_BRIGHT, alpha: 0 });
-    this.addChild(this.hoverOverlay);
-
-    // Energy cost gem - TOP LEFT - fantasy crystal style
-    const energyX = 5;
-    const energyY = 7;
-    const energyBgWidth = 26;
-    const energyBgHeight = 19;
+    // Energy cost - TOP LEFT with clean neon style
+    const energyX = 4;
+    const energyY = 5;
+    const energyBgWidth = 28;
+    const energyBgHeight = 20;
     
     const energyCostBg = new Graphics()
       .roundRect(energyX, energyY, energyBgWidth, energyBgHeight, 4)
-      .fill({ color: Colors.ROBOT_CYAN, alpha: 0.95 })
-      .stroke({ width: 1.5, color: Colors.GOLD, alpha: 0.95 });  // Golden border
-    
-    // Inner highlight for gem effect
-    energyCostBg.roundRect(energyX + 1, energyY + 1, energyBgWidth - 2, energyBgHeight - 2, 3)
-      .stroke({ width: 0.6, color: Colors.GOLD_BRIGHT, alpha: 0.6 });
+      .fill({ color: Colors.BLACK, alpha: 0.8 })
+      .stroke({ width: 1.5, color: Colors.ROBOT_CYAN, alpha: 0.9 });
     
     const energyIcon = new Text({
       text: '⚡',
       style: {
-        fontFamily: 'Orbitron',
-        fontSize: Math.max(8, Math.round(14 * fontScale)),
-        fill: Colors.ORANGE,
+        fontFamily: 'Arial, sans-serif',
+        fontSize: Math.round(12 * fontScale),
+        fill: Colors.ROBOT_CYAN,
         dropShadow: {
-          color: Colors.GOLD_BRIGHT,
-          blur: 2,
+          color: Colors.ROBOT_CYAN,
+          blur: 3,
           angle: 0,
           distance: 0,
-          alpha: 0.6
+          alpha: 0.8
         }
       }
     });
@@ -157,87 +86,88 @@ export class DeckCard extends Container {
     const energyText = new Text({
       text: card.energy_cost.toString(),
       style: {
-        fontFamily: 'Orbitron',
-        fontSize: Math.max(12, Math.round(14 * fontScale)),
-        fontWeight: 'bold',
+        fontFamily: 'Arial, sans-serif',
+        fontSize: Math.round(15 * fontScale),
+        fontWeight: '900',
         fill: Colors.WHITE,
-        stroke: { color: Colors.ROBOT_CYAN, width: 1.5 }
-      }
-    });
-    energyText.anchor.set(0.5);
-    energyText.x = energyX + 17.5;
-    energyText.y = energyY + energyBgHeight / 2;
-
-    // Group icon - TOP RIGHT with ornate frame
-    let groupIcon = '';
-    let iconColor: string = Colors.WHITE;
-    
-    if (card.group.includes('Damage')) {
-      groupIcon = '⚔️';
-      iconColor = Colors.RED;  // Red
-    } else if (card.group.includes('Healing')) {
-      groupIcon = '❤️';
-      iconColor = Colors.GREEN_BRIGHT;  // Green
-    } else if (card.group.includes('Buff')) {
-      groupIcon = '🔼';
-      iconColor = Colors.BLUE_SKY;  // Blue
-    } else {
-      groupIcon = '✨';
-      iconColor = Colors.PURPLE;  // Purple
-    }
-    
-    const groupIconRadius = 10;
-    const groupIconBg = new Graphics()
-      .circle(width - 12, 16, groupIconRadius)
-      .fill({ color: Colors.ROBOT_CYAN, alpha: 0.95 })
-      .stroke({ width: 1.5, color: Colors.GOLD, alpha: 0.9 });
-    
-    // Inner magical glow ring
-    groupIconBg.circle(width - 12, 16, groupIconRadius - 1.5)
-      .stroke({ width: 1, color: iconColor, alpha: 0.6 });
-    
-    const groupIconText = new Text({
-      text: groupIcon,
-      style: {
-        fontFamily: 'Orbitron',
-        fontSize: Math.max(10, Math.round(12 * fontScale)),
-        align: 'center',
-        fill: Colors.WHITE,
+        stroke: { color: Colors.BLACK, width: 3 },
         dropShadow: {
-          color: Colors.BLACK,
-          blur: 1,
-          angle: Math.PI / 4,
-          distance: 1,
+          color: Colors.ROBOT_CYAN,
+          blur: 2,
+          angle: 0,
+          distance: 0,
           alpha: 0.6
         }
       }
     });
-    groupIconText.anchor.set(0.5);
-    groupIconText.x = width - 12;
-    groupIconText.y = 16;
+    energyText.anchor.set(0.5);
+    energyText.x = energyX + 19;
+    energyText.y = energyY + energyBgHeight / 2;
 
-    // Avatar/Icon in center of frame with magical glow
-    const avatarIcon = new Text({
-      text: card.icon_url || groupIcon,  // Fallback to group icon if no avatar
+    // Group icon - TOP RIGHT with clean design
+    let groupIcon = '';
+    let iconColor: string = Colors.ROBOT_CYAN;
+    
+    if (card.group.includes('Damage')) {
+      groupIcon = '⚔️';
+      iconColor = Colors.RED;
+    } else if (card.group.includes('Healing')) {
+      groupIcon = '❤️';
+      iconColor = Colors.GREEN_BRIGHT;
+    } else if (card.group.includes('Buff')) {
+      groupIcon = '🔼';
+      iconColor = Colors.BLUE_SKY;
+    } else {
+      groupIcon = '✨';
+      iconColor = Colors.PURPLE;
+    }
+    
+    const groupIconRadius = 9;
+    const groupIconBg = new Graphics()
+      .circle(width - 11, 14, groupIconRadius)
+      .fill({ color: Colors.BLACK, alpha: 0.8 })
+      .stroke({ width: 1.5, color: iconColor, alpha: 0.9 });
+    
+    const groupIconText = new Text({
+      text: groupIcon,
       style: {
-        fontFamily: 'Orbitron',
-        fontSize: Math.max(28, Math.round(36 * fontScale)),
+        fontFamily: 'Arial, sans-serif',
+        fontSize: Math.round(11 * fontScale),
         align: 'center',
-        fill: Colors.WHITE
+        fill: Colors.WHITE,
+        dropShadow: {
+          color: iconColor,
+          blur: 2,
+          angle: 0,
+          distance: 0,
+          alpha: 0.8
+        }
+      }
+    });
+    groupIconText.anchor.set(0.5);
+    groupIconText.x = width - 11;
+    groupIconText.y = 14;
+
+    // Avatar/Icon in center of frame with clean glow
+    const avatarIcon = new Text({
+      text: card.icon_url || groupIcon,
+      style: {
+        fontFamily: 'Arial, sans-serif',
+        fontSize: Math.round(32 * fontScale),
+        align: 'center',
+        fill: Colors.WHITE,
+        dropShadow: {
+          color: Colors.BLACK,
+          blur: 2,
+          angle: Math.PI / 4,
+          distance: 1,
+          alpha: 0.8
+        }
       }
     });
     avatarIcon.anchor.set(0.5);
     avatarIcon.x = width / 2;
     avatarIcon.y = frameY + (frameHeight / 2);
-    
-    // Apply magical glow filter matching the card type
-    const glowFilter = new DropShadowFilter({
-      offset: { x: 0, y: 0 },
-      blur: 6,
-      alpha: 0.8,
-      color: iconColor
-    });
-    avatarIcon.filters = [glowFilter];
 
     this.addChild(energyCostBg, energyIcon, energyText, groupIconBg, groupIconText, avatarIcon);
 
@@ -248,70 +178,21 @@ export class DeckCard extends Container {
 
       if (enableHover) {
         this.on('pointerover', () => {
-          // Golden glow on hover
-          gsap.to(this.hoverOverlay, {
-            alpha: 0.15,
-            duration: 0.35,
-            ease: 'power2.out'
-          });
-          
           gsap.to(this.scale, {
             x: 1.05,
             y: 1.05,
-            duration: 0.35,
+            duration: 0.3,
             ease: 'power2.out'
           });
-
-          gsap.to(avatarIcon.scale, {
-            x: 1.1,
-            y: 1.1,
-            duration: 0.35,
-            ease: 'power2.out'
-          });
-          
-          // Increase glow intensity on hover
-          if (avatarIcon.filters && avatarIcon.filters[0]) {
-            const glow = avatarIcon.filters[0] as DropShadowFilter;
-            gsap.to(glow, {
-              blur: 10,
-              alpha: 1.0,
-              duration: 0.35,
-              ease: 'power2.out'
-            });
-          }
         });
 
         this.on('pointerout', () => {
-          gsap.to(this.hoverOverlay, {
-            alpha: 0,
-            duration: 0.35,
-            ease: 'power2.out'
-          });
-          
           gsap.to(this.scale, {
             x: 1.0,
             y: 1.0,
-            duration: 0.35,
+            duration: 0.3,
             ease: 'power2.out'
           });
-
-          gsap.to(avatarIcon.scale, {
-            x: 1.0,
-            y: 1.0,
-            duration: 0.35,
-            ease: 'power2.out'
-          });
-          
-          // Reset glow
-          if (avatarIcon.filters && avatarIcon.filters[0]) {
-            const glow = avatarIcon.filters[0] as DropShadowFilter;
-            gsap.to(glow, {
-              blur: 6,
-              alpha: 0.8,
-              duration: 0.35,
-              ease: 'power2.out'
-            });
-          }
         });
       }
 
@@ -324,30 +205,8 @@ export class DeckCard extends Container {
   }
 
   /** Show the card with optional animation */
-  public async show(animated = true) {
-    gsap.killTweensOf(this);
-    this.visible = true;
-    if (animated) {
-      this.alpha = 0;
-      this.scale.set(0.5);
-      await gsap.to(this, { alpha: 1, duration: 0.3, ease: 'power2.out' });
-      await gsap.to(this.scale, { x: 1, y: 1, duration: 0.3, ease: 'back.out' });
-    } else {
-      this.alpha = 1;
-      this.scale.set(1);
-    }
-  }
+  public async show() {}
 
   /** Hide the card with optional animation */
-  public async hide(animated = true) {
-    gsap.killTweensOf(this);
-    if (animated) {
-      await gsap.to(this.scale, { x: 0.5, y: 0.5, duration: 0.2, ease: 'back.in' });
-      await gsap.to(this, { alpha: 0, duration: 0.2, ease: 'power2.in' });
-    } else {
-      this.alpha = 0;
-      this.scale.set(0.5);
-    }
-    this.visible = false;
-  }
+  public async hide() {}
 }
