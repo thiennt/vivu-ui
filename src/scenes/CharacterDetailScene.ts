@@ -412,20 +412,8 @@ export class CharacterDetailScene extends BaseScene {
         .stroke({ width: 1.5, color: Colors.ROBOT_CYAN, alpha: 0.4 });
     }
 
-    const iconText = new Text({
-      text: icon,
-      style: {
-        fontFamily: 'Arial',
-        fontSize: 16,
-        fill: isActive ? Colors.WHITE : Colors.ROBOT_CYAN_MID
-      }
-    });
-    iconText.anchor.set(0.5);
-    iconText.x = width / 2 - 20;
-    iconText.y = height / 2;
-
     const labelText = new Text({
-      text: label,
+      text: icon + ' ' + label,
       style: {
         fontFamily: 'Orbitron',
         fontSize: 13,
@@ -437,7 +425,7 @@ export class CharacterDetailScene extends BaseScene {
     labelText.x = width / 2 + 10;
     labelText.y = height / 2;
 
-    button.addChild(bg, iconText, labelText);
+    button.addChild(bg, labelText);
     button.x = x;
     button.y = y;
     button.interactive = true;
