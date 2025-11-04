@@ -1,5 +1,5 @@
 import { Container, Graphics, Text } from 'pixi.js';
-import { Colors } from '@/utils/colors';
+import { Colors, FontFamily } from '@/utils/cssStyles';
 import { gsap } from 'gsap';
 
 const defaultButtonOptions = {
@@ -62,7 +62,7 @@ export class Button extends Container {
     this.buttonText = new Text({
       text: opts.text,
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: responsiveFontSize,
         fontWeight: 'bold',
         fill: textColor,

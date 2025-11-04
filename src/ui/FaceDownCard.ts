@@ -1,5 +1,5 @@
 import { Container, Graphics } from 'pixi.js';
-import { Colors } from '@/utils/colors';
+import { Colors } from '@/utils/cssStyles';
 import { gsap } from 'gsap';
 
 const defaultFaceDownCardOptions = {

@@ -1,5 +1,5 @@
 import { Container, Graphics, Text } from 'pixi.js';
-import { Colors } from '@/utils/colors';
+import { Colors, FontFamily } from '@/utils/cssStyles';
 
 export class BottomNavigationMenu extends Container {
   private menuHeight = 60;
@@ -123,7 +123,7 @@ export class BottomNavigationMenu extends Container {
     const iconText = new Text({
       text: icon,
       style: {
-        fontFamily: 'Arial',
+        fontFamily: FontFamily.ARIAL,
         fontSize: 26,
         fill: Colors.ROBOT_CYAN_LIGHT,
         align: 'center',
@@ -144,7 +144,7 @@ export class BottomNavigationMenu extends Container {
     const labelText = new Text({
       text: label,
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 10,
         fill: Colors.ROBOT_CYAN_MID,
         align: 'center',

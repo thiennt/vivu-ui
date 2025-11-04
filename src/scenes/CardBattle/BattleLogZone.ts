@@ -1,4 +1,4 @@
-import { Colors } from '@/utils/colors';
+import { Colors, FontFamily } from '@/utils/cssStyles';
 import { Container, Graphics, Text, Ticker } from "pixi.js";
 import { BattlePhaseName } from "@/types";
 import { gsap } from "gsap";
@@ -61,7 +61,7 @@ export class BattleLogZone extends Container {
     // Golden title - easier to read
     this.logTitle.text = '📜 BATTLE LOG 📜';
     this.logTitle.style = {
-      fontFamily: 'Orbitron',
+      fontFamily: FontFamily.PRIMARY,
       fontSize: 18,
       fontWeight: 'bold',
       fill: Colors.GOLD_BRIGHT,
@@ -81,7 +81,7 @@ export class BattleLogZone extends Container {
 
     // Turn display - bright and readable
     this.turnText.style = {
-      fontFamily: 'Orbitron',
+      fontFamily: FontFamily.PRIMARY,
       fontSize: 16,
       fontWeight: 'bold',
       fill: Colors.WHITE,
@@ -101,7 +101,7 @@ export class BattleLogZone extends Container {
 
     // Phase text - bright with strong contrast
     this.phaseText.style = {
-      fontFamily: 'Orbitron',
+      fontFamily: FontFamily.PRIMARY,
       fontSize: 13,
       fontWeight: 'bold',
       fill: Colors.WHITE,
@@ -121,7 +121,7 @@ export class BattleLogZone extends Container {
 
     // Notification styling - bright colors
     this.notificationText.style = {
-      fontFamily: 'Orbitron',
+      fontFamily: FontFamily.PRIMARY,
       fontSize: 14,
       fontWeight: 'bold',
       fill: Colors.WHITE,

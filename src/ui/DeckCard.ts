@@ -1,5 +1,5 @@
 import { Container, Graphics, Text } from 'pixi.js';
-import { Colors } from '@/utils/colors';
+import { Colors, FontFamily } from '@/utils/cssStyles';
 import { Card, CardType } from '@/types';
 import { gsap } from 'gsap';
 import { DropShadowFilter } from 'pixi-filters';
@@ -67,7 +67,7 @@ export class DeckCard extends Container {
     const energyIcon = new Text({
       text: '⚡',
       style: {
-        fontFamily: 'Arial, sans-serif',
+        fontFamily: FontFamily.SECONDARY,
         fontSize: Math.round(12 * fontScale),
         fill: Colors.ROBOT_CYAN,
         dropShadow: {
@@ -86,7 +86,7 @@ export class DeckCard extends Container {
     const energyText = new Text({
       text: card.energy_cost.toString(),
       style: {
-        fontFamily: 'Arial, sans-serif',
+        fontFamily: FontFamily.SECONDARY,
         fontSize: Math.round(15 * fontScale),
         fontWeight: '900',
         fill: Colors.WHITE,
@@ -131,7 +131,7 @@ export class DeckCard extends Container {
     const groupIconText = new Text({
       text: groupIcon,
       style: {
-        fontFamily: 'Arial, sans-serif',
+        fontFamily: FontFamily.SECONDARY,
         fontSize: Math.round(11 * fontScale),
         align: 'center',
         fill: Colors.WHITE,
@@ -152,7 +152,7 @@ export class DeckCard extends Container {
     const avatarIcon = new Text({
       text: card.icon_url || groupIcon,
       style: {
-        fontFamily: 'Arial, sans-serif',
+        fontFamily: FontFamily.SECONDARY,
         fontSize: Math.round(32 * fontScale),
         align: 'center',
         fill: Colors.WHITE,

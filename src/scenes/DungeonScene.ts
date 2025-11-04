@@ -3,7 +3,7 @@ import { BaseScene } from '@/ui/BaseScene';
 import { navigation } from '@/utils/navigation';
 import { HomeScene } from './HomeScene';
 import { StageScene } from './StageScene';
-import { Colors } from '@/utils/colors';
+import { Colors, FontFamily } from '@/utils/cssStyles';
 import { dungeonsApi, isLikelyUsingMockData } from '@/services/api';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
 
@@ -121,7 +121,7 @@ export class DungeonScene extends BaseScene {
     const subtitle = new Text({
       text: 'Select a dungeon to explore',
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 18,
         fill: Colors.TEXT_SECONDARY,
         align: 'center'
@@ -199,7 +199,7 @@ export class DungeonScene extends BaseScene {
     const title = new Text({
       text: dungeon.name,
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: titleFontSize,
         fontWeight: 'bold',
         fill: Colors.TEXT_PRIMARY,
@@ -215,7 +215,7 @@ export class DungeonScene extends BaseScene {
     const description = new Text({
       text: dungeon.description,
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: descFontSize,
         fill: Colors.TEXT_SECONDARY,
         wordWrap: true,
@@ -230,7 +230,7 @@ export class DungeonScene extends BaseScene {
     const requiredLevel = new Text({
       text: `Required Level: ${dungeon.requiredLevel}`,
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: levelFontSize,
         fontWeight: 'bold',
         fill: Colors.RARITY_LEGENDARY
@@ -243,7 +243,7 @@ export class DungeonScene extends BaseScene {
     const stages = new Text({
       text: `Stages: ${dungeon.stages.length}`,
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: stagesFontSize,
         fill: Colors.TEXT_TERTIARY
       }

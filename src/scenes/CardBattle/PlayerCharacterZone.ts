@@ -1,4 +1,4 @@
-import { Colors } from '@/utils/colors';
+import { Colors, FontFamily } from '@/utils/cssStyles';
 import { Container, Graphics, Text } from "pixi.js";
 import { CardBattlePlayerState } from "@/types";
 import { BaseScene } from "@/ui/BaseScene";
@@ -90,7 +90,7 @@ export class PlayerCharacterZone extends Container {
     const labelIcon = this.playerNo === 1 ? '🛡️' : '⚔️';
     this.playerInfoLabel.text = this.playerNo === 1 ? `${labelIcon}\nYOU` : `${labelIcon}\nENEMY`;
     this.playerInfoLabel.style = {
-      fontFamily: 'Orbitron',
+      fontFamily: FontFamily.PRIMARY,
       fontSize: 14,
       fontWeight: 'bold',
       fill: Colors.WHITE,
@@ -112,7 +112,7 @@ export class PlayerCharacterZone extends Container {
     // Energy display - bright and readable
     this.energyText.text = `⚡${this.energyCount}`;
     this.energyText.style = {
-      fontFamily: 'Orbitron',
+      fontFamily: FontFamily.PRIMARY,
       fontSize: 20,
       fontWeight: 'bold',
       fill: Colors.GOLD_BRIGHT,
@@ -133,7 +133,7 @@ export class PlayerCharacterZone extends Container {
     // Deck display - white text for readability
     this.deckText.text = `🃏${this.deckCount}`;
     this.deckText.style = {
-      fontFamily: 'Orbitron',
+      fontFamily: FontFamily.PRIMARY,
       fontSize: 16,
       fontWeight: 'bold',
       fill: Colors.WHITE,

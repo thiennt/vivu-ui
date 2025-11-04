@@ -1,4 +1,4 @@
-import { Colors } from '@/utils/colors';
+import { Colors } from '@/utils/cssStyles';
 import { Container, Graphics, FederatedPointerEvent, Text } from "pixi.js";
 import { CardBattlePlayerState, Card } from "@/types";
 import { BaseScene } from "@/ui/BaseScene";

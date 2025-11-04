@@ -2,7 +2,7 @@ import { Container, Graphics, Text } from 'pixi.js';
 import { navigation } from '@/utils/navigation';
 import { HomeScene } from './HomeScene';
 import { BaseScene } from '@/ui/BaseScene';
-import { Colors } from '@/utils/colors';
+import { Colors, FontFamily } from '@/utils/cssStyles';
 import { ScrollBox } from '@pixi/ui';
 import { equipmentApi, isLikelyUsingMockData } from '@/services/api';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
@@ -199,7 +199,7 @@ export class CraftEquipmentScene extends BaseScene {
     const title = new Text({
       text: '⚒️ Craft Equipment ⚒️',
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 24,
         fontWeight: 'bold',
         fill: Colors.WHITE,
@@ -220,7 +220,7 @@ export class CraftEquipmentScene extends BaseScene {
     const subtitle = new Text({
       text: 'Merge 2 same level items to upgrade',
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 12,
         fill: Colors.ROBOT_CYAN,
         align: 'center'
@@ -312,7 +312,7 @@ export class CraftEquipmentScene extends BaseScene {
     const nameText = new Text({
       text: item.name || 'Equipment',
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 13,
         fontWeight: 'bold',
         fill: Colors.WHITE,
@@ -330,7 +330,7 @@ export class CraftEquipmentScene extends BaseScene {
     const levelText = new Text({
       text: `Lv.${item.level || 1}`,
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 16,
         fontWeight: 'bold',
         fill: Colors.ROBOT_CYAN,
@@ -388,7 +388,7 @@ export class CraftEquipmentScene extends BaseScene {
     const title = new Text({
       text: 'Selected Items',
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 14,
         fontWeight: 'bold',
         fill: Colors.WHITE,
@@ -415,7 +415,7 @@ export class CraftEquipmentScene extends BaseScene {
       const emptyText = new Text({
         text: 'Select 2 items of same level to craft',
         style: {
-          fontFamily: 'Orbitron',
+          fontFamily: FontFamily.PRIMARY,
           fontSize: 12,
           fill: Colors.ROBOT_CYAN,
           align: 'center'
@@ -442,7 +442,7 @@ export class CraftEquipmentScene extends BaseScene {
         const nameText = new Text({
           text: item.name,
           style: {
-            fontFamily: 'Orbitron',
+            fontFamily: FontFamily.PRIMARY,
             fontSize: 11,
             fill: Colors.WHITE,
             align: 'center',
@@ -457,7 +457,7 @@ export class CraftEquipmentScene extends BaseScene {
         const levelText = new Text({
           text: `Lv.${item.level || 1}`,
           style: {
-            fontFamily: 'Orbitron',
+            fontFamily: FontFamily.PRIMARY,
             fontSize: 14,
             fontWeight: 'bold',
             fill: Colors.ROBOT_CYAN
@@ -479,7 +479,7 @@ export class CraftEquipmentScene extends BaseScene {
           const resultText = new Text({
             text: `→ Lv.${level1 + 1} Equipment`,
             style: {
-              fontFamily: 'Orbitron',
+              fontFamily: FontFamily.PRIMARY,
               fontSize: 13,
               fontWeight: 'bold',
               fill: Colors.GREEN_BRIGHT,
@@ -494,7 +494,7 @@ export class CraftEquipmentScene extends BaseScene {
           const errorText = new Text({
             text: '⚠ Items must be same level',
             style: {
-              fontFamily: 'Orbitron',
+              fontFamily: FontFamily.PRIMARY,
               fontSize: 12,
               fill: Colors.RED,
               align: 'center'
@@ -552,7 +552,7 @@ export class CraftEquipmentScene extends BaseScene {
     const successText = new Text({
       text: '✓ Crafted Successfully!',
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 16,
         fontWeight: 'bold',
         fill: Colors.GREEN_BRIGHT,

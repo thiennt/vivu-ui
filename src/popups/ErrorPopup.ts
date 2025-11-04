@@ -1,6 +1,6 @@
 import { Container, Graphics, Text } from 'pixi.js';
 import { navigation } from '@/utils/navigation';
-import { Colors } from '@/utils/colors';
+import { Colors, FontFamily } from '@/utils/cssStyles';
 import { Button } from '@/ui/Button';
 
 export class ErrorPopup extends Container {
@@ -39,7 +39,7 @@ export class ErrorPopup extends Container {
     const errorTitle = new Text({
       text: 'Error',
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 24,
         fontWeight: 'bold',
         fill: Colors.MODAL_BORDER,
@@ -54,7 +54,7 @@ export class ErrorPopup extends Container {
     const errorMessage = new Text({
       text: this.message,
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 16,
         fill: Colors.TEXT_PRIMARY,
         align: 'center',

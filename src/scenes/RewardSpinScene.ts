@@ -2,7 +2,7 @@ import { Container, Graphics, Text } from 'pixi.js';
 import { navigation } from '@/utils/navigation';
 import { HomeScene } from './HomeScene';
 import { BaseScene } from '@/ui/BaseScene';
-import { Colors } from '@/utils/colors';
+import { Colors, FontFamily } from '@/utils/cssStyles';
 import { gsap } from 'gsap';
 
 interface SpinSegment {
@@ -133,7 +133,7 @@ export class RewardSpinScene extends BaseScene {
     const title = new Text({
       text: '🎡 Reward Spin Wheel 🎡',
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 26,
         fontWeight: 'bold',
         fill: Colors.ROBOT_CYAN_LIGHT,
@@ -154,7 +154,7 @@ export class RewardSpinScene extends BaseScene {
     const subtitle = new Text({
       text: '✨ Spin to win amazing rewards! ✨',
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 14,
         fill: Colors.ROBOT_CYAN,
         align: 'center'
@@ -209,7 +209,7 @@ export class RewardSpinScene extends BaseScene {
       const emoji = new Text({
         text: segment.emoji,
         style: {
-          fontFamily: 'Orbitron',
+          fontFamily: FontFamily.PRIMARY,
           fontSize: 24,
         }
       });
@@ -223,7 +223,7 @@ export class RewardSpinScene extends BaseScene {
       const label = new Text({
         text: segment.label,
         style: {
-          fontFamily: 'Orbitron',
+          fontFamily: FontFamily.PRIMARY,
           fontSize: 11,
           fontWeight: 'bold',
           fill: Colors.ROBOT_CYAN_LIGHT,
@@ -303,7 +303,7 @@ export class RewardSpinScene extends BaseScene {
     this.resultText = new Text({
       text: '',
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 20,
         fontWeight: 'bold',
         fill: Colors.ROBOT_CYAN,

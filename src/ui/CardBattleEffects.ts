@@ -10,7 +10,7 @@ import { Container, Text, Graphics, Sprite } from 'pixi.js';
 import { gsap } from 'gsap';
 import { CardBattleLogTarget } from '@/types';
 import type { CardBattleScene } from '@/scenes/CardBattleScene';
-import { Colors } from '@/utils/colors';
+import { Colors, FontFamily } from '@/utils/cssStyles';
 
 export type CardGroup = 'damage' | 'healing' | 'debuff' | 'other';
 
@@ -877,7 +877,7 @@ export class CardBattleEffects extends Container {
     const damageText = new Text({
       text: `-${damage}`,
       style: {
-        fontFamily: 'Arial',
+        fontFamily: FontFamily.ARIAL,
         fontSize: isCritical ? 20 : 16,
         fill: isCritical ? Colors.EFFECT_DAMAGE_DARK : Colors.EFFECT_DAMAGE_LIGHT,
         fontWeight: isCritical ? 'bold' : 'normal',
@@ -919,7 +919,7 @@ export class CardBattleEffects extends Container {
     const healingText = new Text({
       text: `+${healing}`,
       style: {
-        fontFamily: 'Arial',
+        fontFamily: FontFamily.ARIAL,
         fontSize: 18,
         fill: Colors.EFFECT_HEAL_GREEN,
         fontWeight: 'bold',
@@ -961,7 +961,7 @@ export class CardBattleEffects extends Container {
     const energyText = new Text({
       text: energyChange > 0 ? `+${energyChange} ⚡` : `${energyChange} ⚡`,
       style: {
-        fontFamily: 'Arial',
+        fontFamily: FontFamily.ARIAL,
         fontSize: 16,
         fill: energyChange > 0 ? Colors.ENERGY_TEXT : Colors.ERROR,
         fontWeight: 'bold',

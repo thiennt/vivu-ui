@@ -1,6 +1,6 @@
 import { Container, Graphics, Text } from 'pixi.js';
 import { navigation } from '@/utils/navigation';
-import { Colors } from '@/utils/colors';
+import { Colors, FontFamily } from '@/utils/cssStyles';
 import { skillsApi } from '@/services/api';
 
 interface Skill {
@@ -79,7 +79,7 @@ export class SkillChangePopup extends Container {
     const loadingText = new Text({
       text: 'Loading skills...',
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 18,
         fontWeight: 'bold',
         fill: Colors.TEXT_PRIMARY,
@@ -114,7 +114,7 @@ export class SkillChangePopup extends Container {
     const dialogTitle = new Text({
       text: `Change ${this.skillType.replace('_', ' ').toUpperCase()} Skill`,
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 18,
         fontWeight: 'bold',
         fill: Colors.TEXT_PRIMARY,
@@ -129,7 +129,7 @@ export class SkillChangePopup extends Container {
     const currentText = new Text({
       text: `Current: ${this.currentSkill.name}`,
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 14,
         fontWeight: 'bold',
         fill: Colors.TEXT_SECONDARY,
@@ -157,7 +157,7 @@ export class SkillChangePopup extends Container {
       const skillName = new Text({
         text: skill.name,
         style: {
-          fontFamily: 'Orbitron',
+          fontFamily: FontFamily.PRIMARY,
           fontSize: 14,
           fontWeight: 'bold',
           fill: isCurrentSkill ? Colors.TEXT_BUTTON : Colors.TEXT_PRIMARY
@@ -169,7 +169,7 @@ export class SkillChangePopup extends Container {
       const skillDescription = new Text({
         text: skill.description,
         style: {
-          fontFamily: 'Orbitron',
+          fontFamily: FontFamily.PRIMARY,
           fontSize: 12,
           fill: isCurrentSkill ? Colors.TEXT_BUTTON : Colors.TEXT_SECONDARY,
           wordWrap: true,
@@ -243,7 +243,7 @@ export class SkillChangePopup extends Container {
     const buttonText = new Text({
       text,
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 14,
         fontWeight: 'bold',
         fill: Colors.TEXT_BUTTON

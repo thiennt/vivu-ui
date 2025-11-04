@@ -5,7 +5,7 @@ import { BaseScene } from '@/ui/BaseScene';
 import { CharactersScene } from './CharactersScene';
 import { charactersApi, equipmentApi, skillsApi, isLikelyUsingMockData } from '@/services/api';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
-import { Colors } from '@/utils/colors';
+import { Colors, FontFamily } from '@/utils/cssStyles';
 import { LearnSkillPopup } from '@/popups/LearnSkillPopup';
 import { SkillChangePopup } from '@/popups/SkillChangePopup';
 import { EquipmentChangePopup } from '@/popups/EquipmentChangePopup';
@@ -193,7 +193,7 @@ export class CharacterDetailScene extends BaseScene {
     const title = new Text({
       text: this.character!.name,
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 26,
         fontWeight: 'bold',
         fill: Colors.WHITE,
@@ -309,7 +309,7 @@ export class CharacterDetailScene extends BaseScene {
       const iconText = new Text({
         text: stat.name,
         style: {
-          fontFamily: 'Arial',
+          fontFamily: FontFamily.ARIAL,
           fontSize: 18,
           fill: stat.color
         }
@@ -321,7 +321,7 @@ export class CharacterDetailScene extends BaseScene {
       const labelText = new Text({
         text: stat.label,
         style: {
-          fontFamily: 'Orbitron',
+          fontFamily: FontFamily.PRIMARY,
           fontSize: 10,
           fill: Colors.ROBOT_CYAN_MID
         }
@@ -333,7 +333,7 @@ export class CharacterDetailScene extends BaseScene {
       const valueText = new Text({
         text: stat.value.toString(),
         style: {
-          fontFamily: 'Orbitron',
+          fontFamily: FontFamily.PRIMARY,
           fontSize: 16,
           fontWeight: 'bold',
           fill: Colors.WHITE
@@ -415,7 +415,7 @@ export class CharacterDetailScene extends BaseScene {
     const labelText = new Text({
       text: icon + ' ' + label,
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 13,
         fontWeight: isActive ? 'bold' : 'normal',
         fill: isActive ? Colors.WHITE : Colors.ROBOT_CYAN_MID
@@ -548,7 +548,7 @@ export class CharacterDetailScene extends BaseScene {
     const title = new Text({
       text: '⚔️ Combat Stats',
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 14,
         fontWeight: 'bold',
         fill: Colors.ROBOT_CYAN_LIGHT
@@ -585,7 +585,7 @@ export class CharacterDetailScene extends BaseScene {
       const iconText = new Text({
         text: stat.icon,
         style: {
-          fontFamily: 'Arial',
+          fontFamily: FontFamily.ARIAL,
           fontSize: 16,
           fill: stat.color
         }
@@ -597,7 +597,7 @@ export class CharacterDetailScene extends BaseScene {
       const nameText = new Text({
         text: stat.name,
         style: {
-          fontFamily: 'Orbitron',
+          fontFamily: FontFamily.PRIMARY,
           fontSize: 13,
           fontWeight: 'bold',
           fill: Colors.WHITE
@@ -610,7 +610,7 @@ export class CharacterDetailScene extends BaseScene {
       const valueText = new Text({
         text: stat.value.toString(),
         style: {
-          fontFamily: 'Orbitron',
+          fontFamily: FontFamily.PRIMARY,
           fontSize: 14,
           fontWeight: 'bold',
           fill: stat.color
@@ -661,7 +661,7 @@ export class CharacterDetailScene extends BaseScene {
     const title = new Text({
       text: '⚡ Character Skill',
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 16,
         fontWeight: 'bold',
         fill: Colors.ROBOT_CYAN_LIGHT,
@@ -686,7 +686,7 @@ export class CharacterDetailScene extends BaseScene {
       const skillIcon = new Text({
         text: this.getSkillTypeIcon(skill.skill_type),
         style: {
-          fontFamily: 'Arial',
+          fontFamily: FontFamily.ARIAL,
           fontSize: 42,
           align: 'center'
         }
@@ -706,7 +706,7 @@ export class CharacterDetailScene extends BaseScene {
       const typeBadgeText = new Text({
         text: this.getSkillTypeName(skill.skill_type),
         style: {
-          fontFamily: 'Orbitron',
+          fontFamily: FontFamily.PRIMARY,
           fontSize: 11,
           fontWeight: 'bold',
           fill: Colors.WHITE
@@ -722,7 +722,7 @@ export class CharacterDetailScene extends BaseScene {
       const skillName = new Text({
         text: skill.name,
         style: {
-          fontFamily: 'Orbitron',
+          fontFamily: FontFamily.PRIMARY,
           fontSize: 18,
           fontWeight: 'bold',
           fill: Colors.WHITE,
@@ -758,7 +758,7 @@ export class CharacterDetailScene extends BaseScene {
       const descText = new Text({
         text: skill.description || 'No description available',
         style: {
-          fontFamily: 'Orbitron',
+          fontFamily: FontFamily.PRIMARY,
           fontSize: 13,
           fill: Colors.GRAY_LIGHTER,
           wordWrap: true,
@@ -798,7 +798,7 @@ export class CharacterDetailScene extends BaseScene {
           const dmgText = new Text({
             text: `Damage: ${skill.damage}%`,
             style: {
-              fontFamily: 'Orbitron',
+              fontFamily: FontFamily.PRIMARY,
               fontSize: 12,
               fill: Colors.WHITE
             }
@@ -822,7 +822,7 @@ export class CharacterDetailScene extends BaseScene {
           const cdText = new Text({
             text: `CD: ${skill.cooldown} turns`,
             style: {
-              fontFamily: 'Orbitron',
+              fontFamily: FontFamily.PRIMARY,
               fontSize: 12,
               fill: Colors.WHITE
             }
@@ -845,7 +845,7 @@ export class CharacterDetailScene extends BaseScene {
           const costText = new Text({
             text: `Cost: ${skill.cost} MP`,
             style: {
-              fontFamily: 'Orbitron',
+              fontFamily: FontFamily.PRIMARY,
               fontSize: 12,
               fill: Colors.WHITE
             }
@@ -884,7 +884,7 @@ export class CharacterDetailScene extends BaseScene {
       const emptyText = new Text({
         text: 'No Skill Equipped',
         style: {
-          fontFamily: 'Orbitron',
+          fontFamily: FontFamily.PRIMARY,
           fontSize: 16,
           fontStyle: 'italic',
           fill: Colors.ROBOT_CYAN_MID,
@@ -959,7 +959,7 @@ export class CharacterDetailScene extends BaseScene {
     const buttonText = new Text({
       text: text,
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 13,
         fontWeight: 'bold',
         fill: Colors.WHITE,
@@ -1130,7 +1130,7 @@ export class CharacterDetailScene extends BaseScene {
     const title = new Text({
       text: '⚔️ Equipment',
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 16,
         fontWeight: 'bold',
         fill: Colors.ROBOT_CYAN_LIGHT,
@@ -1183,7 +1183,7 @@ export class CharacterDetailScene extends BaseScene {
     const bonusTitle = new Text({
       text: '✨ Total Equipment Bonuses',
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 16,
         fontWeight: 'bold',
         fill: Colors.ROBOT_CYAN_LIGHT,
@@ -1249,7 +1249,7 @@ export class CharacterDetailScene extends BaseScene {
     const badgeText = new Text({
       text: slot.name.toUpperCase(),
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 10,
         fontWeight: 'bold',
         fill: isEmpty ? Colors.ROBOT_CYAN_LIGHT : Colors.WHITE
@@ -1265,7 +1265,7 @@ export class CharacterDetailScene extends BaseScene {
     const itemText = new Text({
       text: slot.item,
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 15,
         fontWeight: isEmpty ? 'normal' : 'bold',
         fill: isEmpty ? Colors.ROBOT_CYAN_MID : Colors.WHITE,
@@ -1282,7 +1282,7 @@ export class CharacterDetailScene extends BaseScene {
       const statsText = new Text({
         text: this.getEquipmentStatsText(slot.equipment),
         style: {
-          fontFamily: 'Orbitron',
+          fontFamily: FontFamily.PRIMARY,
           fontSize: 12,
           fill: Colors.GREEN_MINT,
           wordWrap: true,
@@ -1296,7 +1296,7 @@ export class CharacterDetailScene extends BaseScene {
       const emptyHint = new Text({
         text: 'Tap to equip item',
         style: {
-          fontFamily: 'Orbitron',
+          fontFamily: FontFamily.PRIMARY,
           fontSize: 11,
           fill: Colors.ROBOT_CYAN_MID,
           fontStyle: 'italic'
@@ -1329,7 +1329,7 @@ export class CharacterDetailScene extends BaseScene {
       const equippedText = new Text({
         text: 'EQUIPPED',
         style: {
-          fontFamily: 'Orbitron',
+          fontFamily: FontFamily.PRIMARY,
           fontSize: 9,
           fontWeight: 'bold',
           fill: Colors.ROBOT_BG_DARK
@@ -1395,7 +1395,7 @@ export class CharacterDetailScene extends BaseScene {
     const buttonText = new Text({
       text: text,
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 12,
         fontWeight: 'bold',
         fill: Colors.WHITE,
@@ -1503,7 +1503,7 @@ export class CharacterDetailScene extends BaseScene {
       const labelText = new Text({
         text: stat.label,
         style: {
-          fontFamily: 'Orbitron',
+          fontFamily: FontFamily.PRIMARY,
           fontSize: 11,
           fill: Colors.ROBOT_CYAN_LIGHT
         }
@@ -1518,7 +1518,7 @@ export class CharacterDetailScene extends BaseScene {
       const valueText = new Text({
         text: `+${stat.value}`,
         style: {
-          fontFamily: 'Orbitron',
+          fontFamily: FontFamily.PRIMARY,
           fontSize: 14,
           fontWeight: 'bold',
           fill: hasBonus ? stat.color : Colors.ROBOT_CYAN

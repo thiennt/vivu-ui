@@ -3,7 +3,7 @@ import { ScrollBox } from '@pixi/ui';
 import { BaseScene } from '@/ui/BaseScene';
 import { navigation } from '@/utils/navigation';
 import { HomeScene } from './HomeScene';
-import { Colors } from '@/utils/colors';
+import { Colors, FontFamily } from '@/utils/cssStyles';
 import { app } from '../app';
 import { playerApi } from '@/services/api';
 
@@ -162,7 +162,7 @@ export class LineupScene extends BaseScene {
     const title = new Text({
       text: '⚔️ Battle Lineup ⚔️',
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 24,
         fontWeight: 'bold',
         fill: Colors.ROBOT_CYAN_LIGHT,
@@ -183,7 +183,7 @@ export class LineupScene extends BaseScene {
     const subtitle = new Text({
       text: 'Drag to swap • Click to move',
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 12,
         fill: Colors.ROBOT_CYAN,
         align: 'center'
@@ -256,7 +256,7 @@ export class LineupScene extends BaseScene {
     const positionText = new Text({
       text: `${positionIndex + 1}`,
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 28,
         fontWeight: 'bold',
         fill: Colors.ROBOT_ELEMENT,
@@ -326,7 +326,7 @@ export class LineupScene extends BaseScene {
     const poolTitle = new Text({
       text: '🎭 Available Heroes',
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 18,
         fontWeight: 'bold',
         fill: Colors.ROBOT_CYAN,

@@ -1,5 +1,5 @@
 import { Container, Graphics, Ticker } from 'pixi.js';
-import { Colors } from '@/utils/colors';
+import { Colors } from '@/utils/cssStyles';
 
 /**
  * BattleField - Dynamic animated background for card battles

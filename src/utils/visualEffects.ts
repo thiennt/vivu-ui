@@ -4,7 +4,7 @@
  */
 
 import { Graphics, Container } from 'pixi.js';
-import { Colors } from './colors';
+import { Colors } from './cssStyles';
 
 export class VisualEffects {
   /**

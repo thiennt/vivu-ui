@@ -1,6 +1,6 @@
 import { Container, Graphics, Text } from 'pixi.js';
 import { navigation } from '@/utils/navigation';
-import { Colors } from '@/utils/colors';
+import { Colors, FontFamily } from '@/utils/cssStyles';
 import { equipmentApi } from '@/services/api';
 
 interface Equipment {
@@ -121,7 +121,7 @@ export class EquipmentChangePopup extends Container {
     const dialogTitle = new Text({
       text: `⚔️ Change ${this.slotName}`,
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 18,
         fontWeight: 'bold',
         fill: Colors.WHITE,
@@ -137,7 +137,7 @@ export class EquipmentChangePopup extends Container {
     const currentText = new Text({
       text: `Current: ${this.currentItem}`,
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 14,
         fill: Colors.ROBOT_ELEMENT,
         align: 'center'
@@ -178,7 +178,7 @@ export class EquipmentChangePopup extends Container {
       const equipmentName = new Text({
         text: equipment.name,
         style: {
-          fontFamily: 'Orbitron',
+          fontFamily: FontFamily.PRIMARY,
           fontSize: 14,
           fontWeight: 'bold',
           fill: isCurrentItem ? Colors.ROBOT_CYAN : Colors.ROBOT_ELEMENT,
@@ -191,7 +191,7 @@ export class EquipmentChangePopup extends Container {
       const equipmentDescription = new Text({
         text: equipment.description,
         style: {
-          fontFamily: 'Orbitron',
+          fontFamily: FontFamily.PRIMARY,
           fontSize: 11,
           fill: Colors.ROBOT_ELEMENT,
           wordWrap: true,
@@ -303,7 +303,7 @@ export class EquipmentChangePopup extends Container {
     const buttonText = new Text({
       text,
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 14,
         fontWeight: 'bold',
         fill: Colors.WHITE,

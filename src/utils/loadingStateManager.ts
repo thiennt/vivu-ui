@@ -4,7 +4,7 @@
  */
 
 import { Container, Graphics, Text } from 'pixi.js';
-import { Colors } from '@/utils/colors';
+import { Colors, FontFamily } from '@/utils/cssStyles';
 
 export interface LoadingState {
   isLoading: boolean;
@@ -54,7 +54,7 @@ export class LoadingStateManager {
     const loadingText = new Text({
       text: 'Loading...',
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 20,
         fontWeight: 'bold',
         fill: Colors.TEXT_PRIMARY,
@@ -92,7 +92,7 @@ export class LoadingStateManager {
     const errorTitle = new Text({
       text: 'Error',
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 24,
         fontWeight: 'bold',
         fill: Colors.MODAL_BORDER,
@@ -108,7 +108,7 @@ export class LoadingStateManager {
     const errorMessage = new Text({
       text: 'An error occurred',
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 16,
         fill: Colors.TEXT_PRIMARY,
         align: 'center',
@@ -143,7 +143,7 @@ export class LoadingStateManager {
     const text = new Text({
       text: 'Retry',
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 16,
         fontWeight: 'bold',
         fill: Colors.TEXT_PRIMARY
@@ -176,7 +176,7 @@ export class LoadingStateManager {
     const text = new Text({
       text: 'Mock Data',
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 12,
         fill: Colors.GLOW_COLOR,
         align: 'center'

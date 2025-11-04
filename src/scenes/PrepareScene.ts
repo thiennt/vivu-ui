@@ -1,7 +1,7 @@
 import { Container, Graphics, Text } from 'pixi.js';
 import { navigation } from '@/utils/navigation';
 import { BaseScene } from '@/ui/BaseScene';
-import { Colors } from '@/utils/colors';
+import { Colors, FontFamily } from '@/utils/cssStyles';
 import { CardBattleScene } from './CardBattleScene';
 import { BattleStageResponse, Card, Character } from '@/types';
 import { battleApi } from '@/services/api';
@@ -115,7 +115,7 @@ export class PrepareScene extends BaseScene {
     const title = new Text({
       text: `⚔️ ${this.stage.name} ⚔️`,
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 24,
         fontWeight: 'bold',
         fill: Colors.ROBOT_CYAN_LIGHT,
@@ -183,7 +183,7 @@ export class PrepareScene extends BaseScene {
     const lineupTitle = new Text({
       text: `🧑‍🤝‍🧑 Your Lineup ⚡${lineup_power}`,
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 16,
         fontWeight: 'bold',
         fill: Colors.ROBOT_CYAN,
@@ -223,7 +223,7 @@ export class PrepareScene extends BaseScene {
     const deckTitle = new Text({
       text: `🃏 Battle Deck (${this.battleStage?.cards.length || 0} cards)`,
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 18,
         fontWeight: 'bold',
         fill: Colors.ROBOT_CYAN_LIGHT,
