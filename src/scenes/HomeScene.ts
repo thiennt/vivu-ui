@@ -7,7 +7,7 @@ import { BattleScene } from './BattleScene';
 import { CardBattleScene } from './CardBattleScene';
 import { TowerScene } from './TowerScene';
 import { CheckinScene } from './CheckinScene';
-import { RewardSpinScene } from './RewardSpinScene';
+import { LootBoxScene } from './LootBoxScene';
 import { CraftEquipmentScene } from './CraftEquipmentScene';
 import { CraftSkillScene } from './CraftSkillScene';
 import { Colors, FontFamily } from '@/utils/cssStyles';
@@ -365,7 +365,7 @@ export class HomeScene extends BaseScene {
     
     const buttons = [
       { text: '📅 Daily Check-In', screen: CheckinScene },
-      { text: '🎡 Reward Spin', screen: RewardSpinScene },
+      { text: '🎁 Loot Box', screen: LootBoxScene },
       { text: '👥 Characters', screen: CharactersScene },
       { text: '🃏 Card Battle', screen: CardBattleScene },
       { text: '🧑‍🤝‍🧑 Lineup', screen: LineupScene },
