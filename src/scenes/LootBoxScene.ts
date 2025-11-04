@@ -16,18 +16,17 @@ interface LootBoxReward {
 }
 
 export class LootBoxScene extends BaseScene {
-  /** Assets bundles required by this screen */
   public static assetBundles = [];
   
   public container: Container;
-  private tickets: number = 50; // Starting tickets for demo
+  private tickets: number = 50;
   private ticketsText: Text | null = null;
-  private resultText: Text | null = null;
   private openOneButton: Container | null = null;
   private openTenButton: Container | null = null;
   private isOpening: boolean = false;
+  private animationArea: Container;
+  private summaryText: Text | null = null;
   
-  // Possible rewards
   private possibleRewards: LootBoxReward[] = [
     { label: 'Gold', emoji: '💰', color: Colors.ROBOT_CYAN, reward: { type: 'gold', amount: 100 } },
     { label: 'Experience', emoji: '⭐', color: Colors.BLUE_SKY, reward: { type: 'exp', amount: 50 } },
@@ -45,17 +44,27 @@ export class LootBoxScene extends BaseScene {
     this.container = new Container();
     this.addChild(this.container);
     
+    this.animationArea = new Container();
+    this.container.addChild(this.animationArea);
+    
     this.createUI();
   }
 
   private createUI(): void {
-    this.container.removeChildren();
+    // Remove all except animation area
+    for (let i = this.container.children.length - 1; i >= 0; i--) {
+      if (this.container.children[i] !== this.animationArea) {
+        this.container.removeChildAt(i);
+      }
+    }
+    
     this.createBackground();
     this.createHeader();
     this.createTicketsDisplay();
-    this.createLootBoxDisplay();
+    this.createDisplayBox();
     this.createOpenButtons();
     this.createBackButton();
+    this.createSummaryText();
   }
 
   resize(width: number, height: number): void {
@@ -65,10 +74,10 @@ export class LootBoxScene extends BaseScene {
   }
 
   async show(): Promise<void> {
-    // Reset state when showing
     this.isOpening = false;
-    if (this.resultText) {
-      this.resultText.visible = false;
+    this.animationArea.removeChildren();
+    if (this.summaryText) {
+      this.summaryText.visible = false;
     }
   }
 
@@ -81,118 +90,69 @@ export class LootBoxScene extends BaseScene {
 
   private createBackground(): void {
     const bg = new Graphics();
-    this.container.addChild(bg);
+    this.container.addChildAt(bg, 0);
     
-    // Dark fantasy background with gradient
     bg.rect(0, 0, this.gameWidth, this.gameHeight)
       .fill({ color: Colors.ROBOT_BG_DARK, alpha: 1.0 });
     
-    // Overlay texture
     bg.rect(0, 0, this.gameWidth, this.gameHeight)
       .fill({ color: Colors.ROBOT_BG_MID, alpha: 0.3 });
     
-    // Add mystical particles
     for (let i = 0; i < 30; i++) {
       const particle = new Graphics();
       const size = 1 + Math.random() * 2.5;
       particle.circle(Math.random() * this.gameWidth, Math.random() * this.gameHeight, size)
         .fill({ color: Colors.ROBOT_CYAN, alpha: 0.2 + Math.random() * 0.3 });
-      this.container.addChild(particle);
+      this.container.addChildAt(particle, 1);
     }
   }
 
   private createHeader(): void {
     const bannerWidth = Math.min(360, this.gameWidth - 40);
-    const bannerHeight = 55;
+    const bannerHeight = 50;
     const bannerX = (this.gameWidth - bannerWidth) / 2;
-    const bannerY = 18;
+    const bannerY = 15;
     
     const banner = new Graphics();
-    banner.moveTo(bannerX + 12, bannerY)
-      .lineTo(bannerX, bannerY + bannerHeight / 2)
-      .lineTo(bannerX + 12, bannerY + bannerHeight)
-      .lineTo(bannerX + bannerWidth - 12, bannerY + bannerHeight)
-      .lineTo(bannerX + bannerWidth, bannerY + bannerHeight / 2)
-      .lineTo(bannerX + bannerWidth - 12, bannerY)
-      .lineTo(bannerX + 12, bannerY)
+    banner.roundRect(bannerX, bannerY, bannerWidth, bannerHeight, 12)
       .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.95 })
       .stroke({ width: 2.5, color: Colors.ROBOT_CYAN });
-    
-    banner.moveTo(bannerX + 15, bannerY + 3)
-      .lineTo(bannerX + bannerWidth - 15, bannerY + 3)
-      .lineTo(bannerX + bannerWidth - 4, bannerY + bannerHeight / 2)
-      .lineTo(bannerX + bannerWidth - 15, bannerY + bannerHeight - 3)
-      .lineTo(bannerX + 15, bannerY + bannerHeight - 3)
-      .lineTo(bannerX + 4, bannerY + bannerHeight / 2)
-      .lineTo(bannerX + 15, bannerY + 3)
-      .stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 0.6 });
 
     const title = new Text({
-      text: '🎁 Mystery Loot Box 🎁',
+      text: '🎁 Mystery Loot Box',
       style: {
         fontFamily: FontFamily.PRIMARY,
-        fontSize: 26,
+        fontSize: 24,
         fontWeight: 'bold',
         fill: Colors.ROBOT_CYAN_LIGHT,
-        stroke: { color: Colors.ROBOT_BG_DARK, width: 2 },
-        dropShadow: {
-          color: Colors.ROBOT_CYAN,
-          blur: 4,
-          angle: Math.PI / 4,
-          distance: 2,
-          alpha: 0.6
-        }
+        stroke: { color: Colors.ROBOT_BG_DARK, width: 2 }
       }
     });
     title.anchor.set(0.5);
     title.x = this.gameWidth / 2;
     title.y = bannerY + bannerHeight / 2;
-
-    const subtitle = new Text({
-      text: '✨ Open boxes to win amazing rewards! ✨',
-      style: {
-        fontFamily: FontFamily.PRIMARY,
-        fontSize: 14,
-        fill: Colors.ROBOT_CYAN,
-        align: 'center'
-      }
-    });
-    subtitle.anchor.set(0.5);
-    subtitle.x = this.gameWidth / 2;
-    subtitle.y = bannerY + bannerHeight + 14;
     
-    this.container.addChild(banner, title, subtitle);
+    this.container.addChild(banner, title);
   }
 
   private createTicketsDisplay(): void {
-    const panelWidth = Math.min(280, this.gameWidth - 80);
-    const panelHeight = 60;
+    const panelWidth = Math.min(200, this.gameWidth - 80);
+    const panelHeight = 50;
     const panelX = (this.gameWidth - panelWidth) / 2;
-    const panelY = 110;
+    const panelY = 80;
     
     const panel = new Graphics();
-    
-    // Outer glow
-    panel.roundRect(panelX - 2, panelY - 2, panelWidth + 4, panelHeight + 4, 10)
-      .fill({ color: Colors.ROBOT_CYAN, alpha: 0.2 });
-    
-    // Main panel
     panel.roundRect(panelX, panelY, panelWidth, panelHeight, 10)
       .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.95 })
       .stroke({ width: 2, color: Colors.ROBOT_CYAN });
     
-    // Inner highlight
-    panel.roundRect(panelX + 3, panelY + 3, panelWidth - 6, panelHeight - 6, 8)
-      .stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 0.5 });
-    
     this.container.addChild(panel);
     
-    // Tickets text
     this.ticketsText = new Text({
       text: `🎫 Tickets: ${this.tickets}`,
       style: {
         fontFamily: FontFamily.PRIMARY,
-        fontSize: 24,
+        fontSize: 22,
         fontWeight: 'bold',
         fill: Colors.ROBOT_CYAN_LIGHT,
         stroke: { color: Colors.ROBOT_BG_DARK, width: 1 }
@@ -204,203 +164,473 @@ export class LootBoxScene extends BaseScene {
     this.container.addChild(this.ticketsText);
   }
 
-  private createLootBoxDisplay(): void {
-    const boxSize = Math.min(120, (this.gameWidth - 100) / 2);
+  private displayBoxContainer: Container | null = null;
+
+  private createDisplayBox(): void {
+    const boxSize = 90;
     const centerX = this.gameWidth / 2;
-    const centerY = 240;
+    const centerY = 200;
     
-    // Loot box shadow
-    const shadow = new Graphics();
-    shadow.roundRect(centerX - boxSize / 2 + 4, centerY - boxSize / 2 + 4, boxSize, boxSize, 12)
-      .fill({ color: Colors.BLACK, alpha: 0.4 });
-    this.container.addChild(shadow);
+    // Decorative loot box display
+    this.displayBoxContainer = new Container();
+    this.displayBoxContainer.x = centerX;
+    this.displayBoxContainer.y = centerY;
+    this.container.addChild(this.displayBoxContainer);
     
-    // Loot box
+    // Glow effect
+    const glow = new Graphics();
+    glow.circle(0, 0, boxSize / 2 + 10)
+      .fill({ color: Colors.ROBOT_CYAN, alpha: 0.15 });
+    this.displayBoxContainer.addChild(glow);
+    
+    // Main box
     const box = new Graphics();
-    
-    // Main box body
-    box.roundRect(centerX - boxSize / 2, centerY - boxSize / 2, boxSize, boxSize, 10)
+    box.roundRect(-boxSize / 2, -boxSize / 2, boxSize, boxSize, 12)
       .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.95 })
       .stroke({ width: 3, color: Colors.ROBOT_CYAN });
+    this.displayBoxContainer.addChild(box);
     
-    // Box lid
-    const lidHeight = boxSize * 0.3;
-    box.roundRect(centerX - boxSize / 2, centerY - boxSize / 2, boxSize, lidHeight, 10)
-      .fill({ color: Colors.ROBOT_CYAN, alpha: 0.8 })
+    // Lid
+    const lidHeight = boxSize * 0.35;
+    const lid = new Graphics();
+    lid.roundRect(-boxSize / 2, -boxSize / 2, boxSize, lidHeight, 12)
+      .fill({ color: Colors.ROBOT_CYAN, alpha: 0.9 })
       .stroke({ width: 2, color: Colors.ROBOT_CYAN_LIGHT });
+    this.displayBoxContainer.addChild(lid);
     
-    // Decorative cross on lid
-    const crossSize = 20;
-    box.rect(centerX - 2, centerY - boxSize / 2 + lidHeight / 2 - crossSize / 2, 4, crossSize)
-      .fill({ color: Colors.ROBOT_CYAN_LIGHT });
-    box.rect(centerX - crossSize / 2, centerY - boxSize / 2 + lidHeight / 2 - 2, crossSize, 4)
-      .fill({ color: Colors.ROBOT_CYAN_LIGHT });
+    // Decorative ribbons
+    const ribbon1 = new Graphics();
+    ribbon1.rect(-3, -boxSize / 2, 6, boxSize)
+      .fill({ color: Colors.ROBOT_CYAN_LIGHT, alpha: 0.8 });
+    this.displayBoxContainer.addChild(ribbon1);
     
-    // Inner details
-    box.roundRect(centerX - boxSize / 2 + 10, centerY - boxSize / 2 + lidHeight + 10, boxSize - 20, boxSize - lidHeight - 20, 5)
-      .fill({ color: Colors.ROBOT_CONTAINER, alpha: 0.6 });
-    
-    this.container.addChild(box);
+    const ribbon2 = new Graphics();
+    ribbon2.rect(-boxSize / 2, -3, boxSize, 6)
+      .fill({ color: Colors.ROBOT_CYAN_LIGHT, alpha: 0.8 });
+    this.displayBoxContainer.addChild(ribbon2);
     
     // Box emoji
     const boxEmoji = new Text({
       text: '🎁',
-      style: {
-        fontSize: 48
-      }
+      style: { fontSize: 50 }
     });
     boxEmoji.anchor.set(0.5);
-    boxEmoji.x = centerX;
-    boxEmoji.y = centerY + 10;
-    this.container.addChild(boxEmoji);
+    boxEmoji.y = 5;
+    this.displayBoxContainer.addChild(boxEmoji);
+    
+    // Floating animation
+    gsap.to(this.displayBoxContainer, {
+      y: centerY - 8,
+      duration: 2,
+      yoyo: true,
+      repeat: -1,
+      ease: 'sine.inOut'
+    });
+    
+    // Subtle rotation
+    gsap.to(this.displayBoxContainer, {
+      rotation: 0.05,
+      duration: 3,
+      yoyo: true,
+      repeat: -1,
+      ease: 'sine.inOut'
+    });
   }
 
   private createOpenButtons(): void {
-    const buttonWidth = Math.min(180, this.gameWidth - 2 * this.STANDARD_PADDING);
-    const buttonHeight = 50;
+    const buttonWidth = Math.min(160, this.gameWidth - 2 * this.STANDARD_PADDING);
+    const buttonHeight = 48;
     const centerX = this.gameWidth / 2;
-    const startY = 380;
+    const startY = this.gameHeight - 160;
     
-    // Open 1 button
+    // Open 1
     this.openOneButton = this.createButton(
-      '🎁 Open 1 Box',
-      centerX - buttonWidth / 2,
+      'Open 1 (1🎫)',
+      centerX - buttonWidth - 10,
       startY,
       buttonWidth,
       buttonHeight,
       () => this.openBoxes(1),
-      16,
+      15,
       this.tickets < 1
     );
     this.container.addChild(this.openOneButton);
     
-    // Cost text for open 1
-    const cost1Text = new Text({
-      text: '1 Ticket',
-      style: {
-        fontFamily: FontFamily.PRIMARY,
-        fontSize: 12,
-        fill: Colors.ROBOT_CYAN,
-        align: 'center'
-      }
-    });
-    cost1Text.anchor.set(0.5);
-    cost1Text.x = centerX;
-    cost1Text.y = startY + buttonHeight + 8;
-    this.container.addChild(cost1Text);
-    
-    // Open 10 button
+    // Open 10
     this.openTenButton = this.createButton(
-      '🎁✨ Open 10 Boxes',
-      centerX - buttonWidth / 2,
-      startY + 70,
+      'Open 10 (10🎫)',
+      centerX + 10,
+      startY,
       buttonWidth,
       buttonHeight,
       () => this.openBoxes(10),
-      16,
+      15,
       this.tickets < 10
     );
     this.container.addChild(this.openTenButton);
-    
-    // Cost text for open 10
-    const cost10Text = new Text({
-      text: '10 Tickets',
-      style: {
-        fontFamily: FontFamily.PRIMARY,
-        fontSize: 12,
-        fill: Colors.ROBOT_CYAN,
-        align: 'center'
-      }
-    });
-    cost10Text.anchor.set(0.5);
-    cost10Text.x = centerX;
-    cost10Text.y = startY + 70 + buttonHeight + 8;
-    this.container.addChild(cost10Text);
-    
-    // Result text (initially hidden)
-    this.resultText = new Text({
+  }
+
+  private createSummaryText(): void {
+    this.summaryText = new Text({
       text: '',
       style: {
         fontFamily: FontFamily.PRIMARY,
         fontSize: 16,
         fontWeight: 'bold',
-        fill: Colors.ROBOT_CYAN,
-        stroke: { color: Colors.ROBOT_BG_DARK, width: 1 },
+        fill: Colors.ROBOT_CYAN_LIGHT,
+        stroke: { color: Colors.ROBOT_BG_DARK, width: 2 },
         align: 'center',
-        dropShadow: {
-          color: Colors.ROBOT_CYAN,
-          blur: 3,
-          angle: Math.PI / 4,
-          distance: 2,
-          alpha: 0.6
-        },
         wordWrap: true,
-        wordWrapWidth: this.gameWidth - 40
+        wordWrapWidth: this.gameWidth - 60
       }
     });
-    this.resultText.anchor.set(0.5);
-    this.resultText.x = this.gameWidth / 2;
-    this.resultText.y = startY + 150;
-    this.resultText.visible = false;
-    this.container.addChild(this.resultText);
+    this.summaryText.anchor.set(0.5);
+    this.summaryText.x = this.gameWidth / 2;
+    this.summaryText.y = this.gameHeight - 180;
+    this.summaryText.visible = false;
+    this.container.addChild(this.summaryText);
+  }
+
+  private animateSingleBox(reward: LootBoxReward, delay: number): void {
+    const centerX = this.gameWidth / 2;
+    const centerY = 200;
+    const boxSize = 100;
+    
+    // Create box container
+    const boxContainer = new Container();
+    boxContainer.x = centerX;
+    boxContainer.y = centerY;
+    boxContainer.alpha = 0;
+    boxContainer.scale.set(0.3);
+    this.animationArea.addChild(boxContainer);
+    
+    console.log('Creating single box animation');
+    
+    // Box
+    const box = new Graphics();
+    box.roundRect(-boxSize / 2, -boxSize / 2, boxSize, boxSize, 10)
+      .fill({ color: Colors.ROBOT_ELEMENT })
+      .stroke({ width: 3, color: Colors.ROBOT_CYAN });
+    
+    const lid = new Graphics();
+    lid.roundRect(-boxSize / 2, -boxSize / 2, boxSize, boxSize * 0.3, 10)
+      .fill({ color: Colors.ROBOT_CYAN, alpha: 0.8 });
+    
+    const emoji = new Text({ text: '🎁', style: { fontSize: 50 } });
+    emoji.anchor.set(0.5);
+    
+    boxContainer.addChild(box, lid, emoji);
+    
+    console.log('Starting GSAP animation, boxContainer:', boxContainer);
+    
+    // Animate
+    const tween = gsap.to(boxContainer, {
+      alpha: 1,
+      scale: 1,
+      duration: 0.3,
+      delay: delay,
+      ease: 'back.out(2)',
+      onStart: () => console.log('Animation started'),
+      onUpdate: () => {
+        // Force update
+        boxContainer.alpha = tween.progress();
+      },
+      onComplete: () => {
+        console.log('Box appeared, starting shake');
+        // Shake
+        const shakeTween = gsap.to(boxContainer, {
+          rotation: 0.1,
+          duration: 0.05,
+          yoyo: true,
+          repeat: 7,
+          onComplete: () => {
+            console.log('Shake complete, opening box');
+            boxContainer.rotation = 0;
+            
+            // Open - lid flies
+            gsap.to(lid, {
+              y: -150,
+              rotation: 0.5,
+              alpha: 0,
+              duration: 0.5,
+              ease: 'power2.out'
+            });
+            
+            // Reveal reward
+            const rewardEmoji = new Text({
+              text: reward.emoji,
+              style: { fontSize: 80 }
+            });
+            rewardEmoji.anchor.set(0.5);
+            rewardEmoji.alpha = 0;
+            rewardEmoji.scale.set(0.3);
+            boxContainer.addChild(rewardEmoji);
+            
+            gsap.to(emoji, { alpha: 0, duration: 0.2 });
+            gsap.to(rewardEmoji, {
+              alpha: 1,
+              scale: 1,
+              duration: 0.4,
+              delay: 0.2,
+              ease: 'back.out(2)'
+            });
+            
+            // Amount text
+            const amountText = new Text({
+              text: `+${reward.reward.amount}`,
+              style: {
+                fontFamily: FontFamily.PRIMARY,
+                fontSize: 28,
+                fontWeight: 'bold',
+                fill: reward.color,
+                stroke: { color: Colors.ROBOT_BG_DARK, width: 2 }
+              }
+            });
+            amountText.anchor.set(0.5);
+            amountText.y = 60;
+            amountText.alpha = 0;
+            boxContainer.addChild(amountText);
+            
+            gsap.to(amountText, {
+              alpha: 1,
+              y: 50,
+              duration: 0.3,
+              delay: 0.4
+            });
+            
+            // Fade out after showing
+            gsap.to(boxContainer, {
+              alpha: 0,
+              duration: 0.4,
+              delay: 1.5,
+              onComplete: () => {
+                if (this.animationArea.children.includes(boxContainer)) {
+                  this.animationArea.removeChild(boxContainer);
+                }
+              }
+            });
+          }
+        });
+      }
+    });
+  }
+
+  private animateMultipleBoxes(rewards: LootBoxReward[]): void {
+    const padding = 20;
+    const availableWidth = this.gameWidth - padding * 2;
+    const availableHeight = this.gameHeight - 400;
+    
+    const cols = rewards.length <= 3 ? rewards.length : rewards.length <= 6 ? 3 : 4;
+    const rows = Math.ceil(rewards.length / cols);
+    
+    const cardSize = Math.min(85, Math.floor(availableWidth / cols) - 15, Math.floor(availableHeight / rows) - 15);
+    const gridWidth = cols * (cardSize + 10) - 10;
+    const gridHeight = rows * (cardSize + 10) - 10;
+    
+    const startX = (this.gameWidth - gridWidth) / 2 + cardSize / 2;
+    const startY = 180;
+    
+    rewards.forEach((reward, i) => {
+      const col = i % cols;
+      const row = Math.floor(i / cols);
+      const x = startX + col * (cardSize + 10);
+      const y = startY + row * (cardSize + 10);
+      
+      // Create card
+      const card = new Container();
+      card.x = x;
+      card.y = y;
+      card.alpha = 0;
+      card.scale.set(0.1);
+      this.animationArea.addChild(card);
+      
+      // Closed box
+      const closedBox = new Container();
+      const boxBg = new Graphics();
+      boxBg.roundRect(-cardSize / 2, -cardSize / 2, cardSize, cardSize, 8)
+        .fill({ color: Colors.ROBOT_ELEMENT })
+        .stroke({ width: 2, color: Colors.ROBOT_CYAN });
+      
+      const boxLid = new Graphics();
+      boxLid.roundRect(-cardSize / 2, -cardSize / 2, cardSize, cardSize * 0.3, 8)
+        .fill({ color: Colors.ROBOT_CYAN, alpha: 0.8 });
+      
+      const boxEmoji = new Text({ text: '🎁', style: { fontSize: cardSize * 0.5 } });
+      boxEmoji.anchor.set(0.5);
+      
+      closedBox.addChild(boxBg, boxLid, boxEmoji);
+      card.addChild(closedBox);
+      
+      // Opened card (hidden initially)
+      const openedCard = new Container();
+      openedCard.visible = false;
+      
+      const cardBg = new Graphics();
+      cardBg.roundRect(-cardSize / 2, -cardSize / 2, cardSize, cardSize, 8)
+        .fill({ color: Colors.ROBOT_ELEMENT })
+        .stroke({ width: 2, color: reward.color });
+      
+      const rewardEmoji = new Text({
+        text: reward.emoji,
+        style: { fontSize: cardSize * 0.45 }
+      });
+      rewardEmoji.anchor.set(0.5);
+      rewardEmoji.y = -cardSize * 0.15;
+      
+      const amount = new Text({
+        text: `+${reward.reward.amount}`,
+        style: {
+          fontFamily: FontFamily.PRIMARY,
+          fontSize: cardSize * 0.24,
+          fontWeight: 'bold',
+          fill: reward.color,
+          stroke: { color: Colors.ROBOT_BG_DARK, width: 1 }
+        }
+      });
+      amount.anchor.set(0.5);
+      amount.y = cardSize * 0.22;
+      
+      openedCard.addChild(cardBg, rewardEmoji, amount);
+      card.addChild(openedCard);
+      
+      // Animate appearance
+      gsap.to(card, {
+        alpha: 1,
+        scale: 1,
+        duration: 0.4,
+        delay: i * 0.08,
+        ease: 'back.out(2)',
+        onComplete: () => {
+          // Shake
+          gsap.to(closedBox, {
+            rotation: 0.15,
+            duration: 0.04,
+            yoyo: true,
+            repeat: 5,
+            delay: 0.2,
+            onComplete: () => {
+              // Open
+              gsap.to(boxLid, {
+                y: -cardSize * 0.8,
+                rotation: 0.3,
+                alpha: 0,
+                duration: 0.3,
+                ease: 'power2.out'
+              });
+              
+              gsap.to(boxEmoji, {
+                scale: 1.5,
+                alpha: 0,
+                duration: 0.3,
+                onComplete: () => {
+                  closedBox.visible = false;
+                  openedCard.visible = true;
+                  openedCard.scale.set(0.3);
+                  gsap.to(openedCard, {
+                    scale: 1,
+                    duration: 0.3,
+                    ease: 'back.out(2)'
+                  });
+                }
+              });
+            }
+          });
+        }
+      });
+    });
   }
 
   private openBoxes(count: number): void {
     if (this.isOpening || this.tickets < count) return;
     
+    console.log(`Opening ${count} boxes`);
+
+    this.container.removeChild(this.displayBoxContainer!);
+    
     this.isOpening = true;
     this.tickets -= count;
     
-    // Update tickets display
     if (this.ticketsText) {
       this.ticketsText.text = `🎫 Tickets: ${this.tickets}`;
     }
     
-    if (this.resultText) {
-      this.resultText.visible = false;
+    if (this.summaryText) {
+      this.summaryText.visible = false;
     }
     
-    // Disable buttons
+    // Clear previous rewards
+    this.animationArea.removeChildren();
+    console.log('Animation area cleared, children:', this.animationArea.children.length);
+    
+    // Hide the display box during animation
+    const displayBox = this.container.children.find(child => {
+      return child instanceof Container && Math.abs(child.y - 200) < 5 && child !== this.animationArea;
+    });
+    if (displayBox) {
+      console.log('Hiding display box');
+      gsap.to(displayBox, { alpha: 0, duration: 0.3 });
+    }
+    
     this.updateButtonStates();
     
-    // Generate random rewards
+    // Generate rewards
     const rewards: LootBoxReward[] = [];
     for (let i = 0; i < count; i++) {
       const randomReward = this.possibleRewards[Math.floor(Math.random() * this.possibleRewards.length)];
       rewards.push(randomReward);
     }
     
-    // Animate box opening
-    setTimeout(() => {
-      this.isOpening = false;
+    console.log('Generated rewards:', rewards);
+    
+    // Different animation for single vs multiple
+    if (count === 1) {
+      console.log('Starting single box animation');
+      this.animateSingleBox(rewards[0], 0);
       
-      // Aggregate rewards by type
-      const aggregatedRewards: { [key: string]: { emoji: string; amount: number; label: string } } = {};
-      rewards.forEach(reward => {
-        const key = `${reward.reward.type}`;
-        if (!aggregatedRewards[key]) {
-          aggregatedRewards[key] = {
-            emoji: reward.emoji,
-            amount: 0,
-            label: reward.label
-          };
+      setTimeout(() => {
+        this.isOpening = false;
+        this.showSummary(rewards);
+        this.updateButtonStates();
+        // Show display box again
+        if (displayBox) {
+          gsap.to(displayBox, { alpha: 1, duration: 0.5 });
         }
-        aggregatedRewards[key].amount += reward.reward.amount;
-      });
+      }, 2500);
+    } else {
+      console.log('Starting multiple boxes animation');
+      this.animateMultipleBoxes(rewards);
       
-      // Show result
-      if (this.resultText) {
-        let resultText = `🎉 You opened ${count} box${count > 1 ? 'es' : ''}! 🎉\n\n`;
-        Object.values(aggregatedRewards).forEach(reward => {
-          resultText += `${reward.emoji} +${reward.amount} ${reward.label}\n`;
-        });
-        this.resultText.text = resultText;
-        this.resultText.visible = true;
+      setTimeout(() => {
+        this.isOpening = false;
+        this.showSummary(rewards);
+        this.updateButtonStates();
+        // Show display box again
+        if (displayBox) {
+          gsap.to(displayBox, { alpha: 1, duration: 0.5 });
+        }
+      }, 1500 + count * 80 + 1000);
+    }
+  }
+
+  private showSummary(rewards: LootBoxReward[]): void {
+    const aggregated: { [key: string]: { emoji: string; amount: number; label: string } } = {};
+    rewards.forEach(reward => {
+      const key = reward.reward.type;
+      if (!aggregated[key]) {
+        aggregated[key] = { emoji: reward.emoji, amount: 0, label: reward.label };
       }
-      
-      // Update button states
-      this.updateButtonStates();
-    }, 1000);
+      aggregated[key].amount += reward.reward.amount;
+    });
+    
+    if (this.summaryText) {
+      let text = '🎉 Total: ';
+      const parts = Object.values(aggregated).map(r => `${r.emoji}${r.amount}`);
+      text += parts.join(' · ');
+      this.summaryText.text = text;
+      this.summaryText.alpha = 0;
+      this.summaryText.visible = true;
+      gsap.to(this.summaryText, { alpha: 1, duration: 0.5 });
+    }
   }
 
   private updateButtonStates(): void {
@@ -426,13 +656,13 @@ export class LootBoxScene extends BaseScene {
   }
 
   private createBackButton(): void {
-    const buttonWidth = Math.min(180, this.gameWidth - 2 * this.STANDARD_PADDING);
-    const buttonHeight = 45;
+    const buttonWidth = Math.min(160, this.gameWidth - 2 * this.STANDARD_PADDING);
+    const buttonHeight = 42;
     
     const backButton = this.createButton(
       '← Back',
       (this.gameWidth - buttonWidth) / 2,
-      this.gameHeight - buttonHeight - 20,
+      this.gameHeight - buttonHeight - 15,
       buttonWidth,
       buttonHeight,
       () => navigation.showScreen(HomeScene)
@@ -442,6 +672,5 @@ export class LootBoxScene extends BaseScene {
   }
 
   update(): void {
-    // No continuous update needed
   }
 }
