@@ -17,16 +17,17 @@
 // ============================================================================
 
 export const FontFamily = {
-  /** Primary font used throughout the UI - cyberpunk/tech style */
+  /** Primary font used throughout the UI - cyberpunk/tech style (Orbitron) */
   PRIMARY: 'Orbitron',
-  /** Fallback font for compatibility */
+  /** Fallback font stack with Arial and sans-serif */
   SECONDARY: 'Arial, sans-serif',
-  /** Alternative sans-serif fallback */
+  /** Plain Arial font (used in some legacy components) */
   ARIAL: 'Arial',
 } as const;
 
 // ============================================================================
 // FONT SIZES
+// Note: Defined for future use. Not currently applied throughout the codebase.
 // ============================================================================
 
 export const FontSize = {
@@ -48,6 +49,7 @@ export const FontSize = {
 
 // ============================================================================
 // FONT WEIGHTS
+// Note: Defined for future use. Not currently applied throughout the codebase.
 // ============================================================================
 
 export const FontWeight = {
