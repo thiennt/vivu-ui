@@ -2,7 +2,7 @@ import { Container, Graphics, Text } from 'pixi.js';
 import { navigation } from '@/utils/navigation';
 import { HomeScene } from './HomeScene';
 import { BaseScene } from '@/ui/BaseScene';
-import { Colors } from '@/utils/colors';
+import { Colors, FontFamily } from '@/utils/cssStyles';
 import { CharacterDetailScene } from './CharacterDetailScene';
 import { ScrollBox } from '@pixi/ui';
 import { charactersApi, isLikelyUsingMockData } from '@/services/api';
@@ -197,7 +197,7 @@ export class CharactersScene extends BaseScene {
     const title = new Text({
       text: '🎭 Character Gallery 🎭',
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 24,
         fontWeight: 'bold',
         fill: Colors.ROBOT_CYAN_LIGHT,
@@ -218,7 +218,7 @@ export class CharactersScene extends BaseScene {
     const subtitle = new Text({
       text: `${this.characters.length} Heroes`,
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 14,
         fill: Colors.ROBOT_CYAN,
         align: 'center'

@@ -2,7 +2,7 @@
  * Effect icon utility for displaying status effects on character cards
  */
 import { Container, Graphics, Text } from 'pixi.js';
-import { Colors } from './colors';
+import { Colors } from './cssStyles';
 
 export interface EffectIconConfig {
   icon: string;

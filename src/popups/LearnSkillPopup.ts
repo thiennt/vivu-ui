@@ -1,6 +1,6 @@
 import { Container, Graphics, Text } from 'pixi.js';
 import { navigation } from '@/utils/navigation';
-import { Colors } from '@/utils/colors';
+import { Colors, FontFamily } from '@/utils/cssStyles';
 import { skillsApi } from '@/services/api';
 
 interface Skill {
@@ -73,7 +73,7 @@ export class LearnSkillPopup extends Container {
     const loadingText = new Text({
       text: 'Loading skills...',
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 18,
         fontWeight: 'bold',
         fill: Colors.ROBOT_ELEMENT,
@@ -142,7 +142,7 @@ export class LearnSkillPopup extends Container {
     const dialogTitle = new Text({
       text: `📜 Learn ${skillTypeLabel}`,
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 18,
         fontWeight: 'bold',
         fill: Colors.WHITE,
@@ -157,7 +157,7 @@ export class LearnSkillPopup extends Container {
     const instructionText = new Text({
       text: 'Choose a skill to learn:',
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 14,
         fill: Colors.ROBOT_ELEMENT,
         align: 'center'
@@ -192,7 +192,7 @@ export class LearnSkillPopup extends Container {
       const badgeText = new Text({
         text: this.skillType === 'active_skill' ? 'ACTIVE' : 'PASSIVE',
         style: {
-          fontFamily: 'Orbitron',
+          fontFamily: FontFamily.PRIMARY,
           fontSize: 9,
           fontWeight: 'bold',
           fill: Colors.WHITE
@@ -205,7 +205,7 @@ export class LearnSkillPopup extends Container {
       const skillName = new Text({
         text: skill.name,
         style: {
-          fontFamily: 'Orbitron',
+          fontFamily: FontFamily.PRIMARY,
           fontSize: 14,
           fontWeight: 'bold',
           fill: Colors.ROBOT_CYAN
@@ -217,7 +217,7 @@ export class LearnSkillPopup extends Container {
       const skillDescription = new Text({
         text: skill.description,
         style: {
-          fontFamily: 'Orbitron',
+          fontFamily: FontFamily.PRIMARY,
           fontSize: 11,
           fill: Colors.ROBOT_ELEMENT,
           wordWrap: true,
@@ -327,7 +327,7 @@ export class LearnSkillPopup extends Container {
     const buttonText = new Text({
       text,
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 14,
         fontWeight: 'bold',
         fill: Colors.WHITE,

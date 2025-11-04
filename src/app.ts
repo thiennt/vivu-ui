@@ -4,7 +4,7 @@ import { navigation } from './utils/navigation';
 import { HomeScene } from './scenes/HomeScene';
 import { initAssets } from "./utils/assets";
 import { getUrlParam } from './utils/getUrlParams';
-import { Colors } from './utils/colors';
+import { Colors } from './utils/cssStyles';
 import { sdk } from '@farcaster/miniapp-sdk';
 import { Sign } from 'crypto';
 import { SignInScene } from './scenes/SignInScene';

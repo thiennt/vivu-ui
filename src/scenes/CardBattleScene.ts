@@ -13,7 +13,7 @@ import {
 } from '@/types';
 import { battleApi, ApiError } from '@/services/api';
 import { gsap } from 'gsap';
-import { Colors } from '@/utils/colors';
+import { Colors, FontFamily } from '@/utils/cssStyles';
 import { navigation } from '@/utils/navigation';
 import { HomeScene } from './HomeScene';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
@@ -710,7 +710,7 @@ export class CardBattleScene extends BaseScene {
     const iconText = new Text({
       text: isVictory ? '🏆' : '💀',
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 64,
         fill: Colors.WHITE
       }
@@ -723,7 +723,7 @@ export class CardBattleScene extends BaseScene {
     const resultText = new Text({
       text: isVictory ? 'VICTORY!' : 'DEFEAT!',
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 42,
         fontWeight: 'bold',
         fill: isVictory ? Colors.GREEN_DARK : Colors.RED_DARKEST,
@@ -746,7 +746,7 @@ export class CardBattleScene extends BaseScene {
     const subtitleText = new Text({
       text: isVictory ? 'Well fought, hero!' : 'Try again, brave warrior!',
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 16,
         fill: Colors.ROBOT_ELEMENT,
         align: 'center'
@@ -773,7 +773,7 @@ export class CardBattleScene extends BaseScene {
     const backText = new Text({
       text: '← Back Home',
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 16,
         fontWeight: 'bold',
         fill: Colors.WHITE,

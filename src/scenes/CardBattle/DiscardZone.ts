@@ -1,4 +1,4 @@
-import { Colors } from "@/utils/colors";
+import { Colors, FontFamily } from "@/utils/cssStyles";
 import { Container, Graphics, Text } from "pixi.js";
 
 export class DiscardZone extends Container {
@@ -33,7 +33,7 @@ export class DiscardZone extends Container {
     // Simple label
     this.discardLabel.text = 'DISCARD';
     this.discardLabel.style = {
-      fontFamily: 'Orbitron',
+      fontFamily: FontFamily.PRIMARY,
       fontSize: 11,
       fontWeight: 'bold',
       fill: Colors.TEXT_PRIMARY,

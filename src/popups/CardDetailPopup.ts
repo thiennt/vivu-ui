@@ -1,6 +1,6 @@
 import { Container, Graphics, Text } from 'pixi.js';
 import { navigation } from '@/utils/navigation';
-import { Colors } from '@/utils/colors';
+import { Colors, FontFamily } from '@/utils/cssStyles';
 import { Card, CardType, CardRarity } from '@/types';
 import { DropShadowFilter } from 'pixi-filters';
 
@@ -82,7 +82,7 @@ export class CardDetailPopup extends Container {
     const cardNameText = new Text({
       text: this.card.name,
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 15,
         fontWeight: 'bold',
         fill: Colors.WHITE,
@@ -135,7 +135,7 @@ export class CardDetailPopup extends Container {
     const groupIconText = new Text({
       text: groupIcon,
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 22,
         fill: Colors.WHITE
       }
@@ -156,7 +156,7 @@ export class CardDetailPopup extends Container {
     const avatarIcon = new Text({
       text: this.card.icon_url || groupIcon,
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 60,
         fill: Colors.WHITE
       }
@@ -189,7 +189,7 @@ export class CardDetailPopup extends Container {
     const descText = new Text({
       text: this.card.description,
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 16,
         fill: Colors.WHITE,
         align: 'center',
@@ -233,7 +233,7 @@ export class CardDetailPopup extends Container {
     const energyIcon = new Text({
       text: '⚡',
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: height * 0.5,
         fill: Colors.ORANGE,
         dropShadow: {
@@ -252,7 +252,7 @@ export class CardDetailPopup extends Container {
     const energyText = new Text({
       text: this.card.energy_cost.toString(),
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: height * 0.6,
         fontWeight: 'bold',
         fill: Colors.WHITE,
@@ -320,7 +320,7 @@ export class CardDetailPopup extends Container {
     const buttonText = new Text({
       text: '✕',
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 20,
         fontWeight: 'bold',
         fill: Colors.WHITE,

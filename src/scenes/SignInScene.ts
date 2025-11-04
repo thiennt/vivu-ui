@@ -1,7 +1,7 @@
 import { Container, Graphics, Text } from 'pixi.js';
 import { BaseScene } from '@/ui/BaseScene';
 import { Button } from '@/ui/Button';
-import { Colors } from '@/utils/colors';
+import { Colors, FontFamily } from '@/utils/cssStyles';
 import { authApi } from '@/services/api';
 import { navigation } from '@/utils/navigation';
 import { HomeScene } from './HomeScene';
@@ -63,7 +63,7 @@ export class SignInScene extends BaseScene {
     const titleText = new Text({
       text: 'Welcome to Vivu',
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 32,
         fontWeight: 'bold',
         fill: Colors.TEXT_PRIMARY,

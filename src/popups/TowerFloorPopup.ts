@@ -1,6 +1,6 @@
 import { Assets, Container, Graphics, Sprite, Text } from 'pixi.js';
 import { navigation } from '@/utils/navigation';
-import { Colors } from '@/utils/colors';
+import { Colors, FontFamily } from '@/utils/cssStyles';
 import { Stage, Character } from '@/types';
 import { CardBattleScene } from '@/scenes/CardBattleScene';
 import { PrepareScene } from '@/scenes/PrepareScene';
@@ -108,7 +108,7 @@ export class TowerFloorPopup extends Container {
     const dialogTitle = new Text({
       text: `🗼 ${this.stage.name}`,
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 22,
         fontWeight: 'bold',
         fill: Colors.WHITE,
@@ -137,7 +137,7 @@ export class TowerFloorPopup extends Container {
     const enemyTitle = new Text({
       text: `⚔️ Enemy Lineup ⚡${lineup_power}`,
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 16,
         fontWeight: 'bold',
         fill: Colors.ROBOT_CYAN,
@@ -174,7 +174,7 @@ export class TowerFloorPopup extends Container {
     const rewardTitle = new Text({
       text: '🏆 Battle Rewards',
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 16,
         fontWeight: 'bold',
         fill: Colors.ROBOT_CYAN,
@@ -188,7 +188,7 @@ export class TowerFloorPopup extends Container {
     const treasureChest = new Text({
       text: this.stage.is_completed ? '🎟️ x1' : '🎟️ x10',
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 28,
         fill: Colors.ROBOT_CYAN
       }
@@ -199,7 +199,7 @@ export class TowerFloorPopup extends Container {
     const chestText = new Text({
       text: 'Crystal Ball',
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 14,
         fontWeight: 'bold',
         fill: Colors.ROBOT_CYAN,
@@ -288,7 +288,7 @@ export class TowerFloorPopup extends Container {
       const placeholderText = new Text({
         text: '👹 Mysterious Enemies Await...',
         style: {
-          fontFamily: 'Orbitron',
+          fontFamily: FontFamily.PRIMARY,
           fontSize: 16,
           fontStyle: 'italic',
           fill: Colors.ROBOT_ELEMENT
@@ -345,7 +345,7 @@ export class TowerFloorPopup extends Container {
     const buttonText = new Text({
       text,
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 18,
         fontWeight: 'bold',
         fill: Colors.WHITE,
@@ -408,7 +408,7 @@ export class TowerFloorPopup extends Container {
     const buttonText = new Text({
       text: '✕',
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 18,
         fontWeight: 'bold',
         fill: Colors.WHITE

@@ -1,7 +1,7 @@
 import { Container, Graphics, Text, FederatedPointerEvent } from 'pixi.js';
 import { navigation } from '@/utils/navigation';
 import { BaseScene } from '@/ui/BaseScene';
-import { Colors } from '@/utils/colors';
+import { Colors, FontFamily } from '@/utils/cssStyles';
 import { HomeScene } from './HomeScene';
 import { gsap } from 'gsap';
 import { 
@@ -254,7 +254,7 @@ export class CardBattleScene extends BaseScene {
     const energyLabel = new Text({
       text: 'Energy: 0',
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 11,
         fill: Colors.TEXT_PRIMARY,
         align: 'center'
@@ -279,7 +279,7 @@ export class CardBattleScene extends BaseScene {
     const deckLabel = new Text({
       text: 'DECK',
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 10,
         fill: Colors.TEXT_PRIMARY,
         align: 'center'
@@ -292,7 +292,7 @@ export class CardBattleScene extends BaseScene {
     const deckCount = new Text({
       text: '0',
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 12,
         fill: Colors.TEXT_SECONDARY,
         align: 'center'
@@ -317,7 +317,7 @@ export class CardBattleScene extends BaseScene {
     const discardLabel = new Text({
       text: 'DISCARD PILE',
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 10,
         fill: Colors.TEXT_PRIMARY,
         align: 'center'
@@ -371,7 +371,7 @@ export class CardBattleScene extends BaseScene {
     const logTitle = new Text({
       text: 'BATTLE LOG',
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 12,
         fill: Colors.TEXT_PRIMARY,
         align: 'center'
@@ -730,7 +730,7 @@ export class CardBattleScene extends BaseScene {
     const titleText = new Text({
       text: 'Card Battle Scene',
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 24,
         fill: Colors.TEXT_PRIMARY,
         align: 'center'
@@ -743,7 +743,7 @@ export class CardBattleScene extends BaseScene {
     const statusText = new Text({
       text: 'Waiting for battle data...\nBattle ID: ' + this.battleId,
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 16,
         fill: Colors.TEXT_SECONDARY,
         align: 'center'
@@ -763,7 +763,7 @@ export class CardBattleScene extends BaseScene {
     const backText = new Text({
       text: 'BACK TO HOME',
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 14,
         fill: Colors.TEXT_PRIMARY,
         align: 'center'
@@ -1380,7 +1380,7 @@ export class CardBattleScene extends BaseScene {
     const buttonText = new Text({
       text: 'END TURN',
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 16,
         fill: Colors.TEXT_PRIMARY,
         align: 'center'
@@ -1430,7 +1430,7 @@ export class CardBattleScene extends BaseScene {
     const resultText = new Text({
       text: isVictory ? 'VICTORY!' : 'DEFEAT!',
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 32,
         fill: isVictory ? Colors.SUCCESS : Colors.ERROR,
         align: 'center'
@@ -1449,7 +1449,7 @@ export class CardBattleScene extends BaseScene {
     const backText = new Text({
       text: 'BACK',
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 14,
         fill: Colors.TEXT_PRIMARY,
         align: 'center'

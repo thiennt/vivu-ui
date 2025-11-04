@@ -4,7 +4,7 @@ import { navigation } from '@/utils/navigation';
 import { CharactersScene } from './CharactersScene';
 import { CharacterDetailScene } from './CharacterDetailScene';
 import { HomeScene } from './HomeScene';
-import { Colors } from '@/utils/colors';
+import { Colors, FontFamily } from '@/utils/cssStyles';
 import { ScrollBox } from '@pixi/ui';
 import { playerApi, ApiError, isLikelyUsingMockData } from '@/services/api';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
@@ -182,7 +182,7 @@ export class PlayerDetailScene extends BaseScene {
     const title = new Text({
       text: '👤 Player Profile 👤',
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 24,
         fontWeight: 'bold',
         fill: Colors.ROBOT_CYAN_LIGHT,
@@ -277,7 +277,7 @@ export class PlayerDetailScene extends BaseScene {
     const title = new Text({
       text: '📜 Player Info',
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 18,
         fontWeight: 'bold',
         fill: Colors.ROBOT_CYAN,
@@ -334,7 +334,7 @@ export class PlayerDetailScene extends BaseScene {
       const statText = new Text({
         text: `${item.label} ${item.value}`,
         style: {
-          fontFamily: 'Orbitron',
+          fontFamily: FontFamily.PRIMARY,
           fontSize: 16,
           fill: Colors.ROBOT_CYAN_LIGHT
         }
@@ -376,7 +376,7 @@ export class PlayerDetailScene extends BaseScene {
     const title = new Text({
       text: '⚔️ Statistics',
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 18,
         fontWeight: 'bold',
         fill: Colors.ROBOT_CYAN,
@@ -399,7 +399,7 @@ export class PlayerDetailScene extends BaseScene {
       const statText = new Text({
         text: `${item.label} ${item.value}`,
         style: {
-          fontFamily: 'Orbitron',
+          fontFamily: FontFamily.PRIMARY,
           fontSize: 16,
           fill: Colors.ROBOT_CYAN_LIGHT
         }
@@ -446,7 +446,7 @@ export class PlayerDetailScene extends BaseScene {
     const titleText = new Text({
       text: '✨ Attribute Points ✨',
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 18,
         fontWeight: 'bold',
         fill: Colors.ROBOT_CYAN,
@@ -469,7 +469,7 @@ export class PlayerDetailScene extends BaseScene {
       const noPointsText = new Text({
         text: 'No points available to distribute',
         style: {
-          fontFamily: 'Orbitron',
+          fontFamily: FontFamily.PRIMARY,
           fontSize: 16,
           fill: Colors.ROBOT_CYAN_MID,
           fontStyle: 'italic'
@@ -489,7 +489,7 @@ export class PlayerDetailScene extends BaseScene {
     const remainingText = new Text({
       text: `⭐ ${this.remainingPoints} pts`,
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 16,
         fontWeight: 'bold',
         fill: Colors.ROBOT_CYAN,
@@ -516,7 +516,7 @@ export class PlayerDetailScene extends BaseScene {
       const nameText = new Text({
         text: stat.name,
         style: {
-          fontFamily: 'Orbitron',
+          fontFamily: FontFamily.PRIMARY,
           fontSize: 14,
           fontWeight: 'bold',
           fill: Colors.ROBOT_CYAN_MID
@@ -530,7 +530,7 @@ export class PlayerDetailScene extends BaseScene {
       const valueText = new Text({
         text: `${currentValue}`,
         style: {
-          fontFamily: 'Orbitron',
+          fontFamily: FontFamily.PRIMARY,
           fontSize: 16,
           fontWeight: 'bold',
           fill: Colors.ROBOT_CYAN
@@ -630,7 +630,7 @@ export class PlayerDetailScene extends BaseScene {
     const buttonText = new Text({
       text: text,
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 16,
         fontWeight: 'bold',
         fill: Colors.ROBOT_CYAN_LIGHT,
@@ -704,7 +704,7 @@ export class PlayerDetailScene extends BaseScene {
     const collectionTitle = new Text({ 
       text: '🎭 Character Collection', 
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 20,
         fontWeight: 'bold',
         fill: Colors.ROBOT_CYAN,

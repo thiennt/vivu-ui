@@ -2,7 +2,7 @@ import { Container, Graphics, Text } from 'pixi.js';
 import { navigation } from '@/utils/navigation';
 import { HomeScene } from './HomeScene';
 import { BaseScene } from '@/ui/BaseScene';
-import { Colors } from '@/utils/colors';
+import { Colors, FontFamily } from '@/utils/cssStyles';
 import { authApi, isLikelyUsingMockData } from '@/services/api';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
 
@@ -218,7 +218,7 @@ export class CheckinScene extends BaseScene {
     const title = new Text({
       text: '📅 Daily Check-In 📅',
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 24,
         fontWeight: 'bold',
         fill: Colors.ROBOT_CYAN_LIGHT,
@@ -244,7 +244,7 @@ export class CheckinScene extends BaseScene {
     const subtitle = new Text({
       text: subtitleText,
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 14,
         fill: this.hasCheckedInToday ? Colors.GREEN_LIGHT : Colors.ROBOT_CYAN,
         align: 'center'
@@ -291,7 +291,7 @@ export class CheckinScene extends BaseScene {
     const rewardTitle = new Text({
       text: '🎁 Rewards Received',
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 14,
         fontWeight: 'bold',
         fill: Colors.ROBOT_CYAN,
@@ -306,7 +306,7 @@ export class CheckinScene extends BaseScene {
     const rewardText = new Text({
       text: `x${this.checkinReward.dice || 0} 🎟️`,
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 18,
         fontWeight: 'bold',
         fill: Colors.ROBOT_CYAN,
@@ -415,7 +415,7 @@ export class CheckinScene extends BaseScene {
     const sectionTitle = new Text({
       text: '🎭 Unlocked Characters',
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 18,
         fontWeight: 'bold',
         fill: Colors.ROBOT_CYAN_LIGHT,

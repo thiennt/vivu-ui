@@ -1,7 +1,7 @@
 import { Assets, Color, Container, Graphics, Sprite, Text } from 'pixi.js';
 import { app } from '@/app';
 import { navigation } from '@/utils/navigation';
-import { Colors } from '@/utils/colors';
+import { Colors, FontFamily } from '@/utils/cssStyles';
 import { BottomNavigationMenu } from './BottomNavigationMenu';
 import { Card, CardType } from '@/types';
 import { DropShadowFilter, GlowFilter } from 'pixi-filters';
@@ -193,7 +193,7 @@ export abstract class BaseScene extends Container {
     const title = new Text({
       text: text,
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 28, // Reduced from 36 for 400x700
         fontWeight: 'bold',
         fill: Colors.TEXT_PRIMARY,

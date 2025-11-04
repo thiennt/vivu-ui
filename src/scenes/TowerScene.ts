@@ -2,7 +2,7 @@ import { Container, Graphics, Text, Ticker } from 'pixi.js';
 import { navigation } from '@/utils/navigation';
 import { BaseScene } from '@/ui/BaseScene';
 import { HomeScene } from './HomeScene';
-import { Colors } from '@/utils/colors';
+import { Colors, FontFamily } from '@/utils/cssStyles';
 import { battleApi, isLikelyUsingMockData } from '@/services/api';
 import { Dungeon, Stage } from '@/types';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
@@ -165,7 +165,7 @@ export class TowerScene extends BaseScene {
     const title = new Text({
       text: '🗼 Battle Tower 🗼',
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 26,
         fontWeight: 'bold',
         fill: Colors.WHITE,
@@ -315,7 +315,7 @@ export class TowerScene extends BaseScene {
     const floorNumber = new Text({
       text: stage.name,
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 16,
         fontWeight: 'bold',
         fill: isAccessible ? Colors.PURPLE_DARKER : Colors.GRAY,
@@ -333,7 +333,7 @@ export class TowerScene extends BaseScene {
       towerIcon = new Text({
         text: '🔒',
         style: {
-          fontFamily: 'Orbitron',
+          fontFamily: FontFamily.PRIMARY,
           fontSize: 48,
           fill: Colors.GRAY
         }
@@ -342,7 +342,7 @@ export class TowerScene extends BaseScene {
       towerIcon = new Text({
         text: '✓',
         style: {
-          fontFamily: 'Orbitron',
+          fontFamily: FontFamily.PRIMARY,
           fontSize: 48,
           fill: Colors.GREEN_BRIGHT,
           stroke: { color: Colors.GREEN_FOREST_DARK, width: 2 }
@@ -352,7 +352,7 @@ export class TowerScene extends BaseScene {
       towerIcon = new Text({
         text: '🗼',
         style: {
-          fontFamily: 'Orbitron',
+          fontFamily: FontFamily.PRIMARY,
           fontSize: 48,
           fill: Colors.PURPLE
         }

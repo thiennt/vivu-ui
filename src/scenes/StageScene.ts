@@ -5,7 +5,7 @@ import { DungeonScene } from './DungeonScene';
 import { CardBattleScene } from './CardBattleScene';
 import { PrepareScene } from './PrepareScene';
 import { HomeScene } from './HomeScene';
-import { Colors } from '@/utils/colors';
+import { Colors, FontFamily } from '@/utils/cssStyles';
 import { battleApi } from '@/services/api';
 import { Dungeon } from '@/types';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
@@ -109,7 +109,7 @@ export class StageScene extends BaseScene {
     const subtitle = new Text({
       text: 'Choose your stage',
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 18,
         fill: Colors.TEXT_SECONDARY,
         align: 'center'
@@ -137,7 +137,7 @@ export class StageScene extends BaseScene {
     const stageTitle = new Text({
       text: 'Stages:',
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 18,
         fontWeight: 'bold',
         fill: Colors.TEXT_PRIMARY
@@ -185,7 +185,7 @@ export class StageScene extends BaseScene {
     const buttonText = new Text({
       text,
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 14,
         fontWeight: 'bold',
         fill: textColor,
@@ -259,7 +259,7 @@ export class StageScene extends BaseScene {
     const stageNumber = new Text({
       text: `Stage ${stage.stageNumber}`,
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 16,
         fontWeight: 'bold',
         fill: Colors.TEXT_PRIMARY
@@ -272,7 +272,7 @@ export class StageScene extends BaseScene {
     const stageName = new Text({
       text: stage.name,
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 14,
         fontWeight: 'bold',
         fill: Colors.TEXT_SECONDARY,
@@ -294,7 +294,7 @@ export class StageScene extends BaseScene {
     const difficulty = new Text({
       text: stage.difficulty.toString(),
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 12,
         fontWeight: 'bold',
         fill: difficultyColors[stage.difficulty] || Colors.TEXT_WHITE
@@ -307,7 +307,7 @@ export class StageScene extends BaseScene {
     const rewardText = new Text({
       text: `Rewards: ${stage.rewards.length} items`,
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 10,
         fill: Colors.TEXT_TERTIARY
       }

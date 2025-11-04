@@ -1,5 +1,5 @@
 import { Assets, Container, Graphics, Sprite, Text } from 'pixi.js';
-import { Colors } from '@/utils/colors';
+import { Colors, FontFamily } from '@/utils/cssStyles';
 import { DropShadowFilter, GlowFilter } from 'pixi-filters';
 import { gsap } from 'gsap';
 
@@ -62,7 +62,7 @@ export class HeroCard extends Container {
     const nameText = new Text({
       text: character.name,
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: nameSize,
         fontWeight: 'bold',
         fill: Colors.TEXT_WHITE,
@@ -133,7 +133,7 @@ export class HeroCard extends Container {
     const expText = new Text({
       text: `EXP: ${character.exp}`,
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: expSize,
         fill: Colors.TEXT_SECONDARY,
         align: 'center'
@@ -157,7 +157,7 @@ export class HeroCard extends Container {
       const statText = new Text({
         text: stat,
         style: {
-          fontFamily: 'Orbitron',
+          fontFamily: FontFamily.PRIMARY,
           fontSize: statSize,
           fill: Colors.TEXT_SECONDARY
         }
@@ -175,7 +175,7 @@ export class HeroCard extends Container {
     const hpText = new Text({
       text: `❤️ ${character.hp}`,
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 14,
         fill: Colors.TEXT_SECONDARY
       }
@@ -186,7 +186,7 @@ export class HeroCard extends Container {
     const atkText = new Text({
       text: `⚔️ ${character.atk}`,
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 14,
         fill: Colors.TEXT_SECONDARY
       }
@@ -197,7 +197,7 @@ export class HeroCard extends Container {
     const defText = new Text({
       text: `🛡️ ${character.def}`,
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 14,
         fill: Colors.TEXT_SECONDARY
       }

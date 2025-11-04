@@ -1,13 +1,69 @@
 /**
- * Centralized color constants for the application
- * All hex color values used throughout the UI should be defined here
+ * Centralized CSS style constants for the application
+ * All color values, font families, and common CSS properties used throughout the UI should be defined here
  * 
  * Structure:
- * 1. BASE_COLORS: Core palette colors (single source of truth)
- * 2. Semantic aliases: Descriptive names that reference base colors
+ * 1. Colors: Core palette colors and semantic aliases
+ * 2. FontFamily: Font family constants
+ * 3. FontSize: Common font size values
+ * 4. FontWeight: Font weight constants
+ * 5. Other CSS properties: lineHeight, letterSpacing, etc.
  * 
  * Note: Colors are defined in hex format (#RRGGBB) which works in both CSS and PixiJS
  */
+
+// ============================================================================
+// FONT FAMILIES
+// ============================================================================
+
+export const FontFamily = {
+  /** Primary font used throughout the UI - cyberpunk/tech style (Orbitron) */
+  PRIMARY: 'Orbitron',
+  /** Fallback font stack with Arial and sans-serif */
+  SECONDARY: 'Arial, sans-serif',
+  /** Plain Arial font (used in some legacy components) */
+  ARIAL: 'Arial',
+} as const;
+
+// ============================================================================
+// FONT SIZES
+// Note: Defined for future use. Not currently applied throughout the codebase.
+// ============================================================================
+
+export const FontSize = {
+  /** Extra small text - 10px */
+  XS: 10,
+  /** Small text - 12px */
+  SM: 12,
+  /** Medium text - 14px */
+  MD: 14,
+  /** Medium-large text - 16px */
+  LG: 16,
+  /** Extra large text - 18px */
+  XL: 18,
+  /** 2X large text - 20px */
+  XXL: 20,
+  /** 3X large text - 24px */
+  XXXL: 24,
+} as const;
+
+// ============================================================================
+// FONT WEIGHTS
+// Note: Defined for future use. Not currently applied throughout the codebase.
+// ============================================================================
+
+export const FontWeight = {
+  /** Normal font weight */
+  NORMAL: 'normal',
+  /** Bold font weight - most commonly used */
+  BOLD: 'bold',
+  /** Extra bold font weight */
+  EXTRA_BOLD: '900',
+} as const;
+
+// ============================================================================
+// COLORS - All hex color values used throughout the UI
+// ============================================================================
 
 export const Colors = {
   // ============================================================================
@@ -334,5 +390,11 @@ export const Colors = {
   WHITE_OVERLAY: 'rgba(240, 244, 232, 0.3)',
 } as const;
 
-// Type-safe color access
+// ============================================================================
+// TYPE EXPORTS
+// ============================================================================
+
 export type ColorKey = keyof typeof Colors;
+export type FontFamilyKey = keyof typeof FontFamily;
+export type FontSizeKey = keyof typeof FontSize;
+export type FontWeightKey = keyof typeof FontWeight;

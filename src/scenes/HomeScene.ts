@@ -10,7 +10,7 @@ import { CheckinScene } from './CheckinScene';
 import { RewardSpinScene } from './RewardSpinScene';
 import { CraftEquipmentScene } from './CraftEquipmentScene';
 import { CraftSkillScene } from './CraftSkillScene';
-import { Colors } from '@/utils/colors';
+import { Colors, FontFamily } from '@/utils/cssStyles';
 import { playerApi, isLikelyUsingMockData } from '@/services/api';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
 
@@ -211,7 +211,7 @@ export class HomeScene extends BaseScene {
     const title = new Text({
       text: '⚔️ VIVU ⚔️',
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 38,
         fontWeight: 'bold',
         fill: Colors.ROBOT_CYAN_LIGHT,
@@ -293,7 +293,7 @@ export class HomeScene extends BaseScene {
     const playerName = new Text({
       text: `${this.player.username}`,
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 20,
         fontWeight: 'bold',
         fill: Colors.ROBOT_CYAN_LIGHT,
@@ -306,7 +306,7 @@ export class HomeScene extends BaseScene {
     const playerLevel = new Text({
       text: `⭐ Level: ${this.player.level}`,
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 17,
         fill: Colors.ROBOT_CYAN_MID
       }
@@ -317,7 +317,7 @@ export class HomeScene extends BaseScene {
     const playerExp = new Text({
       text: `✨ EXP: ${this.player.exp}`,
       style: {
-        fontFamily: 'Orbitron',
+        fontFamily: FontFamily.PRIMARY,
         fontSize: 17,
         fill: Colors.ROBOT_CYAN_MID
       }
