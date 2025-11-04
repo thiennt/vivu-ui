@@ -17,8 +17,8 @@
 // ============================================================================
 
 export const FontFamily = {
-  /** Primary font used throughout the UI - cyberpunk/tech style (Orbitron) */
-  PRIMARY: 'Orbitron',
+  /** Primary font used throughout the UI */
+  PRIMARY: 'Rajdhani, Roboto Mono, monospace',
   /** Fallback font stack with Arial and sans-serif */
   SECONDARY: 'Arial, sans-serif',
   /** Plain Arial font (used in some legacy components) */

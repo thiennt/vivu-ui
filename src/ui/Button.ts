@@ -69,10 +69,6 @@ export class Button extends Container {
         align: 'center',
         wordWrap: true,
         wordWrapWidth: this.adjustedWidth * 0.9,
-        stroke: {
-          color: strokeColor,
-          width: 2
-        }
       }
     });
     this.buttonText.anchor.set(0.5);
