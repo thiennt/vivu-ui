@@ -107,7 +107,7 @@ export class PlayerCharacterZone extends Container {
     };
     this.playerInfoLabel.anchor.set(0.5);
     this.playerInfoLabel.x = this.infoWidth / 2;
-    this.playerInfoLabel.y = this.infoHeight * 0.18;
+    this.playerInfoLabel.y = this.infoHeight * 0.3;
 
     // Energy display - hidden (energy feature disabled)
     this.energyText.visible = false;
@@ -131,7 +131,7 @@ export class PlayerCharacterZone extends Container {
     };
     this.deckText.anchor.set(0.5);
     this.deckText.x = this.infoWidth / 2;
-    this.deckText.y = this.infoHeight * 0.50; // Centered vertically
+    this.deckText.y = this.infoHeight * 0.70; // Centered vertically
 
     this.charactersWidth = width - this.infoWidth;
     this.charactersHeight = height;

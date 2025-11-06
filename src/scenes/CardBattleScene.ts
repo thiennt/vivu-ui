@@ -527,7 +527,7 @@ export class CardBattleScene extends BaseScene {
       console.log('AI drew cards:', cardCount);
 
       // Show notification
-      this.battleLogZone.showNotification(`AI drew ${cardCount} card${cardCount !== 1 ? 's' : ''}`, Colors.EFFECT_DRAW_BLUE);
+      this.battleLogZone.showNotification(`Enemy drew ${cardCount} card${cardCount !== 1 ? 's' : ''}`, Colors.EFFECT_DRAW_BLUE);
 
       // Update battle state from after_state if available
       if (log.after_state) {
@@ -545,7 +545,7 @@ export class CardBattleScene extends BaseScene {
       console.log(`AI played card: ${log.card.name}`);
 
       // Show notification
-      this.battleLogZone.showNotification(`AI played: ${log.card.name}`, Colors.EFFECT_PLAY_ORANGE);
+      this.battleLogZone.showNotification(`Enemy played: ${log.card.name}`, Colors.EFFECT_PLAY_ORANGE);
 
       // Update battle state from after_state if available
       if (log.after_state) {
@@ -590,7 +590,7 @@ export class CardBattleScene extends BaseScene {
       console.log('AI ended its turn');
 
       // Show notification
-      this.battleLogZone.showNotification('AI ended its turn', Colors.TEXT_PRIMARY, 1500);
+      this.battleLogZone.showNotification('Enemy ended its turn', Colors.TEXT_PRIMARY, 1500);
 
       // Update battle state from after_state if available
       if (log.after_state) {

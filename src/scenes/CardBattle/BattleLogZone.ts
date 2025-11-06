@@ -23,10 +23,10 @@ export class BattleLogZone extends Container {
     super();
 
     this.logGlow = new Graphics();
-    this.addChild(this.logGlow);
+    //this.addChild(this.logGlow);
 
     this.borderPulse = new Graphics();
-    this.addChild(this.borderPulse);
+    //this.addChild(this.borderPulse);
 
     this.logBg = new Graphics();
     this.addChild(this.logBg);
@@ -163,15 +163,15 @@ export class BattleLogZone extends Container {
       .fill({ color: Colors.BROWN_DARKER, alpha: 0.95 });
 
     // Darker inner layer
-    this.logBg.roundRect(2, 2, width - 4, height - 4, 6)
-      .fill({ color: Colors.BROWN_DARK, alpha: 0.7 });
+    //this.logBg.roundRect(2, 2, width - 4, height - 4, 6)
+      //.fill({ color: Colors.BROWN_DARK, alpha: 0.7 });
 
     // Very subtle gradient
     const segmentHeight = height / 8;
     for (let i = 0; i < 8; i++) {
       const alpha = 0.05 - (i * 0.006);
-      this.logBg.rect(4, 4 + i * segmentHeight, width - 8, segmentHeight)
-        .fill({ color: Colors.BLACK, alpha });
+      //this.logBg.rect(4, 4 + i * segmentHeight, width - 8, segmentHeight)
+        //.fill({ color: Colors.BLACK, alpha });
     }
 
     // Golden border (main)
@@ -179,20 +179,20 @@ export class BattleLogZone extends Container {
       .stroke({ width: 3, color: Colors.GOLD, alpha: 0.8 });
 
     // Team-colored inner border (subtle)
-    this.logBg.roundRect(3, 3, width - 6, height - 6, 5)
-      .stroke({ width: 2, color: playerColor, alpha: 0.5 });
+    //this.logBg.roundRect(3, 3, width - 6, height - 6, 5)
+      //.stroke({ width: 2, color: playerColor, alpha: 0.5 });
 
     // Decorative golden corner accents
     this.drawParchmentCorners(this.logBg, 0, 0, width, height, Colors.GOLD_BRIGHT);
 
     // Top and bottom golden accent bars
-    this.logBg.roundRect(12, 8, width - 24, 3, 1.5)
-      .fill({ color: Colors.GOLD_BRIGHT, alpha: 0.6 })
-      .stroke({ width: 1, color: Colors.GOLD, alpha: 0.4 });
+    //this.logBg.roundRect(12, 8, width - 24, 3, 1.5)
+      //.fill({ color: Colors.GOLD_BRIGHT, alpha: 0.6 })
+      //.stroke({ width: 1, color: Colors.GOLD, alpha: 0.4 });
 
-    this.logBg.roundRect(12, height - 11, width - 24, 3, 1.5)
-      .fill({ color: Colors.GOLD_BRIGHT, alpha: 0.6 })
-      .stroke({ width: 1, color: Colors.GOLD, alpha: 0.4 });
+    //this.logBg.roundRect(12, height - 11, width - 24, 3, 1.5)
+      //.fill({ color: Colors.GOLD_BRIGHT, alpha: 0.6 })
+      //.stroke({ width: 1, color: Colors.GOLD, alpha: 0.4 });
   }
 
   private drawParchmentCorners(graphics: Graphics, x: number, y: number, width: number, height: number, color: string): void {
@@ -235,7 +235,7 @@ export class BattleLogZone extends Container {
       'draw_phase': '📋 Draw Phase',
       'main_phase': '⚔️ Main Phase',
       'end_turn': '🏁 End Turn',
-      'ai_turn': '🤖 AI Turn'
+      'ai_turn': '🤖 Enemy Turn'
     };
 
     // Update phase text - keep white for readability
