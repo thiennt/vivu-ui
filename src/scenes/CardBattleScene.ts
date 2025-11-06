@@ -137,22 +137,7 @@ export class CardBattleScene extends BaseScene {
 
     try {
       if (dropTarget.startsWith('character:')) {
-        // Check if player has enough energy to play the card
-        const currentPlayer = this.battleState.players.find(p => p.team === this.battleState!.current_player);
-        const currentEnergy = currentPlayer?.deck.current_energy || 0;
-
-        if (card.energy_cost > currentEnergy) {
-          // Insufficient energy - return card to hand
-          this.battleLogZone.showNotification(
-            `Not enough energy! Need ${card.energy_cost}, have ${currentEnergy}`,
-            Colors.ERROR,
-            2000
-          );
-          this.enablePlayerUI();
-          this.updateHandAndPlayerInfoZones();
-          return;
-        }
-
+        // Energy feature disabled - players can play cards without energy cost check
         const characterId = dropTarget.replace('character:', '');
         await this.playCardOnCharacter(card, characterId, cardPosition);
       }
@@ -405,10 +390,6 @@ export class CardBattleScene extends BaseScene {
     this.currentPhase = 'draw_phase';
     console.log('Draw Phase');
 
-    // Store previous energy count for animation
-    let currentPlayer = this.battleState.players.find(p => p.team === this.battleState!.current_player);
-    const previousEnergy = currentPlayer?.deck.current_energy || 0;
-
     const turnAction: TurnAction = {
       type: 'draw_card',
       player_team: this.battleState.current_player
@@ -435,13 +416,6 @@ export class CardBattleScene extends BaseScene {
 
         this.updateAllZones();
         await this.p1HandZone.animateCardDraw();
-
-        // Animate energy increase after drawing cards
-        currentPlayer = this.battleState.players.find(p => p.team === this.battleState!.current_player);
-        const newEnergy = currentPlayer?.deck.current_energy || 0;
-        if (newEnergy > previousEnergy) {
-          await this.animateEnergyIncrease(this.battleState.current_player);
-        }
       }
     } catch (error) {
       console.error('Failed to draw cards:', error);
@@ -562,10 +536,6 @@ export class CardBattleScene extends BaseScene {
       const cardCount = log.drawn_cards?.length || 0;
       console.log('AI drew cards:', cardCount);
 
-      // Store previous energy count for animation
-      let aiPlayer = this.battleState?.players.find(p => p.team === 2);
-      const previousEnergy = aiPlayer?.deck.current_energy || 0;
-
       // Show notification
       this.battleLogZone.showNotification(`AI drew ${cardCount} card${cardCount !== 1 ? 's' : ''}`, Colors.EFFECT_DRAW_BLUE);
 
@@ -576,13 +546,6 @@ export class CardBattleScene extends BaseScene {
 
       this.updateAllZones();
       await this.p2HandZone.animateCardDraw();
-
-      // Animate energy increase after drawing cards
-      aiPlayer = this.battleState?.players.find(p => p.team === 2);
-      const newEnergy = aiPlayer?.deck.current_energy || 0;
-      if (newEnergy > previousEnergy) {
-        await this.animateEnergyIncrease(2);
-      }
 
       // Brief delay
       await new Promise(resolve => setTimeout(resolve, 300));

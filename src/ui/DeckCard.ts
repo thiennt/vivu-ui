@@ -53,56 +53,8 @@ export class DeckCard extends Container {
 
     this.addChild(this.bg);
 
-    // Energy cost - TOP LEFT with clean neon style
-    const energyX = 4;
-    const energyY = 5;
-    const energyBgWidth = 28;
-    const energyBgHeight = 20;
-    
-    const energyCostBg = new Graphics()
-      .roundRect(energyX, energyY, energyBgWidth, energyBgHeight, 4)
-      .fill({ color: Colors.BLACK, alpha: 0.8 })
-      .stroke({ width: 1.5, color: Colors.ROBOT_CYAN, alpha: 0.9 });
-    
-    const energyIcon = new Text({
-      text: '⚡',
-      style: {
-        fontFamily: FontFamily.SECONDARY,
-        fontSize: Math.round(12 * fontScale),
-        fill: Colors.ROBOT_CYAN,
-        dropShadow: {
-          color: Colors.ROBOT_CYAN,
-          blur: 3,
-          angle: 0,
-          distance: 0,
-          alpha: 0.8
-        }
-      }
-    });
-    energyIcon.anchor.set(0.5);
-    energyIcon.x = energyX + 7;
-    energyIcon.y = energyY + energyBgHeight / 2;
-    
-    const energyText = new Text({
-      text: card.energy_cost.toString(),
-      style: {
-        fontFamily: FontFamily.SECONDARY,
-        fontSize: Math.round(15 * fontScale),
-        fontWeight: '900',
-        fill: Colors.WHITE,
-        stroke: { color: Colors.BLACK, width: 3 },
-        dropShadow: {
-          color: Colors.ROBOT_CYAN,
-          blur: 2,
-          angle: 0,
-          distance: 0,
-          alpha: 0.6
-        }
-      }
-    });
-    energyText.anchor.set(0.5);
-    energyText.x = energyX + 19;
-    energyText.y = energyY + energyBgHeight / 2;
+    // Energy cost display - hidden (energy feature disabled)
+    // Energy cost badge removed to declutter UI
 
     // Group icon - TOP RIGHT with clean design
     let groupIcon = '';
@@ -169,7 +121,7 @@ export class DeckCard extends Container {
     avatarIcon.x = width / 2;
     avatarIcon.y = frameY + (frameHeight / 2);
 
-    this.addChild(energyCostBg, energyIcon, energyText, groupIconBg, groupIconText, avatarIcon);
+    this.addChild(groupIconBg, groupIconText, avatarIcon);
 
     // Make card interactive with smooth hover effects
     if (enableHover || opts.onClick) {

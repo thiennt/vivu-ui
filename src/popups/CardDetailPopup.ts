@@ -120,9 +120,8 @@ export class CardDetailPopup extends Container {
     this.addChild(this.dialogPanel);
     this.addChild(cardNameText);
 
-    // Energy cost badge - positioned at top-left of frame
-    const energyBadge = this.createEnergyGem(frameMargin, frameY, 50, 32);
-    this.addChild(energyBadge);
+    // Energy cost badge - hidden (energy feature disabled)
+    // Energy badge removed to declutter UI
 
     // Group icon - positioned at top-right of frame
     const { icon: groupIcon, color: groupColor } = this.getGroupIconColor(this.card.group);
