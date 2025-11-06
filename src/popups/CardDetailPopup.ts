@@ -120,9 +120,8 @@ export class CardDetailPopup extends Container {
     this.addChild(this.dialogPanel);
     this.addChild(cardNameText);
 
-    // Energy cost badge - positioned at top-left of frame
-    const energyBadge = this.createEnergyGem(frameMargin, frameY, 50, 32);
-    this.addChild(energyBadge);
+    // Energy cost badge - hidden (energy feature disabled)
+    // Energy badge removed to declutter UI
 
     // Group icon - positioned at top-right of frame
     const { icon: groupIcon, color: groupColor } = this.getGroupIconColor(this.card.group);
@@ -214,66 +213,6 @@ export class CardDetailPopup extends Container {
     if (this.popupMode) {
       this.createCloseButton(cardWidth, cardHeight);
     }
-  }
-
-  private createEnergyGem(x: number, y: number, width: number, height: number): Container {
-    const gem = new Container();
-
-    // Clean gem background
-    const gemBg = new Graphics();
-    
-    gemBg.roundRect(0, 0, width, height, 8)
-      .fill({ color: 0x051420, alpha: 1 })
-      .stroke({ width: 2, color: Colors.ROBOT_CYAN, alpha: 0.8 });
-    
-    // Inner accent
-    gemBg.roundRect(3, 3, width - 6, height - 6, 6)
-      .stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 0.3 });
-
-    const energyIcon = new Text({
-      text: '⚡',
-      style: {
-        fontFamily: FontFamily.PRIMARY,
-        fontSize: height * 0.5,
-        fill: Colors.ORANGE,
-        dropShadow: {
-          color: Colors.ORANGE,
-          blur: 8,
-          angle: 0,
-          distance: 0,
-          alpha: 0.9
-        }
-      }
-    });
-    energyIcon.anchor.set(0.5);
-    energyIcon.x = width * 0.3;
-    energyIcon.y = height / 2;
-
-    const energyText = new Text({
-      text: this.card.energy_cost.toString(),
-      style: {
-        fontFamily: FontFamily.PRIMARY,
-        fontSize: height * 0.6,
-        fontWeight: 'bold',
-        fill: Colors.WHITE,
-        dropShadow: {
-          color: Colors.BLACK,
-          blur: 2,
-          angle: 0,
-          distance: 1,
-          alpha: 0.8
-        }
-      }
-    });
-    energyText.anchor.set(0.5);
-    energyText.x = width * 0.7;
-    energyText.y = height / 2;
-
-    gem.addChild(gemBg, energyIcon, energyText);
-    gem.x = x;
-    gem.y = y;
-
-    return gem;
   }
 
   private getGroupIconColor(group: string): { icon: string; color: string } {

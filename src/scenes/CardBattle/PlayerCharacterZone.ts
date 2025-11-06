@@ -109,28 +109,10 @@ export class PlayerCharacterZone extends Container {
     this.playerInfoLabel.x = this.infoWidth / 2;
     this.playerInfoLabel.y = this.infoHeight * 0.18;
 
-    // Energy display - bright and readable
-    this.energyText.text = `⚡${this.energyCount}`;
-    this.energyText.style = {
-      fontFamily: FontFamily.PRIMARY,
-      fontSize: 20,
-      fontWeight: 'bold',
-      fill: Colors.GOLD_BRIGHT,
-      align: 'center',
-      stroke: { color: Colors.BLACK, width: 3 },
-      dropShadow: {
-        color: Colors.GOLD_BRIGHT,
-        blur: 8,
-        angle: 0,
-        distance: 0,
-        alpha: 0.9
-      }
-    };
-    this.energyText.anchor.set(0.5);
-    this.energyText.x = this.infoWidth / 2;
-    this.energyText.y = this.infoHeight * 0.50;
+    // Energy display - hidden (energy feature disabled)
+    this.energyText.visible = false;
 
-    // Deck display - white text for readability
+    // Deck display - white text for readability (centered since energy is hidden)
     this.deckText.text = `🃏${this.deckCount}`;
     this.deckText.style = {
       fontFamily: FontFamily.PRIMARY,
@@ -149,7 +131,7 @@ export class PlayerCharacterZone extends Container {
     };
     this.deckText.anchor.set(0.5);
     this.deckText.x = this.infoWidth / 2;
-    this.deckText.y = this.infoHeight * 0.78;
+    this.deckText.y = this.infoHeight * 0.50; // Centered vertically
 
     this.charactersWidth = width - this.infoWidth;
     this.charactersHeight = height;
@@ -333,9 +315,5 @@ export class PlayerCharacterZone extends Container {
     return this.characterCards.find(card => 
       (card as Container & { characterId: string }).characterId === characterId
     ) || null;
-  }
-
-  public getEnergyText(): Text {
-    return this.energyText;
   }
 }
