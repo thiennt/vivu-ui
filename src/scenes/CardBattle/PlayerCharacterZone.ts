@@ -316,8 +316,4 @@ export class PlayerCharacterZone extends Container {
       (card as Container & { characterId: string }).characterId === characterId
     ) || null;
   }
-
-  public getEnergyText(): Text {
-    return this.energyText;
-  }
 }

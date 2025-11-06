@@ -193,16 +193,6 @@ export class CardBattleScene extends BaseScene {
     }
   }
 
-  private async animateEnergyIncrease(playerTeam: number): Promise<void> {
-    // Get the appropriate character zone based on player team
-    const characterZone = playerTeam === 1 ? this.p1CharacterZone : this.p2CharacterZone;
-    const energyText = characterZone.getEnergyText();
-
-    if (!energyText) return;
-
-    return this.vfx.animateEnergyIncrease(energyText);
-  }
-
   private async animateCardPlay(characterId: string, battleLogs?: CardBattleLog[]): Promise<void> {
     if (!battleLogs || battleLogs.length === 0) {
       // Fallback: simple character glow if no battle log data
