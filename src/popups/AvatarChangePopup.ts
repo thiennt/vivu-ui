@@ -3,14 +3,7 @@ import { navigation } from '@/utils/navigation';
 import { Colors, FontFamily } from '@/utils/cssStyles';
 import { nftApi } from '@/services/api';
 import { ScrollBox } from '@pixi/ui';
-
-interface NFT {
-  id: string;
-  name: string;
-  image_url: string;
-  collection?: string;
-  rarity?: string;
-}
+import { NFT } from '@/types';
 
 export class AvatarChangePopup extends Container {
   private static readonly PLACEHOLDER_ICON_SIZE_RATIO = 0.4; // Placeholder icon is 40% of card size

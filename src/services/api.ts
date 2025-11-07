@@ -14,9 +14,7 @@ import {
   mockCheckinStatusResponse,
   mockPlayerNFTs
 } from '@/utils/mockData';
-import {
-  TurnAction,
-} from '@/types';
+import { TurnAction, NFT, AvatarUpdateResponse } from '@/types';
 
 // Loading state interface
 interface LoadingState {
@@ -464,13 +462,7 @@ export const nftApi = {
    * Get player's NFT collection
    * GET /players/:playerId/nfts
    */
-  async getPlayerNFTs(playerId?: string): Promise<Array<{
-    id: string;
-    name: string;
-    image_url: string;
-    collection?: string;
-    rarity?: string;
-  }>> {
+  async getPlayerNFTs(playerId?: string): Promise<NFT[]> {
     const pid = playerId || sessionStorage.getItem('playerId') || 'player_fc_001';
     return apiRequest(`/players/${pid}/nfts`, {}, mockPlayerNFTs);
   },
@@ -479,11 +471,7 @@ export const nftApi = {
    * Update character avatar with NFT
    * PUT /players/:playerId/characters/:characterId/avatar
    */
-  async updateCharacterAvatar(characterId: string, nftId: string, playerId?: string): Promise<{
-    success: boolean;
-    message: string;
-    avatar_url?: string;
-  }> {
+  async updateCharacterAvatar(characterId: string, nftId: string, playerId?: string): Promise<AvatarUpdateResponse> {
     const pid = playerId || sessionStorage.getItem('playerId') || 'player_fc_001';
     const nft = mockPlayerNFTs.find(n => n.id === nftId);
     return apiRequest(`/players/${pid}/characters/${characterId}/avatar`, {
