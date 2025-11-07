@@ -93,7 +93,16 @@ export const mockPlayer1Characters = [
     "equipped_skills": [
       "bcce57f4-5b26-49ff-8950-bee1b0a9336d",
       "a2520721-c08b-46a7-90d4-6f9cbc099418"
-    ]
+    ],
+    "weapon_level": 5,
+    "weapon_exp": 120,
+    "weapon_value": 50,
+    "helmet_level": 3,
+    "helmet_exp": 80,
+    "helmet_value": 30,
+    "armor_level": 4,
+    "armor_exp": 95,
+    "armor_value": 40
   },
   {
     "id": "624da9bb-5ac3-48b2-a557-51f233f925d3",
@@ -119,7 +128,16 @@ export const mockPlayer1Characters = [
     "equipped_skills": [
       "bcce57f4-5b26-49ff-8950-bee1b0a9336d",
       "750fb360-fde6-4cc8-901b-fa786dcb3d44"
-    ]
+    ],
+    "weapon_level": 4,
+    "weapon_exp": 90,
+    "weapon_value": 45,
+    "helmet_level": 2,
+    "helmet_exp": 50,
+    "helmet_value": 25,
+    "armor_level": 3,
+    "armor_exp": 70,
+    "armor_value": 35
   },
   {
     "id": "08fcbeff-2583-4c71-a894-d4254cc4d2e7",
@@ -145,7 +163,16 @@ export const mockPlayer1Characters = [
     "equipped_skills": [
       "bcce57f4-5b26-49ff-8950-bee1b0a9336d",
       "986f94de-7be1-47cf-bea0-c5dcbe947705"
-    ]
+    ],
+    "weapon_level": 6,
+    "weapon_exp": 150,
+    "weapon_value": 55,
+    "helmet_level": 4,
+    "helmet_exp": 100,
+    "helmet_value": 35,
+    "armor_level": 5,
+    "armor_exp": 110,
+    "armor_value": 45
   }
 ];
 
@@ -5307,46 +5334,46 @@ export const mockAllEquipment = [
     rarity: 'uncommon',
     stats: { def: 12, agi: -2 }
   },
-  // Accessories
+  // Helmets
   {
-    id: 'accessory_power_ring_001',
-    name: 'Power Ring',
-    description: '+5 Attack. Increases physical damage output.',
-    slot: 'accessory',
+    id: 'helmet_steel_001',
+    name: 'Steel Helmet',
+    description: '+8 Defense. Protective headgear for combat.',
+    slot: 'helmet',
     rarity: 'uncommon',
-    stats: { atk: 5 }
+    stats: { def: 8 }
   },
   {
-    id: 'accessory_shield_ring_001',
-    name: 'Shield Ring',
-    description: '+5 Defense. Reduces incoming damage.',
-    slot: 'accessory',
-    rarity: 'uncommon',
+    id: 'helmet_iron_001',
+    name: 'Iron Helmet',
+    description: '+5 Defense. Basic protective helmet.',
+    slot: 'helmet',
+    rarity: 'common',
     stats: { def: 5 }
   },
   {
-    id: 'accessory_speed_boots_001',
-    name: 'Speed Boots',
-    description: '+5 Speed. Increases movement and attack speed.',
-    slot: 'accessory',
+    id: 'helmet_light_001',
+    name: 'Light Helmet',
+    description: '+3 Defense, +2 Speed. Lightweight helmet for mobility.',
+    slot: 'helmet',
     rarity: 'uncommon',
-    stats: { agi: 5 }
+    stats: { def: 3, agi: 2 }
   },
   {
-    id: 'accessory_magic_amulet_001',
-    name: 'Magic Amulet',
-    description: '+8 Magic. Enhances magical abilities.',
-    slot: 'accessory',
+    id: 'helmet_magic_001',
+    name: 'Magic Hood',
+    description: '+4 Defense, +5 Magic. Enchanted headwear for spellcasters.',
+    slot: 'helmet',
     rarity: 'rare',
-    stats: { crit_dmg: 8 }
+    stats: { def: 4, crit_dmg: 5 }
   },
   {
-    id: 'accessory_health_pendant_001',
-    name: 'Health Pendant',
-    description: '+20 HP. Increases maximum health points.',
-    slot: 'accessory',
+    id: 'helmet_heavy_001',
+    name: 'Heavy Helmet',
+    description: '+12 Defense, -1 Speed. Heavy-duty helmet with maximum protection.',
+    slot: 'helmet',
     rarity: 'rare',
-    stats: { hp: 20 }
+    stats: { def: 12, agi: -1 }
   }
 ];
 
@@ -5371,7 +5398,14 @@ export const mockCharacterEquipment = {
     rarity: 'rare',
     stats: { def: 15, agi: -3 }
   },
-  accessory: null
+  helmet: {
+    id: 'helmet_steel_001',
+    name: 'Steel Helmet',
+    description: '+8 Defense. Protective headgear for combat.',
+    slot: 'helmet',
+    rarity: 'uncommon',
+    stats: { def: 8 }
+  }
 };
 
 // ---- NFTs (User's NFT Collection for Avatars) ----

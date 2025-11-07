@@ -1162,37 +1162,40 @@ export class CharacterDetailScene extends BaseScene {
       {
         name: 'Weapon',
         icon: '⚔️',
-        item: this.characterEquipment?.weapon?.name || '(empty)',
         type: 'weapon',
-        equipment: this.characterEquipment?.weapon,
-        color: Colors.ROBOT_CYAN
+        level: this.character?.weapon_level || 1,
+        exp: this.character?.weapon_exp || 0,
+        value: this.character?.weapon_value || 0,
+        color: Colors.STAT_ATK
+      },
+      {
+        name: 'Helmet',
+        icon: '🪖',
+        type: 'helmet',
+        level: this.character?.helmet_level || 1,
+        exp: this.character?.helmet_exp || 0,
+        value: this.character?.helmet_value || 0,
+        color: Colors.STAT_DEF
       },
       {
         name: 'Armor',
         icon: '🛡️',
-        item: this.characterEquipment?.armor?.name || '(empty)',
         type: 'armor',
-        equipment: this.characterEquipment?.armor,
-        color: Colors.ROBOT_CYAN
-      },
-      {
-        name: 'Accessory',
-        icon: '💎',
-        item: this.characterEquipment?.accessory?.name || '(empty)',
-        type: 'accessory',
-        equipment: this.characterEquipment?.accessory,
-        color: Colors.ROBOT_CYAN_LIGHT
+        level: this.character?.armor_level || 1,
+        exp: this.character?.armor_exp || 0,
+        value: this.character?.armor_value || 0,
+        color: Colors.STAT_HP
       }
     ];
 
     let currentY = 45;
 
     equipmentSlots.forEach((slot) => {
-      const card = this.createEquipmentCard(slot, panelWidth);
+      const card = this.createPermanentEquipmentCard(slot, panelWidth);
       card.x = 0;
       card.y = currentY;
       this.equipmentContainer.addChild(card);
-      currentY += 100;
+      currentY += 120;
     });
 
     // Equipment Bonuses Section
@@ -1211,7 +1214,7 @@ export class CharacterDetailScene extends BaseScene {
     bonusTitle.y = bonusY;
     this.equipmentContainer.addChild(bonusTitle);
 
-    const bonusPanel = this.createEquipmentBonusPanel(panelWidth);
+    const bonusPanel = this.createPermanentEquipmentBonusPanel(panelWidth);
     bonusPanel.x = 0;
     bonusPanel.y = bonusY + 35;
     this.equipmentContainer.addChild(bonusPanel);
@@ -1457,6 +1460,313 @@ export class CharacterDetailScene extends BaseScene {
     return button;
   }
 
+  private createPermanentEquipmentCard(slot: any, width: number): Container {
+    const card = new Container();
+    const height = 110;
+
+    // Card background
+    const bg = new Graphics();
+    bg.roundRect(0, 0, width, height, 10)
+      .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.98 })
+      .stroke({ width: 2, color: slot.color, alpha: 0.8 });
+
+    bg.roundRect(3, 3, width - 6, height - 6, 8)
+      .fill({ color: Colors.ROBOT_BG_MID, alpha: 0.7 });
+
+    bg.roundRect(5, 5, width - 10, height - 10, 7)
+      .stroke({ width: 1, color: slot.color, alpha: 0.4 });
+
+    card.addChild(bg);
+
+    // Equipment icon
+    const iconSize = 70;
+    const iconBg = new Graphics();
+    iconBg.roundRect(15, 20, iconSize, iconSize, 10)
+      .fill({ color: slot.color, alpha: 0.2 })
+      .stroke({ width: 2.5, color: slot.color, alpha: 0.8 });
+
+    const iconText = new Text({
+      text: slot.icon,
+      style: {
+        fontSize: 36,
+        fill: slot.color
+      }
+    });
+    iconText.anchor.set(0.5);
+    iconText.x = 15 + iconSize / 2;
+    iconText.y = 20 + iconSize / 2;
+
+    card.addChild(iconBg, iconText);
+
+    // Equipment name badge
+    const badgeWidth = 85;
+    const badge = new Graphics();
+    badge.roundRect(100, 20, badgeWidth, 24, 12)
+      .fill({ color: slot.color, alpha: 0.3 })
+      .stroke({ width: 1.5, color: slot.color });
+
+    const badgeText = new Text({
+      text: slot.name.toUpperCase(),
+      style: {
+        fontFamily: FontFamily.PRIMARY,
+        fontSize: 11,
+        fontWeight: 'bold',
+        fill: Colors.WHITE
+      }
+    });
+    badgeText.anchor.set(0.5);
+    badgeText.x = 100 + badgeWidth / 2;
+    badgeText.y = 32;
+
+    card.addChild(badge, badgeText);
+
+    // Level display
+    const levelText = new Text({
+      text: `Level ${slot.level}`,
+      style: {
+        fontFamily: FontFamily.PRIMARY,
+        fontSize: 15,
+        fontWeight: 'bold',
+        fill: Colors.WHITE,
+        stroke: { color: Colors.ROBOT_ELEMENT, width: 1.5 }
+      }
+    });
+    levelText.x = 100;
+    levelText.y = 50;
+    card.addChild(levelText);
+
+    // Experience bar
+    const expBarWidth = width - 215;
+    const expBarBg = new Graphics();
+    expBarBg.roundRect(100, 72, expBarWidth, 12, 6)
+      .fill({ color: Colors.ROBOT_BG_DARK, alpha: 0.8 })
+      .stroke({ width: 1, color: slot.color, alpha: 0.5 });
+
+    const expToNextLevel = slot.level * 100;
+    const expProgress = Math.min(slot.exp / expToNextLevel, 1);
+    const expBarFill = new Graphics();
+    expBarFill.roundRect(100, 72, expBarWidth * expProgress, 12, 6)
+      .fill({ color: slot.color, alpha: 0.9 });
+
+    card.addChild(expBarBg, expBarFill);
+
+    // EXP text
+    const expText = new Text({
+      text: `EXP: ${slot.exp}/${expToNextLevel}`,
+      style: {
+        fontFamily: FontFamily.PRIMARY,
+        fontSize: 10,
+        fill: Colors.ROBOT_CYAN_LIGHT
+      }
+    });
+    expText.x = 100;
+    expText.y = 87;
+    card.addChild(expText);
+
+    // Stat bonus value
+    const statBonusText = new Text({
+      text: `Stat Bonus: +${slot.value}`,
+      style: {
+        fontFamily: FontFamily.PRIMARY,
+        fontSize: 13,
+        fontWeight: 'bold',
+        fill: Colors.GREEN_MINT
+      }
+    });
+    statBonusText.x = width - 145;
+    statBonusText.y = 52;
+    card.addChild(statBonusText);
+
+    // Level up button
+    const buttonWidth = 90;
+    const buttonHeight = 28;
+    const levelUpButton = this.createLevelUpButton(
+      width - buttonWidth - 15,
+      height - buttonHeight - 12,
+      buttonWidth,
+      buttonHeight,
+      () => this.levelUpEquipment(slot.type)
+    );
+    card.addChild(levelUpButton);
+
+    return card;
+  }
+
+  private createLevelUpButton(
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    onClick: () => void
+  ): Container {
+    const button = new Container();
+
+    const bg = new Graphics();
+    bg.roundRect(0, 0, width, height, 7)
+      .fill({ color: Colors.GREEN_MINT, alpha: 0.95 })
+      .stroke({ width: 2, color: Colors.WHITE });
+
+    bg.roundRect(2, 2, width - 4, height - 4, 5)
+      .stroke({ width: 1, color: Colors.WHITE, alpha: 0.6 });
+
+    const buttonText = new Text({
+      text: 'Level Up',
+      style: {
+        fontFamily: FontFamily.PRIMARY,
+        fontSize: 12,
+        fontWeight: 'bold',
+        fill: Colors.ROBOT_BG_DARK,
+        stroke: { color: Colors.WHITE, width: 1 }
+      }
+    });
+    buttonText.anchor.set(0.5);
+    buttonText.x = width / 2;
+    buttonText.y = height / 2;
+
+    button.addChild(bg, buttonText);
+    button.x = x;
+    button.y = y;
+    button.interactive = true;
+    button.cursor = 'pointer';
+
+    button.on('pointerover', () => {
+      bg.clear();
+      bg.roundRect(0, 0, width, height, 7)
+        .fill({ color: Colors.GREEN_MINT, alpha: 1 })
+        .stroke({ width: 2, color: Colors.WHITE });
+      bg.roundRect(2, 2, width - 4, height - 4, 5)
+        .stroke({ width: 1, color: Colors.WHITE, alpha: 0.9 });
+      button.scale.set(1.05);
+    });
+
+    button.on('pointerout', () => {
+      bg.clear();
+      bg.roundRect(0, 0, width, height, 7)
+        .fill({ color: Colors.GREEN_MINT, alpha: 0.95 })
+        .stroke({ width: 2, color: Colors.WHITE });
+      bg.roundRect(2, 2, width - 4, height - 4, 5)
+        .stroke({ width: 1, color: Colors.WHITE, alpha: 0.6 });
+      button.scale.set(1.0);
+    });
+
+    button.on('pointerdown', (e) => {
+      e.stopPropagation();
+      onClick();
+    });
+
+    return button;
+  }
+
+  private async levelUpEquipment(equipmentType: string): Promise<void> {
+    console.log(`Leveling up ${equipmentType}`);
+
+    // Update character equipment level locally
+    const levelKey = `${equipmentType}_level` as keyof typeof this.character;
+    const expKey = `${equipmentType}_exp` as keyof typeof this.character;
+    const valueKey = `${equipmentType}_value` as keyof typeof this.character;
+
+    const currentLevel = (this.character[levelKey] as number) || 1;
+    const currentExp = (this.character[expKey] as number) || 0;
+    const currentValue = (this.character[valueKey] as number) || 0;
+
+    // Increase level and stats
+    (this.character as any)[levelKey] = currentLevel + 1;
+    (this.character as any)[expKey] = 0; // Reset exp
+    (this.character as any)[valueKey] = currentValue + 5 + currentLevel; // Increase value
+
+    // Refresh equipment display
+    this.equipmentContainer.removeChildren();
+    this.createEquipmentDisplay();
+
+    // Refresh the scroll content
+    if (this.activeTab === 'equipment') {
+      this.refreshTabContent();
+    }
+  }
+
+  private createPermanentEquipmentBonusPanel(width: number): Container {
+    const panel = new Container();
+    const height = 140;
+
+    const bg = new Graphics();
+    bg.roundRect(0, 0, width, height, 10)
+      .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.98 })
+      .stroke({ width: 2, color: Colors.ROBOT_CYAN });
+
+    bg.roundRect(3, 3, width - 6, height - 6, 8)
+      .fill({ color: Colors.ROBOT_BG_MID, alpha: 0.7 });
+
+    bg.roundRect(5, 5, width - 10, height - 10, 7)
+      .stroke({ width: 1, color: Colors.ROBOT_CYAN_MID, alpha: 0.4 });
+
+    panel.addChild(bg);
+
+    // Calculate total bonuses from permanent equipment
+    const bonuses = {
+      weapon: this.character?.weapon_value || 0,
+      helmet: this.character?.helmet_value || 0,
+      armor: this.character?.armor_value || 0,
+      total: (this.character?.weapon_value || 0) + (this.character?.helmet_value || 0) + (this.character?.armor_value || 0)
+    };
+
+    const bonusStats = [
+      { label: 'Weapon', value: bonuses.weapon, icon: '⚔️', color: Colors.STAT_ATK },
+      { label: 'Helmet', value: bonuses.helmet, icon: '🪖', color: Colors.STAT_DEF },
+      { label: 'Armor', value: bonuses.armor, icon: '🛡️', color: Colors.STAT_HP },
+      { label: 'Total Bonus', value: bonuses.total, icon: '✨', color: Colors.GREEN_MINT }
+    ];
+
+    bonusStats.forEach((stat, index) => {
+      const row = Math.floor(index / 2);
+      const col = index % 2;
+      const x = 15 + (col * (width / 2));
+      const y = 15 + (row * 60);
+
+      // Bonus stat row
+      const statBg = new Graphics();
+      statBg.roundRect(x, y, (width / 2) - 20, 50, 6)
+        .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.8 })
+        .stroke({ width: 1, color: stat.color, alpha: 0.5 });
+
+      // Icon
+      const iconText = new Text({
+        text: stat.icon,
+        style: { fontSize: 20 }
+      });
+      iconText.x = x + 10;
+      iconText.y = y + 8;
+
+      // Label
+      const labelText = new Text({
+        text: stat.label,
+        style: {
+          fontFamily: FontFamily.PRIMARY,
+          fontSize: 11,
+          fill: Colors.ROBOT_CYAN_LIGHT
+        }
+      });
+      labelText.x = x + 40;
+      labelText.y = y + 8;
+
+      // Value
+      const valueText = new Text({
+        text: `+${stat.value}`,
+        style: {
+          fontFamily: FontFamily.PRIMARY,
+          fontSize: 18,
+          fontWeight: 'bold',
+          fill: stat.color
+        }
+      });
+      valueText.x = x + 40;
+      valueText.y = y + 25;
+
+      panel.addChild(statBg, iconText, labelText, valueText);
+    });
+
+    return panel;
+  }
+
   private getEquipmentStatsText(equipment: any): string {
     const stats = [];
     if (equipment.atk_bonus) stats.push(`+${equipment.atk_bonus} ATK`);
@@ -1565,7 +1875,7 @@ export class CharacterDetailScene extends BaseScene {
     const items = [
       this.characterEquipment.weapon,
       this.characterEquipment.armor,
-      this.characterEquipment.accessory
+      this.characterEquipment.helmet
     ];
 
     items.forEach(item => {
