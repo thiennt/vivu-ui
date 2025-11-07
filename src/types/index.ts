@@ -34,6 +34,16 @@ export interface Character {
   skills: Skill[];
   element: Element;
   position?: LineupPosition;
+  // Permanent equipment attributes
+  weapon_level?: number;
+  weapon_exp?: number;
+  weapon_value?: number;
+  helmet_level?: number;
+  helmet_exp?: number;
+  helmet_value?: number;
+  armor_level?: number;
+  armor_exp?: number;
+  armor_value?: number;
 }
 
 export interface CharacterStats {
@@ -483,13 +493,13 @@ export interface EquipmentStats {
 export enum EquipmentSlot {
   WEAPON = 'weapon',
   ARMOR = 'armor',
-  ACCESSORY = 'accessory'
+  HELMET = 'helmet'
 }
 
 export interface CharacterEquipment {
   weapon?: Equipment | null;
   armor?: Equipment | null;
-  accessory?: Equipment | null;
+  helmet?: Equipment | null;
 }
 
 export interface PlayerInventory {
