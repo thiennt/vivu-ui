@@ -5373,3 +5373,63 @@ export const mockCharacterEquipment = {
   },
   accessory: null
 };
+
+// ---- NFTs (User's NFT Collection for Avatars) ----
+export const mockPlayerNFTs = [
+  {
+    id: 'nft_001',
+    name: 'Bitcoin NFT',
+    image_url: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1.png',
+    collection: 'Crypto Heroes',
+    rarity: 'legendary'
+  },
+  {
+    id: 'nft_002',
+    name: 'Ethereum NFT',
+    image_url: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png',
+    collection: 'Crypto Heroes',
+    rarity: 'epic'
+  },
+  {
+    id: 'nft_003',
+    name: 'BNB NFT',
+    image_url: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1839.png',
+    collection: 'Crypto Heroes',
+    rarity: 'rare'
+  },
+  {
+    id: 'nft_004',
+    name: 'Solana NFT',
+    image_url: 'https://s2.coinmarketcap.com/static/img/coins/64x64/5426.png',
+    collection: 'Crypto Heroes',
+    rarity: 'epic'
+  },
+  {
+    id: 'nft_005',
+    name: 'Cardano NFT',
+    image_url: 'https://s2.coinmarketcap.com/static/img/coins/64x64/2010.png',
+    collection: 'Crypto Heroes',
+    rarity: 'rare'
+  },
+  {
+    id: 'nft_006',
+    name: 'Polkadot NFT',
+    image_url: 'https://s2.coinmarketcap.com/static/img/coins/64x64/6636.png',
+    collection: 'Crypto Heroes',
+    rarity: 'rare'
+  },
+  {
+    id: 'nft_007',
+    name: 'Avalanche NFT',
+    image_url: 'https://s2.coinmarketcap.com/static/img/coins/64x64/5805.png',
+    collection: 'Crypto Heroes',
+    rarity: 'uncommon'
+  },
+  {
+    id: 'nft_008',
+    name: 'Chainlink NFT',
+    image_url: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1975.png',
+    collection: 'Crypto Heroes',
+    rarity: 'uncommon'
+  }
+];
