@@ -4,6 +4,7 @@ import { HomeScene } from './HomeScene';
 import { BaseScene } from '@/ui/BaseScene';
 import { Colors, FontFamily } from '@/utils/cssStyles';
 import { gsap } from 'gsap';
+import { LootBoxRewardsPopup } from '@/popups/LootBoxRewardsPopup';
 
 interface LootBoxReward {
   label: string;
@@ -164,31 +165,32 @@ export class LootBoxScene extends BaseScene {
     this.container.addChild(this.ticketsText);
   }
 
-  private displayBoxContainer: Container | null = null;
-
   private createDisplayBox(): void {
     const boxSize = 90;
     const centerX = this.gameWidth / 2;
-    const centerY = 200;
+    // Position in the middle between tickets display (at y=130) and open buttons (at startY)
+    const ticketsBottom = 130; // 80 (panelY) + 50 (panelHeight)
+    const buttonsTop = this.gameHeight - 160;
+    const centerY = (ticketsBottom + buttonsTop) / 2;
     
     // Decorative loot box display
-    this.displayBoxContainer = new Container();
-    this.displayBoxContainer.x = centerX;
-    this.displayBoxContainer.y = centerY;
-    this.container.addChild(this.displayBoxContainer);
+    const displayBoxContainer = new Container();
+    displayBoxContainer.x = centerX;
+    displayBoxContainer.y = centerY;
+    this.container.addChild(displayBoxContainer);
     
     // Glow effect
     const glow = new Graphics();
     glow.circle(0, 0, boxSize / 2 + 10)
       .fill({ color: Colors.ROBOT_CYAN, alpha: 0.15 });
-    this.displayBoxContainer.addChild(glow);
+    displayBoxContainer.addChild(glow);
     
     // Main box
     const box = new Graphics();
     box.roundRect(-boxSize / 2, -boxSize / 2, boxSize, boxSize, 12)
       .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.95 })
       .stroke({ width: 3, color: Colors.ROBOT_CYAN });
-    this.displayBoxContainer.addChild(box);
+    displayBoxContainer.addChild(box);
     
     // Lid
     const lidHeight = boxSize * 0.35;
@@ -196,18 +198,18 @@ export class LootBoxScene extends BaseScene {
     lid.roundRect(-boxSize / 2, -boxSize / 2, boxSize, lidHeight, 12)
       .fill({ color: Colors.ROBOT_CYAN, alpha: 0.9 })
       .stroke({ width: 2, color: Colors.ROBOT_CYAN_LIGHT });
-    this.displayBoxContainer.addChild(lid);
+    displayBoxContainer.addChild(lid);
     
     // Decorative ribbons
     const ribbon1 = new Graphics();
     ribbon1.rect(-3, -boxSize / 2, 6, boxSize)
       .fill({ color: Colors.ROBOT_CYAN_LIGHT, alpha: 0.8 });
-    this.displayBoxContainer.addChild(ribbon1);
+    displayBoxContainer.addChild(ribbon1);
     
     const ribbon2 = new Graphics();
     ribbon2.rect(-boxSize / 2, -3, boxSize, 6)
       .fill({ color: Colors.ROBOT_CYAN_LIGHT, alpha: 0.8 });
-    this.displayBoxContainer.addChild(ribbon2);
+    displayBoxContainer.addChild(ribbon2);
     
     // Box emoji
     const boxEmoji = new Text({
@@ -216,10 +218,10 @@ export class LootBoxScene extends BaseScene {
     });
     boxEmoji.anchor.set(0.5);
     boxEmoji.y = 5;
-    this.displayBoxContainer.addChild(boxEmoji);
+    displayBoxContainer.addChild(boxEmoji);
     
     // Floating animation
-    gsap.to(this.displayBoxContainer, {
+    gsap.to(displayBoxContainer, {
       y: centerY - 8,
       duration: 2,
       yoyo: true,
@@ -228,7 +230,7 @@ export class LootBoxScene extends BaseScene {
     });
     
     // Subtle rotation
-    gsap.to(this.displayBoxContainer, {
+    gsap.to(displayBoxContainer, {
       rotation: 0.05,
       duration: 3,
       yoyo: true,
@@ -543,10 +545,6 @@ export class LootBoxScene extends BaseScene {
   private openBoxes(count: number): void {
     if (this.isOpening || this.tickets < count) return;
     
-    console.log(`Opening ${count} boxes`);
-
-    this.container.removeChild(this.displayBoxContainer!);
-    
     this.isOpening = true;
     this.tickets -= count;
     
@@ -558,19 +556,6 @@ export class LootBoxScene extends BaseScene {
       this.summaryText.visible = false;
     }
     
-    // Clear previous rewards
-    this.animationArea.removeChildren();
-    console.log('Animation area cleared, children:', this.animationArea.children.length);
-    
-    // Hide the display box during animation
-    const displayBox = this.container.children.find(child => {
-      return child instanceof Container && Math.abs(child.y - 200) < 5 && child !== this.animationArea;
-    });
-    if (displayBox) {
-      console.log('Hiding display box');
-      gsap.to(displayBox, { alpha: 0, duration: 0.3 });
-    }
-    
     this.updateButtonStates();
     
     // Generate rewards
@@ -580,36 +565,14 @@ export class LootBoxScene extends BaseScene {
       rewards.push(randomReward);
     }
     
-    console.log('Generated rewards:', rewards);
+    // Show rewards in popup
+    navigation.presentPopup(LootBoxRewardsPopup, { rewards });
     
-    // Different animation for single vs multiple
-    if (count === 1) {
-      console.log('Starting single box animation');
-      this.animateSingleBox(rewards[0], 0);
-      
-      setTimeout(() => {
-        this.isOpening = false;
-        this.showSummary(rewards);
-        this.updateButtonStates();
-        // Show display box again
-        if (displayBox) {
-          gsap.to(displayBox, { alpha: 1, duration: 0.5 });
-        }
-      }, 2500);
-    } else {
-      console.log('Starting multiple boxes animation');
-      this.animateMultipleBoxes(rewards);
-      
-      setTimeout(() => {
-        this.isOpening = false;
-        this.showSummary(rewards);
-        this.updateButtonStates();
-        // Show display box again
-        if (displayBox) {
-          gsap.to(displayBox, { alpha: 1, duration: 0.5 });
-        }
-      }, 1500 + count * 80 + 1000);
-    }
+    // Reset state after showing popup
+    setTimeout(() => {
+      this.isOpening = false;
+      this.updateButtonStates();
+    }, 500);
   }
 
   private showSummary(rewards: LootBoxReward[]): void {
