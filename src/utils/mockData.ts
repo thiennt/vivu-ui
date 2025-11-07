@@ -201,7 +201,16 @@ export const mockPlayer2Characters = [
     "equipped_skills": [
       "bcce57f4-5b26-49ff-8950-bee1b0a9336d",
       "f3fd80b1-15d1-4c21-87ca-09e98938ec5b"
-    ]
+    ],
+    "weapon_level": 2,
+    "weapon_exp": 40,
+    "weapon_value": 20,
+    "helmet_level": 1,
+    "helmet_exp": 20,
+    "helmet_value": 10,
+    "armor_level": 2,
+    "armor_exp": 35,
+    "armor_value": 15
   },
   {
     "id": "3a3c6da1-2a55-4bcf-ab6d-760892d507e3",
@@ -227,7 +236,16 @@ export const mockPlayer2Characters = [
     "equipped_skills": [
       "bcce57f4-5b26-49ff-8950-bee1b0a9336d",
       "c0cf1536-3355-4250-92c6-c77acef7e5b2"
-    ]
+    ],
+    "weapon_level": 1,
+    "weapon_exp": 25,
+    "weapon_value": 15,
+    "helmet_level": 1,
+    "helmet_exp": 15,
+    "helmet_value": 10,
+    "armor_level": 1,
+    "armor_exp": 30,
+    "armor_value": 12
   },
   {
     "id": "217ebccf-b467-4ecc-9bb5-441165345d4a",
@@ -253,7 +271,16 @@ export const mockPlayer2Characters = [
     "equipped_skills": [
       "bcce57f4-5b26-49ff-8950-bee1b0a9336d",
       "62cf745c-ac43-4817-88fe-8a5cbe7d9196"
-    ]
+    ],
+    "weapon_level": 2,
+    "weapon_exp": 50,
+    "weapon_value": 22,
+    "helmet_level": 1,
+    "helmet_exp": 18,
+    "helmet_value": 11,
+    "armor_level": 2,
+    "armor_exp": 45,
+    "armor_value": 18
   }
 ];
 
