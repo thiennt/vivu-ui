@@ -495,3 +495,17 @@ export interface CharacterEquipment {
 export interface PlayerInventory {
   equipment: Equipment[];
 }
+
+export interface NFT {
+  id: string;
+  name: string;
+  image_url: string;
+  collection?: string;
+  rarity?: string;
+}
+
+export interface AvatarUpdateResponse {
+  success: boolean;
+  message: string;
+  avatar_url?: string;
+}

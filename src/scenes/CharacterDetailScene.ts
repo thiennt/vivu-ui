@@ -3,13 +3,15 @@ import { navigation } from '@/utils/navigation';
 import { HomeScene } from './HomeScene';
 import { BaseScene } from '@/ui/BaseScene';
 import { CharactersScene } from './CharactersScene';
-import { charactersApi, equipmentApi, skillsApi, isLikelyUsingMockData } from '@/services/api';
+import { charactersApi, equipmentApi, skillsApi, nftApi, isLikelyUsingMockData } from '@/services/api';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
 import { Colors, FontFamily } from '@/utils/cssStyles';
 import { LearnSkillPopup } from '@/popups/LearnSkillPopup';
 import { SkillChangePopup } from '@/popups/SkillChangePopup';
 import { EquipmentChangePopup } from '@/popups/EquipmentChangePopup';
 import { SkillDetailPopup } from '@/popups/SkillDetailPopup';
+import { AvatarChangePopup } from '@/popups/AvatarChangePopup';
+import { ErrorPopup } from '@/popups/ErrorPopup';
 import { ScrollBox } from '@pixi/ui';
 
 type TabType = 'stats' | 'skills' | 'equipment';
@@ -278,6 +280,15 @@ export class CharacterDetailScene extends BaseScene {
       rarityBadge,
       avatarIcon
     );
+
+    // Change Avatar button
+    const changeAvatarBtn = this.createAvatarChangeButton(
+      padding + 5,
+      17 + avatarSize - 22,
+      avatarSize - 10,
+      20
+    );
+    headerPanelContainer.addChild(changeAvatarBtn);
 
     // Core stats with fantasy badges
     const coreStats = [
@@ -1638,6 +1649,101 @@ export class CharacterDetailScene extends BaseScene {
       () => navigation.showScreen(CharactersScene)
     );
     this.buttonContainer.addChild(backButton);
+  }
+
+  private createAvatarChangeButton(x: number, y: number, width: number, height: number): Container {
+    const button = new Container();
+    
+    const bg = new Graphics();
+    bg.roundRect(0, 0, width, height, 5)
+      .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.95 })
+      .stroke({ width: 1.5, color: Colors.ROBOT_CYAN });
+    
+    const buttonText = new Text({
+      text: '🖼️',
+      style: {
+        fontFamily: FontFamily.ARIAL,
+        fontSize: 12,
+        fill: Colors.WHITE
+      }
+    });
+    buttonText.anchor.set(0.5);
+    buttonText.x = width / 2;
+    buttonText.y = height / 2;
+    
+    button.addChild(bg, buttonText);
+    button.x = x;
+    button.y = y;
+    button.interactive = true;
+    button.cursor = 'pointer';
+    
+    button.on('pointerover', () => {
+      bg.clear();
+      bg.roundRect(0, 0, width, height, 5)
+        .fill({ color: Colors.ROBOT_CYAN, alpha: 0.95 })
+        .stroke({ width: 1.5, color: Colors.ROBOT_CYAN_LIGHT });
+      button.scale.set(1.05);
+    });
+    
+    button.on('pointerout', () => {
+      bg.clear();
+      bg.roundRect(0, 0, width, height, 5)
+        .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.95 })
+        .stroke({ width: 1.5, color: Colors.ROBOT_CYAN });
+      button.scale.set(1.0);
+    });
+    
+    button.on('pointerdown', () => this.showAvatarChangeDialog());
+    
+    return button;
+  }
+
+  private showAvatarChangeDialog(): void {
+    const self = this;
+    navigation.presentPopup(class extends AvatarChangePopup {
+      constructor() {
+        super({
+          currentAvatarUrl: self.character.avatar_url || '',
+          characterId: self.character.id,
+          onAvatarSelected: async (nftId: string, avatarUrl: string) => {
+            await self.updateCharacterAvatar(nftId, avatarUrl);
+          }
+        });
+      }
+    });
+  }
+
+  private async updateCharacterAvatar(nftId: string, avatarUrl: string): Promise<void> {
+    console.log(`Updating character avatar to NFT: ${nftId}`);
+
+    // Show loading indicator
+    this.loadingManager.showLoading();
+
+    try {
+      // Call API to update avatar
+      await nftApi.updateCharacterAvatar(this.character.id, nftId);
+
+      // Update local character data
+      this.character.avatar_url = avatarUrl;
+
+      // Refresh character info display
+      this.infoContainer.removeChildren();
+      await this.createCharacterInfo();
+
+    } catch (error) {
+      console.error('Failed to update avatar:', error);
+      
+      // Show error popup to user
+      navigation.presentPopup(class extends ErrorPopup {
+        constructor() {
+          super({
+            message: 'Failed to update character avatar. Please try again.'
+          });
+        }
+      });
+    } finally {
+      this.loadingManager.hideLoading();
+    }
   }
 
   update(): void {
