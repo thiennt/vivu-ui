@@ -11,6 +11,7 @@ import { SkillChangePopup } from '@/popups/SkillChangePopup';
 import { EquipmentChangePopup } from '@/popups/EquipmentChangePopup';
 import { SkillDetailPopup } from '@/popups/SkillDetailPopup';
 import { AvatarChangePopup } from '@/popups/AvatarChangePopup';
+import { ErrorPopup } from '@/popups/ErrorPopup';
 import { ScrollBox } from '@pixi/ui';
 
 type TabType = 'stats' | 'skills' | 'equipment';
@@ -1731,6 +1732,15 @@ export class CharacterDetailScene extends BaseScene {
 
     } catch (error) {
       console.error('Failed to update avatar:', error);
+      
+      // Show error popup to user
+      navigation.presentPopup(class extends ErrorPopup {
+        constructor() {
+          super({
+            message: 'Failed to update character avatar. Please try again.'
+          });
+        }
+      });
     } finally {
       this.loadingManager.hideLoading();
     }

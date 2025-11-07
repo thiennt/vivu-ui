@@ -13,6 +13,8 @@ interface NFT {
 }
 
 export class AvatarChangePopup extends Container {
+  private static readonly PLACEHOLDER_ICON_SIZE_RATIO = 0.4; // Placeholder icon is 40% of card size
+  
   private dialogBg!: Graphics;
   private dialogPanel!: Graphics;
   private currentAvatarUrl: string;
@@ -315,7 +317,7 @@ export class AvatarChangePopup extends Container {
       // Show placeholder icon if image fails to load
       const placeholderText = new Text({
         text: '🖼️',
-        style: { fontSize: 40 }
+        style: { fontSize: size * AvatarChangePopup.PLACEHOLDER_ICON_SIZE_RATIO }
       });
       placeholderText.anchor.set(0.5);
       placeholderText.x = size / 2;
