@@ -545,8 +545,6 @@ export class LootBoxScene extends BaseScene {
   private openBoxes(count: number): void {
     if (this.isOpening || this.tickets < count) return;
     
-    console.log(`Opening ${count} boxes`);
-    
     this.isOpening = true;
     this.tickets -= count;
     
@@ -566,8 +564,6 @@ export class LootBoxScene extends BaseScene {
       const randomReward = this.possibleRewards[Math.floor(Math.random() * this.possibleRewards.length)];
       rewards.push(randomReward);
     }
-    
-    console.log('Generated rewards:', rewards);
     
     // Show rewards in popup
     navigation.presentPopup(LootBoxRewardsPopup, { rewards });

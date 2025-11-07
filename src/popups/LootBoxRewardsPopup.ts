@@ -53,7 +53,14 @@ export class LootBoxRewardsPopup extends Container {
     this.dialogPanel = new Container();
 
     // Calculate grid layout
-    const cols = this.rewards.length <= 3 ? this.rewards.length : this.rewards.length <= 6 ? 3 : 4;
+    let cols: number;
+    if (this.rewards.length <= 3) {
+      cols = this.rewards.length;
+    } else if (this.rewards.length <= 6) {
+      cols = 3;
+    } else {
+      cols = 4;
+    }
     const rows = Math.ceil(this.rewards.length / cols);
     const cardSize = Math.min(90, (maxWidth - padding * 2 - (cols - 1) * 10) / cols);
     const gridWidth = cols * cardSize + (cols - 1) * 10;
