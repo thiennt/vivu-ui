@@ -268,6 +268,11 @@ export class CharacterDetailScene extends BaseScene {
     avatarIcon.x = padding + avatarSize / 2;
     avatarIcon.y = 17 + avatarSize / 2;
 
+    // Make avatar clickable to change avatar
+    avatarIcon.interactive = true;
+    avatarIcon.cursor = 'pointer';
+    avatarIcon.on('pointerdown', () => this.showAvatarChangeDialog());
+
     // Rarity indicator gem
     const rarityBadge = new Graphics();
     rarityBadge.circle(padding + avatarSize - 12, 27, 10)
@@ -278,17 +283,18 @@ export class CharacterDetailScene extends BaseScene {
       headerPanel,
       avatar,
       rarityBadge,
-      avatarIcon
+      avatarIcon // clickable avatar
     );
 
-    // Change Avatar button
-    const changeAvatarBtn = this.createAvatarChangeButton(
-      padding + 5,
-      17 + avatarSize - 22,
-      avatarSize - 10,
-      20
-    );
-    headerPanelContainer.addChild(changeAvatarBtn);
+    // --- REMOVE changeAvatarBtn ---
+    // // Change Avatar button
+    // const changeAvatarBtn = this.createAvatarChangeButton(
+    //   padding + 5,
+    //   17 + avatarSize - 22,
+    //   avatarSize - 10,
+    //   20
+    // );
+    // headerPanelContainer.addChild(changeAvatarBtn);
 
     // Core stats with fantasy badges
     const coreStats = [
@@ -664,7 +670,7 @@ export class CharacterDetailScene extends BaseScene {
       .fill({ color: Colors.ROBOT_BG_MID, alpha: 0.7 });
 
     skillsPanel.roundRect(5, 5, panelWidth - 10, panelHeight - 10, 7)
-      .stroke({ width: 1, color: Colors.ROBOT_CYAN_MID, alpha: 0.4 });
+      .stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 0.4 });
 
     this.skillsContainer.addChild(skillsPanel);
 
@@ -994,7 +1000,7 @@ export class CharacterDetailScene extends BaseScene {
         .stroke({ width: 2, color: Colors.ROBOT_CYAN_LIGHT });
       bg.roundRect(2, 2, width - 4, height - 4, 6)
         .stroke({ width: 1, color: Colors.ROBOT_CYAN_MID, alpha: 0.9 });
-      button.scale.set(1.03);
+      button.scale.set(1.05);
     });
 
     button.on('pointerout', () => {
