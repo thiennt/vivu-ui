@@ -44,6 +44,11 @@ export interface Character {
   armor_level?: number;
   armor_exp?: number;
   armor_value?: number;
+  // Skin attributes (used for cosmetic changes with stat bonuses)
+  current_skin_id?: string;
+  skin_hp_bonus?: number; // Random % bonus for HP (0-10%)
+  skin_atk_bonus?: number; // Random % bonus for ATK (0-10%)
+  skin_def_bonus?: number; // Random % bonus for DEF (0-10%)
 }
 
 export interface CharacterStats {
@@ -272,6 +277,8 @@ export interface CardBattleCharacter {
   atk: number;
   def: number;
   agi: number;
+  // Advanced combat stats - kept for data compatibility but not actively used in battle logic
+  // Battle calculations use simplified stats (hp, atk, def) only
   crit_rate: number;
   crit_dmg: number;
   res: number;
@@ -332,6 +339,8 @@ export interface CharacterState {
   atk: number;
   def: number;
   agi: number;
+  // Advanced combat stats - kept for data compatibility but not actively used in battle logic
+  // Battle calculations use simplified stats (hp, atk, def) only
   crit_rate: number;
   crit_dmg: number;
   res: number;
@@ -481,6 +490,8 @@ export interface EquipmentStats {
   atk?: number;
   def?: number;
   agi?: number;
+  // Advanced combat stats - kept for data compatibility but not actively used in battle logic
+  // Battle calculations use simplified stats (hp, atk, def) only
   crit_rate?: number;
   crit_dmg?: number;
   res?: number;

@@ -14,7 +14,7 @@ import { AvatarChangePopup } from '@/popups/AvatarChangePopup';
 import { ErrorPopup } from '@/popups/ErrorPopup';
 import { ScrollBox } from '@pixi/ui';
 
-type TabType = 'stats' | 'skills' | 'equipment';
+type TabType = 'skin' | 'skills' | 'equipment';
 
 export class CharacterDetailScene extends BaseScene {
   /** Assets bundles required by this screen */
@@ -25,7 +25,7 @@ export class CharacterDetailScene extends BaseScene {
   private loadingManager: LoadingStateManager;
 
   // Tab state
-  private activeTab: TabType = 'stats';
+  private activeTab: TabType = 'skin';
 
   // UI containers
   public container: Container;
@@ -38,6 +38,7 @@ export class CharacterDetailScene extends BaseScene {
   private statsContainer: Container;
   private skillsContainer: Container;
   private equipmentContainer: Container;
+  private skinContainer: Container;
   private buttonContainer: Container;
 
   constructor(params?: { selectedCharacter: any }) {
@@ -55,6 +56,7 @@ export class CharacterDetailScene extends BaseScene {
     this.statsContainer = new Container();
     this.skillsContainer = new Container();
     this.equipmentContainer = new Container();
+    this.skinContainer = new Container();
     this.buttonContainer = new Container();
 
     this.addChild(this.container);
@@ -137,6 +139,7 @@ export class CharacterDetailScene extends BaseScene {
     this.statsContainer.removeChildren();
     this.skillsContainer.removeChildren();
     this.equipmentContainer.removeChildren();
+    this.skinContainer.removeChildren();
     this.buttonContainer.removeChildren();
 
     // Reset scroll box
@@ -373,7 +376,7 @@ export class CharacterDetailScene extends BaseScene {
     const tabsY = 225;
 
     const tabs: { type: TabType; label: string; icon: string }[] = [
-      { type: 'stats', label: 'Stats', icon: '📊' },
+      { type: 'skin', label: 'Skin', icon: '👕' },
       // { type: 'skills', label: 'Skills', icon: '📜' }, // Hidden to simplify game
       { type: 'equipment', label: 'Equipment', icon: '⚔️' }
     ];
@@ -480,6 +483,7 @@ export class CharacterDetailScene extends BaseScene {
     this.statsContainer.removeChildren();
     this.skillsContainer.removeChildren();
     this.equipmentContainer.removeChildren();
+    this.skinContainer.removeChildren();
     this.scrollBox = null;
 
     this.createTabs();
@@ -497,11 +501,11 @@ export class CharacterDetailScene extends BaseScene {
 
     // Add appropriate content based on active tab
     switch (this.activeTab) {
-      case 'stats':
-        this.createStatsDisplay();
-        scrollContent.addChild(this.statsContainer);
-        this.statsContainer.x = 0;
-        this.statsContainer.y = 0;
+      case 'skin':
+        this.createSkinDisplay();
+        scrollContent.addChild(this.skinContainer);
+        this.skinContainer.x = 0;
+        this.skinContainer.y = 0;
         break;
       case 'skills':
         this.createSkillsDisplay();
@@ -642,6 +646,375 @@ export class CharacterDetailScene extends BaseScene {
     });
 
     this.statsContainer.addChild(otherStatsContainer);
+  }
+
+  private createSkinDisplay(): void {
+    const padding = 12;
+    const panelWidth = this.gameWidth - 2 * padding;
+
+    // Title
+    const title = new Text({
+      text: '👕 Character Skins',
+      style: {
+        fontFamily: FontFamily.PRIMARY,
+        fontSize: 16,
+        fontWeight: 'bold',
+        fill: Colors.ROBOT_CYAN_LIGHT,
+        stroke: { color: Colors.ROBOT_ELEMENT, width: 1 }
+      }
+    });
+    title.x = 10;
+    title.y = 10;
+    this.skinContainer.addChild(title);
+
+    // Current skin display
+    const currentSkinPanel = this.createCurrentSkinPanel(panelWidth);
+    currentSkinPanel.x = 0;
+    currentSkinPanel.y = 45;
+    this.skinContainer.addChild(currentSkinPanel);
+
+    // Skin bonuses display
+    const bonusY = 220;
+    const bonusTitle = new Text({
+      text: '✨ Skin Stat Bonuses',
+      style: {
+        fontFamily: FontFamily.PRIMARY,
+        fontSize: 16,
+        fontWeight: 'bold',
+        fill: Colors.ROBOT_CYAN_LIGHT,
+        stroke: { color: Colors.ROBOT_ELEMENT, width: 1 }
+      }
+    });
+    bonusTitle.x = 10;
+    bonusTitle.y = bonusY;
+    this.skinContainer.addChild(bonusTitle);
+
+    const bonusPanel = this.createSkinBonusPanel(panelWidth);
+    bonusPanel.x = 0;
+    bonusPanel.y = bonusY + 35;
+    this.skinContainer.addChild(bonusPanel);
+
+    // Description
+    const descY = bonusY + 195;
+    const descText = new Text({
+      text: 'Change your character\'s appearance with skins! Each skin provides random stat bonuses to HP, ATK, and DEF.',
+      style: {
+        fontFamily: FontFamily.PRIMARY,
+        fontSize: 12,
+        fill: Colors.ROBOT_CYAN_MID,
+        wordWrap: true,
+        wordWrapWidth: panelWidth - 20,
+        lineHeight: 18,
+        fontStyle: 'italic'
+      }
+    });
+    descText.x = 10;
+    descText.y = descY;
+    this.skinContainer.addChild(descText);
+  }
+
+  private createCurrentSkinPanel(width: number): Container {
+    const panel = new Container();
+    const height = 160;
+
+    // Panel background
+    const bg = new Graphics();
+    bg.roundRect(0, 0, width, height, 10)
+      .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.98 })
+      .stroke({ width: 2, color: Colors.ROBOT_CYAN });
+
+    bg.roundRect(3, 3, width - 6, height - 6, 8)
+      .fill({ color: Colors.ROBOT_BG_MID, alpha: 0.7 });
+
+    bg.roundRect(5, 5, width - 10, height - 10, 7)
+      .stroke({ width: 1, color: Colors.ROBOT_CYAN_MID, alpha: 0.4 });
+
+    panel.addChild(bg);
+
+    // Current skin avatar with frame
+    const avatarSize = 100;
+    const avatarFrame = new Graphics();
+    avatarFrame.roundRect(20, 30, avatarSize, avatarSize, 12)
+      .fill({ color: Colors.ROBOT_BG_MID, alpha: 0.95 })
+      .stroke({ width: 3, color: Colors.ROBOT_CYAN_LIGHT });
+
+    avatarFrame.roundRect(23, 33, avatarSize - 6, avatarSize - 6, 10)
+      .stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 0.5 });
+
+    panel.addChild(avatarFrame);
+
+    // Avatar sprite (async load)
+    this.loadCurrentSkinAvatar(panel, 20 + avatarSize / 2, 30 + avatarSize / 2, avatarSize - 10);
+
+    // Skin info section
+    const infoX = 135;
+    
+    // "Current Skin" label
+    const labelText = new Text({
+      text: 'CURRENT SKIN',
+      style: {
+        fontFamily: FontFamily.PRIMARY,
+        fontSize: 11,
+        fontWeight: 'bold',
+        fill: Colors.ROBOT_CYAN_MID
+      }
+    });
+    labelText.x = infoX;
+    labelText.y = 35;
+    panel.addChild(labelText);
+
+    // Skin name/character name
+    const skinName = new Text({
+      text: this.character?.name || 'Default',
+      style: {
+        fontFamily: FontFamily.PRIMARY,
+        fontSize: 18,
+        fontWeight: 'bold',
+        fill: Colors.WHITE,
+        stroke: { color: Colors.ROBOT_ELEMENT, width: 2 }
+      }
+    });
+    skinName.x = infoX;
+    skinName.y = 55;
+    panel.addChild(skinName);
+
+    // Change button
+    const buttonWidth = 120;
+    const buttonHeight = 36;
+    const changeSkinBtn = this.createSkinButton(
+      'Change Skin',
+      infoX,
+      95,
+      buttonWidth,
+      buttonHeight,
+      () => this.showSkinChangeDialog()
+    );
+    panel.addChild(changeSkinBtn);
+
+    return panel;
+  }
+
+  private async loadCurrentSkinAvatar(parent: Container, x: number, y: number, size: number): Promise<void> {
+    try {
+      const avatarTexture = await Assets.load(this.character?.avatar_url || 'https://pixijs.com/assets/bunny.png');
+      const avatarSprite = new Sprite(avatarTexture);
+      avatarSprite.width = size;
+      avatarSprite.height = size;
+      avatarSprite.anchor.set(0.5);
+      avatarSprite.x = x;
+      avatarSprite.y = y;
+      parent.addChild(avatarSprite);
+    } catch (error) {
+      console.error('Failed to load skin avatar:', error);
+    }
+  }
+
+  private createSkinBonusPanel(width: number): Container {
+    const panel = new Container();
+    const height = 140;
+
+    const bg = new Graphics();
+    bg.roundRect(0, 0, width, height, 10)
+      .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.98 })
+      .stroke({ width: 2, color: Colors.ROBOT_CYAN });
+
+    bg.roundRect(3, 3, width - 6, height - 6, 8)
+      .fill({ color: Colors.ROBOT_BG_MID, alpha: 0.7 });
+
+    bg.roundRect(5, 5, width - 10, height - 10, 7)
+      .stroke({ width: 1, color: Colors.ROBOT_CYAN_MID, alpha: 0.4 });
+
+    panel.addChild(bg);
+
+    // Get skin bonuses (or defaults if not set)
+    const hpBonus = this.character?.skin_hp_bonus || 0;
+    const atkBonus = this.character?.skin_atk_bonus || 0;
+    const defBonus = this.character?.skin_def_bonus || 0;
+
+    const bonusStats = [
+      { label: 'HP Bonus', value: `${hpBonus.toFixed(1)}%`, icon: '❤️', color: Colors.STAT_HP },
+      { label: 'ATK Bonus', value: `${atkBonus.toFixed(1)}%`, icon: '⚔️', color: Colors.STAT_ATK },
+      { label: 'DEF Bonus', value: `${defBonus.toFixed(1)}%`, icon: '🛡️', color: Colors.STAT_DEF }
+    ];
+
+    bonusStats.forEach((stat, index) => {
+      const row = Math.floor(index / 2);
+      const col = index % 2;
+      const x = 15 + (col * (width / 2));
+      const y = 15 + (row * 60);
+
+      // Bonus stat row
+      const statBg = new Graphics();
+      statBg.roundRect(x, y, (width / 2) - 20, 50, 6)
+        .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.8 })
+        .stroke({ width: 1, color: stat.color, alpha: 0.5 });
+
+      // Icon
+      const iconText = new Text({
+        text: stat.icon,
+        style: { fontSize: 20 }
+      });
+      iconText.x = x + 10;
+      iconText.y = y + 8;
+
+      // Label
+      const labelText = new Text({
+        text: stat.label,
+        style: {
+          fontFamily: FontFamily.PRIMARY,
+          fontSize: 11,
+          fill: Colors.ROBOT_CYAN_LIGHT
+        }
+      });
+      labelText.x = x + 40;
+      labelText.y = y + 8;
+
+      // Value
+      const valueText = new Text({
+        text: stat.value,
+        style: {
+          fontFamily: FontFamily.PRIMARY,
+          fontSize: 18,
+          fontWeight: 'bold',
+          fill: stat.color
+        }
+      });
+      valueText.x = x + 40;
+      valueText.y = y + 25;
+
+      panel.addChild(statBg, iconText, labelText, valueText);
+    });
+
+    return panel;
+  }
+
+  private createSkinButton(
+    text: string,
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    onClick: () => void
+  ): Container {
+    const button = new Container();
+
+    const bg = new Graphics();
+    bg.roundRect(0, 0, width, height, 8)
+      .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.95 })
+      .stroke({ width: 2, color: Colors.ROBOT_CYAN_LIGHT });
+
+    bg.roundRect(2, 2, width - 4, height - 4, 6)
+      .stroke({ width: 1, color: Colors.ROBOT_CYAN_MID, alpha: 0.6 });
+
+    const buttonText = new Text({
+      text: text,
+      style: {
+        fontFamily: FontFamily.PRIMARY,
+        fontSize: 14,
+        fontWeight: 'bold',
+        fill: Colors.WHITE,
+        stroke: { color: Colors.ROBOT_ELEMENT, width: 1.5 }
+      }
+    });
+    buttonText.anchor.set(0.5);
+    buttonText.x = width / 2;
+    buttonText.y = height / 2;
+
+    button.addChild(bg, buttonText);
+    button.x = x;
+    button.y = y;
+    button.interactive = true;
+    button.cursor = 'pointer';
+
+    button.on('pointerover', () => {
+      bg.clear();
+      bg.roundRect(0, 0, width, height, 8)
+        .fill({ color: Colors.ROBOT_CYAN, alpha: 0.95 })
+        .stroke({ width: 2, color: Colors.ROBOT_CYAN_LIGHT });
+      bg.roundRect(2, 2, width - 4, height - 4, 6)
+        .stroke({ width: 1, color: Colors.ROBOT_CYAN_MID, alpha: 0.9 });
+      button.scale.set(1.05);
+    });
+
+    button.on('pointerout', () => {
+      bg.clear();
+      bg.roundRect(0, 0, width, height, 8)
+        .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.95 })
+        .stroke({ width: 2, color: Colors.ROBOT_CYAN_LIGHT });
+      bg.roundRect(2, 2, width - 4, height - 4, 6)
+        .stroke({ width: 1, color: Colors.ROBOT_CYAN_MID, alpha: 0.6 });
+      button.scale.set(1.0);
+    });
+
+    button.on('pointerdown', onClick);
+
+    return button;
+  }
+
+  private showSkinChangeDialog(): void {
+    const self = this;
+    navigation.presentPopup(class extends AvatarChangePopup {
+      constructor() {
+        super({
+          currentAvatarUrl: self.character.avatar_url || '',
+          characterId: self.character.id,
+          onAvatarSelected: async (nftId: string, avatarUrl: string) => {
+            await self.updateCharacterSkin(nftId, avatarUrl);
+          }
+        });
+      }
+    });
+  }
+
+  private async updateCharacterSkin(nftId: string, avatarUrl: string): Promise<void> {
+    console.log(`Updating character skin to NFT: ${nftId}`);
+
+    // Show loading indicator
+    this.loadingManager.showLoading();
+
+    try {
+      // Generate random bonuses (0-10% for each stat)
+      const hpBonus = Math.random() * 10;
+      const atkBonus = Math.random() * 10;
+      const defBonus = Math.random() * 10;
+
+      // Call API to update avatar (reusing existing avatar update API)
+      await nftApi.updateCharacterAvatar(this.character.id, nftId);
+
+      // Update local character data
+      this.character.avatar_url = avatarUrl;
+      this.character.current_skin_id = nftId;
+      this.character.skin_hp_bonus = hpBonus;
+      this.character.skin_atk_bonus = atkBonus;
+      this.character.skin_def_bonus = defBonus;
+
+      // Refresh character info and skin display
+      this.infoContainer.removeChildren();
+      await this.createCharacterInfo();
+
+      // Refresh skin display
+      this.skinContainer.removeChildren();
+      this.createSkinDisplay();
+
+      // Refresh the scroll content if we're on the skin tab
+      if (this.activeTab === 'skin') {
+        this.refreshTabContent();
+      }
+
+    } catch (error) {
+      console.error('Failed to update skin:', error);
+      
+      // Show error popup to user
+      navigation.presentPopup(class extends ErrorPopup {
+        constructor() {
+          super({
+            message: 'Failed to update character skin. Please try again.'
+          });
+        }
+      });
+    } finally {
+      this.loadingManager.hideLoading();
+    }
   }
 
   // Replace the createSkillsDisplay method in CharacterDetailScene.ts
