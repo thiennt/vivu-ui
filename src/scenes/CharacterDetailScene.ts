@@ -271,34 +271,12 @@ export class CharacterDetailScene extends BaseScene {
     avatarIcon.x = padding + avatarSize / 2;
     avatarIcon.y = 17 + avatarSize / 2;
 
-    // Make avatar clickable to change avatar
-    avatarIcon.interactive = true;
-    avatarIcon.cursor = 'pointer';
-    avatarIcon.on('pointerdown', () => this.showAvatarChangeDialog());
-
-    // Rarity indicator gem
-    const rarityBadge = new Graphics();
-    rarityBadge.circle(padding + avatarSize - 12, 27, 10)
-      .fill({ color: Colors.ROBOT_BG_DARK, alpha: 0.95 })
-      .stroke({ width: 2, color: this.getRarityColor(this.character!.rarity) });
-
     headerPanelContainer.addChild(
       headerPanel,
       avatar,
-      rarityBadge,
       avatarIcon // clickable avatar
     );
-
-    // --- REMOVE changeAvatarBtn ---
-    // // Change Avatar button
-    // const changeAvatarBtn = this.createAvatarChangeButton(
-    //   padding + 5,
-    //   17 + avatarSize - 22,
-    //   avatarSize - 10,
-    //   20
-    // );
-    // headerPanelContainer.addChild(changeAvatarBtn);
-
+    
     // Core stats with fantasy badges
     const coreStats = [
       { name: '❤️', value: this.character!.hp, color: Colors.STAT_HP, label: 'HP' },
