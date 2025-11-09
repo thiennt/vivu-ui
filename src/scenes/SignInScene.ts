@@ -61,7 +61,7 @@ export class SignInScene extends BaseScene {
 
   private createTitleSection(): void {
     const titleText = new Text({
-      text: 'Welcome to Vivu',
+      text: 'Syncing players',
       style: {
         fontFamily: FontFamily.PRIMARY,
         fontSize: 32,

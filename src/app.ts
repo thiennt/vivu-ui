@@ -97,13 +97,7 @@ async function init() {
 
   // Show initial loading screen
   //await navigation.showScreen(HomeScene);
-
-  //Go to one of the screens if a shortcut is present in url params, otherwise go to home screen
-  if (getUrlParam("signin") !== null) {
-    await navigation.showScreen(SignInScene);
-  } else {
-    await navigation.showScreen(HomeScene);
-  }
+  await navigation.showScreen(SignInScene);
 }
 
 // Init everything
