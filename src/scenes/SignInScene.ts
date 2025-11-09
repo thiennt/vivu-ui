@@ -1,6 +1,5 @@
 import { Container, Graphics, Text } from 'pixi.js';
 import { BaseScene } from '@/ui/BaseScene';
-import { Button } from '@/ui/Button';
 import { Colors, FontFamily } from '@/utils/cssStyles';
 import { authApi } from '@/services/api';
 import { navigation } from '@/utils/navigation';
@@ -12,9 +11,11 @@ import { sdk } from '@farcaster/miniapp-sdk';
 /**
  * Quick Auth Sign-In Scene
  * 
- * This scene provides two authentication methods:
- * 1. Quick Auth - For users inside Farcaster clients (seamless, one-click)
- * 2. SIWF - For users on regular web browsers (QR code flow)
+ * This scene automatically authenticates users:
+ * - In production mode: Uses Farcaster Quick Auth (handleQuickAuth)
+ * - In development mode: Uses a mock token for testing
+ * 
+ * Shows a "Syncing players" screen while authentication is in progress
  */
 export class SignInScene extends BaseScene {
   /** Assets bundles required by this screen */
@@ -38,6 +39,8 @@ export class SignInScene extends BaseScene {
 
   private async initializeAndCreateUI(): Promise<void> {
     this.createUI();
+    // Automatically start authentication process
+    await this.handleQuickAuth();
   }
 
   private createUI(): void {
@@ -78,42 +81,8 @@ export class SignInScene extends BaseScene {
   }
 
   private createSignInOptions(): void {
-    const formContainer = new Container();
-    
-    // Form background
-    const formBg = new Graphics();
-    const formWidth = Math.min(this.gameWidth - 2 * this.STANDARD_PADDING, 400);
-    const formHeight = this.isInFarcasterClient ? 280 : 420;
-    const formX = (this.gameWidth - formWidth) / 2;
-    const formY = this.gameHeight * 0.35;
-    
-    formBg.fill({ color: Colors.BACKGROUND_SECONDARY, alpha: 0.9 })
-      .stroke({ width: 2, color: Colors.BUTTON_PRIMARY })
-      .roundRect(formX, formY, formWidth, formHeight, 12);
-    formContainer.addChild(formBg);
-
-    let currentY = formY + 30;
-
-    // Show Quick Auth option (primary method when in Farcaster client)
-    this.createQuickAuthSection(formContainer, formX, formWidth, currentY);
-    currentY += 180;
-
-    this.container.addChild(formContainer);
-  }
-
-  private createQuickAuthSection(container: Container, formX: number, formWidth: number, startY: number): void {
-    // Quick Auth button
-    const quickAuthButton = new Button({
-      text: 'Sign In With Farcaster',
-      width: formWidth - 40,
-      height: 50,
-      gameWidth: this.gameWidth,
-      gameHeight: this.gameHeight,
-      onClick: () => this.handleQuickAuth()
-    });
-    quickAuthButton.x = formX + 20;
-    quickAuthButton.y = startY + 100;
-    container.addChild(quickAuthButton);
+    // No longer showing any sign-in buttons
+    // Authentication is triggered automatically on scene load
   }
 
   private async handleQuickAuth(): Promise<void> {
@@ -121,9 +90,19 @@ export class SignInScene extends BaseScene {
       this.loadingManager.showLoading();
       console.log('Attempting Quick Auth...');
 
-      const { token } = await sdk.quickAuth.getToken();
-      //let token = 'eyJhbGciOiJSUzI1NiIsImtpZCI6IjM1NWQ0M2JmLWM0YjQtNDVlMy04MmNhLThlYjI4YzY3MDllNSJ9.eyJpYXQiOjE3NTk5MjAxNTAsImlzcyI6Imh0dHBzOi8vYXV0aC5mYXJjYXN0ZXIueHl6IiwiZXhwIjoxNzU5OTIzNzUwLCJzdWIiOjE5MTIzMSwiYXVkIjoiY2YwOGRjNDgwMjUwLm5ncm9rLWZyZWUuYXBwIn0.Jrx-iGIfsESH5ea3s0bCabDYrKWl-AFx1t1toeCWIs94jRG-OekCuf5jxRcjvSFOENtwECMHpJI6E9jA7QoKoF1cirbw8wszpb1ouXIuIsBYdgZVZZc6lvSDn2XZsJZvBXnJ85S2s9TOq57pVCotfHX_EGO6VITbtoOAw9DkiesfSv9xjtXmvVUpgjSnmqIH7imMZ8veAkVVvnELvsCkQPTk2qgOtjAp1jyRM7GUoSnzpEeTs0NXjOOI6UiESogR4OqGrtmp5YQyY1yjl4RkAIviojinvxO_f3DZYLMgcrk_IRQHWSaGCc1YYZ1kbmdTgKK1RhDFnzPr0p9YxfP8Dw';
-      //token = 'MK-QRFtFkKWj3+fvyB5HjYetJ2FNts2zCq09uAlEMlDOhTyV967NjAOrZJbQPgxaTqlZaaC9y9MVEv3bkU0SiaKig=='
+      let token: string;
+      
+      // In development mode, use mock token directly
+      if (config.isDevelopment) {
+        console.log('🧪 Development mode: Using mock token');
+        // Use a mock token for development
+        token = 'mock_development_token_' + Date.now();
+      } else {
+        // In production mode, get token from Farcaster SDK
+        console.log('🚀 Production mode: Getting token from Farcaster SDK');
+        const result = await sdk.quickAuth.getToken();
+        token = result.token;
+      }
 
       console.log('Quick Auth token received:', token);
       if (!token) {
@@ -150,7 +129,7 @@ export class SignInScene extends BaseScene {
     } catch (error) {
       this.loadingManager.hideLoading();
       this.loadingManager.showError(
-        error instanceof Error ? error.message : 'Quick Auth failed. Please try the QR code method.'
+        error instanceof Error ? error.message : 'Quick Auth failed. Please try again.'
       );
       console.error('❌ Quick Auth error:', error);
     }
