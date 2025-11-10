@@ -23,7 +23,6 @@ export class SignInScene extends BaseScene {
   
   private container: Container;
   private loadingManager: LoadingStateManager;
-  private isInFarcasterClient: boolean = false;
 
   constructor() {
     super();
@@ -46,7 +45,6 @@ export class SignInScene extends BaseScene {
   private createUI(): void {
     this.createBackground();
     this.createTitleSection();
-    this.createSignInOptions();
   }
 
   private createBackground(): void {
@@ -80,29 +78,15 @@ export class SignInScene extends BaseScene {
     this.container.addChild(titleText);
   }
 
-  private createSignInOptions(): void {
-    // No longer showing any sign-in buttons
-    // Authentication is triggered automatically on scene load
-  }
-
   private async handleQuickAuth(): Promise<void> {
+    let token: string = 'mockToken';
+
     try {
       this.loadingManager.showLoading();
-      console.log('Attempting Quick Auth...');
 
-      let token: string;
-      
-      // In development mode, use mock token directly
-      if (config.isDevelopment) {
-        console.log('🧪 Development mode: Using mock token');
-        // Use a mock token for development
-        token = 'mock_development_token_' + Date.now();
-      } else {
-        // In production mode, get token from Farcaster SDK
-        console.log('🚀 Production mode: Getting token from Farcaster SDK');
-        const result = await sdk.quickAuth.getToken();
-        token = result.token;
-      }
+      console.log('🚀 Getting token from Farcaster SDK');
+      const result = await sdk.quickAuth.getToken();
+      token = result.token;
 
       console.log('Quick Auth token received:', token);
       if (!token) {
@@ -110,28 +94,28 @@ export class SignInScene extends BaseScene {
       }
 
       console.log('Token acquired. Sending to backend...', token);
-
-      // Call backend API with Farcaster data
-      const player = await authApi.signIn(token);
-
-      // Store auth token and player data
-      if (player) {
-        sessionStorage.setItem('player', JSON.stringify(player));
-        sessionStorage.setItem('playerId', player.id);
-
-        console.log('✅ Sign in successful:', player.username);
-        
-        this.loadingManager.hideLoading();
-
-        // Navigate to HomeScene
-        await navigation.showScreen(HomeScene);
-      }
     } catch (error) {
       this.loadingManager.hideLoading();
       this.loadingManager.showError(
         error instanceof Error ? error.message : 'Quick Auth failed. Please try again.'
       );
       console.error('❌ Quick Auth error:', error);
+    }
+
+    // Call backend API with Farcaster data
+    const player = await authApi.signIn(token);
+
+    // Store auth token and player data
+    if (player) {
+      sessionStorage.setItem('player', JSON.stringify(player));
+      sessionStorage.setItem('playerId', player.id);
+
+      console.log('✅ Sign in successful:', player.username);
+      
+      this.loadingManager.hideLoading();
+
+      // Navigate to HomeScene
+      await navigation.showScreen(HomeScene);
     }
   }
 
