@@ -5,7 +5,7 @@ import { BaseScene } from '@/ui/BaseScene';
 import { Colors, FontFamily } from '@/utils/cssStyles';
 import { CharacterDetailScene } from './CharacterDetailScene';
 import { ScrollBox } from '@pixi/ui';
-import { charactersApi, isLikelyUsingMockData } from '@/services/api';
+import { charactersApi } from '@/services/api';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
 
 export class CharactersScene extends BaseScene {
@@ -57,11 +57,6 @@ export class CharactersScene extends BaseScene {
     this.characters = await charactersApi.getAllCharacters();
     
     this.loadingManager.hideLoading();
-    
-    // Show mock data indicator if we're likely using mock data
-    if (isLikelyUsingMockData()) {
-      this.loadingManager.showMockDataIndicator();
-    }
     
     this.initializeUI();
   }

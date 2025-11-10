@@ -4,7 +4,7 @@ import { navigation } from '@/utils/navigation';
 import { HomeScene } from './HomeScene';
 import { StageScene } from './StageScene';
 import { Colors, FontFamily } from '@/utils/cssStyles';
-import { dungeonsApi, isLikelyUsingMockData } from '@/services/api';
+import { dungeonsApi } from '@/services/api';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
 
 export class DungeonScene extends BaseScene {
@@ -50,11 +50,6 @@ export class DungeonScene extends BaseScene {
     this.dungeons = await dungeonsApi.getAllDungeons();
     
     this.loadingManager.hideLoading();
-    
-    // Show mock data indicator if we're likely using mock data
-    if (isLikelyUsingMockData()) {
-      this.loadingManager.showMockDataIndicator();
-    }
     
     this.initializeUI();
   }

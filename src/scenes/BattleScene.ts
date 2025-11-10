@@ -1,6 +1,6 @@
 import { Assets, Container, Graphics, Sprite, Text } from 'pixi.js';
 import { navigation } from '@/utils/navigation';
-import { mockCharacters } from '@/utils/mockData';
+import { charactersApi } from '@/services/api';
 import { BaseScene } from '@/ui/BaseScene';
 import { HomeScene } from './HomeScene';
 import { Colors, FontFamily } from '@/utils/cssStyles';
@@ -27,37 +27,47 @@ export class BattleScene extends BaseScene {
     this.container = new Container();
     this.addChild(this.container);
     
-    // Initialize battle teams (4v4)
+    // Initialize battle teams (4v4) - will load from API
     this.initializeTeams();
   }
 
-  private initializeTeams(): void {
-    // Select first 4 characters for team 1
-    this.team1 = mockCharacters.slice(0, 4).map(char => ({
-      ...char,
-      hp: char.hp,
-      current_energy: 50,
-      team: 1
-    }));
-    
-    // Select next 4 characters for team 2 (or duplicate if not enough)
-    this.team2 = mockCharacters.slice(4, 8).map(char => ({
-      ...char,
-      hp: char.hp,
-      current_energy: 50,
-      team: 2
-    }));
-    
-    // If we don't have 8 characters, duplicate some
-    while (this.team2.length < 4) {
-      const char = mockCharacters[this.team2.length % mockCharacters.length];
-      this.team2.push({
+  private async initializeTeams(): Promise<void> {
+    try {
+      // Fetch characters from API
+      const characters = await charactersApi.getAllCharacters();
+      
+      // Select first 4 characters for team 1
+      this.team1 = characters.slice(0, 4).map(char => ({
         ...char,
-        id: `${char.id}_copy`,
+        hp: char.hp,
+        current_energy: 50,
+        team: 1
+      }));
+      
+      // Select next 4 characters for team 2 (or duplicate if not enough)
+      this.team2 = characters.slice(4, 8).map(char => ({
+        ...char,
         hp: char.hp,
         current_energy: 50,
         team: 2
-      });
+      }));
+      
+      // If we don't have 8 characters, duplicate some
+      while (this.team2.length < 4 && characters.length > 0) {
+        const char = characters[this.team2.length % characters.length];
+        this.team2.push({
+          ...char,
+          id: `${char.id}_copy`,
+          hp: char.hp,
+          current_energy: 50,
+          team: 2
+        });
+      }
+    } catch (error) {
+      console.error('Failed to load characters for battle:', error);
+      // Initialize with empty teams if API fails
+      this.team1 = [];
+      this.team2 = [];
     }
   }
 

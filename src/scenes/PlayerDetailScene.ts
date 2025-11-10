@@ -6,7 +6,7 @@ import { CharacterDetailScene } from './CharacterDetailScene';
 import { HomeScene } from './HomeScene';
 import { Colors, FontFamily } from '@/utils/cssStyles';
 import { ScrollBox } from '@pixi/ui';
-import { playerApi, ApiError, isLikelyUsingMockData } from '@/services/api';
+import { playerApi, ApiError } from '@/services/api';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
 
 export class PlayerDetailScene extends BaseScene {
@@ -70,11 +70,6 @@ export class PlayerDetailScene extends BaseScene {
     this.tempStatChanges = { sta: 0, str: 0, agi: 0 };
 
     this.loadingManager.hideLoading();
-    
-    // Show mock data indicator if we're likely using mock data
-    if (isLikelyUsingMockData()) {
-      this.loadingManager.showMockDataIndicator();
-    }
     
     this.initializeUI();
   }

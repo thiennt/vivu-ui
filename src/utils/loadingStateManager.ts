@@ -9,13 +9,11 @@ import { Colors, FontFamily } from '@/utils/cssStyles';
 export interface LoadingState {
   isLoading: boolean;
   error: string | null;
-  usingMockData?: boolean;
 }
 
 export class LoadingStateManager {
   private loadingContainer: Container;
   private errorContainer: Container;
-  private mockDataContainer: Container;
   private parentContainer: Container;
   private gameWidth: number;
   private gameHeight: number;
@@ -27,11 +25,9 @@ export class LoadingStateManager {
     
     this.loadingContainer = new Container();
     this.errorContainer = new Container();
-    this.mockDataContainer = new Container();
     
     this.createLoadingUI();
     this.createErrorUI();
-    this.createMockDataIndicator();
   }
 
   private createLoadingUI(): void {
@@ -161,40 +157,6 @@ export class LoadingStateManager {
     return button;
   }
 
-  private createMockDataIndicator(): void {
-    // Create a small indicator in the top-right corner
-    const indicator = new Container();
-    
-    // Background
-    const bg = new Graphics();
-    bg.roundRect(0, 0, 120, 30, 5);
-    bg.fill({ color: Colors.EMPTY_SLOT, alpha: 0.8 });
-    bg.stroke({ width: 1, color: Colors.GLOW_COLOR });
-    indicator.addChild(bg);
-
-    // Text
-    const text = new Text({
-      text: 'Mock Data',
-      style: {
-        fontFamily: FontFamily.PRIMARY,
-        fontSize: 12,
-        fill: Colors.GLOW_COLOR,
-        align: 'center'
-      }
-    });
-    text.anchor.set(0.5);
-    text.x = 60;
-    text.y = 15;
-    indicator.addChild(text);
-
-    // Position in top-right corner
-    indicator.x = this.gameWidth - 130;
-    indicator.y = 10;
-    
-    this.mockDataContainer.addChild(indicator);
-    this.mockDataContainer.visible = false;
-  }
-
   public showLoading(): void {
     this.hideError();
     this.loadingContainer.visible = true;
@@ -242,18 +204,6 @@ export class LoadingStateManager {
     }
   }
 
-  public showMockDataIndicator(): void {
-    this.mockDataContainer.visible = true;
-    this.parentContainer.addChild(this.mockDataContainer);
-  }
-
-  public hideMockDataIndicator(): void {
-    this.mockDataContainer.visible = false;
-    if (this.mockDataContainer.parent) {
-      this.parentContainer.removeChild(this.mockDataContainer);
-    }
-  }
-
   public updateDimensions(width: number, height: number): void {
     this.gameWidth = width;
     this.gameHeight = height;
@@ -261,18 +211,14 @@ export class LoadingStateManager {
     // Recreate UI with new dimensions
     this.loadingContainer.removeChildren();
     this.errorContainer.removeChildren();
-    this.mockDataContainer.removeChildren();
     this.createLoadingUI();
     this.createErrorUI();
-    this.createMockDataIndicator();
   }
 
   public destroy(): void {
     this.hideLoading();
     this.hideError();
-    this.hideMockDataIndicator();
     this.loadingContainer.destroy();
     this.errorContainer.destroy();
-    this.mockDataContainer.destroy();
   }
 }

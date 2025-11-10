@@ -4,7 +4,7 @@ import { HomeScene } from './HomeScene';
 import { BaseScene } from '@/ui/BaseScene';
 import { Colors, FontFamily } from '@/utils/cssStyles';
 import { ScrollBox } from '@pixi/ui';
-import { skillsApi, isLikelyUsingMockData } from '@/services/api';
+import { skillsApi } from '@/services/api';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
 
 export class CraftSkillScene extends BaseScene {
@@ -57,11 +57,6 @@ export class CraftSkillScene extends BaseScene {
     this.skills = await skillsApi.getAllSkills();
     
     this.loadingManager.hideLoading();
-    
-    // Show mock data indicator if we're likely using mock data
-    if (isLikelyUsingMockData()) {
-      this.loadingManager.showMockDataIndicator();
-    }
     
     this.initializeUI();
   }

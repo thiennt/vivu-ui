@@ -4,15 +4,12 @@
  */
 
 export interface AppConfig {
-  /** Whether to use mock data instead of real API calls */
-  useMockData: boolean;
   /** API base URL */
   apiBaseUrl: string;
 }
 
 // Default configuration
 const defaultConfig: AppConfig = {
-  useMockData: ((import.meta as unknown) as { env?: { VITE_USE_MOCK_DATA?: string } }).env?.VITE_USE_MOCK_DATA === 'true' || ((import.meta as unknown) as { env?: { VITE_USE_MOCK_DATA?: string } }).env?.VITE_USE_MOCK_DATA === undefined, // Default to true for development/testing when env var is not set
   apiBaseUrl: ((import.meta as unknown) as { env?: { VITE_API_BASE_URL?: string } }).env?.VITE_API_BASE_URL || 'https://api.vivu.game',
 };
 
