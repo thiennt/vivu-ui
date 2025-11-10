@@ -32,9 +32,13 @@ async function apiRequest<T>(
 ): Promise<T> {
   const url = `${config.apiBaseUrl}${endpoint}`;
 
+  // Get the auth token from sessionStorage
+  const authToken = sessionStorage.getItem('authToken');
+
   const defaultOptions: RequestInit = {
     headers: {
       'Content-Type': 'application/json',
+      ...(authToken && { 'Authorization': `Bearer ${authToken}` }),
       ...options.headers,
     },
     ...options,
@@ -273,6 +277,7 @@ export const battleApi = {
 // Auth API methods
 export const authApi = {
   async signIn(token: string): Promise<any> {
+    // For signIn, we need to override the default token with the provided one
     return apiRequest('/auth/signin', {
       method: 'GET',
       headers: {
@@ -283,19 +288,13 @@ export const authApi = {
 
   async getCheckinStatus(): Promise<any> {
     return apiRequest('/auth/checkin/status', {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${sessionStorage.getItem('authToken') || ''}`
-      }
+      method: 'GET'
     });
   },
 
   async checkin(): Promise<any> {
     return apiRequest('/auth/checkin', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${sessionStorage.getItem('authToken') || ''}`
-      }
+      method: 'POST'
     });
   },
 };
