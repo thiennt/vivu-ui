@@ -21,7 +21,7 @@ function resize() {
   const windowWidth = Math.min(window.innerWidth, maxWidth);
   const windowHeight = Math.min(window.innerHeight, maxHeight);
   const minWidth = 400;
-  const minHeight = 700;
+  const minHeight = 695;
 
   // Calculate renderer and canvas sizes based on current dimensions
   const scaleX = windowWidth < minWidth ? minWidth / windowWidth : 1;

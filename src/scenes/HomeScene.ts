@@ -3,17 +3,11 @@ import { navigation } from '@/utils/navigation';
 import { BaseScene } from '@/ui/BaseScene';
 import { CharactersScene } from './CharactersScene';
 import { LineupScene } from './LineupScene';
-import { BattleScene } from './BattleScene';
 import { CardBattleScene } from './CardBattleScene';
-import { TowerScene } from './TowerScene';
 import { CheckinScene } from './CheckinScene';
 import { LootBoxScene } from './LootBoxScene';
-import { CraftEquipmentScene } from './CraftEquipmentScene';
-import { CraftSkillScene } from './CraftSkillScene';
 import { Colors, FontFamily } from '@/utils/cssStyles';
-import { playerApi } from '@/services/api';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
-
 
 export class HomeScene extends BaseScene {
   /** Assets bundles required by this screen */
@@ -40,10 +34,8 @@ export class HomeScene extends BaseScene {
   private async loadPlayerData(): Promise<void> {
     this.loadingManager.showLoading();
     
-    const playerId = 'player_fc_001';
-    this.player = await playerApi.getPlayer(playerId);
-    sessionStorage.setItem('player', JSON.stringify(this.player));
-    sessionStorage.setItem('playerId', this.player.id);
+    const player = sessionStorage.getItem('player');
+    this.player = player ? JSON.parse(player) : null;
 
     this.loadingManager.hideLoading();
     
