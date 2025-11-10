@@ -3,7 +3,7 @@ import { navigation } from '@/utils/navigation';
 import { BaseScene } from '@/ui/BaseScene';
 import { HomeScene } from './HomeScene';
 import { Colors, FontFamily } from '@/utils/cssStyles';
-import { battleApi, isLikelyUsingMockData } from '@/services/api';
+import { battleApi } from '@/services/api';
 import { Dungeon, Stage } from '@/types';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
 import { TowerFloorPopup } from '@/popups/TowerFloorPopup';
@@ -61,11 +61,6 @@ export class TowerScene extends BaseScene {
     }
     
     this.loadingManager.hideLoading();
-
-    // Show mock data indicator if we're likely using mock data
-    if (isLikelyUsingMockData()) {
-      this.loadingManager.showMockDataIndicator();
-    }
     
     this.initializeUI();
   }

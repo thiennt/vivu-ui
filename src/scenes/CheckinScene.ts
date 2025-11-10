@@ -3,7 +3,7 @@ import { navigation } from '@/utils/navigation';
 import { HomeScene } from './HomeScene';
 import { BaseScene } from '@/ui/BaseScene';
 import { Colors, FontFamily } from '@/utils/cssStyles';
-import { authApi, isLikelyUsingMockData } from '@/services/api';
+import { authApi } from '@/services/api';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
 
 export class CheckinScene extends BaseScene {
@@ -94,11 +94,6 @@ export class CheckinScene extends BaseScene {
     }
     
     this.loadingManager.hideLoading();
-    
-    // Show mock data indicator if we're likely using mock data
-    if (isLikelyUsingMockData()) {
-      this.loadingManager.showMockDataIndicator();
-    }
     
     // Refresh UI to show the results and disable button
     this.updateLayout();

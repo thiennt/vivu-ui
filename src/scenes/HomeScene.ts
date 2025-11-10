@@ -11,7 +11,7 @@ import { LootBoxScene } from './LootBoxScene';
 import { CraftEquipmentScene } from './CraftEquipmentScene';
 import { CraftSkillScene } from './CraftSkillScene';
 import { Colors, FontFamily } from '@/utils/cssStyles';
-import { playerApi, isLikelyUsingMockData } from '@/services/api';
+import { playerApi } from '@/services/api';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
 
 
@@ -46,11 +46,6 @@ export class HomeScene extends BaseScene {
     sessionStorage.setItem('playerId', this.player.id);
 
     this.loadingManager.hideLoading();
-
-    // Show mock data indicator if we're likely using mock data
-    if (isLikelyUsingMockData()) {
-      this.loadingManager.showMockDataIndicator();
-    }
     
     this.createUI();
   }

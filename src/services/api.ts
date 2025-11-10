@@ -1,26 +1,16 @@
 /**
  * API Service Layer for vivu-api integration
  * Provides TypeScript interfaces and service methods for all game data
- * Uses configuration to determine whether to use mock data or real API calls
+ * All methods now use real API calls only
  */
 
 import { config } from '@/config';
-import {
-  mockPlayer, mockSkills, mockDungeons, mockStages, mockCardBattleState,
-  mockBattleStage, mockPlayer1Characters, mockActionResult, mockDrawCardResult,
-  mockPlayCardResult, mockEndTurnResult,
-  mockAiTurnResult, mockCheckinResponse, mockAllEquipment, mockPlayerInventory,
-  mockCharacterEquipment,
-  mockCheckinStatusResponse,
-  mockPlayerNFTs
-} from '@/utils/mockData';
 import { TurnAction, NFT, AvatarUpdateResponse } from '@/types';
 
 // Loading state interface
 interface LoadingState {
   isLoading: boolean;
   error: string | null;
-  usingMockData?: boolean;
 }
 
 // API Error class
@@ -35,23 +25,11 @@ class ApiError extends Error {
   }
 }
 
-// Generic API request helper with configuration-based mock support
+// Generic API request helper - makes real API calls only
 async function apiRequest<T>(
   endpoint: string,
-  options: RequestInit = {},
-  fallbackData?: T
+  options: RequestInit = {}
 ): Promise<T> {
-  if (config.useMockData) {
-    console.log(`🧪 Using mock data for ${endpoint}`)
-    if (fallbackData !== undefined) {
-      return new Promise((resolve) => {
-        setTimeout(() => resolve(fallbackData), 500); // Simulate network delay
-      });
-    } else {
-      throw new ApiError(`No mock data available for ${endpoint}`);
-    }
-  }
-
   const url = `${config.apiBaseUrl}${endpoint}`;
 
   const defaultOptions: RequestInit = {
@@ -63,7 +41,7 @@ async function apiRequest<T>(
   };
 
   try {
-    console.log(`🌐 Making real API call to ${endpoint}`);
+    console.log(`🌐 Making API call to ${endpoint}`);
     const response = await fetch(url, defaultOptions);
 
     if (!response.ok) {
@@ -89,21 +67,21 @@ async function apiRequest<T>(
 // Player API methods
 export const playerApi = {
   async getPlayer(playerId: string): Promise<any> {
-    return apiRequest(`/players/${playerId}`, {}, mockPlayer);
+    return apiRequest(`/players/${playerId}`);
   },
 
   async updatePlayerStats(playerId: string, stats: any): Promise<any> {
     return apiRequest(`/players/${playerId}/stats`, {
       method: 'PUT',
       body: JSON.stringify(stats),
-    }, { ...mockPlayer, ...stats });
+    });
   },
 
   async updateLineup(playerId: string, lineup: any[]): Promise<any> {
     return apiRequest(`/players/${playerId}/lineup`, {
       method: 'POST',
       body: JSON.stringify(lineup),
-    }, { success: true, lineup });
+    });
   },
 };
 
@@ -111,7 +89,7 @@ export const playerApi = {
 export const charactersApi = {
   async getAllCharacters(): Promise<any[]> {
     const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
-    return apiRequest(`/players/${playerId}/characters`, {}, mockPlayer1Characters);
+    return apiRequest(`/players/${playerId}/characters`);
   },
 
   async getCharacter(characterId: string): Promise<any> {
@@ -122,7 +100,7 @@ export const charactersApi = {
 
   async getCharacterSkills(characterId: string): Promise<any[]> {
     const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
-    return apiRequest(`/players/${playerId}/characters/${characterId}/skills`, {}, mockSkills);
+    return apiRequest(`/players/${playerId}/characters/${characterId}/skills`);
   },
 };
 
@@ -130,25 +108,23 @@ export const charactersApi = {
 export const dungeonsApi = {
   async getAllDungeons(): Promise<any[]> {
     const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
-    return apiRequest(`/players/${playerId}/stages`, {}, mockDungeons);
+    return apiRequest(`/players/${playerId}/stages`);
   },
 
   async getDungeonStages(dungeonId: string): Promise<any[]> {
     const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
-    const dungeon = mockDungeons.find(d => d.id === dungeonId);
-    return apiRequest(`/players/${playerId}/stages/${dungeonId}/stages`, {}, dungeon?.stages || []);
+    return apiRequest(`/players/${playerId}/stages/${dungeonId}/stages`);
   },
 };
 
 // Skills API methods
 export const skillsApi = {
   async getAllSkills(): Promise<any[]> {
-    return apiRequest('/skills', {}, mockSkills);
+    return apiRequest('/skills');
   },
 
   async getSkill(skillId: string): Promise<any> {
-    const skill = mockSkills.find(s => (s as any).id === skillId);
-    return apiRequest(`/skills/${skillId}`, {}, skill);
+    return apiRequest(`/skills/${skillId}`);
   },
 
   /**
@@ -157,7 +133,7 @@ export const skillsApi = {
    */
   async getAvailableSkills(skillType?: string): Promise<any[]> {
     const endpoint = skillType ? `/skills?skill_type=${skillType}` : '/skills';
-    return apiRequest(endpoint, {}, mockSkills.filter(s => !skillType || s.skill_type === skillType));
+    return apiRequest(endpoint);
   },
 
   /**
@@ -169,13 +145,6 @@ export const skillsApi = {
     return apiRequest(`/players/${pid}/characters/${characterId}/skills`, {
       method: 'POST',
       body: JSON.stringify({ skill_id: skillId })
-    }, {
-      success: true,
-      message: 'Skill learned successfully',
-      character_skill: {
-        skill_id: skillId,
-        learned_at: new Date().toISOString()
-      }
     });
   },
 
@@ -188,13 +157,6 @@ export const skillsApi = {
     return apiRequest(`/players/${pid}/characters/${characterId}/skills/${oldSkillId}`, {
       method: 'PUT',
       body: JSON.stringify({ new_skill_id: newSkillId })
-    }, {
-      success: true,
-      message: 'Skill changed successfully',
-      character_skill: {
-        skill_id: newSkillId,
-        updated_at: new Date().toISOString()
-      }
     });
   },
 
@@ -206,9 +168,6 @@ export const skillsApi = {
     const pid = playerId || sessionStorage.getItem('playerId') || 'player_fc_001';
     return apiRequest(`/players/${pid}/characters/${characterId}/skills/${skillId}`, {
       method: 'DELETE'
-    }, {
-      success: true,
-      message: 'Skill removed successfully'
     });
   }
 };
@@ -217,46 +176,18 @@ export const skillsApi = {
 export const battleApi = {
   async getAvailableStages(): Promise<any> {
     const playerId = sessionStorage.getItem('playerId');
-    return apiRequest(`/players/${playerId}/card-battle/stages`, {}, {
-      success: true,
-      code: 200,
-      message: "Stages retrieved successfully",
-      data: mockStages,
-      errors: null,
-      meta: {
-        playerId,
-        timestamp: new Date().toISOString()
-      }
-    });
+    return apiRequest(`/players/${playerId}/card-battle/stages`);
   },
 
   async getStageEnemies(stage_id: string): Promise<any> {
     const playerId = sessionStorage.getItem('playerId');
-    return apiRequest(`/players/${playerId}/card-battle/stages/${stage_id}/enemies`, {}, {
-      success: true,
-      code: 200,
-      message: "Stage enemies retrieved successfully",
-      errors: null,
-      data: mockStages.find(stage => stage.id === stage_id)?.characters || [],
-      meta: {
-        playerId,
-        stage_id,
-        timestamp: new Date().toISOString()
-      }
-    });
+    return apiRequest(`/players/${playerId}/card-battle/stages/${stage_id}/enemies`);
   },
 
   async createBattleStage(stage_id: string): Promise<any> {
     const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
     return apiRequest(`/players/${playerId}/card-battle/stages/${stage_id}`, {
       method: 'POST'
-    }, {
-      success: true,
-      code: 200,
-      message: "Battle stage created successfully",
-      data: mockBattleStage,
-      errors: null,
-      meta: {}
     });
   },
 
@@ -264,34 +195,12 @@ export const battleApi = {
     const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
     return apiRequest(`/players/${playerId}/card-battle/${battleId}/start`, {
       method: 'POST',
-    }, {
-      success: true,
-      code: 200,
-      message: "Battle started successfully",
-      data: null,
-      errors: null,
-      meta: {
-        playerId,
-        battleId,
-        timestamp: new Date().toISOString()
-      }
     });
   },
 
   async getBattleState(battleId: string): Promise<any> {
     const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
-    return apiRequest(`/players/${playerId}/card-battle/${battleId}/state`, {}, {
-      success: true,
-      code: 200,
-      message: "Battle state retrieved successfully",
-      data: mockCardBattleState,
-      errors: null,
-      meta: {
-        playerId,
-        battleId,
-        timestamp: new Date().toISOString()
-      }
-    });
+    return apiRequest(`/players/${playerId}/card-battle/${battleId}/state`);
   },
 
   async startTurn(battleId: string): Promise<any> {
@@ -300,7 +209,7 @@ export const battleApi = {
 
     return apiRequest(`/players/${playerId}/card-battle/${battleId}/start-turn`, {
       method: 'POST',
-    }, mockActionResult);
+    });
   },
 
   async drawCards(battleId: string, turnAction: TurnAction): Promise<any> {
@@ -310,7 +219,7 @@ export const battleApi = {
     return apiRequest(`/players/${playerId}/card-battle/${battleId}/draw-card`, {
       method: 'POST',
       body: JSON.stringify(turnAction),
-    }, mockDrawCardResult);
+    });
   },
 
   async discardCard(battleId: string, turnAction: TurnAction): Promise<any> {
@@ -320,7 +229,7 @@ export const battleApi = {
     return apiRequest(`/players/${playerId}/card-battle/${battleId}/discard-card`, {
       method: 'POST',
       body: JSON.stringify(turnAction),
-    }, mockActionResult);
+    });
   },
 
   async playCard(battleId: string, turnAction: TurnAction): Promise<any> {
@@ -330,7 +239,7 @@ export const battleApi = {
     return apiRequest(`/players/${playerId}/card-battle/${battleId}/play-card`, {
       method: 'POST',
       body: JSON.stringify(turnAction),
-    }, mockPlayCardResult);
+    });
   },
 
   async endTurn(battleId: string, turnAction: TurnAction): Promise<any> {
@@ -340,7 +249,7 @@ export const battleApi = {
     return apiRequest(`/players/${playerId}/card-battle/${battleId}/end-turn`, {
       method: 'POST',
       body: JSON.stringify(turnAction),
-    }, mockEndTurnResult);
+    });
   },
 
   async aiTurn(battleId: string): Promise<any> {
@@ -348,13 +257,13 @@ export const battleApi = {
     const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
     return apiRequest(`/players/${playerId}/card-battle/${battleId}/ai-turn`, {
       method: 'POST',
-    }, mockAiTurnResult);
+    });
   },
 
   async getBattleLogs(battleId: string, turn?: number): Promise<any> {
     console.log('📋 getBattleLogs API called for battle:', battleId, 'turn:', turn);
     const endpoint = turn ? `/card-battle/${battleId}/logs?turn=${turn}` : `/card-battle/${battleId}/logs`;
-    return apiRequest(endpoint, {}, []);
+    return apiRequest(endpoint);
   },
 
 
@@ -369,7 +278,7 @@ export const authApi = {
       headers: {
         'Authorization': `Bearer ${token}`
       }
-    }, mockPlayer);
+    });
   },
 
   async getCheckinStatus(): Promise<any> {
@@ -378,7 +287,7 @@ export const authApi = {
       headers: {
         'Authorization': `Bearer ${sessionStorage.getItem('authToken') || ''}`
       }
-    }, mockCheckinStatusResponse);
+    });
   },
 
   async checkin(): Promise<any> {
@@ -387,7 +296,7 @@ export const authApi = {
       headers: {
         'Authorization': `Bearer ${sessionStorage.getItem('authToken') || ''}`
       }
-    }, mockCheckinResponse);
+    });
   },
 };
 
@@ -403,7 +312,7 @@ export const equipmentApi = {
    */
   async getAllEquipment(playerId?: string): Promise<any[]> {
     const pid = playerId || sessionStorage.getItem('playerId') || 'player_fc_001';
-    return apiRequest(`/players/${pid}/equipments`, {}, mockAllEquipment);
+    return apiRequest(`/players/${pid}/equipments`);
   },
 
   /**
@@ -412,7 +321,7 @@ export const equipmentApi = {
    */
   async getPlayerInventory(playerId?: string): Promise<any> {
     const pid = playerId || sessionStorage.getItem('playerId') || 'player_fc_001';
-    return apiRequest(`/players/${pid}/equipment`, {}, mockPlayerInventory);
+    return apiRequest(`/players/${pid}/equipment`);
   },
 
   /**
@@ -421,7 +330,7 @@ export const equipmentApi = {
    */
   async getCharacterEquipment(characterId: string, playerId?: string): Promise<any> {
     const pid = playerId || sessionStorage.getItem('playerId') || 'player_fc_001';
-    return apiRequest(`/players/${pid}/characters/${characterId}/equipment`, {}, mockCharacterEquipment);
+    return apiRequest(`/players/${pid}/characters/${characterId}/equipment`);
   },
 
   /**
@@ -433,10 +342,6 @@ export const equipmentApi = {
     return apiRequest(`/players/${pid}/characters/${characterId}/equipment`, {
       method: 'POST',
       body: JSON.stringify({ equipment_id: equipmentId, slot })
-    }, {
-      success: true,
-      message: 'Item equipped successfully',
-      equipment: mockCharacterEquipment
     });
   },
 
@@ -448,10 +353,6 @@ export const equipmentApi = {
     const pid = playerId || sessionStorage.getItem('playerId') || 'player_fc_001';
     return apiRequest(`/players/${pid}/characters/${characterId}/equipment/${slot}`, {
       method: 'DELETE'
-    }, {
-      success: true,
-      message: 'Item unequipped successfully',
-      equipment: { ...mockCharacterEquipment, [slot]: null }
     });
   }
 };
@@ -464,7 +365,7 @@ export const nftApi = {
    */
   async getPlayerNFTs(playerId?: string): Promise<NFT[]> {
     const pid = playerId || sessionStorage.getItem('playerId') || 'player_fc_001';
-    return apiRequest(`/players/${pid}/nfts`, {}, mockPlayerNFTs);
+    return apiRequest(`/players/${pid}/nfts`);
   },
 
   /**
@@ -473,19 +374,14 @@ export const nftApi = {
    */
   async updateCharacterAvatar(characterId: string, nftId: string, playerId?: string): Promise<AvatarUpdateResponse> {
     const pid = playerId || sessionStorage.getItem('playerId') || 'player_fc_001';
-    const nft = mockPlayerNFTs.find(n => n.id === nftId);
     return apiRequest(`/players/${pid}/characters/${characterId}/avatar`, {
       method: 'PUT',
       body: JSON.stringify({ nft_id: nftId })
-    }, {
-      success: true,
-      message: 'Avatar updated successfully',
-      avatar_url: nft?.image_url
     });
   }
 };
 
-// Utility function to check if we're using mock data (now based on configuration)
+// Utility function to check if we're using mock data (always false now)
 export function isLikelyUsingMockData(): boolean {
-  return config.useMockData;
+  return false;
 }

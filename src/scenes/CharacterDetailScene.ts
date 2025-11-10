@@ -3,7 +3,7 @@ import { navigation } from '@/utils/navigation';
 import { HomeScene } from './HomeScene';
 import { BaseScene } from '@/ui/BaseScene';
 import { CharactersScene } from './CharactersScene';
-import { charactersApi, equipmentApi, skillsApi, nftApi, isLikelyUsingMockData } from '@/services/api';
+import { charactersApi, equipmentApi, skillsApi, nftApi } from '@/services/api';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
 import { Colors, FontFamily } from '@/utils/cssStyles';
 import { LearnSkillPopup } from '@/popups/LearnSkillPopup';
@@ -90,11 +90,6 @@ export class CharacterDetailScene extends BaseScene {
     this.characterEquipment = await equipmentApi.getCharacterEquipment(this.character.id);
 
     this.loadingManager.hideLoading();
-
-    // Show mock data indicator if we're likely using mock data
-    if (isLikelyUsingMockData()) {
-      this.loadingManager.showMockDataIndicator();
-    }
 
     this.initializeUI();
   }

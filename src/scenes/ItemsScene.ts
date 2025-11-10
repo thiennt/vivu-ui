@@ -4,7 +4,7 @@ import { HomeScene } from './HomeScene';
 import { BaseScene } from '@/ui/BaseScene';
 import { Colors, FontFamily } from '@/utils/cssStyles';
 import { ScrollBox } from '@pixi/ui';
-import { equipmentApi, isLikelyUsingMockData } from '@/services/api';
+import { equipmentApi } from '@/services/api';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
 
 export class ItemsScene extends BaseScene {
@@ -57,11 +57,6 @@ export class ItemsScene extends BaseScene {
     this.equipment = await equipmentApi.getAllEquipment();
     
     this.loadingManager.hideLoading();
-    
-    // Show mock data indicator if we're likely using mock data
-    if (isLikelyUsingMockData()) {
-      this.loadingManager.showMockDataIndicator();
-    }
     
     this.initializeUI();
   }
