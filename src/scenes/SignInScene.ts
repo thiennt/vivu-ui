@@ -102,10 +102,13 @@ export class SignInScene extends BaseScene {
       console.error('❌ Quick Auth error:', error);
     }
 
+    // Store auth token for API requests
+    sessionStorage.setItem('authToken', token);
+
     // Call backend API with Farcaster data
     const player = await authApi.signIn(token);
 
-    // Store auth token and player data
+    // Store player data
     if (player) {
       sessionStorage.setItem('player', JSON.stringify(player));
       sessionStorage.setItem('playerId', player.id);
