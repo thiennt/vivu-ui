@@ -430,7 +430,7 @@ export class TowerScene extends BaseScene {
     const buttonHeight = 42;
     
     const backButton = this.createButton(
-      '← Back to Home',
+      '← Back',
       this.STANDARD_PADDING,
       this.gameHeight - buttonHeight - this.STANDARD_PADDING,
       buttonWidth,

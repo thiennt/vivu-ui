@@ -406,7 +406,7 @@ export class BattleScene extends BaseScene {
     
     // Back button
     const backButton = this.createButton(
-      '← Back to Home',
+      '← Back',
       this.STANDARD_PADDING,
       0,
       backButtonWidth,

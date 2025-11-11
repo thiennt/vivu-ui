@@ -724,7 +724,7 @@ export class CardBattleScene extends BaseScene {
       .stroke({ width: 1, color: Colors.ROBOT_CYAN, alpha: 0.6 });
 
     const backText = new Text({
-      text: '← Back Home',
+      text: '← Back',
       style: {
         fontFamily: FontFamily.PRIMARY,
         fontSize: 16,
@@ -739,7 +739,7 @@ export class CardBattleScene extends BaseScene {
     backText.y = buttonHeight / 2;
 
     backButton.addChild(backBg, backText);
-    backButton.x = this.gameWidth / 2 - buttonWidth / 2;
+    backButton.x = this.STANDARD_PADDING;
     backButton.y = bannerY + 215;
 
     backButton.interactive = true;
