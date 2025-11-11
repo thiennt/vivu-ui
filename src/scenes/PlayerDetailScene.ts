@@ -586,7 +586,7 @@ export class PlayerDetailScene extends BaseScene {
           };
           
           this.loadingManager.showLoading();
-          this.player = await playerApi.updatePlayerStats(this.player.id, updatedStats);
+          this.player = await playerApi.updatePlayerStats(updatedStats);
           
           this.tempStatChanges = { sta: 0, str: 0, agi: 0 };
           

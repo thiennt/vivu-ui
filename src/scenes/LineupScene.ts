@@ -498,11 +498,9 @@ export class LineupScene extends BaseScene {
 
   private async saveLineup(): Promise<void> {
     try {
-      const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
-      
       const lineupIds = this.lineupPositions.map(char => char ? char.id : null);
       
-      await playerApi.updateLineup(playerId, lineupIds);
+      await playerApi.updateLineup(lineupIds);
       alert('Lineup saved successfully!');
     } catch (error) {
       console.error('Failed to save lineup:', error);
