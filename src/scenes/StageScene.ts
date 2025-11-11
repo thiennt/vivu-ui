@@ -366,7 +366,7 @@ export class StageScene extends BaseScene {
     const buttonHeight = Math.max(40, Math.min(46, this.gameHeight * 0.07)); // Reduced heights for small screens
     
     const backButton = this.createButton(
-      '← Back to Dungeons',
+      '← Back',
       this.STANDARD_PADDING,
       this.gameHeight - buttonHeight - this.STANDARD_PADDING,
       buttonWidth,

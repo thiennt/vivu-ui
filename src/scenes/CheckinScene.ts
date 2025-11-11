@@ -458,8 +458,8 @@ export class CheckinScene extends BaseScene {
     
     const backButton = this.createButton(
       '← Back',
-      (this.gameWidth - buttonWidth) / 2,
-      this.gameHeight - buttonHeight - 20,
+      this.STANDARD_PADDING,
+      this.gameHeight - buttonHeight - this.STANDARD_PADDING,
       buttonWidth,
       buttonHeight,
       () => navigation.showScreen(HomeScene)
