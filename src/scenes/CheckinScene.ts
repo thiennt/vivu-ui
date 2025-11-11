@@ -453,7 +453,7 @@ export class CheckinScene extends BaseScene {
   }
 
   private createBackButton(): void {
-    const buttonWidth = Math.min(180, this.gameWidth - 2 * this.STANDARD_PADDING);
+    const buttonWidth = 80;
     const buttonHeight = 45;
     
     const backButton = this.createButton(

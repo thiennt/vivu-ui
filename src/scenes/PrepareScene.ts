@@ -300,6 +300,7 @@ export class PrepareScene extends BaseScene {
     const buttonCount = 2;
     const spacing = 20;
     const totalSpacing = spacing * (buttonCount - 1);
+    const backButtonWidth = 80;
     const buttonWidth = (this.gameWidth - 2 * 40 - totalSpacing) / buttonCount;
     const buttonHeight = 50;
 
@@ -308,7 +309,7 @@ export class PrepareScene extends BaseScene {
       '← Back',
       0,
       0,
-      buttonWidth,
+      backButtonWidth,
       buttonHeight,
       () => {
         navigation.showScreen(TowerScene);

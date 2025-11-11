@@ -511,6 +511,7 @@ export class LineupScene extends BaseScene {
   }
 
   private createActionButtons(): void {
+    const backButtonWidth = 80;
     const buttonWidth = Math.min(115, (this.gameWidth - 4 * this.STANDARD_PADDING) / 3);
     const buttonHeight = 40;
     const buttonCount = 3;
@@ -524,7 +525,7 @@ export class LineupScene extends BaseScene {
       '← Back',
       this.STANDARD_PADDING,
       y,
-      buttonWidth,
+      backButtonWidth,
       buttonHeight,
       () => navigation.showScreen(HomeScene)
     );

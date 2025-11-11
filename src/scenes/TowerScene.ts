@@ -426,7 +426,7 @@ export class TowerScene extends BaseScene {
   }
 
   private createBackButton(): void {
-    const buttonWidth = Math.min(160, this.gameWidth - 2 * this.STANDARD_PADDING);
+    const buttonWidth = 80;
     const buttonHeight = 42;
     
     const backButton = this.createButton(
