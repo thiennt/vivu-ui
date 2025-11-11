@@ -36,10 +36,8 @@ export class BottomNavigationMenu extends Container {
     const menuItems = [
       { text: '🏠', label: 'Home', action: 'home' },
       { text: '👤', label: 'Player', action: 'player' },
-      { text: '🏰', label: 'Dungeon', action: 'dungeon' },
-      { text: '⛏️', label: 'Items', action: 'items' },
+      { text: '⚔️', label: 'Battle', action: 'battle' },
       { text: '📋', label: 'Quests', action: 'quests' },
-      //{ text: '🛒', label: 'Store', action: 'store' },
     ];
 
     const itemWidth = this.gameWidth / menuItems.length;
@@ -79,24 +77,10 @@ export class BottomNavigationMenu extends Container {
           });
         });
         break;
-      case 'dungeon':
+      case 'battle':
         import('@/scenes/TowerScene').then(({ TowerScene }) => {
           import('@/utils/navigation').then(({ navigation }) => {
             navigation.showScreen(TowerScene);
-          });
-        });
-        break;
-      case 'items':
-        import('@/scenes/ItemsScene').then(({ ItemsScene }) => {
-          import('@/utils/navigation').then(({ navigation }) => {
-            navigation.showScreen(ItemsScene);
-          });
-        });
-        break;
-      case 'store':
-        import('@/scenes/HomeScene').then(({ HomeScene }) => {
-          import('@/utils/navigation').then(({ navigation }) => {
-            navigation.showScreen(HomeScene);
           });
         });
         break;

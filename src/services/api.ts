@@ -70,12 +70,6 @@ async function apiRequest<T>(
 
 // Player API methods
 export const playerApi = {
-  async getPlayer(farcasterId?: string): Promise<any> {
-    // If farcasterId is provided, get specific player (for lookup)
-    // Otherwise, JWT auth will return current player
-    return farcasterId ? apiRequest(`/players/${farcasterId}`) : apiRequest(`/players`);
-  },
-
   async updatePlayerStats(stats: any): Promise<any> {
     return apiRequest(`/players/stats`, {
       method: 'PUT',
@@ -100,10 +94,6 @@ export const charactersApi = {
   async getCharacter(characterId: string): Promise<any> {
     return apiRequest(`/players/characters/${characterId}`);
   },
-
-  async getCharacterSkills(characterId: string): Promise<any[]> {
-    return apiRequest(`/players/characters/${characterId}/skills`);
-  },
 };
 
 // Dungeons API methods
@@ -115,58 +105,6 @@ export const dungeonsApi = {
   async getDungeonStages(dungeonId: string): Promise<any[]> {
     return apiRequest(`/players/stages/${dungeonId}/stages`);
   },
-};
-
-// Skills API methods
-export const skillsApi = {
-  async getAllSkills(): Promise<any[]> {
-    return apiRequest('/skills');
-  },
-
-  async getSkill(skillId: string): Promise<any> {
-    return apiRequest(`/skills/${skillId}`);
-  },
-
-  /**
-   * Get available skills by type for a character
-   * GET /skills?skill_type={skillType}
-   */
-  async getAvailableSkills(skillType?: string): Promise<any[]> {
-    const endpoint = skillType ? `/skills?skill_type=${skillType}` : '/skills';
-    return apiRequest(endpoint);
-  },
-
-  /**
-   * Learn/equip a skill to a character
-   * POST /players/characters/:characterId/skills
-   */
-  async learnSkill(characterId: string, skillId: string): Promise<any> {
-    return apiRequest(`/players/characters/${characterId}/skills`, {
-      method: 'POST',
-      body: JSON.stringify({ skill_id: skillId })
-    });
-  },
-
-  /**
-   * Change an equipped skill on a character
-   * PUT /players/characters/:characterId/skills/:oldSkillId
-   */
-  async changeSkill(characterId: string, oldSkillId: string, newSkillId: string): Promise<any> {
-    return apiRequest(`/players/characters/${characterId}/skills/${oldSkillId}`, {
-      method: 'PUT',
-      body: JSON.stringify({ new_skill_id: newSkillId })
-    });
-  },
-
-  /**
-   * Remove a skill from a character
-   * DELETE /players/characters/:characterId/skills/:skillId
-   */
-  async removeSkill(characterId: string, skillId: string): Promise<any> {
-    return apiRequest(`/players/characters/${characterId}/skills/${skillId}`, {
-      method: 'DELETE'
-    });
-  }
 };
 
 // Battle API methods
@@ -212,15 +150,6 @@ export const battleApi = {
     });
   },
 
-  async discardCard(battleId: string, turnAction: TurnAction): Promise<any> {
-    console.log('🎮 discardCard API called for battle:', battleId, 'with data:', turnAction);
-
-    return apiRequest(`/card-battle/${battleId}/discard-card`, {
-      method: 'POST',
-      body: JSON.stringify(turnAction),
-    });
-  },
-
   async playCard(battleId: string, turnAction: TurnAction): Promise<any> {
     console.log('🎮 playCard API called for battle:', battleId, 'with data:', turnAction);
 
@@ -245,14 +174,6 @@ export const battleApi = {
       method: 'POST',
     });
   },
-
-  async getBattleLogs(battleId: string, turn?: number): Promise<any> {
-    console.log('📋 getBattleLogs API called for battle:', battleId, 'turn:', turn);
-    const endpoint = turn ? `/card-battle/${battleId}/logs?turn=${turn}` : `/card-battle/${battleId}/logs`;
-    return apiRequest(endpoint);
-  },
-
-
 };
 
 
@@ -363,8 +284,3 @@ export const nftApi = {
     });
   }
 };
-
-// Utility function to check if we're using mock data (always false now)
-export function isLikelyUsingMockData(): boolean {
-  return false;
-}
