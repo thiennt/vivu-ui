@@ -24,6 +24,10 @@ export class CharacterDetailScene extends BaseScene {
   private characterEquipment: any = null;
   private loadingManager: LoadingStateManager;
 
+  // Navigation state
+  private allCharacters: any[] = [];
+  private currentCharacterIndex: number = 0;
+
   // Tab state
   private activeTab: TabType = 'skin';
 
@@ -41,10 +45,12 @@ export class CharacterDetailScene extends BaseScene {
   private skinContainer: Container;
   private buttonContainer: Container;
 
-  constructor(params?: { selectedCharacter: any }) {
+  constructor(params?: { selectedCharacter: any; allCharacters?: any[]; currentIndex?: number }) {
     super();
 
     this.character = params?.selectedCharacter || null;
+    this.allCharacters = params?.allCharacters || [];
+    this.currentCharacterIndex = params?.currentIndex ?? 0;
 
     // Create containers once
     this.container = new Container();
@@ -2301,16 +2307,152 @@ export class CharacterDetailScene extends BaseScene {
   private createBackButton(): void {
     const buttonWidth = Math.min(160, this.gameWidth - 2 * this.STANDARD_PADDING);
     const buttonHeight = 40;
+    const buttonY = this.gameHeight - buttonHeight - this.STANDARD_PADDING;
 
+    // Back button (left side)
     const backButton = this.createButton(
       '← Back',
       this.STANDARD_PADDING,
-      this.gameHeight - buttonHeight - this.STANDARD_PADDING,
+      buttonY,
       buttonWidth,
       buttonHeight,
       () => navigation.showScreen(CharactersScene)
     );
     this.buttonContainer.addChild(backButton);
+
+    // Only show navigation buttons if we have a character list
+    if (this.allCharacters.length > 1) {
+      const navButtonWidth = 80;
+      const navButtonSpacing = 8;
+
+      // Previous button (center-left)
+      const prevButton = this.createNavigationButton(
+        '← Prev',
+        (this.gameWidth - navButtonWidth * 2 - navButtonSpacing) / 2,
+        buttonY,
+        navButtonWidth,
+        buttonHeight,
+        () => this.navigateToPrevious(),
+        this.currentCharacterIndex === 0 // disabled if first character
+      );
+      this.buttonContainer.addChild(prevButton);
+
+      // Next button (center-right)
+      const nextButton = this.createNavigationButton(
+        'Next →',
+        (this.gameWidth - navButtonWidth * 2 - navButtonSpacing) / 2 + navButtonWidth + navButtonSpacing,
+        buttonY,
+        navButtonWidth,
+        buttonHeight,
+        () => this.navigateToNext(),
+        this.currentCharacterIndex === this.allCharacters.length - 1 // disabled if last character
+      );
+      this.buttonContainer.addChild(nextButton);
+    }
+  }
+
+  private createNavigationButton(
+    text: string,
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    onClick: () => void,
+    disabled: boolean = false
+  ): Container {
+    const button = new Container();
+
+    const bg = new Graphics();
+    const fillColor = disabled ? Colors.GRAY_DARKER : Colors.ROBOT_ELEMENT;
+    const strokeColor = disabled ? Colors.GRAY_DARK : Colors.ROBOT_CYAN_LIGHT;
+    const textColor = disabled ? Colors.GRAY_DARK : Colors.WHITE;
+
+    bg.roundRect(0, 0, width, height, 8)
+      .fill({ color: fillColor, alpha: disabled ? 0.5 : 0.95 })
+      .stroke({ width: 2, color: strokeColor, alpha: disabled ? 0.3 : 1 });
+
+    bg.roundRect(2, 2, width - 4, height - 4, 6)
+      .stroke({ width: 1, color: strokeColor, alpha: disabled ? 0.2 : 0.6 });
+
+    const buttonText = new Text({
+      text: text,
+      style: {
+        fontFamily: FontFamily.PRIMARY,
+        fontSize: 14,
+        fontWeight: 'bold',
+        fill: textColor,
+        stroke: { color: Colors.ROBOT_ELEMENT, width: disabled ? 0 : 1.5 }
+      }
+    });
+    buttonText.anchor.set(0.5);
+    buttonText.x = width / 2;
+    buttonText.y = height / 2;
+
+    button.addChild(bg, buttonText);
+    button.x = x;
+    button.y = y;
+
+    if (!disabled) {
+      button.interactive = true;
+      button.cursor = 'pointer';
+
+      button.on('pointerover', () => {
+        bg.clear();
+        bg.roundRect(0, 0, width, height, 8)
+          .fill({ color: Colors.ROBOT_CYAN, alpha: 0.95 })
+          .stroke({ width: 2, color: Colors.ROBOT_CYAN_LIGHT });
+        bg.roundRect(2, 2, width - 4, height - 4, 6)
+          .stroke({ width: 1, color: Colors.ROBOT_CYAN_MID, alpha: 0.9 });
+        button.scale.set(1.05);
+      });
+
+      button.on('pointerout', () => {
+        bg.clear();
+        bg.roundRect(0, 0, width, height, 8)
+          .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.95 })
+          .stroke({ width: 2, color: Colors.ROBOT_CYAN_LIGHT });
+        bg.roundRect(2, 2, width - 4, height - 4, 6)
+          .stroke({ width: 1, color: Colors.ROBOT_CYAN_MID, alpha: 0.6 });
+        button.scale.set(1.0);
+      });
+
+      button.on('pointerdown', onClick);
+    }
+
+    return button;
+  }
+
+  private async navigateToPrevious(): Promise<void> {
+    if (this.currentCharacterIndex > 0) {
+      this.currentCharacterIndex--;
+      await this.loadNewCharacter();
+    }
+  }
+
+  private async navigateToNext(): Promise<void> {
+    if (this.currentCharacterIndex < this.allCharacters.length - 1) {
+      this.currentCharacterIndex++;
+      await this.loadNewCharacter();
+    }
+  }
+
+  private async loadNewCharacter(): Promise<void> {
+    // Update character reference
+    this.character = this.allCharacters[this.currentCharacterIndex];
+
+    // Show loading
+    this.loadingManager.showLoading();
+
+    // Load new character data
+    this.character = await charactersApi.getCharacter(this.character.id);
+    this.characterSkills = this.character.character_skills || [];
+    this.characterEquipment = await equipmentApi.getCharacterEquipment(this.character.id);
+
+    // Hide loading
+    this.loadingManager.hideLoading();
+
+    // Refresh UI
+    this.updateLayout();
   }
 
   private createAvatarChangeButton(x: number, y: number, width: number, height: number): Container {
