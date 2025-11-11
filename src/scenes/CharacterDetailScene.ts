@@ -2305,7 +2305,7 @@ export class CharacterDetailScene extends BaseScene {
   }
 
   private createBackButton(): void {
-    const buttonWidth = Math.min(160, this.gameWidth - 2 * this.STANDARD_PADDING);
+    const buttonWidth = Math.min(80, this.gameWidth - 2 * this.STANDARD_PADDING);
     const buttonHeight = 40;
     const buttonY = this.gameHeight - buttonHeight - this.STANDARD_PADDING;
 
