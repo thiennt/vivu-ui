@@ -264,7 +264,11 @@ export class CharactersScene extends BaseScene {
       characterCard.cursor = 'pointer';
 
       characterCard.on('pointerdown', () => {
-        navigation.showScreen(CharacterDetailScene, { selectedCharacter: character });
+        navigation.showScreen(CharacterDetailScene, { 
+          selectedCharacter: character,
+          allCharacters: this.characters,
+          currentIndex: index
+        });
       });
 
       gridContent.addChild(characterCard);
