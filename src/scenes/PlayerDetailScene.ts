@@ -586,7 +586,7 @@ export class PlayerDetailScene extends BaseScene {
           };
           
           this.loadingManager.showLoading();
-          this.player = await playerApi.updatePlayerStats(this.player.id, updatedStats);
+          this.player = await playerApi.updatePlayerStats(updatedStats);
           
           this.tempStatChanges = { sta: 0, str: 0, agi: 0 };
           
@@ -771,7 +771,7 @@ export class PlayerDetailScene extends BaseScene {
   }
 
   private createBackButton(): void {
-    const buttonWidth = Math.min(160, this.gameWidth - 2 * this.STANDARD_PADDING);
+    const buttonWidth = 80;
     const buttonHeight = 40;
     
     const backButton = this.createButton(

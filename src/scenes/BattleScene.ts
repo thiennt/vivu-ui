@@ -389,6 +389,7 @@ export class BattleScene extends BaseScene {
     const buttonContainer = new Container();
     
     // Responsive button sizing - optimized for 400x700
+    const backButtonWidth = 80;
     const buttonWidth = Math.min(95, (this.gameWidth - 3 * this.STANDARD_PADDING) / 2); // Reduced from 100
     const buttonHeight = 40; // Fixed height for consistency
     
@@ -408,7 +409,7 @@ export class BattleScene extends BaseScene {
       '← Back to Home',
       this.STANDARD_PADDING,
       0,
-      buttonWidth,
+      backButtonWidth,
       buttonHeight,
       () => navigation.showScreen(HomeScene),
       14 // Base font size for responsive scaling

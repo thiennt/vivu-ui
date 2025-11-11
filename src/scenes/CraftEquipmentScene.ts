@@ -505,6 +505,7 @@ export class CraftEquipmentScene extends BaseScene {
   }
 
   private createButtons(): void {
+    const backButtonWidth = 80;
     const buttonWidth = Math.min(120, this.gameWidth - 2 * this.STANDARD_PADDING);
     const buttonHeight = 40;
     const buttonY = this.gameHeight - buttonHeight - this.STANDARD_PADDING;
@@ -514,7 +515,7 @@ export class CraftEquipmentScene extends BaseScene {
       '← Back',
       this.STANDARD_PADDING,
       buttonY,
-      buttonWidth,
+      backButtonWidth,
       buttonHeight,
       () => navigation.showScreen(HomeScene)
     );

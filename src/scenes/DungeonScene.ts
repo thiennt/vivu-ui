@@ -279,7 +279,7 @@ export class DungeonScene extends BaseScene {
 
   private createBackButton(): void {
     // Responsive button sizing - improved for small screens
-    const buttonWidth = Math.min(160, this.gameWidth - 2 * this.STANDARD_PADDING); // Reduced from 180
+    const buttonWidth = 80;
     const buttonHeight = Math.max(40, Math.min(46, this.gameHeight * 0.07)); // Reduced heights for small screens
     
     const backButton = this.createButton(

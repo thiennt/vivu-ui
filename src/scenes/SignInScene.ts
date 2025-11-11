@@ -111,7 +111,6 @@ export class SignInScene extends BaseScene {
     // Store player data
     if (player) {
       sessionStorage.setItem('player', JSON.stringify(player));
-      sessionStorage.setItem('playerId', player.id);
 
       console.log('✅ Sign in successful:', player.username);
       

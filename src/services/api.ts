@@ -70,19 +70,21 @@ async function apiRequest<T>(
 
 // Player API methods
 export const playerApi = {
-  async getPlayer(playerId: string): Promise<any> {
-    return apiRequest(`/players/${playerId}`);
+  async getPlayer(farcasterId?: string): Promise<any> {
+    // If farcasterId is provided, get specific player (for lookup)
+    // Otherwise, JWT auth will return current player
+    return farcasterId ? apiRequest(`/players/${farcasterId}`) : apiRequest(`/players`);
   },
 
-  async updatePlayerStats(playerId: string, stats: any): Promise<any> {
-    return apiRequest(`/players/${playerId}/stats`, {
+  async updatePlayerStats(stats: any): Promise<any> {
+    return apiRequest(`/players/stats`, {
       method: 'PUT',
       body: JSON.stringify(stats),
     });
   },
 
-  async updateLineup(playerId: string, lineup: any[]): Promise<any> {
-    return apiRequest(`/players/${playerId}/lineup`, {
+  async updateLineup(lineup: any[]): Promise<any> {
+    return apiRequest(`/players/lineup`, {
       method: 'POST',
       body: JSON.stringify(lineup),
     });
@@ -92,32 +94,26 @@ export const playerApi = {
 // Characters API methods
 export const charactersApi = {
   async getAllCharacters(): Promise<any[]> {
-    const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
-    return apiRequest(`/players/${playerId}/characters`);
+    return apiRequest(`/players/characters`);
   },
 
   async getCharacter(characterId: string): Promise<any> {
-    const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
-    const characters = await this.getAllCharacters();
-    return characters.find(char => char.id === characterId) || null;
+    return apiRequest(`/players/characters/${characterId}`);
   },
 
   async getCharacterSkills(characterId: string): Promise<any[]> {
-    const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
-    return apiRequest(`/players/${playerId}/characters/${characterId}/skills`);
+    return apiRequest(`/players/characters/${characterId}/skills`);
   },
 };
 
 // Dungeons API methods
 export const dungeonsApi = {
   async getAllDungeons(): Promise<any[]> {
-    const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
-    return apiRequest(`/players/${playerId}/stages`);
+    return apiRequest(`/players/stages`);
   },
 
   async getDungeonStages(dungeonId: string): Promise<any[]> {
-    const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
-    return apiRequest(`/players/${playerId}/stages/${dungeonId}/stages`);
+    return apiRequest(`/players/stages/${dungeonId}/stages`);
   },
 };
 
@@ -142,11 +138,10 @@ export const skillsApi = {
 
   /**
    * Learn/equip a skill to a character
-   * POST /players/:playerId/characters/:characterId/skills
+   * POST /players/characters/:characterId/skills
    */
-  async learnSkill(characterId: string, skillId: string, playerId?: string): Promise<any> {
-    const pid = playerId || sessionStorage.getItem('playerId') || 'player_fc_001';
-    return apiRequest(`/players/${pid}/characters/${characterId}/skills`, {
+  async learnSkill(characterId: string, skillId: string): Promise<any> {
+    return apiRequest(`/players/characters/${characterId}/skills`, {
       method: 'POST',
       body: JSON.stringify({ skill_id: skillId })
     });
@@ -154,11 +149,10 @@ export const skillsApi = {
 
   /**
    * Change an equipped skill on a character
-   * PUT /players/:playerId/characters/:characterId/skills/:oldSkillId
+   * PUT /players/characters/:characterId/skills/:oldSkillId
    */
-  async changeSkill(characterId: string, oldSkillId: string, newSkillId: string, playerId?: string): Promise<any> {
-    const pid = playerId || sessionStorage.getItem('playerId') || 'player_fc_001';
-    return apiRequest(`/players/${pid}/characters/${characterId}/skills/${oldSkillId}`, {
+  async changeSkill(characterId: string, oldSkillId: string, newSkillId: string): Promise<any> {
+    return apiRequest(`/players/characters/${characterId}/skills/${oldSkillId}`, {
       method: 'PUT',
       body: JSON.stringify({ new_skill_id: newSkillId })
     });
@@ -166,11 +160,10 @@ export const skillsApi = {
 
   /**
    * Remove a skill from a character
-   * DELETE /players/:playerId/characters/:characterId/skills/:skillId
+   * DELETE /players/characters/:characterId/skills/:skillId
    */
-  async removeSkill(characterId: string, skillId: string, playerId?: string): Promise<any> {
-    const pid = playerId || sessionStorage.getItem('playerId') || 'player_fc_001';
-    return apiRequest(`/players/${pid}/characters/${characterId}/skills/${skillId}`, {
+  async removeSkill(characterId: string, skillId: string): Promise<any> {
+    return apiRequest(`/players/characters/${characterId}/skills/${skillId}`, {
       method: 'DELETE'
     });
   }
@@ -179,39 +172,33 @@ export const skillsApi = {
 // Battle API methods
 export const battleApi = {
   async getAvailableStages(): Promise<any> {
-    const playerId = sessionStorage.getItem('playerId');
-    return apiRequest(`/players/${playerId}/card-battle/stages`);
+    return apiRequest(`/card-battle/stages`);
   },
 
   async getStageEnemies(stage_id: string): Promise<any> {
-    const playerId = sessionStorage.getItem('playerId');
-    return apiRequest(`/players/${playerId}/card-battle/stages/${stage_id}/enemies`);
+    return apiRequest(`/card-battle/stages/${stage_id}/enemies`);
   },
 
   async createBattleStage(stage_id: string): Promise<any> {
-    const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
-    return apiRequest(`/players/${playerId}/card-battle/stages/${stage_id}`, {
+    return apiRequest(`/card-battle/stages/${stage_id}`, {
       method: 'POST'
     });
   },
 
   async startBattle(battleId: string): Promise<any> {
-    const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
-    return apiRequest(`/players/${playerId}/card-battle/${battleId}/start`, {
+    return apiRequest(`/card-battle/${battleId}/start`, {
       method: 'POST',
     });
   },
 
   async getBattleState(battleId: string): Promise<any> {
-    const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
-    return apiRequest(`/players/${playerId}/card-battle/${battleId}/state`);
+    return apiRequest(`/card-battle/${battleId}/state`);
   },
 
   async startTurn(battleId: string): Promise<any> {
     console.log('🎯 startTurn API called for battle:', battleId);
-    const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
 
-    return apiRequest(`/players/${playerId}/card-battle/${battleId}/start-turn`, {
+    return apiRequest(`/card-battle/${battleId}/start-turn`, {
       method: 'POST',
     });
   },
@@ -219,8 +206,7 @@ export const battleApi = {
   async drawCards(battleId: string, turnAction: TurnAction): Promise<any> {
     console.log('🎮 drawCards API called for battle:', battleId, 'with data:', turnAction);
 
-    const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
-    return apiRequest(`/players/${playerId}/card-battle/${battleId}/draw-card`, {
+    return apiRequest(`/card-battle/${battleId}/draw-card`, {
       method: 'POST',
       body: JSON.stringify(turnAction),
     });
@@ -229,8 +215,7 @@ export const battleApi = {
   async discardCard(battleId: string, turnAction: TurnAction): Promise<any> {
     console.log('🎮 discardCard API called for battle:', battleId, 'with data:', turnAction);
 
-    const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
-    return apiRequest(`/players/${playerId}/card-battle/${battleId}/discard-card`, {
+    return apiRequest(`/card-battle/${battleId}/discard-card`, {
       method: 'POST',
       body: JSON.stringify(turnAction),
     });
@@ -239,8 +224,7 @@ export const battleApi = {
   async playCard(battleId: string, turnAction: TurnAction): Promise<any> {
     console.log('🎮 playCard API called for battle:', battleId, 'with data:', turnAction);
 
-    const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
-    return apiRequest(`/players/${playerId}/card-battle/${battleId}/play-card`, {
+    return apiRequest(`/card-battle/${battleId}/play-card`, {
       method: 'POST',
       body: JSON.stringify(turnAction),
     });
@@ -249,8 +233,7 @@ export const battleApi = {
   async endTurn(battleId: string, turnAction: TurnAction): Promise<any> {
     console.log('🎮 endTurn API called for battle:', battleId, 'with data:', turnAction);
 
-    const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
-    return apiRequest(`/players/${playerId}/card-battle/${battleId}/end-turn`, {
+    return apiRequest(`/card-battle/${battleId}/end-turn`, {
       method: 'POST',
       body: JSON.stringify(turnAction),
     });
@@ -258,8 +241,7 @@ export const battleApi = {
 
   async aiTurn(battleId: string): Promise<any> {
     console.log('🤖 aiTurn API called for battle:', battleId);
-    const playerId = sessionStorage.getItem('playerId') || 'player_fc_001';
-    return apiRequest(`/players/${playerId}/card-battle/${battleId}/ai-turn`, {
+    return apiRequest(`/card-battle/${battleId}/ai-turn`, {
       method: 'POST',
     });
   },
@@ -307,38 +289,34 @@ export type { LoadingState };
 export const equipmentApi = {
   /**
    * List all available equipment
-   * GET /players/equipment
+   * GET /players/equipments
    */
-  async getAllEquipment(playerId?: string): Promise<any[]> {
-    const pid = playerId || sessionStorage.getItem('playerId') || 'player_fc_001';
-    return apiRequest(`/players/${pid}/equipments`);
+  async getAllEquipment(): Promise<any[]> {
+    return apiRequest(`/players/equipments`);
   },
 
   /**
    * Get player's inventory
-   * GET /players/:playerId/equipment
+   * GET /players/equipment
    */
-  async getPlayerInventory(playerId?: string): Promise<any> {
-    const pid = playerId || sessionStorage.getItem('playerId') || 'player_fc_001';
-    return apiRequest(`/players/${pid}/equipment`);
+  async getPlayerInventory(): Promise<any> {
+    return apiRequest(`/players/equipment`);
   },
 
   /**
    * Get character's equipped items
-   * GET /players/:playerId/characters/:characterId/equipment
+   * GET /players/characters/:characterId/equipment
    */
-  async getCharacterEquipment(characterId: string, playerId?: string): Promise<any> {
-    const pid = playerId || sessionStorage.getItem('playerId') || 'player_fc_001';
-    return apiRequest(`/players/${pid}/characters/${characterId}/equipment`);
+  async getCharacterEquipment(characterId: string): Promise<any> {
+    return apiRequest(`/players/characters/${characterId}/equipment`);
   },
 
   /**
    * Equip item to character
-   * POST /players/:playerId/characters/:characterId/equipment
+   * POST /players/characters/:characterId/equipment
    */
-  async equipItem(characterId: string, equipmentId: string, slot: string, playerId?: string): Promise<any> {
-    const pid = playerId || sessionStorage.getItem('playerId') || 'player_fc_001';
-    return apiRequest(`/players/${pid}/characters/${characterId}/equipment`, {
+  async equipItem(characterId: string, equipmentId: string, slot: string): Promise<any> {
+    return apiRequest(`/players/characters/${characterId}/equipment`, {
       method: 'POST',
       body: JSON.stringify({ equipment_id: equipmentId, slot })
     });
@@ -346,11 +324,10 @@ export const equipmentApi = {
 
   /**
    * Unequip item from character
-   * DELETE /players/:playerId/characters/:characterId/equipment/:slot
+   * DELETE /players/characters/:characterId/equipment/:equipmentSlot
    */
-  async unequipItem(characterId: string, slot: string, playerId?: string): Promise<any> {
-    const pid = playerId || sessionStorage.getItem('playerId') || 'player_fc_001';
-    return apiRequest(`/players/${pid}/characters/${characterId}/equipment/${slot}`, {
+  async unequipItem(characterId: string, slot: string): Promise<any> {
+    return apiRequest(`/players/characters/${characterId}/equipment/${slot}`, {
       method: 'DELETE'
     });
   }
@@ -359,21 +336,28 @@ export const equipmentApi = {
 // NFT API methods
 export const nftApi = {
   /**
-   * Get player's NFT collection
-   * GET /players/:playerId/nfts
+   * Get player's NFT collection (skins)
+   * GET /players/characters/:characterId/skins
    */
-  async getPlayerNFTs(playerId?: string): Promise<NFT[]> {
-    const pid = playerId || sessionStorage.getItem('playerId') || 'player_fc_001';
-    return apiRequest(`/players/${pid}/nfts`);
+  async getPlayerNFTs(): Promise<NFT[]> {
+    // Note: This might need to be called per character or refactored based on backend implementation
+    return apiRequest(`/players/characters/skins`);
+  },
+
+  /**
+   * Get character skins
+   * GET /players/characters/:characterId/skins
+   */
+  async getCharacterSkins(characterId: string): Promise<NFT[]> {
+    return apiRequest(`/players/characters/${characterId}/skins`);
   },
 
   /**
    * Update character avatar with NFT
-   * PUT /players/:playerId/characters/:characterId/avatar
+   * PUT /players/characters/:characterId/avatar
    */
-  async updateCharacterAvatar(characterId: string, nftId: string, playerId?: string): Promise<AvatarUpdateResponse> {
-    const pid = playerId || sessionStorage.getItem('playerId') || 'player_fc_001';
-    return apiRequest(`/players/${pid}/characters/${characterId}/avatar`, {
+  async updateCharacterAvatar(characterId: string, nftId: string): Promise<AvatarUpdateResponse> {
+    return apiRequest(`/players/characters/${characterId}/avatar`, {
       method: 'PUT',
       body: JSON.stringify({ nft_id: nftId })
     });
