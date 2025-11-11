@@ -6,6 +6,7 @@ import { HomeScene } from './HomeScene';
 import { Colors, FontFamily } from '@/utils/cssStyles';
 import { app } from '../app';
 import { playerApi } from '@/services/api';
+import { MessagePopup } from '@/popups/MessagePopup';
 
 export class LineupScene extends BaseScene {
   private player : any = null;
@@ -380,7 +381,7 @@ export class LineupScene extends BaseScene {
         this.availableCharacters = this.availableCharacters.filter(c => c !== character);
         this.refreshLineup();
       } else {
-        alert('No available slot in lineup!');
+        navigation.presentPopup(MessagePopup, { message: 'No available slot in lineup!', type: 'error' });
       }
     });
     return card;
@@ -501,10 +502,10 @@ export class LineupScene extends BaseScene {
       const lineupIds = this.lineupPositions.map(char => char ? char.id : null);
       
       await playerApi.updateLineup(lineupIds);
-      alert('Lineup saved successfully!');
+      navigation.presentPopup(MessagePopup, { message: 'Lineup saved successfully!', type: 'success' });
     } catch (error) {
       console.error('Failed to save lineup:', error);
-      alert('Failed to save lineup. Please try again.');
+      navigation.presentPopup(MessagePopup, { message: 'Failed to save lineup. Please try again.', type: 'error' });
     }
   }
 
