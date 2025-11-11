@@ -8,6 +8,7 @@ import { CheckinScene } from './CheckinScene';
 import { LootBoxScene } from './LootBoxScene';
 import { Colors, FontFamily } from '@/utils/cssStyles';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
+import { authApi } from '@/services/api';
 
 export class HomeScene extends BaseScene {
   /** Assets bundles required by this screen */
@@ -17,6 +18,7 @@ export class HomeScene extends BaseScene {
   private decorativeElements: Container[] = [];
   private player: any = null;
   private loadingManager: LoadingStateManager;
+  private hasCheckedInToday: boolean = false;
 
   constructor() {
     super();
@@ -37,9 +39,26 @@ export class HomeScene extends BaseScene {
     const player = sessionStorage.getItem('player');
     this.player = player ? JSON.parse(player) : null;
 
+    // Check today's check-in status
+    await this.checkTodayCheckinStatus();
+
     this.loadingManager.hideLoading();
     
     this.createUI();
+  }
+
+  private async checkTodayCheckinStatus(): Promise<void> {
+    try {
+      const response = await authApi.getCheckinStatus();
+      if (response) {
+        this.hasCheckedInToday = response.isCheckedInToday || false;
+        console.log('Check-in status in HomeScene:', this.hasCheckedInToday);
+      }
+    } catch (error) {
+      console.error('Error checking check-in status in HomeScene:', error);
+      // Default to false if there's an error
+      this.hasCheckedInToday = false;
+    }
   }
 
   private createUI(): void {
@@ -90,6 +109,14 @@ export class HomeScene extends BaseScene {
 
   /** Show the screen with animation */
   async show(): Promise<void> {
+    // Re-check check-in status when returning to home scene
+    await this.checkTodayCheckinStatus();
+    
+    // Recreate UI to reflect updated check-in status
+    if (this.player) {
+      this.createUI();
+    }
+    
     // Animate elements in
     this.container.alpha = 1;
     const tween = { alpha: 0 };
@@ -351,11 +378,11 @@ export class HomeScene extends BaseScene {
     const buttonContainer = new Container();
     
     const buttons = [
-      { text: '📅 Daily Check-In', screen: CheckinScene },
-      { text: '🎁 Loot Box', screen: LootBoxScene },
-      { text: '👥 Characters', screen: CharactersScene },
-      { text: '🃏 Card Battle', screen: CardBattleScene },
-      { text: '🧑‍🤝‍🧑 Lineup', screen: LineupScene }
+      { text: '📅 Daily Check-In', screen: CheckinScene, isCheckIn: true },
+      { text: '🎁 Loot Box', screen: LootBoxScene, isCheckIn: false },
+      { text: '👥 Characters', screen: CharactersScene, isCheckIn: false },
+      { text: '🃏 Card Battle', screen: CardBattleScene, isCheckIn: false },
+      { text: '🧑‍🤝‍🧑 Lineup', screen: LineupScene, isCheckIn: false }
     ];
     
     const buttonWidth = Math.min(this.gameWidth - 2 * this.STANDARD_PADDING, 400);
@@ -370,14 +397,22 @@ export class HomeScene extends BaseScene {
       this.STANDARD_SPACING;
     
     buttons.forEach((buttonData, index) => {
+      // Disable all buttons except check-in if user hasn't checked in today
+      const isDisabled = !this.hasCheckedInToday && !buttonData.isCheckIn;
+      
       const button = this.createButton(
         buttonData.text,
         0,
         index * (buttonHeight + spacing),
         buttonWidth,
         buttonHeight,
-        () => navigation.showScreen(buttonData.screen),
-        18
+        () => {
+          if (!isDisabled) {
+            navigation.showScreen(buttonData.screen);
+          }
+        },
+        18,
+        isDisabled
       );
       buttonContainer.addChild(button);
     });
