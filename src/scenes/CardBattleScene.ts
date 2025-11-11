@@ -739,7 +739,7 @@ export class CardBattleScene extends BaseScene {
     backText.y = buttonHeight / 2;
 
     backButton.addChild(backBg, backText);
-    backButton.x = this.STANDARD_PADDING;
+    backButton.x = bannerX + 20; // Position relative to dialog panel instead of screen edge
     backButton.y = bannerY + 215;
 
     backButton.interactive = true;
