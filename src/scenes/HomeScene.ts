@@ -107,56 +107,6 @@ export class HomeScene extends BaseScene {
     }
   }
 
-  /** Show the screen with animation */
-  async show(): Promise<void> {
-    // Re-check check-in status when returning to home scene
-    await this.checkTodayCheckinStatus();
-    
-    // Recreate UI to reflect updated check-in status
-    if (this.player) {
-      this.createUI();
-    }
-    
-    // Animate elements in
-    this.container.alpha = 1;
-    const tween = { alpha: 0 };
-    
-    return new Promise((resolve) => {
-      const animate = () => {
-        tween.alpha += 0.05;
-        this.container.alpha = tween.alpha;
-        
-        if (tween.alpha >= 1) {
-          this.container.alpha = 1;
-          resolve();
-        } else {
-          requestAnimationFrame(animate);
-        }
-      };
-      animate();
-    });
-  }
-
-  /** Hide the screen with animation */
-  async hide(): Promise<void> {
-    const tween = { alpha: 1 };
-    
-    return new Promise((resolve) => {
-      const animate = () => {
-        tween.alpha -= 0.1;
-        this.container.alpha = tween.alpha;
-        
-        if (tween.alpha <= 0) {
-          this.container.alpha = 0;
-          resolve();
-        } else {
-          requestAnimationFrame(animate);
-        }
-      };
-      animate();
-    });
-  }
-
   /** Reset screen after hidden */
   reset(): void {
     this.container.removeChildren();
