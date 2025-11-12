@@ -52,6 +52,8 @@ export class HomeScene extends BaseScene {
     
     this.container.removeChildren();
     this.createBackground();
+    this.createPlayerInfo();
+    this.createResourceInfo();
     this.createMenuButtons();
     this.createDecorations();
     
@@ -127,6 +129,174 @@ export class HomeScene extends BaseScene {
     this.container.addChild(bgContainer);
   }
 
+  private createPlayerInfo(): void {
+    const playerPanel = new Container();
+    
+    // Smaller, more compact panel for top left
+    const panelWidth = 160;
+    const panelHeight = 75;
+    
+    // Robot panel
+    const bg = new Graphics();
+    
+    // Outer glow
+    bg.roundRect(-2, -2, panelWidth + 4, panelHeight + 4, 8)
+      .fill({ color: Colors.ROBOT_CYAN, alpha: 0.2 });
+    
+    // Main panel
+    bg.roundRect(0, 0, panelWidth, panelHeight, 8)
+      .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.95 })
+      .stroke({ width: 2, color: Colors.ROBOT_CYAN });
+    
+    // Inner layer
+    bg.roundRect(2, 2, panelWidth - 4, panelHeight - 4, 6)
+      .fill({ color: Colors.ROBOT_CONTAINER, alpha: 0.6 });
+    
+    // Avatar circle on the left
+    const avatarSize = 45;
+    const avatarX = 10;
+    const avatarY = (panelHeight - avatarSize) / 2;
+    
+    const avatarBg = new Graphics();
+    avatarBg.circle(avatarX + avatarSize / 2, avatarY + avatarSize / 2, avatarSize / 2 + 2)
+      .fill({ color: Colors.ROBOT_CYAN, alpha: 0.3 });
+    avatarBg.circle(avatarX + avatarSize / 2, avatarY + avatarSize / 2, avatarSize / 2)
+      .fill({ color: Colors.ROBOT_CONTAINER, alpha: 0.95 })
+      .stroke({ width: 2, color: Colors.ROBOT_CYAN });
+    
+    const avatarEmoji = new Text({
+      text: '👤',
+      style: {
+        fontSize: 28
+      }
+    });
+    avatarEmoji.anchor.set(0.5);
+    avatarEmoji.x = avatarX + avatarSize / 2;
+    avatarEmoji.y = avatarY + avatarSize / 2;
+    
+    // Player info text on the right
+    const infoStartX = avatarX + avatarSize + 8;
+    
+    const playerName = new Text({
+      text: `${this.player.username}`,
+      style: {
+        fontFamily: FontFamily.PRIMARY,
+        fontSize: 14,
+        fontWeight: 'bold',
+        fill: Colors.ROBOT_CYAN_LIGHT,
+        stroke: { color: Colors.ROBOT_BG_DARK, width: 0.5 }
+      }
+    });
+    playerName.x = infoStartX;
+    playerName.y = 12;
+    
+    const playerLevel = new Text({
+      text: `⭐ Lv.${this.player.level}`,
+      style: {
+        fontFamily: FontFamily.PRIMARY,
+        fontSize: 13,
+        fill: Colors.ROBOT_CYAN_MID
+      }
+    });
+    playerLevel.x = infoStartX;
+    playerLevel.y = 32;
+    
+    const playerExp = new Text({
+      text: `✨ ${this.player.exp}`,
+      style: {
+        fontFamily: FontFamily.PRIMARY,
+        fontSize: 13,
+        fill: Colors.ROBOT_CYAN_MID
+      }
+    });
+    playerExp.x = infoStartX;
+    playerExp.y = 50;
+    
+    playerPanel.addChild(bg, avatarBg, avatarEmoji, playerName, playerLevel, playerExp);
+    playerPanel.x = this.STANDARD_PADDING;
+    playerPanel.y = this.STANDARD_PADDING;
+    
+    this.container.addChild(playerPanel);
+  }
+
+  private createResourceInfo(): void {
+    const resourcePanel = new Container();
+    
+    // Compact panel for resources
+    const panelWidth = 130;
+    const panelHeight = 75;
+    
+    // Robot panel
+    const bg = new Graphics();
+    
+    // Outer glow
+    bg.roundRect(-2, -2, panelWidth + 4, panelHeight + 4, 8)
+      .fill({ color: Colors.ROBOT_CYAN, alpha: 0.2 });
+    
+    // Main panel
+    bg.roundRect(0, 0, panelWidth, panelHeight, 8)
+      .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.95 })
+      .stroke({ width: 2, color: Colors.ROBOT_CYAN });
+    
+    // Inner layer
+    bg.roundRect(2, 2, panelWidth - 4, panelHeight - 4, 6)
+      .fill({ color: Colors.ROBOT_CONTAINER, alpha: 0.6 });
+    
+    resourcePanel.addChild(bg);
+    
+    // Energy display (top)
+    const energyIcon = new Text({
+      text: '⚡',
+      style: {
+        fontSize: 20
+      }
+    });
+    energyIcon.x = 10;
+    energyIcon.y = 12;
+    
+    const energyValue = new Text({
+      text: `${this.player.energy || 100}/100`,
+      style: {
+        fontFamily: FontFamily.PRIMARY,
+        fontSize: 14,
+        fontWeight: 'bold',
+        fill: Colors.ROBOT_CYAN_LIGHT
+      }
+    });
+    energyValue.x = 35;
+    energyValue.y = 15;
+    
+    // Stone display (bottom)
+    const stoneIcon = new Text({
+      text: '💎',
+      style: {
+        fontSize: 20
+      }
+    });
+    stoneIcon.x = 10;
+    stoneIcon.y = 42;
+    
+    const stoneValue = new Text({
+      text: `${this.player.stones || 0}`,
+      style: {
+        fontFamily: FontFamily.PRIMARY,
+        fontSize: 14,
+        fontWeight: 'bold',
+        fill: Colors.ROBOT_CYAN_LIGHT
+      }
+    });
+    stoneValue.x = 35;
+    stoneValue.y = 45;
+    
+    resourcePanel.addChild(energyIcon, energyValue, stoneIcon, stoneValue);
+    
+    // Position at top right
+    resourcePanel.x = this.gameWidth - panelWidth - this.STANDARD_PADDING;
+    resourcePanel.y = this.STANDARD_PADDING;
+    
+    this.container.addChild(resourcePanel);
+  }
+
   private createMenuButtons(): void {
     const buttonContainer = new Container();
     
@@ -141,8 +311,9 @@ export class HomeScene extends BaseScene {
     const buttonWidth = Math.min(this.gameWidth - 2 * this.STANDARD_PADDING, 400);
     const buttonHeight = 48;
     
-    const topPadding = 30; // Start from top with minimal padding
-    const availableHeight = this.gameHeight - topPadding - this.STANDARD_PADDING;
+    // Start buttons below the header panels (player info + resource info)
+    const headerHeight = 95; // Panel height (75) + padding (8) + spacing (12)
+    const availableHeight = this.gameHeight - headerHeight - this.STANDARD_PADDING;
     const totalButtonHeight = buttons.length * buttonHeight + (buttons.length - 1) * this.STANDARD_SPACING;
     
     const spacing = totalButtonHeight > availableHeight ? 
@@ -171,7 +342,7 @@ export class HomeScene extends BaseScene {
     });
     
     buttonContainer.x = (this.gameWidth - buttonWidth) / 2;
-    buttonContainer.y = topPadding;
+    buttonContainer.y = headerHeight;
     
     this.container.addChild(buttonContainer);
   }
