@@ -10,6 +10,7 @@ import { FaceDownCard } from './FaceDownCard';
 import { DeckCard } from './DeckCard';
 import { CharacterCard } from './CharacterCard';
 import { HeroCard } from './HeroCard';
+import { checkinStatusManager } from '@/utils/checkinStatusManager';
 
 export abstract class BaseScene extends Container {
   /** Assets bundles required by this screen */
@@ -24,15 +25,22 @@ export abstract class BaseScene extends Container {
 
   // Bottom navigation
   protected bottomNavigation: BottomNavigationMenu | null = null;
+  private checkinStatusUnsubscribe?: () => void;
 
   constructor() {
     super();
     // Don't create bottom navigation in constructor yet - wait for proper dimensions
+    
+    // Subscribe to check-in status changes
+    this.checkinStatusUnsubscribe = checkinStatusManager.subscribe((status) => {
+      this.updateBottomNavigationCheckinStatus(status);
+    });
   }
 
   protected createBottomNavigation(): void {
     if (!this.bottomNavigation && this.gameWidth > 0 && this.gameHeight > 0) {
-      this.bottomNavigation = new BottomNavigationMenu(this.gameWidth, this.gameHeight);
+      const hasCheckedIn = checkinStatusManager.getCachedStatus();
+      this.bottomNavigation = new BottomNavigationMenu(this.gameWidth, this.gameHeight, hasCheckedIn);
       this.addChild(this.bottomNavigation);
       // Ensure it's on top
       this.bottomNavigation.zIndex = 9999;
@@ -46,6 +54,12 @@ export abstract class BaseScene extends Container {
     } else if (this.gameWidth > 0 && this.gameHeight > 0) {
       // Create it if it doesn't exist and we have proper dimensions
       this.createBottomNavigation();
+    }
+  }
+
+  protected updateBottomNavigationCheckinStatus(hasCheckedIn: boolean): void {
+    if (this.bottomNavigation) {
+      this.bottomNavigation.updateCheckinStatus(hasCheckedIn);
     }
   }
 
@@ -262,6 +276,15 @@ export abstract class BaseScene extends Container {
     card.x = x;
     card.y = y;
     return card;
+  }
+
+  public destroy(options?: any): void {
+    // Unsubscribe from check-in status changes
+    if (this.checkinStatusUnsubscribe) {
+      this.checkinStatusUnsubscribe();
+    }
+    
+    super.destroy(options);
   }
 
 }

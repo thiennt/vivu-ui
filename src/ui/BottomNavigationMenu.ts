@@ -5,11 +5,13 @@ export class BottomNavigationMenu extends Container {
   private menuHeight = 60;
   private gameWidth: number;
   private gameHeight: number;
+  private hasCheckedIn: boolean = false;
 
-  constructor(gameWidth: number, gameHeight: number) {
+  constructor(gameWidth: number, gameHeight: number, hasCheckedIn: boolean = false) {
     super();
     this.gameWidth = gameWidth;
     this.gameHeight = gameHeight;
+    this.hasCheckedIn = hasCheckedIn;
     this.createBottomMenu();
   }
 
@@ -43,6 +45,7 @@ export class BottomNavigationMenu extends Container {
     const itemWidth = this.gameWidth / menuItems.length;
 
     menuItems.forEach((item, index) => {
+      const isDisabled = !this.hasCheckedIn;
       const menuItem = this.createFantasyMenuItem(
         item.text,
         item.label,
@@ -50,7 +53,8 @@ export class BottomNavigationMenu extends Container {
         0,
         itemWidth,
         this.menuHeight,
-        () => this.handleNavigation(item.action)
+        () => this.handleNavigation(item.action),
+        isDisabled
       );
       this.addChild(menuItem);
     });
@@ -61,6 +65,12 @@ export class BottomNavigationMenu extends Container {
   }
 
   private handleNavigation(action: string): void {
+    // Don't navigate if not checked in
+    if (!this.hasCheckedIn) {
+      console.log('Navigation blocked: User has not checked in today');
+      return;
+    }
+    
     // Import scenes dynamically to avoid circular imports
     switch (action) {
       case 'home':
@@ -94,7 +104,8 @@ export class BottomNavigationMenu extends Container {
     y: number,
     width: number,
     height: number,
-    onClick: () => void
+    onClick: () => void,
+    isDisabled: boolean = false
   ): Container {
     const item = new Container();
 
@@ -103,34 +114,37 @@ export class BottomNavigationMenu extends Container {
     itemBg.rect(0, 0, width, height)
       .fill({ color: Colors.BLACK, alpha: 0 });
 
-    // Icon with cyan glow
+    // Icon with cyan glow (or dimmed if disabled)
     const iconText = new Text({
       text: icon,
       style: {
         fontFamily: FontFamily.ARIAL,
         fontSize: 26,
-        fill: Colors.ROBOT_CYAN_LIGHT,
+        fill: isDisabled ? Colors.ROBOT_CONTAINER : Colors.ROBOT_CYAN_LIGHT,
         align: 'center',
         dropShadow: {
           color: Colors.ROBOT_CYAN,
           blur: 4,
           angle: 0,
           distance: 0,
-          alpha: 0.6
+          alpha: isDisabled ? 0.2 : 0.6
         }
       }
     });
     iconText.anchor.set(0.5);
     iconText.x = width / 2;
     iconText.y = height / 2 - 8;
+    if (isDisabled) {
+      iconText.alpha = 0.4;
+    }
 
-    // Label with robot style
+    // Label with robot style (or dimmed if disabled)
     const labelText = new Text({
       text: label,
       style: {
         fontFamily: FontFamily.PRIMARY,
         fontSize: 10,
-        fill: Colors.ROBOT_CYAN_MID,
+        fill: isDisabled ? Colors.ROBOT_CONTAINER : Colors.ROBOT_CYAN_MID,
         align: 'center',
         stroke: { color: Colors.ROBOT_BG_DARK, width: 1 }
       }
@@ -138,29 +152,34 @@ export class BottomNavigationMenu extends Container {
     labelText.anchor.set(0.5);
     labelText.x = width / 2;
     labelText.y = height - 10;
+    if (isDisabled) {
+      labelText.alpha = 0.4;
+    }
 
     item.addChild(itemBg, iconText, labelText);
     item.x = x;
     item.y = y;
-    item.interactive = true;
-    item.cursor = 'pointer';
+    item.interactive = !isDisabled;
+    item.cursor = isDisabled ? 'not-allowed' : 'pointer';
 
-    // Hover effects - cyan highlight
-    item.on('pointerover', () => {
-      itemBg.clear();
-      itemBg.rect(0, 0, width, height)
-        .fill({ color: Colors.ROBOT_CYAN, alpha: 0.2 });
-      iconText.scale.set(1.1);
-    });
+    if (!isDisabled) {
+      // Hover effects - cyan highlight
+      item.on('pointerover', () => {
+        itemBg.clear();
+        itemBg.rect(0, 0, width, height)
+          .fill({ color: Colors.ROBOT_CYAN, alpha: 0.2 });
+        iconText.scale.set(1.1);
+      });
 
-    item.on('pointerout', () => {
-      itemBg.clear();
-      itemBg.rect(0, 0, width, height)
-        .fill({ color: Colors.BLACK, alpha: 0 });
-      iconText.scale.set(1.0);
-    });
+      item.on('pointerout', () => {
+        itemBg.clear();
+        itemBg.rect(0, 0, width, height)
+          .fill({ color: Colors.BLACK, alpha: 0 });
+        iconText.scale.set(1.0);
+      });
 
-    item.on('pointerdown', onClick);
+      item.on('pointerdown', onClick);
+    }
 
     return item;
   }
@@ -170,6 +189,14 @@ export class BottomNavigationMenu extends Container {
     this.gameHeight = height;
     
     // Remove all children and recreate
+    this.removeChildren();
+    this.createBottomMenu();
+  }
+
+  public updateCheckinStatus(hasCheckedIn: boolean): void {
+    this.hasCheckedIn = hasCheckedIn;
+    
+    // Remove all children and recreate to reflect new state
     this.removeChildren();
     this.createBottomMenu();
   }

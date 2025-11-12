@@ -8,7 +8,7 @@ import { CheckinScene } from './CheckinScene';
 import { LootBoxScene } from './LootBoxScene';
 import { Colors, FontFamily } from '@/utils/cssStyles';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
-import { authApi } from '@/services/api';
+import { checkinStatusManager } from '@/utils/checkinStatusManager';
 
 export class HomeScene extends BaseScene {
   /** Assets bundles required by this screen */
@@ -39,26 +39,12 @@ export class HomeScene extends BaseScene {
     const player = sessionStorage.getItem('player');
     this.player = player ? JSON.parse(player) : null;
 
-    // Check today's check-in status
-    await this.checkTodayCheckinStatus();
+    // Check today's check-in status using shared manager
+    this.hasCheckedInToday = await checkinStatusManager.getCheckinStatus();
 
     this.loadingManager.hideLoading();
     
     this.createUI();
-  }
-
-  private async checkTodayCheckinStatus(): Promise<void> {
-    try {
-      const response = await authApi.getCheckinStatus();
-      if (response) {
-        this.hasCheckedInToday = response.isCheckedInToday || false;
-        console.log('Check-in status in HomeScene:', this.hasCheckedInToday);
-      }
-    } catch (error) {
-      console.error('Error checking check-in status in HomeScene:', error);
-      // Default to false if there's an error
-      this.hasCheckedInToday = false;
-    }
   }
 
   private createUI(): void {
