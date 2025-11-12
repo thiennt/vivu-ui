@@ -5,6 +5,7 @@ import { BaseScene } from '@/ui/BaseScene';
 import { Colors, FontFamily } from '@/utils/cssStyles';
 import { authApi } from '@/services/api';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
+import { checkinStatusManager } from '@/utils/checkinStatusManager';
 
 export class CheckinScene extends BaseScene {
   /** Assets bundles required by this screen */
@@ -49,9 +50,7 @@ export class CheckinScene extends BaseScene {
     // Initialize loading manager
     this.loadingManager = new LoadingStateManager(this.container, this.gameWidth, this.gameHeight);
     
-    // Check if user has already checked in today
-    this.checkTodayCheckinStatus();
-    
+    // Check if user has already checked in today using shared manager
     this.checkTodayCheckinStatus().then(() => {
       // Initialize UI without performing checkin
       this.initializeUI();
@@ -60,9 +59,9 @@ export class CheckinScene extends BaseScene {
   
   private async checkTodayCheckinStatus(): Promise<void> {
     try {
+      this.hasCheckedInToday = await checkinStatusManager.getCheckinStatus();
       const response = await authApi.getCheckinStatus();
       if (response) {
-        this.hasCheckedInToday = response.isCheckedInToday || false;
         this.characters = response.characters || [];
         console.log('Check-in status response:', this.hasCheckedInToday, this.characters);
       }
@@ -86,8 +85,9 @@ export class CheckinScene extends BaseScene {
         this.characters = response.characters || [];
         this.checkinReward = response.checkin_reward || null;
 
-        // Mark as checked in today
+        // Mark as checked in today in both local state and shared manager
         this.hasCheckedInToday = true;
+        checkinStatusManager.markAsCheckedIn();
       }
     } catch (error) {
       console.error('Checkin failed:', error);
