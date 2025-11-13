@@ -6,7 +6,6 @@ import { CharacterDetailScene } from './CharacterDetailScene';
 import { HomeScene } from './HomeScene';
 import { Colors, FontFamily } from '@/utils/cssStyles';
 import { ScrollBox } from '@pixi/ui';
-import { playerApi, ApiError } from '@/services/api';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
 
 export class PlayerDetailScene extends BaseScene {
@@ -15,7 +14,6 @@ export class PlayerDetailScene extends BaseScene {
   private mainScrollBox: ScrollBox | null = null;
   private scrollContent: Container;
   private backgroundContainer: Container;
-  private headerContainer: Container;
   private statsContainer: Container;
   private collectionContainer: Container;
   private buttonContainer: Container;
@@ -36,7 +34,6 @@ export class PlayerDetailScene extends BaseScene {
     this.container = new Container();
     this.scrollContent = new Container();
     this.backgroundContainer = new Container();
-    this.headerContainer = new Container();
     this.statsContainer = new Container();
     this.collectionContainer = new Container();
     this.buttonContainer = new Container();
@@ -49,7 +46,6 @@ export class PlayerDetailScene extends BaseScene {
     
     // Add scrollable content
     this.scrollContent.addChild(
-      this.headerContainer,
       this.statsContainer,
       this.pointDistributionContainer,
       this.collectionContainer,
@@ -75,7 +71,6 @@ export class PlayerDetailScene extends BaseScene {
     if (!this.player) return;
     
     this.createBackground();
-    this.createHeader();
     this.createPlayerStats();
     this.createStatLevelingPanel();
     //this.createCharacterCollection();
@@ -102,7 +97,6 @@ export class PlayerDetailScene extends BaseScene {
   private updateLayout(): void {
     // Clear and recreate layout
     this.backgroundContainer.removeChildren();
-    this.headerContainer.removeChildren();
     this.statsContainer.removeChildren();
     this.pointDistributionContainer.removeChildren();
     this.collectionContainer.removeChildren();
@@ -116,7 +110,6 @@ export class PlayerDetailScene extends BaseScene {
     
     // Recreate layout with current dimensions
     this.createBackground();
-    this.createHeader();
     this.createPlayerStats();
     this.createStatLevelingPanel();
     //this.createCharacterCollection();
@@ -169,36 +162,10 @@ export class PlayerDetailScene extends BaseScene {
     this.backgroundContainer.addChild(bg);
   }
 
-  private createHeader(): void {
-    // Robot theme header
-    const title = new Text({
-      text: '👤 Player Profile 👤',
-      style: {
-        fontFamily: FontFamily.PRIMARY,
-        fontSize: 24,
-        fontWeight: 'bold',
-        fill: Colors.ROBOT_CYAN_LIGHT,
-        letterSpacing: 2,
-        dropShadow: {
-          color: Colors.ROBOT_CYAN,
-          blur: 8,
-          angle: 0,
-          distance: 0,
-          alpha: 0.6
-        }
-      }
-    });
-    title.anchor.set(0.5);
-    title.x = this.gameWidth / 2;
-    title.y = 32;
-    
-    this.headerContainer.addChild(title);
-  }
-
   private createPlayerStats(): void {
     if (!this.player) return;
     
-    const startY = 85;
+    const startY = this.STANDARD_PADDING;
     const padding = this.STANDARD_PADDING;
     const availableWidth = this.gameWidth - 2 * padding;
     const panelWidth = Math.min(580, availableWidth);
@@ -327,25 +294,10 @@ export class PlayerDetailScene extends BaseScene {
     const padding = this.STANDARD_PADDING;
     
     // Position below player info (167) + gap
-    const startY = 85 + 167 + 15;
+    const startY = this.STANDARD_PADDING + 167 + 15;
     
     const panelWidth = Math.min(580, this.gameWidth - 2 * padding);
     const panelX = (this.gameWidth - panelWidth) / 2;
-
-    // Title with robot theme
-    const title = new Text({
-      text: '⚔️ Statistics',
-      style: {
-        fontFamily: FontFamily.PRIMARY,
-        fontSize: 16,
-        fontWeight: 'bold',
-        fill: Colors.ROBOT_CYAN_LIGHT,
-        stroke: { color: Colors.ROBOT_ELEMENT, width: 1 }
-      }
-    });
-    title.x = panelX + 10;
-    title.y = startY;
-    this.pointDistributionContainer.addChild(title);
 
     const statSlots = [
       {
@@ -377,7 +329,7 @@ export class PlayerDetailScene extends BaseScene {
       }
     ];
 
-    let currentY = startY + 35;
+    let currentY = startY;
 
     statSlots.forEach((slot) => {
       const card = this.createStatCard(slot, panelWidth);
