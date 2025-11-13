@@ -496,50 +496,19 @@ export class CharacterDetailScene extends BaseScene {
     const padding = 12;
     const panelWidth = this.gameWidth - 2 * padding;
 
-    // Title
-    const title = new Text({
-      text: '👕 Character Skins',
-      style: {
-        fontFamily: FontFamily.PRIMARY,
-        fontSize: 16,
-        fontWeight: 'bold',
-        fill: Colors.ROBOT_CYAN_LIGHT,
-        stroke: { color: Colors.ROBOT_ELEMENT, width: 1 }
-      }
-    });
-    title.x = 10;
-    title.y = 10;
-    this.skinContainer.addChild(title);
-
-    // Current skin display
+      // Current skin display
     const currentSkinPanel = this.createCurrentSkinPanel(panelWidth);
     currentSkinPanel.x = 0;
-    currentSkinPanel.y = 45;
+    currentSkinPanel.y = 15;
     this.skinContainer.addChild(currentSkinPanel);
-
-    // Skin bonuses display
-    const bonusY = 220;
-    const bonusTitle = new Text({
-      text: '✨ Skin Stat Bonuses',
-      style: {
-        fontFamily: FontFamily.PRIMARY,
-        fontSize: 16,
-        fontWeight: 'bold',
-        fill: Colors.ROBOT_CYAN_LIGHT,
-        stroke: { color: Colors.ROBOT_ELEMENT, width: 1 }
-      }
-    });
-    bonusTitle.x = 10;
-    bonusTitle.y = bonusY;
-    this.skinContainer.addChild(bonusTitle);
 
     const bonusPanel = this.createSkinBonusPanel(panelWidth);
     bonusPanel.x = 0;
-    bonusPanel.y = bonusY + 35;
+    bonusPanel.y = 150 + 35;
     this.skinContainer.addChild(bonusPanel);
 
     // Description
-    const descY = bonusY + 195;
+    const descY = 150 + 195;
     const descText = new Text({
       text: 'Change your character\'s appearance with skins! Each skin provides random stat bonuses to HP, ATK, and DEF.',
       style: {
@@ -873,21 +842,6 @@ export class CharacterDetailScene extends BaseScene {
     const padding = 12;
     const panelWidth = this.gameWidth - 2 * padding;
 
-    // Title
-    const title = new Text({
-      text: '⚔️ Equipment',
-      style: {
-        fontFamily: FontFamily.PRIMARY,
-        fontSize: 16,
-        fontWeight: 'bold',
-        fill: Colors.ROBOT_CYAN_LIGHT,
-        stroke: { color: Colors.ROBOT_ELEMENT, width: 1 }
-      }
-    });
-    title.x = 10;
-    title.y = 10;
-    this.equipmentContainer.addChild(title);
-
     const equipmentSlots = [
       {
         name: 'Weapon',
@@ -918,39 +872,18 @@ export class CharacterDetailScene extends BaseScene {
       }
     ];
 
-    let currentY = 45;
+    let currentY = 15;
 
     equipmentSlots.forEach((slot) => {
-      const card = this.createPermanentEquipmentCard(slot, panelWidth);
+      const card = this.createEquipmentCard(slot, panelWidth);
       card.x = 0;
       card.y = currentY;
       this.equipmentContainer.addChild(card);
       currentY += 120;
     });
-
-    // Equipment Bonuses Section
-    const bonusY = currentY + 15;
-    const bonusTitle = new Text({
-      text: '✨ Total Equipment Bonuses',
-      style: {
-        fontFamily: FontFamily.PRIMARY,
-        fontSize: 16,
-        fontWeight: 'bold',
-        fill: Colors.ROBOT_CYAN_LIGHT,
-        stroke: { color: Colors.ROBOT_ELEMENT, width: 1 }
-      }
-    });
-    bonusTitle.x = 10;
-    bonusTitle.y = bonusY;
-    this.equipmentContainer.addChild(bonusTitle);
-
-    const bonusPanel = this.createPermanentEquipmentBonusPanel(panelWidth);
-    bonusPanel.x = 0;
-    bonusPanel.y = bonusY + 35;
-    this.equipmentContainer.addChild(bonusPanel);
   }
 
-  private createPermanentEquipmentCard(slot: any, width: number): Container {
+  private createEquipmentCard(slot: any, width: number): Container {
     const card = new Container();
     const height = 110;
 
@@ -1149,89 +1082,6 @@ export class CharacterDetailScene extends BaseScene {
     if (this.activeTab === 'equipment') {
       this.refreshTabContent();
     }
-  }
-
-  private createPermanentEquipmentBonusPanel(width: number): Container {
-    const panel = new Container();
-    const height = 140;
-
-    const bg = new Graphics();
-    bg.roundRect(0, 0, width, height, 10)
-      .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.98 })
-      .stroke({ width: 2, color: Colors.ROBOT_CYAN });
-
-    bg.roundRect(3, 3, width - 6, height - 6, 8)
-      .fill({ color: Colors.ROBOT_BG_MID, alpha: 0.7 });
-
-    bg.roundRect(5, 5, width - 10, height - 10, 7)
-      .stroke({ width: 1, color: Colors.ROBOT_CYAN_MID, alpha: 0.4 });
-
-    panel.addChild(bg);
-
-    // Calculate total bonuses from permanent equipment
-    const bonuses = {
-      weapon: this.character?.weapon_value || 0,
-      helmet: this.character?.helmet_value || 0,
-      armor: this.character?.armor_value || 0,
-      total: (this.character?.weapon_value || 0) + (this.character?.helmet_value || 0) + (this.character?.armor_value || 0)
-    };
-
-    const bonusStats = [
-      { label: 'Weapon', value: bonuses.weapon, icon: '⚔️', color: Colors.STAT_ATK },
-      { label: 'Helmet', value: bonuses.helmet, icon: '🪖', color: Colors.STAT_DEF },
-      { label: 'Armor', value: bonuses.armor, icon: '🛡️', color: Colors.STAT_HP },
-      { label: 'Total Bonus', value: bonuses.total, icon: '✨', color: Colors.GREEN_MINT }
-    ];
-
-    bonusStats.forEach((stat, index) => {
-      const row = Math.floor(index / 2);
-      const col = index % 2;
-      const x = 15 + (col * (width / 2));
-      const y = 15 + (row * 60);
-
-      // Bonus stat row
-      const statBg = new Graphics();
-      statBg.roundRect(x, y, (width / 2) - 20, 50, 6)
-        .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.8 })
-        .stroke({ width: 1, color: stat.color, alpha: 0.5 });
-
-      // Icon
-      const iconText = new Text({
-        text: stat.icon,
-        style: { fontSize: 20 }
-      });
-      iconText.x = x + 10;
-      iconText.y = y + 8;
-
-      // Label
-      const labelText = new Text({
-        text: stat.label,
-        style: {
-          fontFamily: FontFamily.PRIMARY,
-          fontSize: 11,
-          fill: Colors.ROBOT_CYAN_LIGHT
-        }
-      });
-      labelText.x = x + 40;
-      labelText.y = y + 8;
-
-      // Value
-      const valueText = new Text({
-        text: `+${stat.value}`,
-        style: {
-          fontFamily: FontFamily.PRIMARY,
-          fontSize: 18,
-          fontWeight: 'bold',
-          fill: stat.color
-        }
-      });
-      valueText.x = x + 40;
-      valueText.y = y + 25;
-
-      panel.addChild(statBg, iconText, labelText, valueText);
-    });
-
-    return panel;
   }
 
   private createBackButton(): void {
