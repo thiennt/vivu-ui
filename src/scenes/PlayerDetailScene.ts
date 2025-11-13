@@ -212,31 +212,14 @@ export class PlayerDetailScene extends BaseScene {
         { label: '⭐ Level:', value: this.player.level.toString() },
         { label: '✨ Experience:', value: this.player.exp.toString() },
         { label: '🎭 Characters:', value: this.characters.length.toString() },
+        { label: '🍀 Luck:', value: this.player.luck.toString() }
       ]
     );
     
     playerInfoPanel.x = panelX;
     playerInfoPanel.y = startY;
     
-    // Statistics panel (below player info) - showing base stats with equipment bonuses
-    const atkValue = (this.player.atk_value || 0);
-    const defValue = (this.player.def_value || 0);
-    const hpValue = (this.player.hp_value || 0);
-    
-    const statsPanel = this.createStatisticsPanel(
-      panelWidth,
-      [
-        { label: '⚔️ Attack:', value: `${atkValue}` },
-        { label: '🛡️ Defense:', value: `${defValue}` },
-        { label: '❤️ HP:', value: `${hpValue}` },
-        { label: '🍀 Luck:', value: this.player.luck.toString() }
-      ]
-    );
-    
-    statsPanel.x = panelX;
-    statsPanel.y = startY + 155; // Position below player info panel
-    
-    this.statsContainer.addChild(playerInfoPanel, statsPanel);
+    this.statsContainer.addChild(playerInfoPanel);
   }
 
   private createPlayerInfoPanel(
@@ -244,7 +227,7 @@ export class PlayerDetailScene extends BaseScene {
     playerInfo: Array<{label: string, value: string}>
   ): Container {
     const panel = new Container();
-    const height = 145;
+    const height = 167;
     
     // Robot theme panel with glow
     const bg = new Graphics();
@@ -338,85 +321,20 @@ export class PlayerDetailScene extends BaseScene {
     return panel;
   }
 
-  private createStatisticsPanel(
-    width: number,
-    statistics: Array<{label: string, value: string}>
-  ): Container {
-    const panel = new Container();
-    const height = statistics.length * 22 + 60;
-    
-    // Robot theme panel with glow
-    const bg = new Graphics();
-    
-    // Outer glow
-    bg.roundRect(3, 3, width, height, 10)
-      .fill({ color: Colors.ROBOT_CYAN, alpha: 0.25 });
-    
-    // Main panel background
-    bg.roundRect(0, 0, width, height, 14)
-      .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.7 })
-      .stroke({ width: 1, color: Colors.ROBOT_CYAN });
-    
-    // Inner shadow
-    bg.roundRect(3, 3, width - 6, height - 6, 12)
-      .fill({ color: Colors.ROBOT_BG_MID, alpha: 0.5 });
-    
-    panel.addChild(bg);
-    
-    // Title with robot theme
-    const title = new Text({
-      text: '⚔️ Statistics',
-      style: {
-        fontFamily: FontFamily.PRIMARY,
-        fontSize: 18,
-        fontWeight: 'bold',
-        fill: Colors.ROBOT_CYAN,
-        letterSpacing: 2,
-        dropShadow: {
-          color: Colors.ROBOT_CYAN,
-          blur: 4,
-          angle: 0,
-          distance: 0,
-          alpha: 0.5
-        }
-      }
-    });
-    title.x = 12;
-    title.y = 12;
-    panel.addChild(title);
-    
-    // Statistics list with robot theme
-    statistics.forEach((item, index) => {
-      const statText = new Text({
-        text: `${item.label} ${item.value}`,
-        style: {
-          fontFamily: FontFamily.PRIMARY,
-          fontSize: 16,
-          fill: Colors.ROBOT_CYAN_LIGHT
-        }
-      });
-      statText.x = 12;
-      statText.y = 45 + (index * 22);
-      panel.addChild(statText);
-    });
-    
-    return panel;
-  }
-
   private createStatLevelingPanel(): void {
     if (!this.player) return;
 
     const padding = this.STANDARD_PADDING;
     
-    // Position below player info (145) + stats panel (148) + gaps
-    const startY = 85 + 155 + 148 + 15;
+    // Position below player info (167) + gap
+    const startY = 85 + 167 + 15;
     
     const panelWidth = Math.min(580, this.gameWidth - 2 * padding);
     const panelX = (this.gameWidth - panelWidth) / 2;
 
     // Title with robot theme
     const title = new Text({
-      text: '⚔️ Stat Leveling',
+      text: '⚔️ Statistics',
       style: {
         fontFamily: FontFamily.PRIMARY,
         fontSize: 16,
@@ -695,10 +613,9 @@ export class PlayerDetailScene extends BaseScene {
     if (!this.player) return;
     
     // Position after stat leveling panel
-    // Player info: 85 + 145 = 230
-    // Stats: 230 + 10 + 148 = 388
-    // Stat Leveling: 388 + 15 + (3 * 120) = 763
-    const baseY = 85 + 155 + 148 + 15 + (3 * 120) + 15;
+    // Player info: 85 + 167 = 252
+    // Statistics: 252 + 15 + (3 * 120) = 627
+    const baseY = 85 + 167 + 15 + (3 * 120) + 15;
     
     const availableWidth = this.gameWidth - 2 * this.STANDARD_PADDING;
     const gap = 10;
