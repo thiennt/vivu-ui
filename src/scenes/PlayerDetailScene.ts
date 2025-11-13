@@ -26,9 +26,8 @@ export class PlayerDetailScene extends BaseScene {
   private characters: any[] = [];
   private loadingManager: LoadingStateManager;
 
-  // Point distribution state
-  private tempStatChanges = { sta: 0, str: 0, agi: 0 };
-  private remainingPoints: number = 0;
+  // Stat level state (no longer using point distribution)
+  // Stats now use level/exp system like character equipment
 
   constructor() {
     super();
@@ -66,8 +65,6 @@ export class PlayerDetailScene extends BaseScene {
 
     this.player = sessionStorage.getItem('player') ? JSON.parse(sessionStorage.getItem('player') as string) : null;
     this.characters = this.player?.characters || [];
-    this.remainingPoints = this.player.points || 0;
-    this.tempStatChanges = { sta: 0, str: 0, agi: 0 };
 
     this.loadingManager.hideLoading();
     
@@ -80,7 +77,7 @@ export class PlayerDetailScene extends BaseScene {
     this.createBackground();
     this.createHeader();
     this.createPlayerStats();
-    this.createPointDistributionPanel();
+    this.createStatLevelingPanel();
     //this.createCharacterCollection();
     this.createBackButton();
   }
@@ -121,7 +118,7 @@ export class PlayerDetailScene extends BaseScene {
     this.createBackground();
     this.createHeader();
     this.createPlayerStats();
-    this.createPointDistributionPanel();
+    this.createStatLevelingPanel();
     //this.createCharacterCollection();
     this.createBackButton();
     
@@ -207,11 +204,6 @@ export class PlayerDetailScene extends BaseScene {
     const panelWidth = Math.min(580, availableWidth);
     const panelX = (this.gameWidth - panelWidth) / 2;
     
-    // Calculate current stats with changes
-    const currentSta = this.player.sta + this.tempStatChanges.sta;
-    const currentStr = this.player.str + this.tempStatChanges.str;
-    const currentAgi = this.player.agi + this.tempStatChanges.agi;
-    
     // Player info panel with avatar
     const playerInfoPanel = this.createPlayerInfoPanel(
       panelWidth,
@@ -226,13 +218,17 @@ export class PlayerDetailScene extends BaseScene {
     playerInfoPanel.x = panelX;
     playerInfoPanel.y = startY;
     
-    // Statistics panel (below player info)
+    // Statistics panel (below player info) - showing base stats with equipment bonuses
+    const atkValue = (this.player.atk_value || 0);
+    const defValue = (this.player.def_value || 0);
+    const hpValue = (this.player.hp_value || 0);
+    
     const statsPanel = this.createStatisticsPanel(
       panelWidth,
       [
-        { label: '❤️ Stamina:', value: `${currentSta}${this.tempStatChanges.sta !== 0 ? ` (+${this.tempStatChanges.sta})` : ''}` },
-        { label: '💪 Strength:', value: `${currentStr}${this.tempStatChanges.str !== 0 ? ` (+${this.tempStatChanges.str})` : ''}` },
-        { label: '⚡ Agility:', value: `${currentAgi}${this.tempStatChanges.agi !== 0 ? ` (+${this.tempStatChanges.agi})` : ''}` },
+        { label: '⚔️ Attack:', value: `${atkValue}` },
+        { label: '🛡️ Defense:', value: `${defValue}` },
+        { label: '❤️ HP:', value: `${hpValue}` },
         { label: '🍀 Luck:', value: this.player.luck.toString() }
       ]
     );
@@ -407,7 +403,7 @@ export class PlayerDetailScene extends BaseScene {
     return panel;
   }
 
-  private createPointDistributionPanel(): void {
+  private createStatLevelingPanel(): void {
     if (!this.player) return;
 
     const padding = this.STANDARD_PADDING;
@@ -416,277 +412,293 @@ export class PlayerDetailScene extends BaseScene {
     const startY = 85 + 155 + 148 + 15;
     
     const panelWidth = Math.min(580, this.gameWidth - 2 * padding);
-    const panelHeight = this.player.points <= 0 ? 90 : 190;
     const panelX = (this.gameWidth - panelWidth) / 2;
 
-    const panel = new Container();
-    
-    // Robot theme panel
-    const bg = new Graphics();
-    
-    // Outer glow
-    bg.roundRect(3, 3, panelWidth, panelHeight, 10)
-      .fill({ color: Colors.ROBOT_CYAN, alpha: 0.25 });
-    
-    // Main panel background
-    bg.roundRect(0, 0, panelWidth, panelHeight, 14)
-      .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.7 })
-      .stroke({ width: 1, color: Colors.ROBOT_CYAN });
-    
-    // Inner shadow
-    bg.roundRect(3, 3, panelWidth - 6, panelHeight - 6, 12)
-      .fill({ color: Colors.ROBOT_BG_MID, alpha: 0.5 });
-    
     // Title with robot theme
-    const titleText = new Text({
-      text: '✨ Attribute Points ✨',
-      style: {
-        fontFamily: FontFamily.PRIMARY,
-        fontSize: 18,
-        fontWeight: 'bold',
-        fill: Colors.ROBOT_CYAN,
-        letterSpacing: 2,
-        dropShadow: {
-          color: Colors.ROBOT_CYAN,
-          blur: 4,
-          angle: 0,
-          distance: 0,
-          alpha: 0.5
-        }
-      }
-    });
-    titleText.x = 12;
-    titleText.y = 12;
-
-    panel.addChild(bg, titleText);
-
-    if (this.player.points <= 0) {
-      const noPointsText = new Text({
-        text: 'No points available to distribute',
-        style: {
-          fontFamily: FontFamily.PRIMARY,
-          fontSize: 16,
-          fill: Colors.ROBOT_CYAN_MID,
-          fontStyle: 'italic'
-        }
-      });
-      noPointsText.x = 12;
-      noPointsText.y = 45;
-      
-      panel.addChild(noPointsText);
-      panel.x = panelX;
-      panel.y = startY;
-      this.pointDistributionContainer.addChild(panel);
-      return;
-    }
-
-    // Remaining points with robot theme
-    const remainingText = new Text({
-      text: `⭐ ${this.remainingPoints} pts`,
-      style: {
-        fontFamily: FontFamily.PRIMARY,
-        fontSize: 16,
-        fontWeight: 'bold',
-        fill: Colors.ROBOT_CYAN,
-        letterSpacing: 1
-      }
-    });
-    remainingText.anchor.set(1, 0);
-    remainingText.x = panelWidth - 12;
-    remainingText.y = 15;
-    
-    panel.addChild(remainingText);
-    
-    // Stat controls
-    const stats = [
-      { name: '❤️ Stamina', key: 'sta' as keyof typeof this.tempStatChanges, current: this.player.sta },
-      { name: '💪 Strength', key: 'str' as keyof typeof this.tempStatChanges, current: this.player.str },
-      { name: '⚡ Agility', key: 'agi' as keyof typeof this.tempStatChanges, current: this.player.agi }
-    ];
-    
-    stats.forEach((stat, index) => {
-      const yPos = 50 + (index * 36);
-      
-      // Stat name with robot theme
-      const nameText = new Text({
-        text: stat.name,
-        style: {
-          fontFamily: FontFamily.PRIMARY,
-          fontSize: 14,
-          fontWeight: 'bold',
-          fill: Colors.ROBOT_CYAN_MID
-        }
-      });
-      nameText.x = 12;
-      nameText.y = yPos;
-      
-      // Current value with robot theme
-      const currentValue = stat.current + this.tempStatChanges[stat.key];
-      const valueText = new Text({
-        text: `${currentValue}`,
-        style: {
-          fontFamily: FontFamily.PRIMARY,
-          fontSize: 16,
-          fontWeight: 'bold',
-          fill: Colors.ROBOT_CYAN
-        }
-      });
-      valueText.x = 140;
-      valueText.y = yPos - 2;
-      
-      // Buttons
-      const minusButton = this.createFantasyStatButton('-', 180, yPos - 3, 30, 28, () => {
-        if (this.tempStatChanges[stat.key] > 0) {
-          this.tempStatChanges[stat.key]--;
-          this.remainingPoints++;
-          this.refreshPointDistributionPanel();
-        }
-      });
-      
-      const plusButton = this.createFantasyStatButton('+', 218, yPos - 3, 30, 28, () => {
-        if (this.remainingPoints > 0) {
-          this.tempStatChanges[stat.key]++;
-          this.remainingPoints--;
-          this.refreshPointDistributionPanel();
-        }
-      });
-      
-      panel.addChild(nameText, valueText, minusButton, plusButton);
-    });
-
-    // Action buttons
-    const buttonY = panelHeight - 40;
-    const buttonHeight = 34;
-    
-    const resetButton = this.createButton(
-      'Reset',
-      panelWidth - 155,
-      buttonY,
-      70,
-      buttonHeight,
-      () => {
-        this.tempStatChanges = { sta: 0, str: 0, agi: 0 };
-        this.remainingPoints = this.player.points;
-        this.refreshPointDistributionPanel();
-      }
-    );
-    
-    const confirmButton = this.createButton(
-      'Confirm',
-      panelWidth - 77,
-      buttonY,
-      70,
-      buttonHeight,
-      async () => {
-        try {
-          const updatedStats = {
-            sta_point: this.tempStatChanges.sta,
-            str_point: this.tempStatChanges.str,
-            agi_point: this.tempStatChanges.agi
-          };
-          
-          this.loadingManager.showLoading();
-          this.player = await playerApi.updatePlayerStats(updatedStats);
-          
-          this.tempStatChanges = { sta: 0, str: 0, agi: 0 };
-          
-          this.loadingManager.hideLoading();
-          this.updateLayout();
-        } catch (error) {
-          console.error('Failed to update player stats:', error);
-          const errorMessage = error instanceof ApiError 
-            ? error.message 
-            : 'Failed to update stats. Please try again.';
-          this.loadingManager.showError(errorMessage);
-        }
-      }
-    );
-    
-    panel.addChild(resetButton, confirmButton);
-    
-    panel.x = panelX;
-    panel.y = startY;
-    
-    this.pointDistributionContainer.addChild(panel);
-  }
-
-  private createFantasyStatButton(text: string, x: number, y: number, width: number, height: number, onClick: () => void): Container {
-    const button = new Container();
-    
-    const bg = new Graphics();
-    // Outer glow
-    bg.roundRect(-1, -1, width + 2, height + 2, 6)
-      .fill({ color: Colors.ROBOT_CYAN, alpha: 0.3 });
-    // Main button
-    bg.roundRect(0, 0, width, height, 6)
-      .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.95 })
-      .stroke({ width: 1, color: Colors.ROBOT_CYAN });
-
-    const buttonText = new Text({
-      text: text,
+    const title = new Text({
+      text: '⚔️ Stat Leveling',
       style: {
         fontFamily: FontFamily.PRIMARY,
         fontSize: 16,
         fontWeight: 'bold',
         fill: Colors.ROBOT_CYAN_LIGHT,
-        dropShadow: {
-          color: Colors.ROBOT_CYAN,
-          blur: 2,
-          angle: 0,
-          distance: 0,
-          alpha: 0.5
-        }
+        stroke: { color: Colors.ROBOT_ELEMENT, width: 1 }
+      }
+    });
+    title.x = panelX + 10;
+    title.y = startY;
+    this.pointDistributionContainer.addChild(title);
+
+    const statSlots = [
+      {
+        name: 'Attack',
+        icon: '⚔️',
+        type: 'atk',
+        level: this.player?.atk_level || 1,
+        exp: this.player?.atk_exp || 0,
+        value: this.player?.atk_value || 0,
+        color: Colors.STAT_ATK
+      },
+      {
+        name: 'Defense',
+        icon: '🛡️',
+        type: 'def',
+        level: this.player?.def_level || 1,
+        exp: this.player?.def_exp || 0,
+        value: this.player?.def_value || 0,
+        color: Colors.STAT_DEF
+      },
+      {
+        name: 'HP',
+        icon: '❤️',
+        type: 'hp',
+        level: this.player?.hp_level || 1,
+        exp: this.player?.hp_exp || 0,
+        value: this.player?.hp_value || 0,
+        color: Colors.STAT_HP
+      }
+    ];
+
+    let currentY = startY + 35;
+
+    statSlots.forEach((slot) => {
+      const card = this.createStatCard(slot, panelWidth);
+      card.x = panelX;
+      card.y = currentY;
+      this.pointDistributionContainer.addChild(card);
+      currentY += 120;
+    });
+  }
+
+  private createStatCard(slot: any, width: number): Container {
+    const card = new Container();
+    const height = 110;
+
+    // Card background
+    const bg = new Graphics();
+    bg.roundRect(0, 0, width, height, 10)
+      .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.98 })
+      .stroke({ width: 2, color: slot.color, alpha: 0.8 });
+
+    bg.roundRect(3, 3, width - 6, height - 6, 8)
+      .fill({ color: Colors.ROBOT_BG_MID, alpha: 0.7 });
+
+    bg.roundRect(5, 5, width - 10, height - 10, 7)
+      .stroke({ width: 1, color: slot.color, alpha: 0.4 });
+
+    card.addChild(bg);
+
+    // Stat icon
+    const iconSize = 70;
+    const iconBg = new Graphics();
+    iconBg.roundRect(15, 20, iconSize, iconSize, 10)
+      .fill({ color: slot.color, alpha: 0.2 })
+      .stroke({ width: 2.5, color: slot.color, alpha: 0.8 });
+
+    const iconText = new Text({
+      text: slot.icon,
+      style: {
+        fontSize: 36,
+        fill: slot.color
+      }
+    });
+    iconText.anchor.set(0.5);
+    iconText.x = 15 + iconSize / 2;
+    iconText.y = 20 + iconSize / 2;
+
+    card.addChild(iconBg, iconText);
+
+    // Stat name badge
+    const badgeWidth = 85;
+    const badge = new Graphics();
+    badge.roundRect(100, 20, badgeWidth, 24, 12)
+      .fill({ color: slot.color, alpha: 0.3 })
+      .stroke({ width: 1.5, color: slot.color });
+
+    const badgeText = new Text({
+      text: slot.name.toUpperCase(),
+      style: {
+        fontFamily: FontFamily.PRIMARY,
+        fontSize: 11,
+        fontWeight: 'bold',
+        fill: Colors.WHITE
+      }
+    });
+    badgeText.anchor.set(0.5);
+    badgeText.x = 100 + badgeWidth / 2;
+    badgeText.y = 32;
+
+    card.addChild(badge, badgeText);
+
+    // Level display
+    const levelText = new Text({
+      text: `Level ${slot.level}`,
+      style: {
+        fontFamily: FontFamily.PRIMARY,
+        fontSize: 15,
+        fontWeight: 'bold',
+        fill: Colors.WHITE,
+        stroke: { color: Colors.ROBOT_ELEMENT, width: 1.5 }
+      }
+    });
+    levelText.x = 100;
+    levelText.y = 50;
+    card.addChild(levelText);
+
+    // Experience bar
+    const expBarWidth = width - 215;
+    const expBarBg = new Graphics();
+    expBarBg.roundRect(100, 72, expBarWidth, 12, 6)
+      .fill({ color: Colors.ROBOT_BG_DARK, alpha: 0.8 })
+      .stroke({ width: 1, color: slot.color, alpha: 0.5 });
+
+    const expToNextLevel = slot.level * 100;
+    const expProgress = Math.min(slot.exp / expToNextLevel, 1);
+    const expBarFill = new Graphics();
+    expBarFill.roundRect(100, 72, expBarWidth * expProgress, 12, 6)
+      .fill({ color: slot.color, alpha: 0.9 });
+
+    card.addChild(expBarBg, expBarFill);
+
+    // EXP text
+    const expText = new Text({
+      text: `EXP: ${slot.exp}/${expToNextLevel}`,
+      style: {
+        fontFamily: FontFamily.PRIMARY,
+        fontSize: 10,
+        fill: Colors.ROBOT_CYAN_LIGHT
+      }
+    });
+    expText.x = 100;
+    expText.y = 87;
+    card.addChild(expText);
+
+    // Stat bonus value
+    const statBonusText = new Text({
+      text: `Stat Bonus: +${slot.value}`,
+      style: {
+        fontFamily: FontFamily.PRIMARY,
+        fontSize: 13,
+        fontWeight: 'bold',
+        fill: Colors.GREEN_MINT
+      }
+    });
+    statBonusText.x = width - 145;
+    statBonusText.y = 52;
+    card.addChild(statBonusText);
+
+    // Level up button
+    const buttonWidth = 90;
+    const buttonHeight = 28;
+    const levelUpButton = this.createLevelUpButton(
+      width - buttonWidth - 15,
+      height - buttonHeight - 12,
+      buttonWidth,
+      buttonHeight,
+      () => this.levelUpStat(slot.type)
+    );
+    card.addChild(levelUpButton);
+
+    return card;
+  }
+
+  private createLevelUpButton(
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    onClick: () => void
+  ): Container {
+    const button = new Container();
+
+    const bg = new Graphics();
+    bg.roundRect(0, 0, width, height, 7)
+      .fill({ color: Colors.GREEN_MINT, alpha: 0.95 })
+      .stroke({ width: 2, color: Colors.WHITE });
+
+    bg.roundRect(2, 2, width - 4, height - 4, 5)
+      .stroke({ width: 1, color: Colors.WHITE, alpha: 0.6 });
+
+    const buttonText = new Text({
+      text: 'Level Up',
+      style: {
+        fontFamily: FontFamily.PRIMARY,
+        fontSize: 12,
+        fontWeight: 'bold',
+        fill: Colors.ROBOT_BG_DARK,
+        stroke: { color: Colors.WHITE, width: 1 }
       }
     });
     buttonText.anchor.set(0.5);
     buttonText.x = width / 2;
     buttonText.y = height / 2;
-    
+
     button.addChild(bg, buttonText);
     button.x = x;
     button.y = y;
     button.interactive = true;
     button.cursor = 'pointer';
-    
+
     button.on('pointerover', () => {
       bg.clear();
-      bg.roundRect(-1, -1, width + 2, height + 2, 6)
-        .fill({ color: Colors.ROBOT_CYAN, alpha: 0.5 });
-      bg.roundRect(0, 0, width, height, 6)
-        .fill({ color: Colors.ROBOT_BG_MID, alpha: 0.95 })
-        .stroke({ width: 1, color: Colors.ROBOT_CYAN });
+      bg.roundRect(0, 0, width, height, 7)
+        .fill({ color: Colors.GREEN_MINT, alpha: 1 })
+        .stroke({ width: 2, color: Colors.WHITE });
+      bg.roundRect(2, 2, width - 4, height - 4, 5)
+        .stroke({ width: 1, color: Colors.WHITE, alpha: 0.9 });
+      button.scale.set(1.05);
     });
-    
+
     button.on('pointerout', () => {
       bg.clear();
-      bg.roundRect(-1, -1, width + 2, height + 2, 6)
-        .fill({ color: Colors.ROBOT_CYAN, alpha: 0.3 });
-      bg.roundRect(0, 0, width, height, 6)
-        .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.95 })
-        .stroke({ width: 1, color: Colors.ROBOT_CYAN });
+      bg.roundRect(0, 0, width, height, 7)
+        .fill({ color: Colors.GREEN_MINT, alpha: 0.95 })
+        .stroke({ width: 2, color: Colors.WHITE });
+      bg.roundRect(2, 2, width - 4, height - 4, 5)
+        .stroke({ width: 1, color: Colors.WHITE, alpha: 0.6 });
+      button.scale.set(1.0);
     });
-    
-    button.on('pointerdown', onClick);
-    
+
+    button.on('pointerdown', (e) => {
+      e.stopPropagation();
+      onClick();
+    });
+
     return button;
   }
 
-  private refreshPointDistributionPanel(): void {
-    this.pointDistributionContainer.removeChildren();
+  private async levelUpStat(statType: string): Promise<void> {
+    console.log(`Leveling up ${statType}`);
+
+    // Update player stat level locally
+    const levelKey = `${statType}_level` as keyof typeof this.player;
+    const expKey = `${statType}_exp` as keyof typeof this.player;
+    const valueKey = `${statType}_value` as keyof typeof this.player;
+
+    const currentLevel = (this.player[levelKey] as number) || 1;
+    const currentExp = (this.player[expKey] as number) || 0;
+    const currentValue = (this.player[valueKey] as number) || 0;
+
+    // Increase level and stats
+    (this.player as any)[levelKey] = currentLevel + 1;
+    (this.player as any)[expKey] = 0; // Reset exp
+    (this.player as any)[valueKey] = currentValue + 5 + currentLevel; // Increase value
+
+    // Refresh displays
     this.statsContainer.removeChildren();
+    this.pointDistributionContainer.removeChildren();
     this.createPlayerStats();
-    this.createPointDistributionPanel();
+    this.createStatLevelingPanel();
   }
 
   private createCharacterCollection(): void {
     if (!this.player) return;
     
-    // Position after point distribution panel
+    // Position after stat leveling panel
     // Player info: 85 + 145 = 230
     // Stats: 230 + 10 + 148 = 388
-    // Point: 388 + 15 + (90 or 190) = 493 or 593
-    const pointPanelHeight = this.player.points <= 0 ? 90 : 190;
-    const baseY = 85 + 155 + 148 + 15 + pointPanelHeight + 15;
+    // Stat Leveling: 388 + 15 + (3 * 120) = 763
+    const baseY = 85 + 155 + 148 + 15 + (3 * 120) + 15;
     
     const availableWidth = this.gameWidth - 2 * this.STANDARD_PADDING;
     const gap = 10;
