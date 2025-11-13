@@ -340,7 +340,7 @@ export class PlayerDetailScene extends BaseScene {
     });
   }
 
-  private createStatCard(slot: any, width: number): Container {
+ private createStatCard(slot: any, width: number): Container {
     const card = new Container();
     const height = 110;
 
@@ -358,7 +358,7 @@ export class PlayerDetailScene extends BaseScene {
 
     card.addChild(bg);
 
-    // Stat icon
+    // Stat icon - left side
     const iconSize = 70;
     const iconBg = new Graphics();
     iconBg.roundRect(15, 20, iconSize, iconSize, 10)
@@ -376,12 +376,30 @@ export class PlayerDetailScene extends BaseScene {
     iconText.x = 15 + iconSize / 2;
     iconText.y = 20 + iconSize / 2;
 
-    card.addChild(iconBg, iconText);
+    // Level display in bottom right of icon
+    const iconLevelText = new Text({
+      text: `${slot.level}`,
+      style: {
+        fontFamily: FontFamily.PRIMARY,
+        fontSize: 14,
+        fontWeight: 'bold',
+        fill: Colors.WHITE,
+        stroke: { color: Colors.ROBOT_BG_DARK, width: 2 }
+      }
+    });
+    iconLevelText.anchor.set(1, 1);
+    iconLevelText.x = 15 + iconSize - 5;
+    iconLevelText.y = 20 + iconSize - 5;
 
-    // Stat name badge
-    const badgeWidth = 85;
+    card.addChild(iconBg, iconText, iconLevelText);
+
+    // Content area - right of icon
+    const contentStartX = 100;
+
+    // Stat name badge - top
+    const badgeWidth = 100;
     const badge = new Graphics();
-    badge.roundRect(100, 20, badgeWidth, 24, 12)
+    badge.roundRect(contentStartX, 28, badgeWidth, 26, 13)
       .fill({ color: slot.color, alpha: 0.3 })
       .stroke({ width: 1.5, color: slot.color });
 
@@ -389,52 +407,38 @@ export class PlayerDetailScene extends BaseScene {
       text: slot.name.toUpperCase(),
       style: {
         fontFamily: FontFamily.PRIMARY,
-        fontSize: 11,
+        fontSize: 12,
         fontWeight: 'bold',
         fill: Colors.WHITE
       }
     });
     badgeText.anchor.set(0.5);
-    badgeText.x = 100 + badgeWidth / 2;
-    badgeText.y = 32;
+    badgeText.x = contentStartX + badgeWidth / 2;
+    badgeText.y = 40;
 
     card.addChild(badge, badgeText);
 
-    // Level display
-    const levelText = new Text({
-      text: `Level ${slot.level}`,
-      style: {
-        fontFamily: FontFamily.PRIMARY,
-        fontSize: 15,
-        fontWeight: 'bold',
-        fill: Colors.WHITE,
-        stroke: { color: Colors.ROBOT_ELEMENT, width: 1.5 }
-      }
-    });
-    levelText.x = 100;
-    levelText.y = 50;
-    card.addChild(levelText);
-
-    // Stat bonus value
+    // Stat bonus value - middle right
     const statBonusText = new Text({
-      text: `Stat Bonus: +${slot.value}`,
+      text: `${slot.value}`,
       style: {
         fontFamily: FontFamily.PRIMARY,
-        fontSize: 13,
+        fontSize: 20,
         fontWeight: 'bold',
-        fill: Colors.GREEN_MINT
+        fill: slot.color,
+        stroke: { color: Colors.ROBOT_BG_DARK, width: 2 }
       }
     });
-    statBonusText.x = width - 145;
-    statBonusText.y = 52;
+    statBonusText.x = contentStartX;
+    statBonusText.y = 62;
     card.addChild(statBonusText);
 
-    // Level up button
-    const buttonWidth = 90;
-    const buttonHeight = 28;
+    // Level up button - bottom right
+    const buttonWidth = 100;
+    const buttonHeight = 32;
     const levelUpButton = this.createLevelUpButton(
       width - buttonWidth - 15,
-      height - buttonHeight - 12,
+      (height - buttonHeight) / 2,
       buttonWidth,
       buttonHeight,
       () => this.levelUpStat(slot.type)
