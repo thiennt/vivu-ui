@@ -463,34 +463,6 @@ export class PlayerDetailScene extends BaseScene {
     levelText.y = 50;
     card.addChild(levelText);
 
-    // Experience bar
-    const expBarWidth = width - 215;
-    const expBarBg = new Graphics();
-    expBarBg.roundRect(100, 72, expBarWidth, 12, 6)
-      .fill({ color: Colors.ROBOT_BG_DARK, alpha: 0.8 })
-      .stroke({ width: 1, color: slot.color, alpha: 0.5 });
-
-    const expToNextLevel = slot.level * 100;
-    const expProgress = Math.min(slot.exp / expToNextLevel, 1);
-    const expBarFill = new Graphics();
-    expBarFill.roundRect(100, 72, expBarWidth * expProgress, 12, 6)
-      .fill({ color: slot.color, alpha: 0.9 });
-
-    card.addChild(expBarBg, expBarFill);
-
-    // EXP text
-    const expText = new Text({
-      text: `EXP: ${slot.exp}/${expToNextLevel}`,
-      style: {
-        fontFamily: FontFamily.PRIMARY,
-        fontSize: 10,
-        fill: Colors.ROBOT_CYAN_LIGHT
-      }
-    });
-    expText.x = 100;
-    expText.y = 87;
-    card.addChild(expText);
-
     // Stat bonus value
     const statBonusText = new Text({
       text: `Stat Bonus: +${slot.value}`,
@@ -538,13 +510,14 @@ export class PlayerDetailScene extends BaseScene {
       .stroke({ width: 1, color: Colors.WHITE, alpha: 0.6 });
 
     const buttonText = new Text({
-      text: 'Level Up',
+      text: '🪙1000\nLevel Up',
       style: {
         fontFamily: FontFamily.PRIMARY,
-        fontSize: 12,
+        fontSize: 10,
         fontWeight: 'bold',
         fill: Colors.ROBOT_BG_DARK,
-        stroke: { color: Colors.WHITE, width: 1 }
+        stroke: { color: Colors.WHITE, width: 1 },
+        align: 'center'
       }
     });
     buttonText.anchor.set(0.5);
