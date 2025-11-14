@@ -10,7 +10,7 @@ import { AvatarChangePopup } from '@/popups/AvatarChangePopup';
 import { ErrorPopup } from '@/popups/ErrorPopup';
 import { ScrollBox } from '@pixi/ui';
 
-type TabType = 'skin' | 'equipment';
+type TabType = 'skin';
 
 export class CharacterDetailScene extends BaseScene {
   /** Assets bundles required by this screen */
@@ -343,13 +343,13 @@ export class CharacterDetailScene extends BaseScene {
     const tabsY = 225;
 
     const tabs: { type: TabType; label: string; icon: string }[] = [
-      { type: 'skin', label: 'Skin', icon: '👕' },
+      { type: 'skin', label: 'Skin', icon: '👕' }
       // { type: 'skills', label: 'Skills', icon: '📜' }, // Hidden to simplify game
-      { type: 'equipment', label: 'Equipment', icon: '⚔️' }
+      // { type: 'equipment', label: 'Equipment', icon: '⚔️' } // Hidden to simplify game
     ];
 
     const spacing = 5;
-    const tabWidth = (panelWidth - spacing) / 2; // Changed from 3 to 2 tabs
+    const tabWidth = panelWidth; // Only 1 tab now
     const tabHeight = 36;
 
     tabs.forEach((tab, index) => {
@@ -471,12 +471,6 @@ export class CharacterDetailScene extends BaseScene {
         scrollContent.addChild(this.skinContainer);
         this.skinContainer.x = 0;
         this.skinContainer.y = 0;
-        break;
-      case 'equipment':
-        this.createEquipmentDisplay();
-        scrollContent.addChild(this.equipmentContainer);
-        this.equipmentContainer.x = 0;
-        this.equipmentContainer.y = 0;
         break;
     }
 
@@ -834,254 +828,6 @@ export class CharacterDetailScene extends BaseScene {
     this.contentContainer.removeChildren();
     this.scrollBox = null;
     this.createTabContent();
-  }
-
-  // Replace the createEquipmentDisplay method in CharacterDetailScene.ts
-
-  private createEquipmentDisplay(): void {
-    const padding = 12;
-    const panelWidth = this.gameWidth - 2 * padding;
-
-    const equipmentSlots = [
-      {
-        name: 'Weapon',
-        icon: '⚔️',
-        type: 'weapon',
-        level: this.character?.weapon_level || 1,
-        exp: this.character?.weapon_exp || 0,
-        value: this.character?.weapon_value || 0,
-        color: Colors.STAT_ATK
-      },
-      {
-        name: 'Helmet',
-        icon: '🪖',
-        type: 'helmet',
-        level: this.character?.helmet_level || 1,
-        exp: this.character?.helmet_exp || 0,
-        value: this.character?.helmet_value || 0,
-        color: Colors.STAT_DEF
-      },
-      {
-        name: 'Armor',
-        icon: '🛡️',
-        type: 'armor',
-        level: this.character?.armor_level || 1,
-        exp: this.character?.armor_exp || 0,
-        value: this.character?.armor_value || 0,
-        color: Colors.STAT_HP
-      }
-    ];
-
-    let currentY = 15;
-
-    equipmentSlots.forEach((slot) => {
-      const card = this.createEquipmentCard(slot, panelWidth);
-      card.x = 0;
-      card.y = currentY;
-      this.equipmentContainer.addChild(card);
-      currentY += 120;
-    });
-  }
-
-  private createEquipmentCard(slot: any, width: number): Container {
-    const card = new Container();
-    const height = 110;
-
-    // Card background
-    const bg = new Graphics();
-    bg.roundRect(0, 0, width, height, 10)
-      .fill({ color: Colors.ROBOT_ELEMENT, alpha: 0.98 })
-      .stroke({ width: 2, color: slot.color, alpha: 0.8 });
-
-    bg.roundRect(3, 3, width - 6, height - 6, 8)
-      .fill({ color: Colors.ROBOT_BG_MID, alpha: 0.7 });
-
-    bg.roundRect(5, 5, width - 10, height - 10, 7)
-      .stroke({ width: 1, color: slot.color, alpha: 0.4 });
-
-    card.addChild(bg);
-
-    // Equipment icon
-    const iconSize = 70;
-    const iconBg = new Graphics();
-    iconBg.roundRect(15, 20, iconSize, iconSize, 10)
-      .fill({ color: slot.color, alpha: 0.2 })
-      .stroke({ width: 2.5, color: slot.color, alpha: 0.8 });
-
-    const iconText = new Text({
-      text: slot.icon,
-      style: {
-        fontSize: 36,
-        fill: slot.color
-      }
-    });
-    iconText.anchor.set(0.5);
-    iconText.x = 15 + iconSize / 2;
-    iconText.y = 20 + iconSize / 2;
-
-    // Level display in bottom right of icon
-    const iconLevelText = new Text({
-      text: `${slot.level}`,
-      style: {
-        fontFamily: FontFamily.PRIMARY,
-        fontSize: 14,
-        fontWeight: 'bold',
-        fill: Colors.WHITE,
-        stroke: { color: Colors.ROBOT_BG_DARK, width: 2 }
-      }
-    });
-    iconLevelText.anchor.set(1, 1);
-    iconLevelText.x = 15 + iconSize - 5;
-    iconLevelText.y = 20 + iconSize - 5;
-
-    card.addChild(iconBg, iconText, iconLevelText);
-
-    // Content area - right of icon
-    const contentStartX = 100;
-
-    // Equipment name badge - top
-    const badgeWidth = 100;
-    const badge = new Graphics();
-    badge.roundRect(contentStartX, 28, badgeWidth, 26, 13)
-      .fill({ color: slot.color, alpha: 0.3 })
-      .stroke({ width: 1.5, color: slot.color });
-
-    const badgeText = new Text({
-      text: slot.name.toUpperCase(),
-      style: {
-        fontFamily: FontFamily.PRIMARY,
-        fontSize: 12,
-        fontWeight: 'bold',
-        fill: Colors.WHITE
-      }
-    });
-    badgeText.anchor.set(0.5);
-    badgeText.x = contentStartX + badgeWidth / 2;
-    badgeText.y = 40;
-
-    card.addChild(badge, badgeText);
-
-    // Stat bonus value - middle right
-    const statBonusText = new Text({
-      text: `${slot.value}`,
-      style: {
-        fontFamily: FontFamily.PRIMARY,
-        fontSize: 20,
-        fontWeight: 'bold',
-        fill: slot.color,
-        stroke: { color: Colors.ROBOT_BG_DARK, width: 2 }
-      }
-    });
-    statBonusText.x = contentStartX;
-    statBonusText.y = 62;
-    card.addChild(statBonusText);
-
-    // Level up button - bottom right
-    const buttonWidth = 100;
-    const buttonHeight = 32;
-    const levelUpButton = this.createLevelUpButton(
-      width - buttonWidth - 15,
-      (height - buttonHeight) / 2,
-      buttonWidth,
-      buttonHeight,
-      () => this.levelUpEquipment(slot.type)
-    );
-    card.addChild(levelUpButton);
-
-    return card;
-  }
-
-  private createLevelUpButton(
-    x: number,
-    y: number,
-    width: number,
-    height: number,
-    onClick: () => void
-  ): Container {
-    const button = new Container();
-
-    const bg = new Graphics();
-    bg.roundRect(0, 0, width, height, 7)
-      .fill({ color: Colors.GREEN_MINT, alpha: 0.95 })
-      .stroke({ width: 2, color: Colors.WHITE });
-
-    bg.roundRect(2, 2, width - 4, height - 4, 5)
-      .stroke({ width: 1, color: Colors.WHITE, alpha: 0.6 });
-
-    const buttonText = new Text({
-      text: '🪙1000\nLevel Up',
-      style: {
-        fontFamily: FontFamily.PRIMARY,
-        fontSize: 10,
-        fontWeight: 'bold',
-        fill: Colors.ROBOT_BG_DARK,
-        stroke: { color: Colors.WHITE, width: 1 },
-        align: 'center'
-      }
-    });
-    buttonText.anchor.set(0.5);
-    buttonText.x = width / 2;
-    buttonText.y = height / 2;
-
-    button.addChild(bg, buttonText);
-    button.x = x;
-    button.y = y;
-    button.interactive = true;
-    button.cursor = 'pointer';
-
-    button.on('pointerover', () => {
-      bg.clear();
-      bg.roundRect(0, 0, width, height, 7)
-        .fill({ color: Colors.GREEN_MINT, alpha: 1 })
-        .stroke({ width: 2, color: Colors.WHITE });
-      bg.roundRect(2, 2, width - 4, height - 4, 5)
-        .stroke({ width: 1, color: Colors.WHITE, alpha: 0.9 });
-      button.scale.set(1.05);
-    });
-
-    button.on('pointerout', () => {
-      bg.clear();
-      bg.roundRect(0, 0, width, height, 7)
-        .fill({ color: Colors.GREEN_MINT, alpha: 0.95 })
-        .stroke({ width: 2, color: Colors.WHITE });
-      bg.roundRect(2, 2, width - 4, height - 4, 5)
-        .stroke({ width: 1, color: Colors.WHITE, alpha: 0.6 });
-      button.scale.set(1.0);
-    });
-
-    button.on('pointerdown', (e) => {
-      e.stopPropagation();
-      onClick();
-    });
-
-    return button;
-  }
-
-  private async levelUpEquipment(equipmentType: string): Promise<void> {
-    console.log(`Leveling up ${equipmentType}`);
-
-    // Update character equipment level locally
-    const levelKey = `${equipmentType}_level` as keyof typeof this.character;
-    const expKey = `${equipmentType}_exp` as keyof typeof this.character;
-    const valueKey = `${equipmentType}_value` as keyof typeof this.character;
-
-    const currentLevel = (this.character[levelKey] as number) || 1;
-    const currentExp = (this.character[expKey] as number) || 0;
-    const currentValue = (this.character[valueKey] as number) || 0;
-
-    // Increase level and stats
-    (this.character as any)[levelKey] = currentLevel + 1;
-    (this.character as any)[expKey] = 0; // Reset exp
-    (this.character as any)[valueKey] = currentValue + 5 + currentLevel; // Increase value
-
-    // Refresh equipment display
-    this.equipmentContainer.removeChildren();
-    this.createEquipmentDisplay();
-
-    // Refresh the scroll content
-    if (this.activeTab === 'equipment') {
-      this.refreshTabContent();
-    }
   }
 
   private createBackButton(): void {
