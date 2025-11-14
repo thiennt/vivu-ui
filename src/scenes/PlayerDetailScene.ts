@@ -167,7 +167,9 @@ export class PlayerDetailScene extends BaseScene {
   private createPlayerStats(): void {
     if (!this.player) return;
     
-    const startY = this.STANDARD_PADDING;
+    // Position below gold display (gold takes ~36px: 8px padding + 28px button height)
+    const goldHeight = 45; // Gold panel height + spacing
+    const startY = goldHeight;
     const padding = this.STANDARD_PADDING;
     const availableWidth = this.gameWidth - 2 * padding;
     const panelWidth = Math.min(580, availableWidth);
@@ -379,9 +381,11 @@ export class PlayerDetailScene extends BaseScene {
     if (!this.player) return;
 
     const padding = this.STANDARD_PADDING;
+    const goldHeight = 45; // Gold panel height + spacing (matching createPlayerStats)
     
     // Position below player info (167) + gap
-    const startY = this.STANDARD_PADDING + 167 + 15;
+    // Player info now starts at goldHeight instead of STANDARD_PADDING
+    const startY = goldHeight + 167 + 15;
     
     const panelWidth = Math.min(580, this.gameWidth - 2 * padding);
     const panelX = (this.gameWidth - panelWidth) / 2;
