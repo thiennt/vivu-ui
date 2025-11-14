@@ -1,4 +1,4 @@
-import { Graphics, Container, Text, Ticker } from 'pixi.js';
+import { Graphics, Container, Text, Ticker, Sprite, Assets } from 'pixi.js';
 import { BaseScene } from '@/ui/BaseScene';
 import { navigation } from '@/utils/navigation';
 import { CharactersScene } from './CharactersScene';
@@ -277,24 +277,10 @@ export class PlayerDetailScene extends BaseScene {
       .fill({ color: Colors.ROBOT_BG_MID, alpha: 0.95 })
       .stroke({ width: 1, color: Colors.ROBOT_CYAN });
     
-    const avatarEmoji = new Text({
-      text: '👤',
-      style: {
-        fontSize: 48,
-        dropShadow: {
-          color: Colors.ROBOT_CYAN,
-          blur: 4,
-          angle: 0,
-          distance: 0,
-          alpha: 0.5
-        }
-      }
-    });
-    avatarEmoji.anchor.set(0.5);
-    avatarEmoji.x = avatarX + avatarSize / 2;
-    avatarEmoji.y = avatarY + avatarSize / 2;
+    panel.addChild(avatarBg);
     
-    panel.addChild(avatarBg, avatarEmoji);
+    // Load avatar asynchronously
+    this.loadPlayerAvatar(panel, avatarX + avatarSize / 2, avatarY + avatarSize / 2, avatarSize);
     
     // Player info on the right with robot theme
     const infoStartX = avatarX + avatarSize + 20;
@@ -313,6 +299,54 @@ export class PlayerDetailScene extends BaseScene {
     });
     
     return panel;
+  }
+
+  private async loadPlayerAvatar(panel: Container, centerX: number, centerY: number, size: number): Promise<void> {
+    try {
+      const pfpUrl = this.player?.pfpUrl;
+      
+      if (!pfpUrl) {
+        this.loadFallbackPlayerAvatar(panel, centerX, centerY);
+        return;
+      }
+
+      const avatarTexture = await Assets.load(pfpUrl);
+      const avatarSprite = new Sprite(avatarTexture);
+      
+      // Scale to fit within circle
+      const maxSize = size - 4; // Leave some padding
+      const scale = Math.min(maxSize / avatarSprite.width, maxSize / avatarSprite.height);
+      avatarSprite.scale.set(scale);
+      avatarSprite.anchor.set(0.5);
+      avatarSprite.x = centerX;
+      avatarSprite.y = centerY;
+
+      panel.addChild(avatarSprite);
+    } catch (error) {
+      console.error('Error loading player avatar:', error);
+      this.loadFallbackPlayerAvatar(panel, centerX, centerY);
+    }
+  }
+
+  private loadFallbackPlayerAvatar(panel: Container, centerX: number, centerY: number): void {
+    const avatarEmoji = new Text({
+      text: '👤',
+      style: {
+        fontSize: 48,
+        dropShadow: {
+          color: Colors.ROBOT_CYAN,
+          blur: 4,
+          angle: 0,
+          distance: 0,
+          alpha: 0.5
+        }
+      }
+    });
+    avatarEmoji.anchor.set(0.5);
+    avatarEmoji.x = centerX;
+    avatarEmoji.y = centerY;
+    
+    panel.addChild(avatarEmoji);
   }
 
   private createStatLevelingPanel(): void {

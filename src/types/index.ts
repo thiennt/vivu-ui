@@ -4,6 +4,7 @@ export interface Player {
   level: number;
   experience: number;
   gold?: number;
+  pfpUrl?: string;
   stats: PlayerStats;
   characters: Character[];
   lineup: Lineup;
