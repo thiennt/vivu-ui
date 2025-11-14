@@ -176,12 +176,10 @@ export class PlayerDetailScene extends BaseScene {
     const playerInfoPanel = this.createPlayerInfoPanel(
       panelWidth,
       [
-        { label: '👤 Username:', value: this.player.username },
         { label: '⭐ Level:', value: this.player.level.toString() },
-        { label: '✨ Experience:', value: this.player.exp.toString() },
-        { label: '🪙 Gold:', value: goldAmount.toString() },
-        { label: '🎭 Characters:', value: this.characters.length.toString() },
-        { label: '🍀 Luck:', value: this.player.luck.toString() }
+        { label: '✨ Exp:', value: this.player.exp.toString() },
+        { label: '🍀 Luck:', value: this.player.luck.toString() },
+        { label: '🪙 Gold:', value: goldAmount.toString() }
       ]
     );
     
@@ -218,7 +216,7 @@ export class PlayerDetailScene extends BaseScene {
     
     // Title with robot theme
     const title = new Text({
-      text: '📜 Player Info',
+      text: this.player.username,
       style: {
         fontFamily: FontFamily.PRIMARY,
         fontSize: 18,
