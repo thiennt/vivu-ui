@@ -278,6 +278,88 @@ export abstract class BaseScene extends Container {
     return card;
   }
 
+  /**
+   * Load player avatar from pfpUrl
+   * @param panel - Container to add the avatar to
+   * @param centerX - X coordinate for the avatar center
+   * @param centerY - Y coordinate for the avatar center
+   * @param size - Size of the avatar circle
+   * @param pfpUrl - URL of the profile picture
+   * @param fallbackOptions - Options for fallback emoji avatar
+   */
+  protected async loadPlayerAvatar(
+    panel: Container, 
+    centerX: number, 
+    centerY: number, 
+    size: number, 
+    pfpUrl: string | undefined | null,
+    fallbackOptions?: {
+      fontSize?: number;
+      dropShadow?: {
+        color: number;
+        blur: number;
+        angle: number;
+        distance: number;
+        alpha: number;
+      };
+    }
+  ): Promise<void> {
+    try {
+      if (!pfpUrl) {
+        this.loadFallbackPlayerAvatar(panel, centerX, centerY, fallbackOptions);
+        return;
+      }
+
+      const avatarTexture = await Assets.load(pfpUrl);
+      const avatarSprite = new Sprite(avatarTexture);
+      
+      // Scale to fit within circle
+      const maxSize = size - 4; // Leave some padding
+      const scale = Math.min(maxSize / avatarSprite.width, maxSize / avatarSprite.height);
+      avatarSprite.scale.set(scale);
+      avatarSprite.anchor.set(0.5);
+      avatarSprite.x = centerX;
+      avatarSprite.y = centerY;
+
+      panel.addChild(avatarSprite);
+    } catch (error) {
+      console.error('Error loading player avatar:', error);
+      this.loadFallbackPlayerAvatar(panel, centerX, centerY, fallbackOptions);
+    }
+  }
+
+  /**
+   * Load fallback emoji avatar when pfpUrl is not available or fails to load
+   */
+  protected loadFallbackPlayerAvatar(
+    panel: Container, 
+    centerX: number, 
+    centerY: number,
+    options?: {
+      fontSize?: number;
+      dropShadow?: {
+        color: number;
+        blur: number;
+        angle: number;
+        distance: number;
+        alpha: number;
+      };
+    }
+  ): void {
+    const avatarEmoji = new Text({
+      text: '👤',
+      style: {
+        fontSize: options?.fontSize || 28,
+        dropShadow: options?.dropShadow
+      }
+    });
+    avatarEmoji.anchor.set(0.5);
+    avatarEmoji.x = centerX;
+    avatarEmoji.y = centerY;
+    
+    panel.addChild(avatarEmoji);
+  }
+
   public destroy(options?: any): void {
     // Unsubscribe from check-in status changes
     if (this.checkinStatusUnsubscribe) {

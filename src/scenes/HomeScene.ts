@@ -1,4 +1,4 @@
-import { Container, Graphics, Text, Ticker, Sprite, Assets } from 'pixi.js';
+import { Container, Graphics, Text, Ticker } from 'pixi.js';
 import { navigation } from '@/utils/navigation';
 import { BaseScene } from '@/ui/BaseScene';
 import { CharactersScene } from './CharactersScene';
@@ -148,7 +148,7 @@ export class HomeScene extends BaseScene {
     playerPanel.addChild(avatarBg);
     
     // Load avatar asynchronously
-    this.loadPlayerAvatar(playerPanel, avatarSize / 2, avatarSize / 2, avatarSize);
+    this.loadPlayerAvatar(playerPanel, avatarSize / 2, avatarSize / 2, avatarSize, this.player?.pfpUrl);
     
     // Player info text to the right of avatar
     const infoStartX = avatarSize + 10;
@@ -193,47 +193,6 @@ export class HomeScene extends BaseScene {
     playerPanel.y = padding;
     
     this.container.addChild(playerPanel);
-  }
-
-  private async loadPlayerAvatar(panel: Container, centerX: number, centerY: number, size: number): Promise<void> {
-    try {
-      const pfpUrl = this.player?.pfpUrl;
-      
-      if (!pfpUrl) {
-        this.loadFallbackPlayerAvatar(panel, centerX, centerY);
-        return;
-      }
-
-      const avatarTexture = await Assets.load(pfpUrl);
-      const avatarSprite = new Sprite(avatarTexture);
-      
-      // Scale to fit within circle
-      const maxSize = size - 4; // Leave some padding
-      const scale = Math.min(maxSize / avatarSprite.width, maxSize / avatarSprite.height);
-      avatarSprite.scale.set(scale);
-      avatarSprite.anchor.set(0.5);
-      avatarSprite.x = centerX;
-      avatarSprite.y = centerY;
-
-      panel.addChild(avatarSprite);
-    } catch (error) {
-      console.error('Error loading player avatar:', error);
-      this.loadFallbackPlayerAvatar(panel, centerX, centerY);
-    }
-  }
-
-  private loadFallbackPlayerAvatar(panel: Container, centerX: number, centerY: number): void {
-    const avatarEmoji = new Text({
-      text: '👤',
-      style: {
-        fontSize: 28
-      }
-    });
-    avatarEmoji.anchor.set(0.5);
-    avatarEmoji.x = centerX;
-    avatarEmoji.y = centerY;
-    
-    panel.addChild(avatarEmoji);
   }
 
   private createTopRightGold(): void {
