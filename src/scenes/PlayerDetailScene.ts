@@ -71,6 +71,7 @@ export class PlayerDetailScene extends BaseScene {
     if (!this.player) return;
     
     this.createBackground();
+    this.createTopRightGold();
     this.createPlayerStats();
     this.createStatLevelingPanel();
     //this.createCharacterCollection();
@@ -110,6 +111,7 @@ export class PlayerDetailScene extends BaseScene {
     
     // Recreate layout with current dimensions
     this.createBackground();
+    this.createTopRightGold();
     this.createPlayerStats();
     this.createStatLevelingPanel();
     //this.createCharacterCollection();
@@ -171,15 +173,13 @@ export class PlayerDetailScene extends BaseScene {
     const panelWidth = Math.min(580, availableWidth);
     const panelX = (this.gameWidth - panelWidth) / 2;
     
-    // Player info panel with avatar
-    const goldAmount = this.player.gold ?? 100;
+    // Player info panel with avatar (gold removed, now in top right)
     const playerInfoPanel = this.createPlayerInfoPanel(
       panelWidth,
       [
         { label: '⭐ Level:', value: this.player.level.toString() },
         { label: '✨ Exp:', value: this.player.exp.toString() },
-        { label: '🍀 Luck:', value: this.player.luck.toString() },
-        { label: '🪙 Gold:', value: goldAmount.toString() }
+        { label: '🍀 Luck:', value: this.player.luck.toString() }
       ]
     );
     
@@ -187,6 +187,93 @@ export class PlayerDetailScene extends BaseScene {
     playerInfoPanel.y = startY;
     
     this.statsContainer.addChild(playerInfoPanel);
+  }
+
+  private createTopRightGold(): void {
+    const goldPanel = new Container();
+    const padding = this.STANDARD_PADDING;
+    
+    const goldAmount = this.player.gold ?? 100;
+    const goldText = new Text({
+      text: `🪙${goldAmount}`,
+      style: {
+        fontFamily: FontFamily.PRIMARY,
+        fontSize: 16,
+        fontWeight: 'bold',
+        fill: Colors.ROBOT_CYAN_LIGHT,
+        stroke: { color: Colors.ROBOT_BG_DARK, width: 0.5 }
+      }
+    });
+    goldText.anchor.set(1, 0);
+    
+    // Divider
+    const divider = new Text({
+      text: ' | ',
+      style: {
+        fontFamily: FontFamily.PRIMARY,
+        fontSize: 16,
+        fill: Colors.ROBOT_CYAN_MID
+      }
+    });
+    divider.anchor.set(1, 0);
+    divider.x = goldText.x - goldText.width;
+    
+    // Plus button
+    const plusButton = new Container();
+    const buttonSize = 28;
+    
+    const buttonBg = new Graphics();
+    buttonBg.circle(0, buttonSize / 2, buttonSize / 2)
+      .fill({ color: Colors.ROBOT_CYAN, alpha: 0.2 })
+      .stroke({ width: 2, color: Colors.ROBOT_CYAN });
+    
+    const plusText = new Text({
+      text: '+',
+      style: {
+        fontFamily: FontFamily.PRIMARY,
+        fontSize: 20,
+        fontWeight: 'bold',
+        fill: Colors.ROBOT_CYAN_LIGHT
+      }
+    });
+    plusText.anchor.set(0.5);
+    plusText.x = 0;
+    plusText.y = buttonSize / 2;
+    
+    plusButton.addChild(buttonBg, plusText);
+    plusButton.x = divider.x - divider.width - buttonSize / 2 - 5;
+    plusButton.y = 0;
+    plusButton.interactive = true;
+    plusButton.cursor = 'pointer';
+    
+    plusButton.on('pointerover', () => {
+      buttonBg.clear();
+      buttonBg.circle(0, buttonSize / 2, buttonSize / 2)
+        .fill({ color: Colors.ROBOT_CYAN, alpha: 0.4 })
+        .stroke({ width: 2, color: Colors.ROBOT_CYAN_LIGHT });
+      plusButton.scale.set(1.1);
+    });
+    
+    plusButton.on('pointerout', () => {
+      buttonBg.clear();
+      buttonBg.circle(0, buttonSize / 2, buttonSize / 2)
+        .fill({ color: Colors.ROBOT_CYAN, alpha: 0.2 })
+        .stroke({ width: 2, color: Colors.ROBOT_CYAN });
+      plusButton.scale.set(1.0);
+    });
+    
+    plusButton.on('pointerdown', () => {
+      // TODO: Show dialog to buy gold by cash
+      console.log('Buy gold clicked');
+      alert('Buy Gold feature coming soon!');
+    });
+    
+    goldPanel.addChild(goldText, divider, plusButton);
+    goldPanel.x = this.gameWidth - padding;
+    goldPanel.y = padding;
+    
+    // Add to background container so it doesn't scroll
+    this.backgroundContainer.addChild(goldPanel);
   }
 
   private createPlayerInfoPanel(
