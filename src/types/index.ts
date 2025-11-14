@@ -5,6 +5,7 @@ export interface Player {
   experience: number;
   gold?: number;
   pfpUrl?: string;
+  farcaster_id?: number;
   stats: PlayerStats;
   characters: Character[];
   lineup: Lineup;

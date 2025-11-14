@@ -206,14 +206,105 @@ export const authApi = {
 export { ApiError };
 export type { LoadingState };
 
+// Warpcast NFT response interfaces
+interface WarpcastNFT {
+  chain: string;
+  tokenId: string;
+  contractAddress: string;
+  interface: string;
+  amount: string;
+  collection: {
+    collectionId: string;
+    name: string;
+  };
+  name: string;
+  chainId: number;
+  previewUrl: string;
+  imageUrl: string;
+  usdPrice: number;
+  externalUrls: {
+    openseaUrl: string;
+  };
+}
+
+interface WarpcastNFTResponse {
+  result: {
+    nfts: WarpcastNFT[];
+  };
+  next?: {
+    cursor: string;
+  };
+}
+
 // NFT API methods
 export const nftApi = {
   /**
-   * Get character skins
-   * GET /players/characters/:characterId/skins
+   * Get character skins from Warpcast wallet API
+   * Fetches NFTs for the authenticated user's FID from Warpcast
+   * Filters for Base chain NFTs only
    */
   async getCharacterSkins(characterId: string): Promise<NFT[]> {
-    return apiRequest(`/players/characters/${characterId}/skins`);
+    try {
+      // Get FID from player data in sessionStorage
+      const playerData = sessionStorage.getItem('player');
+      if (!playerData) {
+        console.warn('No player data found in sessionStorage');
+        return [];
+      }
+
+      const player = JSON.parse(playerData);
+      const fid = player.farcaster_id;
+      
+      if (!fid) {
+        console.warn('No farcaster_id found in player data');
+        return [];
+      }
+
+      // Get the auth token from sessionStorage
+      const authToken = sessionStorage.getItem('authToken');
+      
+      // Call Warpcast API
+      const warpcastUrl = `https://client.warpcast.com/v2/wallet/nfts?fid=${fid}&limit=100`;
+      
+      console.log(`🌐 Fetching NFTs from Warpcast for FID ${fid}`);
+      
+      const response = await fetch(warpcastUrl, {
+        headers: {
+          'Content-Type': 'application/json',
+          ...(authToken && { 'Authorization': `Bearer ${authToken}` }),
+        },
+      });
+
+      if (!response.ok) {
+        throw new ApiError(
+          `Warpcast API error: ${response.statusText}`,
+          response.status
+        );
+      }
+
+      const data: WarpcastNFTResponse = await response.json();
+      
+      // Filter for Base chain only and transform to NFT format
+      const baseChainNFTs = data.result.nfts
+        .filter((nft) => nft.chain === 'base')
+        .map((nft) => ({
+          id: `${nft.contractAddress}-${nft.tokenId}`,
+          name: nft.name,
+          image_url: nft.imageUrl,
+          collection: nft.collection.name,
+          rarity: undefined, // Warpcast API doesn't provide rarity
+        }));
+
+      console.log(`✅ Retrieved ${baseChainNFTs.length} Base chain NFTs from Warpcast`);
+      
+      return baseChainNFTs;
+    } catch (error) {
+      console.error('Failed to fetch NFTs from Warpcast:', error);
+      if (error instanceof ApiError) {
+        throw error;
+      }
+      throw new ApiError(`Failed to fetch NFTs: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
   },
 
   /**
