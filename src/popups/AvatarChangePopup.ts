@@ -34,7 +34,7 @@ export class AvatarChangePopup extends Container {
   private async loadNFTsAndCreateDialog(): Promise<void> {
     try {
       // Fetch player's NFT collection
-      this.availableNFTs = await nftApi.getPlayerNFTs();
+      this.availableNFTs = await nftApi.getCharacterSkins(this.characterId);
       this.createDialog();
     } catch (error) {
       console.error('Failed to load NFTs:', error);

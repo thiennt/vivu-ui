@@ -209,15 +209,6 @@ export type { LoadingState };
 // NFT API methods
 export const nftApi = {
   /**
-   * Get player's NFT collection (skins)
-   * GET /players/characters/:characterId/skins
-   */
-  async getPlayerNFTs(): Promise<NFT[]> {
-    // Note: This might need to be called per character or refactored based on backend implementation
-    return apiRequest(`/players/characters/skins`);
-  },
-
-  /**
    * Get character skins
    * GET /players/characters/:characterId/skins
    */
