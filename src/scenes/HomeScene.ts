@@ -315,9 +315,9 @@ export class HomeScene extends BaseScene {
     
     const buttons = [
       { text: '📅 Daily Check-In', screen: CheckinScene, isCheckIn: true },
-      { text: '🎁 Loot Box', screen: LootBoxScene, isCheckIn: false },
+      { text: '🎁 Loot Box', screen: LootBoxScene, isCheckIn: false, isDisabled: true },
       { text: '👥 Characters', screen: CharactersScene, isCheckIn: false },
-      { text: '🃏 Card Battle', screen: CardBattleScene, isCheckIn: false },
+      { text: '🃏 Ongoing Battle', screen: CardBattleScene, isCheckIn: false },
       { text: '🧑‍🤝‍🧑 Lineup', screen: LineupScene, isCheckIn: false }
     ];
     
@@ -334,8 +334,11 @@ export class HomeScene extends BaseScene {
     
     buttons.forEach((buttonData, index) => {
       // Disable all buttons except check-in if user hasn't checked in today
-      const isDisabled = !this.hasCheckedInToday && !buttonData.isCheckIn;
-      
+      let isDisabled = !this.hasCheckedInToday && !buttonData.isCheckIn;
+      if (buttonData.isDisabled !== undefined) {
+        isDisabled = buttonData.isDisabled;
+      }
+
       const button = this.createButton(
         buttonData.text,
         0,

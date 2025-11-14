@@ -16,7 +16,6 @@ export class CharacterDetailScene extends BaseScene {
   /** Assets bundles required by this screen */
   public static assetBundles = [];
   private character: any = null;
-  private characterEquipment: any = null;
   private loadingManager: LoadingStateManager;
 
   // Navigation state
@@ -83,7 +82,6 @@ export class CharacterDetailScene extends BaseScene {
 
     // Load character skills and equipment
     this.character = await charactersApi.getCharacter(this.character.id);
-    this.characterEquipment = await equipmentApi.getCharacterEquipment(this.character.id);
 
     this.loadingManager.hideLoading();
 
@@ -971,7 +969,6 @@ export class CharacterDetailScene extends BaseScene {
 
     // Load new character data
     this.character = await charactersApi.getCharacter(this.character.id);
-    this.characterEquipment = await equipmentApi.getCharacterEquipment(this.character.id);
 
     // Hide loading
     this.loadingManager.hideLoading();

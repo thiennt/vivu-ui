@@ -94,7 +94,7 @@ export class AvatarChangePopup extends Container {
       .stroke({ width: 2, color: Colors.ROBOT_CYAN });
 
     const dialogTitle = new Text({
-      text: '🖼️ Change Avatar',
+      text: '🖼️ Change Skin',
       style: {
         fontFamily: FontFamily.PRIMARY,
         fontSize: 18,

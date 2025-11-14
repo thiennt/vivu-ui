@@ -289,7 +289,7 @@ export class LineupScene extends BaseScene {
 
     const gap = this.STANDARD_PADDING;
     const slotHeight = 114;
-    const poolTop = 150 + slotHeight + 2 * this.STANDARD_SPACING;
+    const poolTop = 100 + slotHeight + 2 * this.STANDARD_SPACING;
     const actionButtonY = this.gameHeight - 80;
     const poolBottom = actionButtonY - this.STANDARD_SPACING * 2;
     const poolHeight = poolBottom - poolTop;
@@ -325,7 +325,7 @@ export class LineupScene extends BaseScene {
 
     // Title
     const poolTitle = new Text({
-      text: '🎭 Available Heroes',
+      text: '🎭 Available Characters',
       style: {
         fontFamily: FontFamily.PRIMARY,
         fontSize: 18,
