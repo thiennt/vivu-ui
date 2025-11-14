@@ -145,15 +145,10 @@ export class HomeScene extends BaseScene {
       .fill({ color: Colors.ROBOT_CONTAINER, alpha: 0.95 })
       .stroke({ width: 2, color: Colors.ROBOT_CYAN });
     
-    const avatarEmoji = new Text({
-      text: '👤',
-      style: {
-        fontSize: 28
-      }
-    });
-    avatarEmoji.anchor.set(0.5);
-    avatarEmoji.x = avatarSize / 2;
-    avatarEmoji.y = avatarSize / 2;
+    playerPanel.addChild(avatarBg);
+    
+    // Load avatar asynchronously
+    this.loadPlayerAvatar(playerPanel, avatarSize / 2, avatarSize / 2, avatarSize, this.player?.pfpUrl);
     
     // Player info text to the right of avatar
     const infoStartX = avatarSize + 10;
@@ -193,7 +188,7 @@ export class HomeScene extends BaseScene {
     playerExp.x = infoStartX;
     playerExp.y = 46;
     
-    playerPanel.addChild(avatarBg, avatarEmoji, playerName, playerLevel, playerExp);
+    playerPanel.addChild(playerName, playerLevel, playerExp);
     playerPanel.x = padding;
     playerPanel.y = padding;
     

@@ -277,24 +277,26 @@ export class PlayerDetailScene extends BaseScene {
       .fill({ color: Colors.ROBOT_BG_MID, alpha: 0.95 })
       .stroke({ width: 1, color: Colors.ROBOT_CYAN });
     
-    const avatarEmoji = new Text({
-      text: '👤',
-      style: {
+    panel.addChild(avatarBg);
+    
+    // Load avatar asynchronously with custom fallback styling
+    this.loadPlayerAvatar(
+      panel, 
+      avatarX + avatarSize / 2, 
+      avatarY + avatarSize / 2, 
+      avatarSize, 
+      this.player?.pfpUrl,
+      {
         fontSize: 48,
         dropShadow: {
-          color: Colors.ROBOT_CYAN,
+          color: 0x0ff3c6, // ROBOT_CYAN as number
           blur: 4,
           angle: 0,
           distance: 0,
           alpha: 0.5
         }
       }
-    });
-    avatarEmoji.anchor.set(0.5);
-    avatarEmoji.x = avatarX + avatarSize / 2;
-    avatarEmoji.y = avatarY + avatarSize / 2;
-    
-    panel.addChild(avatarBg, avatarEmoji);
+    );
     
     // Player info on the right with robot theme
     const infoStartX = avatarX + avatarSize + 20;
