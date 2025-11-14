@@ -3,6 +3,7 @@ export interface Player {
   username: string;
   level: number;
   experience: number;
+  gold?: number;
   stats: PlayerStats;
   characters: Character[];
   lineup: Lineup;

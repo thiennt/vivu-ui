@@ -275,7 +275,23 @@ export class HomeScene extends BaseScene {
     playerExp.x = infoStartX;
     playerExp.y = 72;
     
-    playerPanel.addChild(bg, avatarBg, avatarEmoji, playerName, playerLevel, playerExp);
+    // Gold amount on the right side
+    const goldAmount = this.player.gold ?? 100;
+    const goldText = new Text({
+      text: `🪙 ${goldAmount}`,
+      style: {
+        fontFamily: FontFamily.PRIMARY,
+        fontSize: 20,
+        fontWeight: 'bold',
+        fill: Colors.ROBOT_CYAN_LIGHT,
+        stroke: { color: Colors.ROBOT_BG_DARK, width: 0.5 }
+      }
+    });
+    goldText.anchor.set(1, 0.5);
+    goldText.x = panelWidth - 15;
+    goldText.y = panelHeight / 2;
+    
+    playerPanel.addChild(bg, avatarBg, avatarEmoji, playerName, playerLevel, playerExp, goldText);
     playerPanel.x = (this.gameWidth - panelWidth) / 2;
     playerPanel.y = 115;
     

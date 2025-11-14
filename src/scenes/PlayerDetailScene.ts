@@ -172,12 +172,14 @@ export class PlayerDetailScene extends BaseScene {
     const panelX = (this.gameWidth - panelWidth) / 2;
     
     // Player info panel with avatar
+    const goldAmount = this.player.gold ?? 100;
     const playerInfoPanel = this.createPlayerInfoPanel(
       panelWidth,
       [
         { label: '👤 Username:', value: this.player.username },
         { label: '⭐ Level:', value: this.player.level.toString() },
         { label: '✨ Experience:', value: this.player.exp.toString() },
+        { label: '🪙 Gold:', value: goldAmount.toString() },
         { label: '🎭 Characters:', value: this.characters.length.toString() },
         { label: '🍀 Luck:', value: this.player.luck.toString() }
       ]
