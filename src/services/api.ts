@@ -6,7 +6,6 @@
 
 import { config } from '@/config';
 import { TurnAction, NFT, AvatarUpdateResponse } from '@/types';
-import { sdk } from '@farcaster/miniapp-sdk';
 
 // Loading state interface
 interface LoadingState {
@@ -246,12 +245,18 @@ export const nftApi = {
    */
   async getCharacterSkins(characterId: string): Promise<NFT[]> {
     try {
-      // Get FID from Farcaster SDK context
-      const context = await sdk.context;
-      const fid = context?.user?.fid;
+      // Get FID from player data in sessionStorage
+      const playerData = sessionStorage.getItem('player');
+      if (!playerData) {
+        console.warn('No player data found in sessionStorage');
+        return [];
+      }
+
+      const player = JSON.parse(playerData);
+      const fid = player.farcaster_id;
       
       if (!fid) {
-        console.warn('No FID found in Farcaster context');
+        console.warn('No farcaster_id found in player data');
         return [];
       }
 
