@@ -34,7 +34,7 @@ export class Button extends Container {
     this.disabled = opts.disabled;
     
     // Ensure minimum touch target for mobile but more compact for 400x700
-    const minHeight = Math.min(40, opts.gameHeight * 0.07); // Reduced from 44 and 0.08
+    const minHeight = Math.min(20, opts.gameHeight * 0.07); // Reduced from 44 and 0.08
     this.adjustedHeight = Math.max(minHeight, opts.height);
     
     // Adjust width for small screens - ensure it doesn't exceed available space
@@ -63,7 +63,7 @@ export class Button extends Container {
       text: opts.text,
       style: {
         fontFamily: FontFamily.PRIMARY,
-        fontSize: responsiveFontSize,
+        fontSize: opts.baseFontSize,
         fontWeight: 'bold',
         fill: textColor,
         align: 'center',

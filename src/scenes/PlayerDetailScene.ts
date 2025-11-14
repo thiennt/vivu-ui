@@ -71,6 +71,7 @@ export class PlayerDetailScene extends BaseScene {
     if (!this.player) return;
     
     this.createBackground();
+    this.createTopRightGold();
     this.createPlayerStats();
     this.createStatLevelingPanel();
     //this.createCharacterCollection();
@@ -110,6 +111,7 @@ export class PlayerDetailScene extends BaseScene {
     
     // Recreate layout with current dimensions
     this.createBackground();
+    this.createTopRightGold();
     this.createPlayerStats();
     this.createStatLevelingPanel();
     //this.createCharacterCollection();
@@ -165,21 +167,21 @@ export class PlayerDetailScene extends BaseScene {
   private createPlayerStats(): void {
     if (!this.player) return;
     
-    const startY = this.STANDARD_PADDING;
+    // Position below gold display (gold takes ~36px: 8px padding + 28px button height)
+    const goldHeight = 45; // Gold panel height + spacing
+    const startY = goldHeight;
     const padding = this.STANDARD_PADDING;
     const availableWidth = this.gameWidth - 2 * padding;
     const panelWidth = Math.min(580, availableWidth);
     const panelX = (this.gameWidth - panelWidth) / 2;
     
-    // Player info panel with avatar
-    const goldAmount = this.player.gold ?? 100;
+    // Player info panel with avatar (gold removed, now in top right)
     const playerInfoPanel = this.createPlayerInfoPanel(
       panelWidth,
       [
         { label: '⭐ Level:', value: this.player.level.toString() },
         { label: '✨ Exp:', value: this.player.exp.toString() },
-        { label: '🍀 Luck:', value: this.player.luck.toString() },
-        { label: '🪙 Gold:', value: goldAmount.toString() }
+        { label: '🍀 Luck:', value: this.player.luck.toString() }
       ]
     );
     
@@ -187,6 +189,31 @@ export class PlayerDetailScene extends BaseScene {
     playerInfoPanel.y = startY;
     
     this.statsContainer.addChild(playerInfoPanel);
+  }
+
+  private createTopRightGold(): void {
+    const goldPanel = new Container();
+    const padding = this.STANDARD_PADDING;
+    
+    const goldAmount = this.player.gold ?? 100;
+    const goldText = new Text({
+      text: `🪙${goldAmount}`,
+      style: {
+        fontFamily: FontFamily.PRIMARY,
+        fontSize: 16,
+        fontWeight: 'bold',
+        fill: Colors.ROBOT_CYAN_LIGHT,
+        stroke: { color: Colors.ROBOT_BG_DARK, width: 0.5 }
+      }
+    });
+    goldText.anchor.set(1, 0);
+    
+    goldPanel.addChild(goldText);
+    goldPanel.x = this.gameWidth - padding;
+    goldPanel.y = padding;
+    
+    // Add to background container so it doesn't scroll
+    this.backgroundContainer.addChild(goldPanel);
   }
 
   private createPlayerInfoPanel(
@@ -292,9 +319,11 @@ export class PlayerDetailScene extends BaseScene {
     if (!this.player) return;
 
     const padding = this.STANDARD_PADDING;
+    const goldHeight = 45; // Gold panel height + spacing (matching createPlayerStats)
     
     // Position below player info (167) + gap
-    const startY = this.STANDARD_PADDING + 167 + 15;
+    // Player info now starts at goldHeight instead of STANDARD_PADDING
+    const startY = goldHeight + 167 + 15;
     
     const panelWidth = Math.min(580, this.gameWidth - 2 * padding);
     const panelX = (this.gameWidth - panelWidth) / 2;

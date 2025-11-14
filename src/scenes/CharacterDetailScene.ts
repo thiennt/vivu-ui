@@ -3,7 +3,7 @@ import { navigation } from '@/utils/navigation';
 import { HomeScene } from './HomeScene';
 import { BaseScene } from '@/ui/BaseScene';
 import { CharactersScene } from './CharactersScene';
-import { charactersApi, equipmentApi, nftApi } from '@/services/api';
+import { charactersApi, nftApi } from '@/services/api';
 import { LoadingStateManager } from '@/utils/loadingStateManager';
 import { Colors, FontFamily } from '@/utils/cssStyles';
 import { AvatarChangePopup } from '@/popups/AvatarChangePopup';
@@ -33,7 +33,6 @@ export class CharacterDetailScene extends BaseScene {
   private tabsContainer: Container;
   private contentContainer: Container;
   private scrollBox: ScrollBox | null = null;
-  private equipmentContainer: Container;
   private skinContainer: Container;
   private buttonContainer: Container;
 
@@ -51,7 +50,6 @@ export class CharacterDetailScene extends BaseScene {
     this.infoContainer = new Container();
     this.tabsContainer = new Container();
     this.contentContainer = new Container();
-    this.equipmentContainer = new Container();
     this.skinContainer = new Container();
     this.buttonContainer = new Container();
 
@@ -125,7 +123,6 @@ export class CharacterDetailScene extends BaseScene {
     this.infoContainer.removeChildren();
     this.tabsContainer.removeChildren();
     this.contentContainer.removeChildren();
-    this.equipmentContainer.removeChildren();
     this.skinContainer.removeChildren();
     this.buttonContainer.removeChildren();
 
@@ -445,7 +442,6 @@ export class CharacterDetailScene extends BaseScene {
     // Clear and recreate tabs and content
     this.tabsContainer.removeChildren();
     this.contentContainer.removeChildren();
-    this.equipmentContainer.removeChildren();
     this.skinContainer.removeChildren();
     this.scrollBox = null;
 

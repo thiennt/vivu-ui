@@ -206,54 +206,6 @@ export const authApi = {
 export { ApiError };
 export type { LoadingState };
 
-// Equipment API methods
-export const equipmentApi = {
-  /**
-   * List all available equipment
-   * GET /players/equipments
-   */
-  async getAllEquipment(): Promise<any[]> {
-    return apiRequest(`/players/equipments`);
-  },
-
-  /**
-   * Get player's inventory
-   * GET /players/equipment
-   */
-  async getPlayerInventory(): Promise<any> {
-    return apiRequest(`/players/equipment`);
-  },
-
-  /**
-   * Get character's equipped items
-   * GET /players/characters/:characterId/equipment
-   */
-  async getCharacterEquipment(characterId: string): Promise<any> {
-    return apiRequest(`/players/characters/${characterId}/equipment`);
-  },
-
-  /**
-   * Equip item to character
-   * POST /players/characters/:characterId/equipment
-   */
-  async equipItem(characterId: string, equipmentId: string, slot: string): Promise<any> {
-    return apiRequest(`/players/characters/${characterId}/equipment`, {
-      method: 'POST',
-      body: JSON.stringify({ equipment_id: equipmentId, slot })
-    });
-  },
-
-  /**
-   * Unequip item from character
-   * DELETE /players/characters/:characterId/equipment/:equipmentSlot
-   */
-  async unequipItem(characterId: string, slot: string): Promise<any> {
-    return apiRequest(`/players/characters/${characterId}/equipment/${slot}`, {
-      method: 'DELETE'
-    });
-  }
-};
-
 // NFT API methods
 export const nftApi = {
   /**
