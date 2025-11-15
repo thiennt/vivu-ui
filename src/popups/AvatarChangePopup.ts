@@ -200,7 +200,7 @@ export class AvatarChangePopup extends Container {
     card.x = x;
     card.y = y;
     
-    const isCurrentAvatar = nft.image_url === this.currentAvatarUrl;
+    const isCurrentAvatar = nft.image === this.currentAvatarUrl;
     
     // Card background
     const bg = new Graphics();
@@ -220,8 +220,9 @@ export class AvatarChangePopup extends Container {
       .fill({ color: Colors.ROBOT_BG_MID, alpha: 0.8 });
     card.addChild(imageBg);
     
-    // Load NFT image
-    this.loadNFTImage(nft.image_url, card, size);
+    // Load NFT image (handle both IPFS URLs and regular URLs)
+    const imageUrl = this.resolveImageUrl(nft.image);
+    this.loadNFTImage(imageUrl, card, size);
     
     // NFT name
     const nameText = new Text({
@@ -295,6 +296,15 @@ export class AvatarChangePopup extends Container {
     return card;
   }
 
+  private resolveImageUrl(imageUrl: string): string {
+    // If the image URL starts with "ipfs://", convert it to an IPFS gateway URL
+    if (imageUrl.startsWith('ipfs://')) {
+      return imageUrl.replace('ipfs://', 'https://ipfs.io/ipfs/');
+    }
+    // Return the URL as-is if it's already a regular HTTP/HTTPS URL
+    return imageUrl;
+  }
+
   private async loadNFTImage(url: string, container: Container, size: number): Promise<void> {
     try {
       const texture = await Assets.load(url);
@@ -321,7 +331,9 @@ export class AvatarChangePopup extends Container {
 
   private selectNFT(nft: NFT): void {
     console.log('Selected NFT:', nft.name);
-    this.onAvatarSelected(nft.id, nft.image_url);
+    const nftId = `${nft.contract_address}-${nft.token_id}`;
+    const imageUrl = this.resolveImageUrl(nft.image);
+    this.onAvatarSelected(nftId, imageUrl);
     this.closeDialog();
   }
 

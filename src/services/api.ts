@@ -5,7 +5,7 @@
  */
 
 import { config } from '@/config';
-import { TurnAction, NFT, AvatarUpdateResponse } from '@/types';
+import { TurnAction, NFT, NFTApiResponse, AvatarUpdateResponse } from '@/types';
 import { get } from 'http';
 
 // Loading state interface
@@ -240,14 +240,17 @@ interface WarpcastNFTResponse {
 // NFT API methods
 export const nftApi = {
   /**
-   * Get character skins from Warpcast wallet API
-   * Fetches NFTs for the authenticated user's FID from Warpcast
-   * Filters for Base chain NFTs only
+   * Get character skins from NFT API
+   * Fetches NFTs from the backend API
+   * Returns array of NFTs with blockchain metadata
    */
-  async getCharacterSkins(characterId: string): Promise<any> {
-    return apiRequest(`/players/characters/${characterId}/skins`, {
+  async getCharacterSkins(characterId: string): Promise<NFT[]> {
+    const response: NFTApiResponse = await apiRequest(`/players/characters/${characterId}/skins`, {
       method: 'GET'
     });
+    
+    // Return the nfts array from the response
+    return response.nfts || [];
   },
 
   async getCharacterSkinsByWarpcast(characterId: string): Promise<NFT[]> {
@@ -295,11 +298,15 @@ export const nftApi = {
       const baseChainNFTs = data.result.nfts
         .filter((nft) => nft.chain === 'base')
         .map((nft) => ({
-          id: `${nft.contractAddress}-${nft.tokenId}`,
+          contract_address: nft.contractAddress,
+          token_id: nft.tokenId,
           name: nft.name,
-          image_url: nft.imageUrl,
-          collection: nft.collection.name,
-          rarity: undefined, // Warpcast API doesn't provide rarity
+          description: '',
+          image: nft.imageUrl,
+          token_uri: '',
+          attributes: [],
+          collection_name: nft.collection.name,
+          owner: '',
         }));
 
       console.log(`✅ Retrieved ${baseChainNFTs.length} Base chain NFTs from Warpcast`);
