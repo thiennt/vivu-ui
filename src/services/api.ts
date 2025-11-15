@@ -6,6 +6,7 @@
 
 import { config } from '@/config';
 import { TurnAction, NFT, AvatarUpdateResponse } from '@/types';
+import { get } from 'http';
 
 // Loading state interface
 interface LoadingState {
@@ -243,7 +244,13 @@ export const nftApi = {
    * Fetches NFTs for the authenticated user's FID from Warpcast
    * Filters for Base chain NFTs only
    */
-  async getCharacterSkins(characterId: string): Promise<NFT[]> {
+  async getCharacterSkins(characterId: string): Promise<any> {
+    return apiRequest(`/players/characters/${characterId}/skins`, {
+      method: 'GET'
+    });
+  },
+
+  async getCharacterSkinsByWarpcast(characterId: string): Promise<NFT[]> {
     try {
       // Get FID from player data in sessionStorage
       const playerData = sessionStorage.getItem('player');
