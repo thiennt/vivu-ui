@@ -322,13 +322,17 @@ export const nftApi = {
   },
 
   /**
-   * Update character avatar with NFT
-   * PUT /players/characters/:characterId/avatar
+   * Update character skin with NFT
+   * POST /characters/:characterId/skin
    */
-  async updateCharacterAvatar(characterId: string, nftId: string): Promise<AvatarUpdateResponse> {
-    return apiRequest(`/players/characters/${characterId}/avatar`, {
-      method: 'PUT',
-      body: JSON.stringify({ nft_id: nftId })
+  async updateCharacterSkin(characterId: string, nftId: string, contractAddress: string, skinUrl: string): Promise<AvatarUpdateResponse> {
+    return apiRequest(`/characters/${characterId}/skin`, {
+      method: 'POST',
+      body: JSON.stringify({ 
+        nft_id: nftId,
+        contract_address: contractAddress,
+        skin_url: skinUrl
+      })
     });
   }
 };

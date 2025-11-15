@@ -12,7 +12,7 @@ export class AvatarChangePopup extends Container {
   private dialogPanel!: Graphics;
   private currentAvatarUrl: string;
   private characterId: string;
-  private onAvatarSelected: (nftId: string, avatarUrl: string) => void;
+  private onAvatarSelected: (contractAddress: string, tokenId: string, avatarUrl: string) => void;
   private gameWidth: number;
   private gameHeight: number;
   private availableNFTs: NFT[] = [];
@@ -20,7 +20,7 @@ export class AvatarChangePopup extends Container {
   constructor(params: { 
     currentAvatarUrl: string;
     characterId: string;
-    onAvatarSelected: (nftId: string, avatarUrl: string) => void 
+    onAvatarSelected: (contractAddress: string, tokenId: string, avatarUrl: string) => void 
   }) {
     super();
     this.currentAvatarUrl = params.currentAvatarUrl;
@@ -331,9 +331,8 @@ export class AvatarChangePopup extends Container {
 
   private selectNFT(nft: NFT): void {
     console.log('Selected NFT:', nft.name);
-    const nftId = `${nft.contract_address}-${nft.token_id}`;
     const imageUrl = this.resolveImageUrl(nft.image);
-    this.onAvatarSelected(nftId, imageUrl);
+    this.onAvatarSelected(nft.contract_address, nft.token_id, imageUrl);
     this.closeDialog();
   }
 

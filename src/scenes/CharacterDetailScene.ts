@@ -759,15 +759,16 @@ export class CharacterDetailScene extends BaseScene {
         super({
           currentAvatarUrl: self.character.avatar_url || '',
           characterId: self.character.id,
-          onAvatarSelected: async (nftId: string, avatarUrl: string) => {
-            await self.updateCharacterSkin(nftId, avatarUrl);
+          onAvatarSelected: async (contractAddress: string, tokenId: string, avatarUrl: string) => {
+            await self.updateCharacterSkin(contractAddress, tokenId, avatarUrl);
           }
         });
       }
     });
   }
 
-  private async updateCharacterSkin(nftId: string, avatarUrl: string): Promise<void> {
+  private async updateCharacterSkin(contractAddress: string, tokenId: string, avatarUrl: string): Promise<void> {
+    const nftId = `${contractAddress}-${tokenId}`;
     console.log(`Updating character skin to NFT: ${nftId}`);
 
     // Show loading indicator
@@ -779,8 +780,8 @@ export class CharacterDetailScene extends BaseScene {
       const atkBonus = Math.random() * 10;
       const defBonus = Math.random() * 10;
 
-      // Call API to update avatar (reusing existing avatar update API)
-      await nftApi.updateCharacterAvatar(this.character.id, nftId);
+      // Call API to update skin
+      await nftApi.updateCharacterSkin(this.character.id, tokenId, contractAddress, avatarUrl);
 
       // Update local character data
       this.character.avatar_url = avatarUrl;
