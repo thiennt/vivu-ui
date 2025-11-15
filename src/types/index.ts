@@ -520,12 +520,27 @@ export interface PlayerInventory {
   equipment: Equipment[];
 }
 
+export interface NFTAttribute {
+  trait_type: string;
+  value: string;
+}
+
 export interface NFT {
-  id: string;
+  contract_address: string;
+  token_id: string;
   name: string;
-  image_url: string;
-  collection?: string;
-  rarity?: string;
+  description: string;
+  image: string;
+  token_uri: string;
+  attributes: NFTAttribute[];
+  collection_name: string;
+  owner: string;
+}
+
+export interface NFTApiResponse {
+  wallet_address: string;
+  nfts: NFT[];
+  total: number;
 }
 
 export interface AvatarUpdateResponse {
